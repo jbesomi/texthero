@@ -24,7 +24,7 @@ def do_pca(df, vector_columns, n_components=2):
         return pca.fit_transform(vectors).tolist()
 
     if isinstance(vector_columns, str):
-        df['pca' + vector_columns] = do_pca_col(list(df[vector_columns]))
+        df['pca_' + vector_columns] = do_pca_col(list(df[vector_columns]))
 
     else:
         for col in vector_columns:

@@ -8,10 +8,8 @@ tests/unit/__init__.py
 tests/unit/test_example.py
 tests/unit/test_version.py
 texthero/__init__.py
-texthero/clustering.py
 texthero/preprocessing.py
 texthero/representation.py
-texthero/statistics.py
 texthero/texthero.py
 texthero/version.py
 texthero/visualization.py

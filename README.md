@@ -1,39 +1,32 @@
-<h1 align="center">Texthero</h1>
+<p align="center">
+    <img src=".github/logo_v1.0.png">
+</p>
 
 <p align="center">Text preprocessing, analysis and visualization from zero to hero</p>
 
 <p align="center">
-  <a href="https://github.com/jonathanbesomi/texthero/stargazers">
-    <img src="https://img.shields.io/github/stars/jonathanbesomi/texthero.svg?colorA=orange&colorB=orange&logo=github"
+   <a href="https://github.com/jbesomi/texthero/stargazers">
+    <img src="https://img.shields.io/github/stars/jbesomi/texthero.svg?colorA=orange&colorB=orange&logo=github"
          alt="GitHub stars">
-  </a>
-  <a href="https://pypi.org/search/?q=bert-serving">
+   </a>
+   <a href="https://pypi.org/search/?q=texthero">
       <img src="https://img.shields.io/pypi/v/bert-serving-server.svg?colorB=brightgreen"
            alt="Pypi package">
-    </a>
-  <a href="https://texthero.readthedocs.io/">
-      <img src="https://readthedocs.org/projects/texthero/badge/?version=latest"
-           alt="ReadTheDoc">
-    </a>
-  <a href="https://pypi.org/search/?q=bert-serving">
+   </a>
+   <a href="https://pypi.org/search/?q=bert-serving">
       <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/bert-serving-server">
-  </a>
-  <a href="https://github.com/jonathanbesomi/texthero/issues">
-        <img src="https://img.shields.io/github/issues/jonathanbesomi/texthero.svg"
+   </a>
+   <a href="https://github.com/jbesomi/texthero/issues">
+        <img src="https://img.shields.io/github/issues/jbesomi/texthero.svg"
              alt="GitHub issues">
-  </a>
-  <a href="https://github.com/jonathanbesomi/texthero/blob/master/LICENSE">
-        <img src="https://img.shields.io/github/license/jonathanbesomi/texthero.svg"
+   </a>
+   <a href="https://github.com/jbesomi/texthero/blob/master/LICENSE">
+        <img src="https://img.shields.io/github/license/jbesomi/texthero.svg"
              alt="GitHub license">
-  </a>
-  <a href="https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2Fjonathanbesomi%2Ftexthero">
-  <img src="https://img.shields.io/twitter/url/https/github.com/jonathanbesomi/texthero.svg?style=social" alt="Twitter">
-  </a>      
+   </a>   
 </p>
 
-<p align="center">
-    <img src=".github/logo_v1.0.png">
-</p>
+
 
 <p align="center">
   <a href="#zero-to-hero">From zero to hero</a> •

@@ -1,6 +1,6 @@
 <h1 align="center">Texthero</h1>
 
-<p align="center">Text preprocessing, analysis and visualization from zero to hero in seconds</p>
+<p align="center">Text preprocessing, analysis and visualization from zero to hero</p>
 
 <p align="center">
   <a href="https://github.com/jonathanbesomi/texthero/stargazers">

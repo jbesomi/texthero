@@ -10,11 +10,11 @@
          alt="GitHub stars">
    </a>
    <a href="https://pypi.org/search/?q=texthero">
-      <img src="https://img.shields.io/pypi/v/bert-serving-server.svg?colorB=brightgreen"
+      <img src="https://img.shields.io/pypi/v/texthero-server.svg?colorB=brightgreen"
            alt="Pypi package">
    </a>
-   <a href="https://pypi.org/search/?q=bert-serving">
-      <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/bert-serving-server">
+   <a href="https://pypi.org/search/?q=texthero">
+      <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/texthero">
    </a>
    <a href="https://github.com/jbesomi/texthero/issues">
         <img src="https://img.shields.io/github/issues/jbesomi/texthero.svg"

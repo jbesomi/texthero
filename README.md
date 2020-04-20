@@ -32,6 +32,10 @@
 </p>
 
 <p align="center">
+    <img src=".github/logo_v1.0.png">
+</p>
+
+<p align="center">
   <a href="#zero-to-hero">From zero to hero</a> •
   <a href="#installation">Installation</a> •
   <a href="#getting-started">Getting Started</a> •
@@ -41,15 +45,8 @@
   <a href="#contributions">Contributions</a>
 </p>
 
-<p align="center">
-    <img src=".github/demo.gif?raw=true" width="700">
-</p>
-
 
 <h2 align="center">From zero to hero</h2>
-
-
-
 
 <h2 align="center">Why</h2>
 

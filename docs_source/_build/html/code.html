@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Documentation for the Code &#8212; Texthero v1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-texthero">
+<span id="documentation-for-the-code"></span><h1>Documentation for the Code<a class="headerlink" href="#module-texthero" title="Permalink to this headline">¶</a></h1>
+<p>Texthero: python toolkit for text preprocessing, representation and visualization.</p>
+<div class="section" id="useful-1-auto-members">
+<h2>useful #1 – auto members<a class="headerlink" href="#useful-1-auto-members" title="Permalink to this headline">¶</a></h2>
+<p>This is something I want to say that is not in the docstring.</p>
+<span class="target" id="module-texthero.preprocessing"></span><dl class="py function">
+<dt id="texthero.preprocessing.get_default_pipeline">
+<code class="sig-prename descclassname">texthero.preprocessing.</code><code class="sig-name descname">get_default_pipeline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#texthero.preprocessing.get_default_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Default pipeline:</dt><dd><ul class="simple">
+<li><p>remove_lowercase</p></li>
+<li><p>remove_numbers</p></li>
+<li><p>remove_punctuations</p></li>
+<li><p>remove_diacritics</p></li>
+<li><p>remove_white_space</p></li>
+<li><p>remove_stop_words</p></li>
+<li><p>stemming</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="texthero.preprocessing.remove_diacritics">
+<code class="sig-prename descclassname">texthero.preprocessing.</code><code class="sig-name descname">remove_diacritics</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input</span></em><span class="sig-paren">)</span><a class="headerlink" href="#texthero.preprocessing.remove_diacritics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove diacritics (as accent marks) from input</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="texthero.preprocessing.remove_lowercase">
+<code class="sig-prename descclassname">texthero.preprocessing.</code><code class="sig-name descname">remove_lowercase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input</span></em><span class="sig-paren">)</span><a class="headerlink" href="#texthero.preprocessing.remove_lowercase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lowercase input</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="texthero.preprocessing.remove_numbers">
+<code class="sig-prename descclassname">texthero.preprocessing.</code><code class="sig-name descname">remove_numbers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input</span></em><span class="sig-paren">)</span><a class="headerlink" href="#texthero.preprocessing.remove_numbers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove numbers from input</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="texthero.preprocessing.remove_punctuations">
+<code class="sig-prename descclassname">texthero.preprocessing.</code><code class="sig-name descname">remove_punctuations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input</span></em><span class="sig-paren">)</span><a class="headerlink" href="#texthero.preprocessing.remove_punctuations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove punctuations from input</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="texthero.preprocessing.remove_stop_words">
+<code class="sig-prename descclassname">texthero.preprocessing.</code><code class="sig-name descname">remove_stop_words</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input</span></em><span class="sig-paren">)</span><a class="headerlink" href="#texthero.preprocessing.remove_stop_words" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove stopwords from input</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="texthero.preprocessing.remove_white_space">
+<code class="sig-prename descclassname">texthero.preprocessing.</code><code class="sig-name descname">remove_white_space</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input</span></em><span class="sig-paren">)</span><a class="headerlink" href="#texthero.preprocessing.remove_white_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all types of spaces from input</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="texthero.preprocessing.stemming">
+<code class="sig-prename descclassname">texthero.preprocessing.</code><code class="sig-name descname">stemming</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input</span></em><span class="sig-paren">)</span><a class="headerlink" href="#texthero.preprocessing.stemming" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stem words</p>
+</dd></dl>
+
+</div>
+<div class="section" id="useful-2-explicit-members">
+<h2>useful #2 – explicit members<a class="headerlink" href="#useful-2-explicit-members" title="Permalink to this headline">¶</a></h2>
+<p>This is something I want to say that is not in the docstring.</p>
+<p>#.. automodule:: an_example_pypi_project.useful_2
+#   :members: public_fn_with_sphinxy_docstring, _private_fn_with_docstring</p>
+<p>#.. autoclass:: MyPublicClass
+#   :members: get_foobar, _get_baz</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Texthero</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Jonathan Besomi.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/code.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

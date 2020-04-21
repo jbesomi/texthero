@@ -34,27 +34,28 @@
   <a href="#zero-to-hero">From zero to hero</a> •
   <a href="#installation">Installation</a> •
   <a href="#getting-started">Getting Started</a> •
-  <a href="#book-tutorial">Tutorials</a> •
   <a href="#documentation">Documentation</a> •
-  <a href="#faq">FAQ</a>
   <a href="#contributions">Contributions</a>
 </p>
 
 
 <h2 align="center">From zero to hero</h2>
 
-- Missing-piece for quick-text analytics with Pandas
-- Simple and intuitive
+Texthero is a python toolkit for quick handling of text data. Texthero is concise, simple to learn and integrates smoothly with Pandas.
+
+Given a Pandas DataFrame with one or more _text_ columns, texthero help to preprocess the text data, map it into vectors using different algorithms and models and visualize it on screen.
+
+
 
 <h2 align="center">Installation</h2>
 
 ```bash
 pip install texthero
 ```
-:point_up:  requirements **Python >= 3.5**
 
 <h2 align="center">Getting started</h2>
 
+<h2 align="center">Getting started</h2>
 
 
 <h2 align="center">Contributions</h2>

@@ -87,22 +87,22 @@ Texthero is composed of three main components; preprocessing.py, representation.
 
 **Job:** prepare the **text** data for further analysis.
 
-Exhaustive documentation:
+Exhaustive documentation: (preprocessing)[https://jbesomi.github.io/texthero/preprocessing.html]
 
 <h3>📒Representation</h3>
 
 **Job:** map text data into vectors and do dimensionality reduction.
 
 Supported representation algorithms:
-   - 1. TF-IDF, Term Frequency–Inverse Document Frequency
-   - 2. TF, term frequency [soon]
-   - 3. Word2Vec from Gensim [soon]
-   - 4. GloVe [soon]
-   - 5. Transformers [soon]
+1. TF-IDF, Term Frequency–Inverse Document Frequency
+2. TF, term frequency [soon]
+3. Word2Vec from Gensim [soon]
+4. GloVe [soon]
+5. Transformers [soon]
 
 Supported dimensionality reduction algorithms:
-   - 1. PCA, Principal Component Analysis
-   - 2. NMF, non-negative matrix factorization
+1. PCA, Principal Component Analysis
+2. NMF, non-negative matrix factorization
 
 Exhaustive documentation:
 

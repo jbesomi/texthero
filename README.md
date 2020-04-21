@@ -24,7 +24,7 @@
     <img src=".github/logo_v1.0.png">
 </p>
 
-<p align="center">⚒️📒🔮 Text preprocessing, analysis and visualization from zero to hero</p>
+<p align="center">Text preprocessing, analysis and visualization from zero to hero</p>
 
 <p align="center">
     <img src=".github/demo.gif?raw=true" width="700">

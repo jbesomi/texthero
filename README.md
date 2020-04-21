@@ -1,22 +1,22 @@
 <p align="center">
    <a href="https://github.com/jbesomi/texthero/stargazers">
     <img src="https://img.shields.io/github/stars/jbesomi/texthero.svg?colorA=orange&colorB=orange&logo=github"
-         alt="GitHub stars">
+         alt="Github stars">
    </a>
    <a href="https://pypi.org/search/?q=texthero">
       <img src="https://img.shields.io/pypi/v/texthero.svg?colorB=brightgreen"
-           alt="Pypi package">
+           alt="pip package">
    </a>
    <a href="https://pypi.org/project/texthero/">
-      <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/texthero">
+      <img alt="pip downloads" src="https://img.shields.io/pypi/dm/texthero">
    </a>
    <a href="https://github.com/jbesomi/texthero/issues">
         <img src="https://img.shields.io/github/issues/jbesomi/texthero.svg"
-             alt="GitHub issues">
+             alt="Github issues">
    </a>
    <a href="https://github.com/jbesomi/texthero/blob/master/LICENSE">
         <img src="https://img.shields.io/github/license/jbesomi/texthero.svg"
-             alt="GitHub license">
+             alt="Github license">
    </a>   
 </p>
 
@@ -24,7 +24,7 @@
     <img src=".github/logo_v1.0.png">
 </p>
 
-<p align="center">Text preprocessing, analysis and visualization from zero to hero</p>
+<p align="center">Text preprocessing, representation and visualization from zero to hero</p>
 
 <p align="center">
     <img src=".github/demo.gif?raw=true" width="700">
@@ -53,20 +53,70 @@ Given a Pandas DataFrame with one or more _text_ columns, texthero help to prepr
 pip install texthero
 ```
 
-<h2 align="center">Getting started</h2>
+> ☝️Under the hoods, texthero make use of multiple NLP/mL toolkit such as Gensim, NLTK, SpaCy and Sklearn. You don't need to install them separately; pip will take care of that.
+
+<h2 align="center">Getting started and examples</h2>
+
+<h3>1. Clustering of TF-IDF vectors</h3>
+
+```python
+import texthero.texthero as hero
+
+```
+
+<h3>2. Most common words and top TF-IDF words</h3>
+
+```python
+import texthero.texthero as hero
+
+```
+
+<h3>3. Transformers representation and visualization [soon]</h3>
+
+```python
+import texthero.texthero as hero
+```
 
 <h2 align="center">Documentation</h2>
 
-Texthero main objective is to provide a quick solution for handling text data. For this reason, we believe the documentation must be kept very simple and intuitive.
+The way texthero is structured and his documentation follow the same principles of texthero: to provide a simple tool to text data handling. We put our best to keep the code concise, simple to read and understand.
 
-Texthero is split into three main files
+Texthero is composed of three main components; preprocessing.py, representation.py and visualization.py.
 
-- preprocessing.py
+<h3>⚒️Preprocessing</h3>
 
-- representation.py
+**Job:** prepare the **text** data for further analysis.
 
-- visualization.py
+Exhaustive documentation:
+
+<h3>📒Representation</h3>
+
+**Job:** map text data into vectors and do dimensionality reduction.
+
+Supported representation algorithms:
+   - 1. TF-IDF, Term Frequency–Inverse Document Frequency
+   - 2. TF, term frequency [soon]
+   - 3. Word2Vec from Gensim [soon]
+   - 4. GloVe [soon]
+   - 5. Transformers [soon]
+
+Supported dimensionality reduction algorithms:
+   - 1. PCA, Principal Component Analysis
+   - 2. NMF, non-negative matrix factorization
+
+Exhaustive documentation:
+
+<h3>🔮Visualization</h3>
+
+**Job:** collection of functions to both summarize the main facts regarding the data and visualize the results. This part is very opinionated and ideal for anyone that needs a quick solution to visualize on screen the text data for instance during a text exploratory data analysis (EDA).
+
+Most common functions:
+   - Text scatterplot. Handy when coupled with dimensionality reduction algorithms such as pca.
+   - Most common words
+   - Most common words between two entities [soon]
+
+Exhaustive documentation:
 
 <h2 align="center">Contributions</h2>
 
-Any help, feedback and contribution is very appreciated. Texthero is in beta version and therefore any help is very appreciated, just [open an issue](issues)
+Any help, feedback and contribution are very welcome. You can simply fork this repository and [open an issue](issues).

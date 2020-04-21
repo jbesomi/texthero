@@ -1,12 +1,5 @@
 README.md
 setup.py
-tests/__init__.py
-tests/tests_helper.py
-tests/helpers/__init__.py
-tests/helpers/my_helper.py
-tests/unit/__init__.py
-tests/unit/test_example.py
-tests/unit/test_version.py
 texthero/__init__.py
 texthero/preprocessing.py
 texthero/representation.py
@@ -17,4 +10,5 @@ texthero.egg-info/PKG-INFO
 texthero.egg-info/SOURCES.txt
 texthero.egg-info/dependency_links.txt
 texthero.egg-info/not-zip-safe
+texthero.egg-info/requires.txt
 texthero.egg-info/top_level.txt

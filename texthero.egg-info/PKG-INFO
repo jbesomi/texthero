@@ -1,18 +1,12 @@
 Metadata-Version: 2.1
 Name: texthero
-Version: 1.0
+Version: 1.0.1
 Summary: Text preprocessing, representation and visualization made easy.
 Home-page: https://github.com/jbesomi/texthero
 Author: Jonathan Besomi
 Author-email: jonathanbesomi@gmail.com
 License: MIT
 Description: <p align="center">
-            <img src=".github/logo_v1.0.png">
-        </p>
-        
-        <p align="center">⚒️📒🔮 Text preprocessing, analysis and visualization from zero to hero</p>
-        
-        <p align="center">
            <a href="https://github.com/jbesomi/texthero/stargazers">
             <img src="https://img.shields.io/github/stars/jbesomi/texthero.svg?colorA=orange&colorB=orange&logo=github"
                  alt="GitHub stars">
@@ -34,53 +28,56 @@ Description: <p align="center">
            </a>   
         </p>
         
+        <p align="center">
+            <img src=".github/logo_v1.0.png">
+        </p>
         
+        <p align="center">Text preprocessing, analysis and visualization from zero to hero</p>
+        
+        <p align="center">
+            <img src=".github/demo.gif?raw=true" width="700">
+        </p>
         
         <p align="center">
           <a href="#zero-to-hero">From zero to hero</a> •
           <a href="#installation">Installation</a> •
           <a href="#getting-started">Getting Started</a> •
-          <a href="#book-tutorial">Tutorials</a> •
           <a href="#documentation">Documentation</a> •
-          <a href="#faq">FAQ</a>
           <a href="#contributions">Contributions</a>
         </p>
         
         
         <h2 align="center">From zero to hero</h2>
         
+        Texthero is a python toolkit for quick handling of text data. Texthero is concise, simple to learn and integrates smoothly with Pandas.
+        
+        Given a Pandas DataFrame with one or more _text_ columns, texthero help to preprocess the text data, map it into vectors using different algorithms and models and visualize it on screen.
         
         
-        <h2 align="center">Key-points</h2>
-        
-        - Missing-piece for quick-text analytics with Pandas
-        - Simple and intuitive
         
         <h2 align="center">Installation</h2>
         
-        Install texthero via `pip`:
         ```bash
         pip install texthero
         ```
-        :point_up:  Requirements: **Python >= 3.5**
         
         <h2 align="center">Getting started</h2>
         
-        #### 1. TODO
+        <h2 align="center">Documentation</h2>
         
-        > **Optional:** ...
+        Texthero main objective is to provide a quick solution for handling text data. For this reason, we believe the documentation must be kept very simple and intuitive.
         
-        #### 2. Preprocessing
-        descritption
-        ```bash
-        hehe
-        ```
-        Below ...
-        <p align="center"><img src=".github/server-demo.gif?raw=true"/></p>
+        Texthero is split into three main files
         
+        - preprocessing.py
+        
+        - representation.py
+        
+        - visualization.py
         
         <h2 align="center">Contributions</h2>
-        ...
+        
+        Any help, feedback and contribution is very appreciated. Texthero is in beta version and therefore any help is very appreciated, just [open an issue](issues)
         
 Keywords: text analytics
 Platform: UNKNOWN

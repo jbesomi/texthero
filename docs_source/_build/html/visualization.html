@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Texthero &#8212; Texthero v1.0 documentation</title>
+    <title>Visualization &#8212; Texthero v1.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -14,7 +14,6 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Preprocessing" href="preprocessing.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -29,17 +28,24 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="texthero">
-<h1>Texthero<a class="headerlink" href="#texthero" title="Permalink to this headline">¶</a></h1>
-<p>Welcome to the texthero documentation. Documentation in construction.</p>
-<div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="representation.html">Representation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
-</ul>
-</div>
+  <div class="section" id="module-texthero.visualization">
+<span id="visualization"></span><h1>Visualization<a class="headerlink" href="#module-texthero.visualization" title="Permalink to this headline">¶</a></h1>
+<p>Text visualization</p>
+<dl class="py function">
+<dt id="texthero.visualization.scatterplot">
+<code class="sig-prename descclassname">texthero.visualization.</code><code class="sig-name descname">scatterplot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">column</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">color</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">hover_data</span><span class="p">:</span> <span class="n"><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#texthero.visualization.scatterplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scatterplot of df[column].</p>
+<p>The df[column] must be a tuple of 2d-coordinates.</p>
+<dl>
+<dt>Usage example:</dt><dd><p><a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a></p>
+<p>import texthero</p>
+<p>df = pd.DataFrame([(0,1), (1,0)], columns=’pca’)
+texthero.visualization.scatterplot(df, ‘pca’)</p>
+<p><a href="#id5"><span class="problematic" id="id6">``</span></a><a href="#id7"><span class="problematic" id="id8">`</span></a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 
@@ -48,7 +54,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="#">Texthero</a></h1>
+<h1 class="logo"><a href="index.html">Texthero</a></h1>
 
 
 
@@ -61,15 +67,12 @@
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="representation.html">Representation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
-  <li><a href="#">Documentation overview</a><ul>
-      <li>Next: <a href="preprocessing.html" title="next chapter">Preprocessing</a></li>
+  <li><a href="index.html">Documentation overview</a><ul>
   </ul></li>
 </ul>
 </div>
@@ -95,7 +98,7 @@
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
-      <a href="_sources/index.rst.txt"
+      <a href="_sources/visualization.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

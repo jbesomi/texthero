@@ -16,7 +16,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="texthero",
-    version=Version("1.0").number,
+    version=Version("1.0.1").number,
     description="Text preprocessing, representation and visualization made easy.",
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -24,7 +24,7 @@ setuptools.setup(
     author_email="jonathanbesomi@gmail.com",
     url="https://github.com/jbesomi/texthero",
     keywords = ['text analytics'],
-    install_requires=[],
+    install_requires=['nltk', 'scikit-learn', 'plotly_express'],
     license="MIT",
     zip_safe=False,
     packages=find_packages(),

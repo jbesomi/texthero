@@ -1,6 +1,28 @@
+"""
+Text visualization
+
+
+"""
+import pandas as pd
 import plotly.express as px
 
-def scatterplot(df, column, color, hover_data):
+def scatterplot(df: pd.DataFrame , column: str, color: str, hover_data: []) -> None:
+    """
+    Scatterplot of df[column].
+
+    The df[column] must be a tuple of 2d-coordinates.
+
+    Usage example:
+        ```
+
+        import texthero
+
+        df = pd.DataFrame([(0,1), (1,0)], columns='pca')
+        texthero.visualization.scatterplot(df, 'pca')
+
+        ```
+    """
+
     pca0 = df[column].apply(lambda x: x[0])
     pca1 = df[column].apply(lambda x: x[1])
 

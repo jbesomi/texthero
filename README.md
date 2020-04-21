@@ -55,9 +55,18 @@ pip install texthero
 
 <h2 align="center">Getting started</h2>
 
-<h2 align="center">Getting started</h2>
+<h2 align="center">Documentation</h2>
 
+Texthero main objective is to provide a quick solution for handling text data. For this reason, we believe the documentation must be kept very simple and intuitive.
+
+Texthero is split into three main files
+
+- preprocessing.py
+
+- representation.py
+
+- visualization.py
 
 <h2 align="center">Contributions</h2>
 
-Open an issue.
+Any help, feedback and contribution is very appreciated. Texthero is in beta version and therefore any help is very appreciated, just [open an issue](issues)

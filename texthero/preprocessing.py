@@ -1,48 +1,98 @@
+"""
+Text preprocessing
+"""
+
 import re
 import string
 import unidecode
 from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
 from nltk.stem import PorterStemmer
+import pandas as pd
 
-def remove_lowercase(input):
-    """Lowercase input"""
-    return input.lower()
+def fillna_s(input: pd.Series) -> pd.Series:
+    """
+    Fillna the given `input` of the pd.Series with ""
+    """
+    input.fillna("")
+    return input.astype("str")
 
-def remove_numbers(input):
-    """Remove numbers from input"""
-    return re.sub(r"\d+", "", input)
 
-def remove_punctuations(input):
-    """Remove punctuations from input"""
-    return input.translate(str.maketrans("", "", string.punctuation))
+def lowercase_s(input: pd.Series) -> pd.Series:
+    """
+    Lowercase the given `input` of the pd.Series
+    """
+    return input.str.lower()
 
-def remove_diacritics(input):
-    """Remove diacritics (as accent marks) from input"""
-    return unidecode.unidecode(input)
+def remove_digits_s(input: pd.Series, only_blocks=True) -> pd.Series:
+    """
+    Remove digits from series
 
-def remove_white_space(input):
-    """Remove all types of spaces from input"""
-    input = input.replace(u"\xa0", u" ")  # remove space
-    # remove white spaces, new lines and tabs
-    return " ".join(input.split())
+    Parameters
+    ----------
 
-def remove_stop_words(input):
-    """Remove stopwords from input"""
+    input : pd.Series
+    only_blocks : bool
+        Remove only blocks of digits. For instance, `hel1234lo 1234` becomes `hel1234lo`.
+
+    Returns
+    -------
+
+    pd.Series
+
+    Examples
+    --------
+
+        >>> import texthero
+        >>> s = pd.Series(["remove_digits_s remove all the 1234 digits of a pandas series. H1N1"])
+        >>> texthero.preprocessing.remove_digits_s(s)
+        u'remove_digits_s remove all the digits of a pandas series. H1N1'
+        >>> texthero.preprocessing.remove_digits_s(s, only_blocks=False)
+        u'remove_digits_s remove all the digits of a pandas series. HN'
+    """
+
+    if type(input) is not pd.Series:
+        raise ValueError('input arguments must be of type pd.Series')
+
+    if only_blocks:
+        return input.str.replace(r"\s+\d+\s+", " ")
+    else:
+        return input.str.replace(r"\d+", " ")
+
+
+def remove_punctuations_s(input : pd.Series) -> pd.Series:
+    """
+    Remove punctuations from input
+    """
+    RE_PUNCT = re.compile(r'([%s])+' % re.escape(string.punctuation), re.UNICODE)
+    return input.str.replace(RE_PUNCT, " ")
+
+def remove_diacritics_s(input: pd.Series) -> pd.Series:
+    """
+    Remove diacritics (as accent marks) from input
+    """
+    return input.apply(unidecode.unidecode)
+
+def remove_spaces_s(input: pd.Series) -> pd.Series:
+    """
+    Remove any type of space between words.
+    """
+
+    return input.str.replace(u"\xa0", u" ").str.split().str.join(" ")
+
+def remove_stop_words_s(input: pd.Series) -> pd.Series:
+
     stop_words = set(stopwords.words("english"))
-    words = word_tokenize(input)
-    return [i for i in words if not (i in stop_words)]
+    pat = r'\b(?:{})\b'.format('|'.join(stop_words))
+    return input.str.replace(pat, '')
 
-def stemming(input):
+
+def stemm(text):
     """Stem words"""
     stemmer = PorterStemmer()
+    return " ".join([stemmer.stem(word) for word in text])
 
-    if type(input) == str:
-        words = word_tokenize(input)
-    else:
-        words = input
-
-    return " ".join([stemmer.stem(word) for word in words])
+def stemm_s(input: pd.Series) -> pd.Series:
+    return input.str.split().apply(stemm)
 
 def get_default_pipeline():
     """
@@ -55,13 +105,13 @@ def get_default_pipeline():
         - remove_stop_words
         - stemming
     """
-    return [remove_lowercase,
-            remove_numbers,
-            remove_punctuations,
-            remove_diacritics,
-            remove_white_space,
-            remove_stop_words,
-            stemming]
+    return [lowercase_s,
+            remove_digits_s,
+            remove_punctuations_s,
+            remove_diacritics_s,
+            remove_spaces_s,
+            remove_stop_words_s,
+            stemm_s]
 
 def apply_fun_to_obj(fun, obj, text_columns):
     for col in text_columns:
@@ -81,9 +131,9 @@ def do_preprocess(df, text_columns=['text'], pipeline=None):
         return text
 
     if isinstance(text_columns, str):
-        df[text_columns + "_clean"] = df.apply(lambda row: clean(row[text_columns]), axis=1)
+        df[text_columns + "_clean"] = clean(df[text_columns])
     else:
         for col in text_columns:
-            df[col + "_clean"] = df.apply(lambda row: clean(row[col]), axis=1)
+            df[col + "_clean"] = clean(df[col])
 
     return df

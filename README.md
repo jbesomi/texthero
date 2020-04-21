@@ -45,7 +45,7 @@ Texthero is a python toolkit for quick handling of text data. Texthero is concis
 
 Given a Pandas DataFrame with one or more _text_ columns, texthero help to preprocess the text data, map it into vectors using different algorithms and models and visualize it on screen.
 
-
+You can think of texthero as an utility tool to quickly _understand_ text-based dataset. Given a tabular dataset such as stock predictions or most selled items, it's easy to _grasp the main insights_, but given a text dataset, it's harder to quickly have an understanding of the underline data. 
 
 <h2 align="center">Installation</h2>
 
@@ -57,12 +57,21 @@ pip install texthero
 
 <h2 align="center">Getting started and examples</h2>
 
-<h3>1. Clustering of TF-IDF vectors</h3>
+<h3>1. Preprocessing, tf-idf representation and visualization</h3>
 
 ```python
 import texthero.texthero as hero
+import pandas as pd
 
+df = pd.DataFrame(["hello world", "hello", "world"], columns='text')
+df = hero.do_preprocess(df)
+df = hero.do_tfidf(df)
+df = hero.do_pca(df)
+hero.scatterplot(df)
 ```
+
+
+
 
 <h3>2. Most common words and top TF-IDF words</h3>
 
@@ -71,7 +80,7 @@ import texthero.texthero as hero
 
 ```
 
-<h3>3. Transformers representation and visualization [soon]</h3>
+<h3>3. Transformers representation and visualization [🔜]</h3>
 
 ```python
 import texthero.texthero as hero
@@ -83,39 +92,38 @@ The way texthero is structured and his documentation follow the same principles 
 
 Texthero is composed of three main components; preprocessing.py, representation.py and visualization.py.
 
-<h3>⚒️Preprocessing</h3>
+<h3>1. ⚒️Preprocessing</h3>
 
 **Job:** prepare the **text** data for further analysis.
 
-Exhaustive documentation: (preprocessing)[https://jbesomi.github.io/texthero/preprocessing.html]
+Exhaustive documentation: [preprocessing](https://jbesomi.github.io/texthero/preprocessing.html)
 
-<h3>📒Representation</h3>
+<h3>2. 📒Representation</h3>
 
 **Job:** map text data into vectors and do dimensionality reduction.
 
 Supported representation algorithms:
-1. TF-IDF, Term Frequency–Inverse Document Frequency
-2. TF, term frequency [soon]
-3. Word2Vec from Gensim [soon]
-4. GloVe [soon]
-5. Transformers [soon]
+1. Term frequency, inverse document frequency (`do_tfidf`)
+3. Word2Vec from Gensim [🔜]
+4. GloVe [🔜]
+5. Transformers [🔜]
 
 Supported dimensionality reduction algorithms:
-1. PCA, Principal Component Analysis
-2. NMF, non-negative matrix factorization
+1. Principal component analysis (`do_pca`)
+2. Non-negative matrix factorization (`do_nmf`)
 
-Exhaustive documentation:
+Exhaustive documentation: [representation](https://jbesomi.github.io/texthero/representation.html)
 
-<h3>🔮Visualization</h3>
+<h3>3. 🔮Visualization</h3>
 
 **Job:** collection of functions to both summarize the main facts regarding the data and visualize the results. This part is very opinionated and ideal for anyone that needs a quick solution to visualize on screen the text data for instance during a text exploratory data analysis (EDA).
 
 Most common functions:
    - Text scatterplot. Handy when coupled with dimensionality reduction algorithms such as pca.
    - Most common words
-   - Most common words between two entities [soon]
+   - Most common words between two entities [🔜]
 
-Exhaustive documentation:
+Exhaustive documentation: [visualization](https://jbesomi.github.io/texthero/visualization.html)
 
 <h2 align="center">Contributions</h2>
 

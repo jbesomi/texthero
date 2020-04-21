@@ -105,13 +105,14 @@ def get_default_pipeline():
         - remove_stop_words
         - stemming
     """
-    return [lowercase_s,
+    return [fillna_s,
+            lowercase_s,
             remove_digits_s,
             remove_punctuations_s,
             remove_diacritics_s,
             remove_spaces_s,
             remove_stop_words_s,
-            stemm_s]
+            ]
 
 def apply_fun_to_obj(fun, obj, text_columns):
     for col in text_columns:

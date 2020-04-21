@@ -5,6 +5,7 @@ Text representation
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 from sklearn.decomposition import NMF
 
@@ -49,5 +50,25 @@ def do_nmf(df, vector_columns, n_components=2):
     else:
         for col in vector_columns:
             df['nmf_' + col] = do_nmf_col(list(df[col]))
+
+    return df
+
+
+def do_tsne(df, vector_columns, n_components, perplexity, early_exaggeration, learning_rate, n_iter):
+    def do_tsne_col(vectors):
+        tsne = TSNE(n_components=n_components,
+                    perplexity=perplexity,
+                    early_exaggeration=early_exaggeration,
+                    learning_rate=learning_rate,
+                    n_iter=n_iter
+        )
+        return tsne.fit_transform(vectors).tolist()
+
+    if isinstance(vector_columns, str):
+        df['tsne_' + vector_columns] = do_tsne_col(list(df[vector_columns]))
+
+    else:
+        for col in vector_columns:
+            df['tsne_' + col] = do_tsne_col(list(df[col]))
 
     return df

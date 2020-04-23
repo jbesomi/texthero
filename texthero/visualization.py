@@ -33,3 +33,11 @@ def scatterplot(df: pd.DataFrame , column: str, color: str, hover_data: []) -> N
                      hover_data=hover_data)
 
     fig.show(config={'displayModeBar': False})
+
+
+def top_words(s: pd.Series,  normalize=True) -> pd.Series:
+    """
+    Return most common words of a given series sorted from most used.
+    """
+    WHITESPACE_SPLITTER = r"\W+"
+    return s.str.split(WHITESPACE_SPLITTER).explode().value_counts(normalize=normalize)

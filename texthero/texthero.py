@@ -2,6 +2,7 @@ from . import preprocessing
 from . import representation
 from . import visualization
 
+import pandas as pd
 
 """
 Preprocessing
@@ -37,3 +38,6 @@ Visualization
 """
 def scatterplot(df, column, color=None, hover_data=None):
     return visualization.scatterplot(df, column, color, hover_data)
+
+def top_words(s: pd.Series, normalize=False):
+    return visualization.top_words(s, normalize=normalize)

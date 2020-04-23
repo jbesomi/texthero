@@ -16,7 +16,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="texthero",
-    version=Version("1.0.1").number,
+    version=Version("1.0.2").number,
     description="Text preprocessing, representation and visualization made easy.",
     long_description=long_description,
     long_description_content_type='text/markdown',

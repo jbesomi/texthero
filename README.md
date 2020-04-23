@@ -45,7 +45,7 @@ Texthero is a python toolkit for quick handling of text data. Texthero is concis
 
 Given a Pandas DataFrame with one or more _text_ columns, texthero help to preprocess the text data, map it into vectors using different algorithms and models and visualize it on screen.
 
-You can think of texthero as an utility tool to quickly _understand_ text-based dataset. Given a tabular dataset such as stock predictions or most selled items, it's easy to _grasp the main insights_, but given a text dataset, it's harder to quickly have an understanding of the underline data.
+You can think of texthero as an utility tool to quickly _understand_ text-based dataset. Given a tabular dataset such as stock predictions or most selled items, it's easy to _grasp the main insights_, but given a text dataset, it's harder to quickly have an understanding of the underline data. Texthero help you with that.
 
 <h2 align="center">Installation</h2>
 
@@ -92,13 +92,13 @@ The way texthero is structured and his documentation follow the same principles 
 
 Texthero is composed of three main components; preprocessing.py, representation.py and visualization.py.
 
-<h3>⚒️1. Preprocessing</h3>
+<h3>⚒️ 1. Preprocessing</h3>
 
 **Job:** prepare the **text** data for further analysis.
 
 Complete documentation: [preprocessing](https://jbesomi.github.io/texthero/preprocessing.html)
 
-<h3>📒2. Representation</h3>
+<h3>📒 2. Representation</h3>
 
 **Job:** map text data into vectors and do dimensionality reduction.
 
@@ -114,7 +114,7 @@ Supported dimensionality reduction algorithms:
 
 Complete documentation: [representation](https://jbesomi.github.io/texthero/representation.html)
 
-<h3>🔮3. Visualization</h3>
+<h3>🔮 3. Visualization</h3>
 
 **Job:** collection of functions to both summarize the main facts regarding the data and visualize the results. This part is very opinionated and ideal for anyone that needs a quick solution to visualize on screen the text data for instance during a text exploratory data analysis (EDA).
 
@@ -127,4 +127,4 @@ Complete documentation: [visualization](https://jbesomi.github.io/texthero/visua
 
 <h2 align="center">Contributions</h2>
 
-Any help, feedback and contribution are very welcome. You can simply fork this repository and [open an issue](/issues).
+Any help, feedback and contribution are very welcome. You can simply fork this repository and [open an issue](https://github.com/jbesomi/texthero/issues).

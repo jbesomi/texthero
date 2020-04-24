@@ -1,6 +1,5 @@
 docs/* linguist-documentation
 docs_source/* linguist-documentation
 
-docs/* linguist-vendored
-docs_source/* linguist-vendored
+
 

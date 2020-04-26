@@ -24,11 +24,8 @@
     <img src=".github/logo_v2.png">
 </p>
 
-<p align="center">Text preprocessing, representation and visualization from zero to hero</p>
+<p style="font-size: 20px;" align="center">Text preprocessing, representation and visualization from zero to hero.</p>
 
-<p align="center">
-    <img src=".github/demo.gif?raw=true" width="700">
-</p>
 
 <p align="center">
   <a href="#zero-to-hero">From zero to hero</a> •

@@ -141,9 +141,9 @@ class HomeSplash extends React.Component {
         <div className="inner">
           <ProjectTitle />
           <PromoSection>
-            <Button href={docUrl('from-zero-to-hero.html')} >Getting started</Button>
+            <Button href={docUrl('getting-started')} >Getting started</Button>
             <Button href={siteConfig.baseUrl + 'blog'}>Tutorial</Button>
-            <Button href={docUrl('api-preprocessing.html')}>API</Button>
+            <Button href={docUrl('api-preprocessing')}>API</Button>
             <Button href='https://github.com/jbesomi/texthero'>Github</Button>
           </PromoSection>
           <GithuButton />

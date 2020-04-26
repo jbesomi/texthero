@@ -32,7 +32,7 @@ Texthero is available on [pip](https://pypi.org/project/texthero/). To install i
 pip install texthero
 ```
 
-If you have already installed it and what to upgrade to the last version type:
+If you have already installed it and want to upgrade to the last version type:
 
 ```bash
 pip install texthero -U
@@ -40,9 +40,13 @@ pip install texthero -U
 
 ## Getting started
 
-For our first analysis, we are gonna use the [BBC Sport Dataset](http://mlg.ucd.ie/datasets/bbc.html) that consists of 737 documents from the BBC Sport website corresponding to sports news articles in five topical areas from 2004-2005. The five different areas are _athletics_, _cricket_, _football_, _rugby_ and _tennis_.
+For a simple example we make use of the [BBC Sport Dataset](http://mlg.ucd.ie/datasets/bbc.html), it consists of 737 documents from the BBC Sport website corresponding to sports news articles in five topical areas from 2004-2005.
 
-The original dataset comes with a zip files with 5 different folder containing text data for each topic. This script simply read all text data and store it into a Pandas Dataframe.
+The five different areas are _athletics_, _cricket_, _football_, _rugby_ and _tennis_.
+
+The original dataset comes as a zip files with five different folder containing the article as text data for each topic.
+
+For convenience, we createdThis script simply read all text data and store it into a Pandas Dataframe.
 
 Import texthero and pandas.
 
@@ -80,23 +84,23 @@ df['text_clean'] = hero.clean(df['text'])
 Recently, Pandas has introduced the pipe function. You can achieve the same results with
 
 ```py
-df['text_clean'] = df['text']).pipe(hero.clean)
+df['text_clean'] = df['text'].pipe(hero.clean)
 ```
 
 The default pipeline for the clean method is:
 
-> As texthero is still in beta, the default pipeline may undergo some minor changes in the next versions.
-
-1. `preprocessing.fillna(s)` Fill non assigned values with empty space.
-1. `preprocessing.lowercase(s)` Lowercase all.
+1. `preprocessing.fillna(s)` Fill non assigned values with an empty space.
+1. `preprocessing.lowercase(s)` Lowercase all text.
 1. `preprocessing.remove_digits()` Remove all blocks of digits.
-1. `preprocessing.remove_punctuation()` Remove all string.punctuation (!"#$%&\'()\*+,-./:;<=>?@[\\]^\_\`{|}~)
-1. `preprocessing.remove_diacritics()` Remove all accents of a string.
-1. `preprocessing.remove_whitespaces()` Trim all extra spaces
+1. `preprocessing.remove_punctuation()` Remove all string.punctuation (!"#$%&\'()\*+,-./:;<=>?@[\\]^\_\`{|}~).
+1. `preprocessing.remove_diacritics()` Remove all accents from strings.
+1. `preprocessing.remove_whitespaces()` Remove any extra space.
+
+> As texthero is still in beta, the default pipeline may undergo some minor changes in the next versions.
 
 #### Custom pipeline
 
-We can also pass a custom pipeline as argument to `clean`.
+We can also pass a custom pipeline as argument to `clean`
 
 ```py
 from texthero import preprocessing
@@ -107,7 +111,7 @@ custom_pipeline = [preprocessing.fillna,
 df['clean_text'] = hero.clean(df['text'])
 ```
 
-or altenatively
+or alternatively
 
 ```py
 df['clean_text'] = df['clean_text']).pipe(hero.clean, custom_pipeline)
@@ -115,12 +119,12 @@ df['clean_text'] = df['clean_text']).pipe(hero.clean, custom_pipeline)
 
 #### Preprocessing API
 
-The complete preprocessing API can be found at the following address: [/docs/api-preprocessing](/docs/api-preprocessing).
+The complete preprocessing API can be found at the following address: [api preprocessing](/docs/api-preprocessing).
 
 
 ### Representation
 
-Once cleaned the data, the next natural is to map each document into a vector, we refer to this as `representation`.
+Once cleaned the data, the next natural is to map each document into a vector.
 
 #### TFIDF representation
 
@@ -139,7 +143,7 @@ df['pca_tfidf_clean_text'] = hero.do_pca(df['tfidf_clean_text'])
 
 #### All in one step
 
-We can achieve the same steps above, cleaning, tf-idf representation and dimensionality reduction in a single step like that. Isn't fabulous?
+We can achieve all the three steps show above, _cleaning_, _tf-idf representation_ and _dimensionality reduction_ in a single step. Isn't fabulous?
 
 ```py
 df['pca'] = (
@@ -152,17 +156,16 @@ df['pca'] = (
 
 ### Visualization
 
-`texthero.visualization` provide some helpers functions to visualize on-screen the results. The visualization are shwon using the [Plotly Python Open Source Graphing Library](https://plotly.com/python/).
+`texthero.visualization` provide some helpers functions to visualize the tarnsformed Dataframe. All visualization utilize under the hoods the [Plotly Python Open Source Graphing Library](https://plotly.com/python/).
 
-For instance `hero.scatterplot`.
 
-```
+```py
 hero.scatterplot(df, col='pca', color='labels', title="PCA BBC Sport news")
 ```
 
 ![](/img/scatterplot_bccsport.svg)
 
-Also, we can "visualize" what are the most common words for each `labels` by the following:
+Also, we can "visualize" the most common words for each `topic` with `top_words`
 
 ```py
 NUM_TOP_WORDS = 5
@@ -191,9 +194,7 @@ tennis     6          0.021047
 
 ## Summarizing
 
-In just a couple of lines of code, we went from having no idea to the text to visualize it and found the most important words.
-
-This is all the code we had to write to produce the scatterlot above.
+We saw how in just a couple of lines of code we can represent and visualize any text dataset. We went from knowing nothing regarding the dataset to see that there are 5 (quite) distinct areas representig each topic. In short, we went _from zero to hero_.
 
 ```py
 import texthero as hero
@@ -214,6 +215,6 @@ hero.scatterplot(df, col='pca', color='topic', title="PCA BBC Sport news")
 
 ## Next sections
 
-By now, you should have understood the main building blocks of Texthero.
+By now, you should have understood the main building blocks of texthero.
 
-In the next sections, we will see how we can tune the default settings and what can be achieved with Texthero.
+In the next sections, we will review each module, see how we can tune the default settings and we will show other different areas where texthero can help us work with text data efficiently.

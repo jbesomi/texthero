@@ -3,8 +3,6 @@ setup.py
 texthero/__init__.py
 texthero/preprocessing.py
 texthero/representation.py
-texthero/texthero.py
-texthero/version.py
 texthero/visualization.py
 texthero.egg-info/PKG-INFO
 texthero.egg-info/SOURCES.txt

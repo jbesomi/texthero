@@ -1,5 +1,6 @@
 """
-Text preprocessing
+Utility functions to clean text-columns of a dataframe.
+
 """
 
 import re
@@ -9,28 +10,23 @@ from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 import pandas as pd
 
-def fillna_s(input: pd.Series) -> pd.Series:
-    """
-    Fillna the given `input` of the pd.Series with ""
-    """
-    input.fillna("")
-    return input.astype("str")
+def fillna(input: pd.Series) -> pd.Series:
+    """Replace not assigned values with empty spaces."""
+    return input.fillna("").astype("str")
 
 
-def lowercase_s(input: pd.Series) -> pd.Series:
-    """
-    Lowercase the given `input` of the pd.Series
-    """
+def lowercase(input: pd.Series) -> pd.Series:
+    """Lowercase all cells."""
     return input.str.lower()
 
-def remove_digits_s(input: pd.Series, only_blocks=True) -> pd.Series:
+def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
     """
-    Remove digits from series
+    Remove all digits.
 
     Parameters
     ----------
 
-    input : pd.Series
+    input: pd.Series
     only_blocks : bool
         Remove only blocks of digits. For instance, `hel1234lo 1234` becomes `hel1234lo`.
 
@@ -59,82 +55,77 @@ def remove_digits_s(input: pd.Series, only_blocks=True) -> pd.Series:
         return input.str.replace(r"\d+", " ")
 
 
-def remove_punctuations_s(input : pd.Series) -> pd.Series:
+def remove_punctuation(input : pd.Series) -> pd.Series:
     """
     Remove punctuations from input
     """
     RE_PUNCT = re.compile(r'([%s])+' % re.escape(string.punctuation), re.UNICODE)
     return input.str.replace(RE_PUNCT, " ")
 
-def remove_diacritics_s(input: pd.Series) -> pd.Series:
+def remove_diacritics(input: pd.Series) -> pd.Series:
     """
     Remove diacritics (as accent marks) from input
     """
     return input.apply(unidecode.unidecode)
 
-def remove_spaces_s(input: pd.Series) -> pd.Series:
+def remove_whitespaces(input: pd.Series) -> pd.Series:
     """
     Remove any type of space between words.
     """
 
     return input.str.replace(u"\xa0", u" ").str.split().str.join(" ")
 
-def remove_stop_words_s(input: pd.Series) -> pd.Series:
+def remove_stop_words(input: pd.Series) -> pd.Series:
 
     stop_words = set(stopwords.words("english"))
     pat = r'\b(?:{})\b'.format('|'.join(stop_words))
     return input.str.replace(pat, '')
 
 
-def stemm(text):
+def _stemm(text):
     """Stem words"""
     stemmer = PorterStemmer()
     return " ".join([stemmer.stem(word) for word in text])
 
-def stemm_s(input: pd.Series) -> pd.Series:
-    return input.str.split().apply(stemm)
+def stemm(input: pd.Series) -> pd.Series:
+    return input.str.split().apply(_stemm)
 
 def get_default_pipeline():
     """
     Default pipeline:
         - remove_lowercase
         - remove_numbers
-        - remove_punctuations
+        - remove_punctuation
         - remove_diacritics
         - remove_white_space
         - remove_stop_words
         - stemming
     """
-    return [fillna_s,
-            lowercase_s,
-            remove_digits_s,
-            remove_punctuations_s,
-            remove_diacritics_s,
-            remove_spaces_s,
-            remove_stop_words_s,
+    return [fillna,
+            lowercase,
+            remove_digits,
+            remove_punctuation,
+            remove_diacritics,
+            remove_whitespaces,
+            remove_stop_words,
             ]
 
-def apply_fun_to_obj(fun, obj, text_columns):
+def _apply_fun_to_obj(fun, obj, text_columns):
     for col in text_columns:
         obj[col] = fun(obj[col])
     return obj
 
-def do_preprocess(df, text_columns=['text'], pipeline=None):
+def clean(s, pipeline=None):
 
     if not pipeline:
         pipeline = get_default_pipeline()
 
-    def clean(text):
-        if text is None:
-            return text
-        for f in pipeline:
-            text = f(text)
-        return text
+    for f in pipeline:
+        s = s.pipe(f)
 
-    if isinstance(text_columns, str):
-        df[text_columns + "_clean"] = clean(df[text_columns])
-    else:
-        for col in text_columns:
-            df[col + "_clean"] = clean(df[col])
+    return s
 
-    return df
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

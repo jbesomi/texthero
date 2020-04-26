@@ -1,5 +1,4 @@
 import setuptools
-from texthero.version import Version
 from setuptools import find_packages
 
 import os
@@ -16,7 +15,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="texthero",
-    version=Version("1.0.2").number,
+    version="1.0.3",
     description="Text preprocessing, representation and visualization made easy.",
     long_description=long_description,
     long_description_content_type='text/markdown',

@@ -1,9 +1,10 @@
-
 build
 dist
-*/__pycache__/*
+__pycache__
 .DS_Store
 .cache
+
+.ipynb_checkpoints/
 
 # docs (docusaurus)
 

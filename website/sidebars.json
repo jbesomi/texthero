@@ -1,0 +1,8 @@
+{
+  "docs": {
+    "Getting Started": ["getting-started"]
+  },
+  "api": {
+    "API": ["api-preprocessing", "api-representation", "api-visualization"]
+  }
+}

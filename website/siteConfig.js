@@ -25,7 +25,7 @@ const users = [
 
 const siteConfig = {
   title: 'Texthero', // Title for your website.
-  tagline: 'Text preprocessing, representation and visualization from zero to hero',
+  tagline: 'Text preprocessing, representation and visualization from zero to hero.',
   url: 'https://texthero.org', // Your website URL
   baseUrl: '/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:

@@ -5,15 +5,23 @@ title: Visualization
 
 # Visualization
 
-Text visualization
+Visualize insights and statistics of a text-based Pandas DataFrame.
 
 
 ### texthero.visualization.scatterplot(df, col, color=None, hover_data=None, title='')
-Scatterplot of df[column].
+Show scatterplot using python plotly scatter.
 
-The df[column] must be a tuple of 2d-coordinates.
 
-Usage example:
+* **Parameters**
+
+    
+    * **df** – 
+
+
+    * **col** – The name of the column of the DataFrame used for x and y axis.
+
+
+### Examples
 
 ```python
 >>> import texthero
@@ -22,8 +30,18 @@ Usage example:
 ```
 
 
-### texthero.visualization.top_words(s, normalize=True)
-Return most common words of a given series sorted from most used.
+### texthero.visualization.top_words(s, normalize=False)
+Return most common words.
+
+
+* **Parameters**
+
+    
+    * **s** (`Series`) – 
+
+
+    * **normalize** – Default is False. If set to True, returns normalized values.
+
 
 
 * **Return type**

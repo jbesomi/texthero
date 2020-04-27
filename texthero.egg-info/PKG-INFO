@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: texthero
-Version: 1.0.3
+Version: 1.0.4
 Summary: Text preprocessing, representation and visualization made easy.
 Home-page: https://github.com/jbesomi/texthero
 Author: Jonathan Besomi
@@ -32,11 +32,8 @@ Description: <p align="center">
             <img src=".github/logo_v2.png">
         </p>
         
-        <p align="center">Text preprocessing, representation and visualization from zero to hero</p>
+        <p style="font-size: 20px;" align="center">Text preprocessing, representation and visualization from zero to hero.</p>
         
-        <p align="center">
-            <img src=".github/demo.gif?raw=true" width="700">
-        </p>
         
         <p align="center">
           <a href="#zero-to-hero">From zero to hero</a> •
@@ -49,29 +46,29 @@ Description: <p align="center">
         
         <h2 align="center">From zero to hero</h2>
         
-        Texthero is a python toolkit for quick handling of text data. Texthero is concise, simple to learn and integrates smoothly with Pandas.
+        **Texthero is a python toolkit that help you work with text-based dataset quickly and effortlessly**. Texthero is very simple to learn and designed to be used on top of Pandas.
         
-        Given a Pandas DataFrame with one or more _text_ columns, texthero help to preprocess the text data, map it into vectors using different algorithms and models and visualize it on screen.
+        You can think of Texthero as a tool to help you _understand_ and work with text-based dataset. Given a tabular dataset, it's easy to _grasp the main concept_. Instead, given a text dataset it's harder to have quick insights of the underline data. With Texthero, preprocessing (cleaning), mapping words into vectors and visualize the reduced vector space takes only a couple lines of code.
         
-        You can think of texthero as an utility tool to quickly _understand_ text-based dataset. Given a tabular dataset such as stock predictions or most selled items, it's easy to _grasp the main insights_, but given a text dataset, it's harder to quickly have an understanding of the underline data. That's when texthero jump in and help you quickly achieve what you wants: work with text data quickly and effortlessly.
-        
-        To start using texthero, you don't have to spend hours understanding complex and messy code. To keep thing simple, Texthero is composed of only three python modules containing each helper functions *preprocessing.py*, *representation.py*, *visualization.py*.
+        To use Texthero, you don't have to spend hours understanding complex and messy code. Texthero is composed of only three python modules *preprocessing.py*, *representation.py*, *visualization.py* and it's <a href="https://texthero.org/docs/getting-started">well documented</a>. Other than that, Texthero is optimized to be very fast.
         
         <h2 align="center">Installation</h2>
+        
+        Texthero is available on the <a href="https://pypi.org/project/texthero/" target="\_blank">Python Package Index</a> and can be installed via `pip`.
         
         ```bash
         pip install texthero
         ```
         
-        > ☝️Under the hoods, texthero make use of multiple NLP/mL toolkit such as Gensim, NLTK, SpaCy and Sklearn. You don't need to install them separately; pip will take care of that.
+        > ☝️Under the hoods, Texthero makes use of multiple NLP and machine learning toolkits such as Gensim, NLTK, SpaCy and scikit-learn. You don't need to install them all separately, pip will take care of that for you.
         
         <h2 align="center">Getting started</h2>
         
-        The best way to quickly and efficiently learn Texthero is through the <a href="">Getting started</a> official documentation.
+        The best way to learn Texthero is probably via the <a href="">Getting Started</a> official documentation. In case you are a pro python user, then `help(texthero)` should suffices.
         
         <h2 align="center">Example</h2>
         
-        ...
+        
         
         ```python
         import texthero.texthero as hero
@@ -88,11 +85,7 @@ Description: <p align="center">
         
         <h2 align="center">API</h2>
         
-        All Texthero code is well-documented and therefore should be easy to understand and work.
-        
-        If you are a superuser oh python, then all you need is to call `help(hero)`, otherwise keep reading.
-        
-        Texthero is composed of only three modules: [preprocessing.py](/texthero/preprocessing.py), [representation.py](/texthero/representation.py) and [visualization.py])(/texthero/visualization.py).
+        Texthero is composed of three modules: [preprocessing.py](/texthero/preprocessing.py), [representation.py](/texthero/representation.py) and [visualization.py])(/texthero/visualization.py).
         
         <h3>⚒️ 1. Preprocessing</h3>
         
@@ -128,6 +121,8 @@ Description: <p align="center">
         Complete documentation: [visualization](https://jbesomi.github.io/texthero/visualization.html)
         
         <h2 align="center">Contributions</h2>
+        
+        Pull requests are amazing and most welcome.
         
         Any help, feedback and contribution are very welcome. You can simply fork this repository and [open an issue](https://github.com/jbesomi/texthero/issues).
         

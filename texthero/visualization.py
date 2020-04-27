@@ -1,22 +1,28 @@
 """
-Text visualization
-
-
+Visualize insights and statistics of a text-based Pandas DataFrame.
 """
+
+
 import pandas as pd
 import plotly.express as px
 
 def scatterplot(df: pd.DataFrame , col: str, color: str = None, hover_data: [] = None, title="") -> None:
     """
-    Scatterplot of df[column].
+    Show scatterplot using python plotly scatter.
 
-    The df[column] must be a tuple of 2d-coordinates.
+    Parameters
+    ----------
+    df
+    col
+        The name of the column of the DataFrame used for x and y axis.
 
-    Usage example:
 
-        >>> import texthero
-        >>> df = pd.DataFrame([(0,1), (1,0)], columns='pca')
-        >>> texthero.visualization.scatterplot(df, 'pca')
+    Examples
+    --------
+
+    >>> import texthero
+    >>> df = pd.DataFrame([(0,1), (1,0)], columns='pca')
+    >>> texthero.visualization.scatterplot(df, 'pca')
 
     """
 
@@ -30,13 +36,19 @@ def scatterplot(df: pd.DataFrame , col: str, color: str = None, hover_data: [] =
                      hover_data=hover_data,
                      title=title
                     )
-
     fig.show(config={'displayModeBar': False})
-    return fig
 
-def top_words(s: pd.Series,  normalize=True) -> pd.Series:
+def top_words(s: pd.Series,  normalize=False) -> pd.Series:
     """
-    Return most common words of a given series sorted from most used.
+    Return most common words.
+
+    Parameters
+    ----------
+
+    s
+    normalize :
+        Default is False. If set to True, returns normalized values.
+
     """
     WHITESPACE_SPLITTER = r"\W+"
     return s.str.split(WHITESPACE_SPLITTER).explode().value_counts(normalize=normalize)

@@ -59,9 +59,9 @@ const ProjectTitle = props => (
     </h2>
 
     <h3>
-      Texthero is a python package to help you work with text data <strong>efficiently</strong>. <br />
-      It help you to quickly understand the underline data of any text-based dataset and <br />
-      it provide a solid pipeline to clean and represent text data, from zero to hero.
+      Texthero is a python package to work with text data <strong>efficiently</strong>. <br />
+      It empowers NLP developers with a tool to quickly understand any text-based dataset and <br />
+      it provides a solid pipeline to clean and represent text data, from zero to hero.
     </h3>
   </div>
 

@@ -1,59 +1,95 @@
 """
-Text representation
-
+Map words into vectors using different algorithms such as TF-IDF, word2vec or GloVe.
 """
 
 import pandas as pd
 
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.manifold import TSNE
-from sklearn.decomposition import PCA
-from sklearn.decomposition import NMF
+from sklearn.decomposition import PCA, NMF
+from sklearn.cluster import KMeans, DBSCAN, MeanShift
+
+"""
+Vectorization
+"""
 
 def do_tfidf(s: pd.Series, max_features=100):
+    """
+    Represent input on a TF-IDF vector space.
+    """
     tfidf = TfidfVectorizer(use_idf=True, max_features=max_features)
     return pd.Series(tfidf.fit_transform(s).toarray().tolist())
 
+def do_count(s: pd.Series, max_features=100):
+    """
+    Represent input on a Count vector space.
+    """
+
+    tfidf = CountVectorizer(use_idf=True, max_features=max_features)
+    return pd.Series(tfidf.fit_transform(s).toarray().tolist())
+
+
+"""
+Dimensionality reduction
+"""
+
 
 def do_pca(s, n_components=2):
+    """
+    Perform PCA.
+    """
     pca = PCA(n_components=n_components)
     return pd.Series(pca.fit_transform(list(s)).tolist())
 
+def do_nmf(s, n_components=2):
+    """
+    Perform non-negative matrix factorization.
+    """
+    pca = NMF(n_components=n_components, init='random', random_state=0)
+    return pd.Series(pca.fit_transform(list(s)).tolist())
 
-def do_nmf(df, vector_columns, n_components=2):
-    def do_nmf_col(vectors):
-        nmf = NMF(n_components=n_components, init='random', random_state=0)
-        return nmf.fit_transform(vectors).tolist()
+def do_tsne(s, vector_columns, n_components, perplexity, early_exaggeration, learning_rate, n_iter):
+    """
+    Perform TSNE.
+    """
+    tsne = TSNE(n_components=n_components,
+                perplexity=perplexity,
+                early_exaggeration=early_exaggeration,
+                learning_rate=learning_rate,
+                n_iter=n_iter
+    )
+    return pd.Series(tsne.fit_transform(list(s)).tolist())
 
-    if isinstance(vector_columns, str):
-        df['nmf' + vector_columns] = do_nmf_col(list(df[vector_columns]))
-
-    else:
-        for col in vector_columns:
-            df['nmf_' + col] = do_nmf_col(list(df[col]))
-
-    return df
+"""
+Clustering
+"""
 
 
-def do_tsne(df, vector_columns, n_components, perplexity, early_exaggeration, learning_rate, n_iter):
-    def do_tsne_col(vectors):
-        tsne = TSNE(n_components=n_components,
-                    perplexity=perplexity,
-                    early_exaggeration=early_exaggeration,
-                    learning_rate=learning_rate,
-                    n_iter=n_iter
-        )
-        return tsne.fit_transform(vectors).tolist()
+def do_kmeans(s: pd.Series, n_clusters=5, init='k-means++', n_init=10, max_iter=300, tol=0.0001, precompute_distances='auto', verbose=0, random_state=None, copy_x=True, n_jobs=-1, algorithm='auto'):
+    """
+    Perform K-means clustering algorithm.
+    """
+    vectors = list(s)
+    kmeans = KMeans(n_clusters=n_clusters, init=init, n_init=n_init, max_iter=max_iter, tol=tol, precompute_distances=precompute_distances, verbose=verbose, random_state=random_state, copy_x=copy_x, n_jobs=n_jobs, algorithm=algorithm).fit(vectors)
+    return pd.Series(kmeans.predict(vectors))
 
-    if isinstance(vector_columns, str):
-        df['tsne_' + vector_columns] = do_tsne_col(list(df[vector_columns]))
 
-    else:
-        for col in vector_columns:
-            df['tsne_' + col] = do_tsne_col(list(df[col]))
+def do_dbscan(s, eps=0.5, min_samples=5, metric='euclidean',
+              metric_params=None, algorithm='auto', leaf_size=30, p=None, n_jobs=None):
+    """
+    Perform DBSCAN clustering.
+    """
 
-    return df
+    return pd.Series(DBSCAN(eps=eps, min_samples=min_samples,
+                            metric=metric,metric_params=metric_params,
+                            algorithm=algorithm, leaf_size=leaf_size, p=p, n_jobs=n_jobs).fit_predict(list(s)))
+
+def do_meanshift(s, bandwidth=None, seeds=None, bin_seeding=False, min_bin_freq=1, cluster_all=True, n_jobs=None, max_iter=300):
+    """
+    Perform mean shift clustering.
+    """
+
+    return pd.Series(MeanShift(bandwidth=bandwidth, seeds=seeds, bin_seeding=bin_seeding, min_bin_freq=min_bin_freq, cluster_all=cluster_all, n_jobs=n_jobs, max_iter=max_iter).fit_predict(list(s)))
 
 if __name__ == "__main__":
     import doctest

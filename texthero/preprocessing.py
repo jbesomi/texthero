@@ -1,6 +1,5 @@
 """
-Utility functions to clean text-columns of a dataframe.
-
+Preprocess text-based Pandas DataFrame.
 """
 
 import re
@@ -8,6 +7,7 @@ import string
 import unidecode
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
+from nltk.stem import SnowballStemmer
 import pandas as pd
 
 def fillna(input: pd.Series) -> pd.Series:
@@ -16,115 +16,145 @@ def fillna(input: pd.Series) -> pd.Series:
 
 
 def lowercase(input: pd.Series) -> pd.Series:
-    """Lowercase all cells."""
+    """Lowercase all text."""
     return input.str.lower()
 
 def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
     """
-    Remove all digits.
+    Remove all digits from a series and replace it with a single space.
 
     Parameters
     ----------
 
-    input: pd.Series
+    input : pd.Series
     only_blocks : bool
-        Remove only blocks of digits. For instance, `hel1234lo 1234` becomes `hel1234lo`.
-
-    Returns
-    -------
-
-    pd.Series
+                  Remove only blocks of digits. For instance, `hel1234lo 1234` becomes `hel1234lo`.
 
     Examples
     --------
 
-        >>> import texthero
-        >>> s = pd.Series(["remove_digits_s remove all the 1234 digits of a pandas series. H1N1"])
-        >>> texthero.preprocessing.remove_digits_s(s)
-        u'remove_digits_s remove all the digits of a pandas series. H1N1'
-        >>> texthero.preprocessing.remove_digits_s(s, only_blocks=False)
-        u'remove_digits_s remove all the digits of a pandas series. HN'
+    >>> import texthero
+    >>> import pandas as pd
+    >>> s = pd.Series(["texthero 1234 He11o"])
+    >>> texthero.preprocessing.remove_digits(s)
+    0    texthero He11o
+    dtype: object
+    >>> texthero.preprocessing.remove_digits(s, only_blocks=False)
+    0    texthero   He o
+    dtype: object
     """
 
-    if type(input) is not pd.Series:
-        raise ValueError('input arguments must be of type pd.Series')
-
     if only_blocks:
-        return input.str.replace(r"\s+\d+\s+", " ")
+        return input.str.replace(r"^\d+\s|\s\d+\s|\s\d+$", " ")
     else:
-        return input.str.replace(r"\d+", " ")
+        return input.str.replace(r"\d+", "")
 
 
 def remove_punctuation(input : pd.Series) -> pd.Series:
     """
-    Remove punctuations from input
+    Remove string.punctuation (!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~).
+
+    Replace it with a single space.
     """
     RE_PUNCT = re.compile(r'([%s])+' % re.escape(string.punctuation), re.UNICODE)
     return input.str.replace(RE_PUNCT, " ")
 
 def remove_diacritics(input: pd.Series) -> pd.Series:
     """
-    Remove diacritics (as accent marks) from input
+    Remove all diacritics.
     """
     return input.apply(unidecode.unidecode)
 
-def remove_whitespaces(input: pd.Series) -> pd.Series:
+def remove_whitespace(input: pd.Series) -> pd.Series:
     """
-    Remove any type of space between words.
+    Remove all white spaces between words.
     """
 
     return input.str.replace(u"\xa0", u" ").str.split().str.join(" ")
 
 def remove_stop_words(input: pd.Series) -> pd.Series:
+    """
+    Remove all stop words using NLTK stopwords list.
 
+    List of stopwords: NLTK 'english' stopwords, 179 items.
+    """
     stop_words = set(stopwords.words("english"))
     pat = r'\b(?:{})\b'.format('|'.join(stop_words))
     return input.str.replace(pat, '')
 
 
-def _stemm(text):
-    """Stem words"""
-    stemmer = PorterStemmer()
-    return " ".join([stemmer.stem(word) for word in text])
 
-def stemm(input: pd.Series) -> pd.Series:
+
+def do_stemm(input: pd.Series, stem="snowball") -> pd.Series:
+    """
+    Stem series using either NLTK 'porter' or 'snowball' stemmers.
+
+    Not in the default pipeline.
+
+    Parameters
+    ----------
+    input
+    stem
+        Can be either 'snowball' or 'stemm'
+
+    """
+
+    if stem is "porter":
+        stemmer = PorterStemmer()
+    elif stem is "snowball":
+        stemmer = SnowballStemmer()
+    else:
+        raise ValueError("stem argument must be either 'porter' of 'stemmer'")
+
+    def _stemm(text):
+        """Stem words"""
+        return " ".join([stemmer.stem(word) for word in text])
+
     return input.str.split().apply(_stemm)
 
-def get_default_pipeline():
+def get_default_pipeline() -> []:
     """
-    Default pipeline:
-        - remove_lowercase
-        - remove_numbers
-        - remove_punctuation
-        - remove_diacritics
-        - remove_white_space
-        - remove_stop_words
-        - stemming
+    Return a list contaning all the methods used in the default cleaning pipeline.
+
+    Return a list with the following function
+     - fillna
+     - lowercase
+     - remove_digits
+     - remove_punctuation
+     - remove_diacritics
+     - remove_stop_words
+     - remove_whitespace
     """
     return [fillna,
             lowercase,
             remove_digits,
             remove_punctuation,
             remove_diacritics,
-            remove_whitespaces,
             remove_stop_words,
+            remove_whitespace,
             ]
 
-def _apply_fun_to_obj(fun, obj, text_columns):
-    for col in text_columns:
-        obj[col] = fun(obj[col])
-    return obj
+def clean(s: pd.Series, pipeline=None) -> pd.Series:
+    """
+    Clean pandas series by appling a preprocessing pipeline.
 
-def clean(s, pipeline=None):
+    For information regarding a specific function type `help(texthero.preprocessing.func_name)`.
+    The default preprocessing pipeline is the following:
+     - fillna
+     - lowercase
+     - remove_digits
+     - remove_punctuation
+     - remove_diacritics
+     - remove_stop_words
+     - remove_whitespace
+    """
 
     if not pipeline:
         pipeline = get_default_pipeline()
 
     for f in pipeline:
         s = s.pipe(f)
-
     return s
-
 
 if __name__ == "__main__":
     import doctest

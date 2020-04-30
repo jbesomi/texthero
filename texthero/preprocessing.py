@@ -9,6 +9,7 @@ from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from nltk.stem import SnowballStemmer
 import pandas as pd
+import numpy as np
 
 def fillna(input: pd.Series) -> pd.Series:
     """Replace not assigned values with empty spaces."""
@@ -32,15 +33,12 @@ def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
 
     Examples
     --------
-
-    >>> import texthero
-    >>> import pandas as pd
-    >>> s = pd.Series(["texthero 1234 He11o"])
-    >>> texthero.preprocessing.remove_digits(s)
-    0    texthero He11o
+    >>> s = pd.Series("7ex7hero is fun 1111")
+    >>> remove_digits(s)
+    0    7ex7hero is fun 
     dtype: object
-    >>> texthero.preprocessing.remove_digits(s, only_blocks=False)
-    0    texthero   He o
+    >>> remove_digits(s, only_blocks=False)
+    0    exhero is fun 
     dtype: object
     """
 
@@ -85,7 +83,7 @@ def remove_stop_words(input: pd.Series) -> pd.Series:
 
 
 
-def do_stemm(input: pd.Series, stem="snowball") -> pd.Series:
+def do_stem(input: pd.Series, stem="snowball") -> pd.Series:
     """
     Stem series using either NLTK 'porter' or 'snowball' stemmers.
 
@@ -102,15 +100,15 @@ def do_stemm(input: pd.Series, stem="snowball") -> pd.Series:
     if stem is "porter":
         stemmer = PorterStemmer()
     elif stem is "snowball":
-        stemmer = SnowballStemmer()
+        stemmer = SnowballStemmer("english") # TODO support for other languages.
     else:
         raise ValueError("stem argument must be either 'porter' of 'stemmer'")
 
-    def _stemm(text):
+    def _stem(text):
         """Stem words"""
         return " ".join([stemmer.stem(word) for word in text])
 
-    return input.str.split().apply(_stemm)
+    return input.str.split().apply(_stem)
 
 def get_default_pipeline() -> []:
     """
@@ -155,6 +153,132 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
     for f in pipeline:
         s = s.pipe(f)
     return s
+
+
+def has_content(s: pd.Series):
+    """
+    For each row, check that there is content.
+
+    Example
+    -------
+
+    >>> s = pd.Series(["c", np.nan, "\t\\n", " "])
+    >>> has_content(s)
+    0     True
+    1    False
+    2    False
+    3    False
+    dtype: bool
+
+    """
+    return (s.pipe(remove_whitespace) != "") & (~s.isna())
+
+def drop_no_content(s: pd.Series):
+    """
+    Drop all rows where has_content is empty.
+
+    Example
+    -------
+
+    >>> s = pd.Series(["c", np.nan, "\t\\n", " "])
+    >>> drop_no_content(s)
+    0    c
+    dtype: object
+
+    """
+    return s[has_content(s)]
+
+
+def remove_round_brackets(s: pd.Series):
+    """
+    Remove content within parentheses () and parentheses.
+
+    Example
+    -------
+
+    >>> s = pd.Series("Texthero (is not a superhero!)")
+    >>> remove_round_brackets(s)
+    0    Texthero 
+    dtype: object
+
+    """
+    return s.str.replace(r"\([^()]*\)", "")
+
+def remove_curly_brackets(s: pd.Series):
+    """
+    Remove content within curly brackets {} and the curly brackets.
+
+    Example
+    -------
+
+    >>> s = pd.Series("Texthero {is not a superhero!}")
+    >>> remove_curly_brackets(s)
+    0    Texthero 
+    dtype: object
+
+    """
+    return s.str.replace(r"\{[^{}]*\}", "")
+
+def remove_square_brackets(s: pd.Series):
+    """
+    Remove content within square brackets [] and the square brackets.
+
+    Example
+    -------
+
+    >>> s = pd.Series("Texthero [is not a superhero!]")
+    >>> remove_square_brackets(s)
+    0    Texthero 
+    dtype: object
+
+    """
+    return s.str.replace(r"\[[^\[\]]*\]", "")
+
+def remove_angle_brackets(s: pd.Series):
+    """
+    Remove content within angle brackets <> and the angle brackets.
+
+    Example
+    -------
+
+    >>> s = pd.Series("Texthero <is not a superhero!>")
+    >>> remove_angle_brackets(s)
+    0    Texthero 
+    dtype: object
+
+    """
+    return s.str.replace(r"<[^<>]*>", "")
+
+def remove_brackets(s: pd.Series):
+    """
+    Remove content within brackets and the brackets.
+
+    Remove content from any kind of brackets, (), [], {}, <>.
+
+    Example
+    -------
+
+    >>> s = pd.Series("Texthero (round) [square] [curly] [angle]")
+    >>> remove_brackets(s)
+    0    Texthero    
+    dtype: object
+
+    See also
+    --------
+    remove_round_brackets(s)
+    remove_curly_brackets(s)
+    remove_square_brackets(s)
+    remove_angle_brackets(s)
+
+    """
+    return (
+        s
+        .pipe(remove_round_brackets)
+        .pipe(remove_curly_brackets)
+        .pipe(remove_square_brackets)
+        .pipe(remove_angle_brackets)
+    )
+
 
 if __name__ == "__main__":
     import doctest

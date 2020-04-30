@@ -1,5 +1,6 @@
 README.md
 setup.py
+texthero/__about__.py
 texthero/__init__.py
 texthero/preprocessing.py
 texthero/representation.py

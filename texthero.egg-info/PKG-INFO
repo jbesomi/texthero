@@ -1,10 +1,9 @@
 Metadata-Version: 2.1
 Name: texthero
-Version: 1.0.4
-Summary: Text preprocessing, representation and visualization made easy.
+Version: 1.0.5
+Summary: Text preprocessing, representation and visualization from zero to hero.
 Home-page: https://github.com/jbesomi/texthero
 Author: Jonathan Besomi
-Author-email: jonathanbesomi@gmail.com
 License: MIT
 Description: <p align="center">
            <a href="https://github.com/jbesomi/texthero/stargazers">

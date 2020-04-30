@@ -16,14 +16,6 @@ def scatterplot(df: pd.DataFrame , col: str, color: str = None, hover_data: [] =
     col
         The name of the column of the DataFrame used for x and y axis.
 
-
-    Examples
-    --------
-
-    >>> import texthero
-    >>> df = pd.DataFrame([(0,1), (1,0)], columns='pca')
-    >>> texthero.visualization.scatterplot(df, 'pca')
-
     """
 
     pca0 = df[col].apply(lambda x: x[0])
@@ -36,7 +28,8 @@ def scatterplot(df: pd.DataFrame , col: str, color: str = None, hover_data: [] =
                      hover_data=hover_data,
                      title=title
                     )
-    fig.show(config={'displayModeBar': False})
+    #fig.show(config={'displayModeBar': False})
+    fig.show()
 
 def top_words(s: pd.Series,  normalize=False) -> pd.Series:
     """

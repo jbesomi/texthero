@@ -1,3 +1,4 @@
+import texthero
 import setuptools
 from setuptools import find_packages
 
@@ -6,25 +7,21 @@ import os
 with open("requirements.txt") as f:
     install_requires = f.read().splitlines()
 
-# If building on RTD, don't install anything
-if os.environ.get("READTHEDOCS", None) == "True":
-    install_requires = []
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="texthero",
-    version="1.0.4",
-    description="Text preprocessing, representation and visualization made easy.",
+    name=texthero.__about__.__name__,
+    version=texthero.__about__.__version__,
+    description=texthero.__about__.__description__,
     long_description=long_description,
     long_description_content_type='text/markdown',
-    author="Jonathan Besomi",
-    author_email="jonathanbesomi@gmail.com",
-    url="https://github.com/jbesomi/texthero",
+    author=texthero.__about__.__author__,
+    url=texthero.__about__.__url__,
     keywords = ['text analytics'],
     install_requires=['nltk', 'scikit-learn', 'plotly_express'],
-    license="MIT",
+    license=texthero.__about__.__license__,
     zip_safe=False,
     packages=find_packages(),
     classifiers=[

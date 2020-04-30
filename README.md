@@ -21,7 +21,7 @@
 </p>
 
 <p align="center">
-    <img src=".github/logo_v2.png">
+    <img src="https://github.com/jbesomi/texthero/raw/master/github/logo.png">
 </p>
 
 <p style="font-size: 20px;" align="center">Text preprocessing, representation and visualization from zero to hero.</p>

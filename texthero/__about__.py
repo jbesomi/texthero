@@ -22,4 +22,4 @@ __author__ = "Jonathan Besomi"
 
 __license__ = "MIT"
 
-__copyright__ = "2020 %s" % __author__
+__copyright__ = "2020 %s" % __name__

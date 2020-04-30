@@ -37,10 +37,10 @@ def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
     --------
     >>> s = pd.Series("7ex7hero is fun 1111")
     >>> remove_digits(s)
-    0    7ex7hero is fun
+    0    7ex7hero is fun 
     dtype: object
     >>> remove_digits(s, only_blocks=False)
-    0    exhero is fun
+    0    exhero is fun 
     dtype: object
     """
 
@@ -207,7 +207,7 @@ def remove_round_brackets(s: pd.Series):
 
     >>> s = pd.Series("Texthero (is not a superhero!)")
     >>> remove_round_brackets(s)
-    0    Texthero
+    0    Texthero 
     dtype: object
 
     """
@@ -223,7 +223,7 @@ def remove_curly_brackets(s: pd.Series):
 
     >>> s = pd.Series("Texthero {is not a superhero!}")
     >>> remove_curly_brackets(s)
-    0    Texthero
+    0    Texthero 
     dtype: object
 
     """
@@ -239,7 +239,7 @@ def remove_square_brackets(s: pd.Series):
 
     >>> s = pd.Series("Texthero [is not a superhero!]")
     >>> remove_square_brackets(s)
-    0    Texthero
+    0    Texthero 
     dtype: object
 
     """
@@ -255,7 +255,7 @@ def remove_angle_brackets(s: pd.Series):
 
     >>> s = pd.Series("Texthero <is not a superhero!>")
     >>> remove_angle_brackets(s)
-    0    Texthero
+    0    Texthero 
     dtype: object
 
     """
@@ -273,7 +273,7 @@ def remove_brackets(s: pd.Series):
 
     >>> s = pd.Series("Texthero (round) [square] [curly] [angle]")
     >>> remove_brackets(s)
-    0    Texthero
+    0    Texthero    
     dtype: object
 
     See also

@@ -67,7 +67,7 @@ def do_tsne(s: pd.Series,
             random_state=None,
             method='barnes_hut',
             angle=0.5,
-            n_jobs=None):
+            n_jobs=-1):
     """
     Perform TSNE.
     """
@@ -78,7 +78,14 @@ def do_tsne(s: pd.Series,
         learning_rate=learning_rate,
         n_iter=n_iter,
         n_iter_without_progress=n_iter_without_progress,
-    )
+        min_grad_norm=min_grad_norm,
+        metric=metric,
+        init=init,
+        verbose=verbose,
+        random_state=random_state,
+        method=method,
+        angle=angle,
+        n_jobs=n_jobs)
     return pd.Series(tsne.fit_transform(list(s)).tolist(), index=s.index)
 
 

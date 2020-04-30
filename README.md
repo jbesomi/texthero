@@ -77,7 +77,7 @@ hero.scatterplot(df)
 
 <h2 align="center">API</h2>
 
-Texthero is composed of three modules: [preprocessing.py](/texthero/preprocessing.py), [representation.py](/texthero/representation.py) and [visualization.py])(/texthero/visualization.py).
+Texthero is composed of three modules: [preprocessing.py](/texthero/preprocessing.py), [representation.py](/texthero/representation.py) and [visualization.py](/texthero/visualization.py).
 
 <h3>⚒️ 1. Preprocessing</h3>
 
@@ -91,9 +91,9 @@ Complete documentation: [preprocessing](https://jbesomi.github.io/texthero/prepr
 
 Supported representation algorithms:
 1. Term frequency, inverse document frequency (`do_tfidf`)
-3. Word2Vec from Gensim [🔜]
-4. GloVe [🔜]
-5. Transformers [🔜]
+3. Word2Vec from Gensim 
+4. GloVe 
+5. Transformers 
 
 Supported dimensionality reduction algorithms:
 1. Principal component analysis (`do_pca`)
@@ -108,7 +108,7 @@ Complete documentation: [representation](https://jbesomi.github.io/texthero/repr
 Most common functions:
    - Text scatterplot. Handy when coupled with dimensionality reduction algorithms such as pca.
    - Most common words
-   - Most common words between two entities [🔜]
+   - Most common words between two entities 
 
 Complete documentation: [visualization](https://jbesomi.github.io/texthero/visualization.html)
 

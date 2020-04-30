@@ -11,6 +11,7 @@ from nltk.stem import SnowballStemmer
 import pandas as pd
 import numpy as np
 
+
 def fillna(input: pd.Series) -> pd.Series:
     """Replace not assigned values with empty spaces."""
     return input.fillna("").astype("str")
@@ -19,6 +20,7 @@ def fillna(input: pd.Series) -> pd.Series:
 def lowercase(input: pd.Series) -> pd.Series:
     """Lowercase all text."""
     return input.str.lower()
+
 
 def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
     """
@@ -35,10 +37,10 @@ def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
     --------
     >>> s = pd.Series("7ex7hero is fun 1111")
     >>> remove_digits(s)
-    0    7ex7hero is fun 
+    0    7ex7hero is fun
     dtype: object
     >>> remove_digits(s, only_blocks=False)
-    0    exhero is fun 
+    0    exhero is fun
     dtype: object
     """
 
@@ -48,14 +50,16 @@ def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
         return input.str.replace(r"\d+", "")
 
 
-def remove_punctuation(input : pd.Series) -> pd.Series:
+def remove_punctuation(input: pd.Series) -> pd.Series:
     """
     Remove string.punctuation (!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~).
 
     Replace it with a single space.
     """
-    RE_PUNCT = re.compile(r'([%s])+' % re.escape(string.punctuation), re.UNICODE)
+    RE_PUNCT = re.compile(r'([%s])+' % re.escape(string.punctuation),
+                          re.UNICODE)
     return input.str.replace(RE_PUNCT, " ")
+
 
 def remove_diacritics(input: pd.Series) -> pd.Series:
     """
@@ -63,12 +67,14 @@ def remove_diacritics(input: pd.Series) -> pd.Series:
     """
     return input.apply(unidecode.unidecode)
 
+
 def remove_whitespace(input: pd.Series) -> pd.Series:
     """
     Remove all white spaces between words.
     """
 
     return input.str.replace(u"\xa0", u" ").str.split().str.join(" ")
+
 
 def remove_stop_words(input: pd.Series) -> pd.Series:
     """
@@ -79,8 +85,6 @@ def remove_stop_words(input: pd.Series) -> pd.Series:
     stop_words = set(stopwords.words("english"))
     pat = r'\b(?:{})\b'.format('|'.join(stop_words))
     return input.str.replace(pat, '')
-
-
 
 
 def do_stem(input: pd.Series, stem="snowball") -> pd.Series:
@@ -100,7 +104,8 @@ def do_stem(input: pd.Series, stem="snowball") -> pd.Series:
     if stem is "porter":
         stemmer = PorterStemmer()
     elif stem is "snowball":
-        stemmer = SnowballStemmer("english") # TODO support for other languages.
+        stemmer = SnowballStemmer(
+            "english")    # TODO support for other languages.
     else:
         raise ValueError("stem argument must be either 'porter' of 'stemmer'")
 
@@ -109,6 +114,7 @@ def do_stem(input: pd.Series, stem="snowball") -> pd.Series:
         return " ".join([stemmer.stem(word) for word in text])
 
     return input.str.split().apply(_stem)
+
 
 def get_default_pipeline() -> []:
     """
@@ -123,14 +129,16 @@ def get_default_pipeline() -> []:
      - remove_stop_words
      - remove_whitespace
     """
-    return [fillna,
-            lowercase,
-            remove_digits,
-            remove_punctuation,
-            remove_diacritics,
-            remove_stop_words,
-            remove_whitespace,
-            ]
+    return [
+        fillna,
+        lowercase,
+        remove_digits,
+        remove_punctuation,
+        remove_diacritics,
+        remove_stop_words,
+        remove_whitespace,
+    ]
+
 
 def clean(s: pd.Series, pipeline=None) -> pd.Series:
     """
@@ -173,6 +181,7 @@ def has_content(s: pd.Series):
     """
     return (s.pipe(remove_whitespace) != "") & (~s.isna())
 
+
 def drop_no_content(s: pd.Series):
     """
     Drop all rows where has_content is empty.
@@ -198,11 +207,12 @@ def remove_round_brackets(s: pd.Series):
 
     >>> s = pd.Series("Texthero (is not a superhero!)")
     >>> remove_round_brackets(s)
-    0    Texthero 
+    0    Texthero
     dtype: object
 
     """
     return s.str.replace(r"\([^()]*\)", "")
+
 
 def remove_curly_brackets(s: pd.Series):
     """
@@ -213,11 +223,12 @@ def remove_curly_brackets(s: pd.Series):
 
     >>> s = pd.Series("Texthero {is not a superhero!}")
     >>> remove_curly_brackets(s)
-    0    Texthero 
+    0    Texthero
     dtype: object
 
     """
     return s.str.replace(r"\{[^{}]*\}", "")
+
 
 def remove_square_brackets(s: pd.Series):
     """
@@ -228,11 +239,12 @@ def remove_square_brackets(s: pd.Series):
 
     >>> s = pd.Series("Texthero [is not a superhero!]")
     >>> remove_square_brackets(s)
-    0    Texthero 
+    0    Texthero
     dtype: object
 
     """
     return s.str.replace(r"\[[^\[\]]*\]", "")
+
 
 def remove_angle_brackets(s: pd.Series):
     """
@@ -243,11 +255,12 @@ def remove_angle_brackets(s: pd.Series):
 
     >>> s = pd.Series("Texthero <is not a superhero!>")
     >>> remove_angle_brackets(s)
-    0    Texthero 
+    0    Texthero
     dtype: object
 
     """
     return s.str.replace(r"<[^<>]*>", "")
+
 
 def remove_brackets(s: pd.Series):
     """
@@ -260,7 +273,7 @@ def remove_brackets(s: pd.Series):
 
     >>> s = pd.Series("Texthero (round) [square] [curly] [angle]")
     >>> remove_brackets(s)
-    0    Texthero    
+    0    Texthero
     dtype: object
 
     See also
@@ -271,13 +284,8 @@ def remove_brackets(s: pd.Series):
     remove_angle_brackets(s)
 
     """
-    return (
-        s
-        .pipe(remove_round_brackets)
-        .pipe(remove_curly_brackets)
-        .pipe(remove_square_brackets)
-        .pipe(remove_angle_brackets)
-    )
+    return (s.pipe(remove_round_brackets).pipe(remove_curly_brackets).pipe(
+        remove_square_brackets).pipe(remove_angle_brackets))
 
 
 if __name__ == "__main__":

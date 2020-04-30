@@ -7,7 +7,6 @@ import os
 with open("requirements.txt") as f:
     install_requires = f.read().splitlines()
 
-
 with open("README.md", "r") as fh:
     long_description = fh.read()
 

@@ -2,11 +2,15 @@
 Visualize insights and statistics of a text-based Pandas DataFrame.
 """
 
-
 import pandas as pd
 import plotly.express as px
 
-def scatterplot(df: pd.DataFrame , col: str, color: str = None, hover_data: [] = None, title="") -> None:
+
+def scatterplot(df: pd.DataFrame,
+                col: str,
+                color: str = None,
+                hover_data: [] = None,
+                title="") -> None:
     """
     Show scatterplot using python plotly scatter.
 
@@ -21,17 +25,13 @@ def scatterplot(df: pd.DataFrame , col: str, color: str = None, hover_data: [] =
     pca0 = df[col].apply(lambda x: x[0])
     pca1 = df[col].apply(lambda x: x[1])
 
-    fig = px.scatter(df,
-                     x=pca0,
-                     y=pca1,
-                     color=color,
-                     hover_data=hover_data,
-                     title=title
-                    )
+    fig = px.scatter(
+        df, x=pca0, y=pca1, color=color, hover_data=hover_data, title=title)
     #fig.show(config={'displayModeBar': False})
     fig.show()
 
-def top_words(s: pd.Series,  normalize=False) -> pd.Series:
+
+def top_words(s: pd.Series, normalize=False) -> pd.Series:
     """
     Return most common words.
 
@@ -44,7 +44,9 @@ def top_words(s: pd.Series,  normalize=False) -> pd.Series:
 
     """
     WHITESPACE_SPLITTER = r"\W+"
-    return s.str.split(WHITESPACE_SPLITTER).explode().value_counts(normalize=normalize)
+    return s.str.split(WHITESPACE_SPLITTER).explode().value_counts(
+        normalize=normalize)
+
 
 if __name__ == "__main__":
     import doctest

@@ -134,9 +134,7 @@ Complete documentation: [preprocessing](https://texthero.org/docs/api-preprocess
 
 Supported representation algorithms:
 1. Term frequency, inverse document frequency (`do_tfidf`)
-3. Word2Vec from Gensim 
-4. GloVe 
-5. Transformers 
+
 
 Supported dimensionality reduction algorithms:
 1. Principal component analysis (`do_pca`)

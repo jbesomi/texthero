@@ -135,7 +135,7 @@ df['tfidf_clean_text'] = hero.do_tfidf(df['clean_text'])
 
 ##### Dimensionality reduction with PCA
 
-Now, to be able to visualize the data, we need to reduce the dimensions of the vector space.
+To visualize the data, we map each point to a two-dimensional representation with PCA. The principal component analysis algorithms returns the combination of attributes that better account the variance in the data.
 
 ```python
 df['pca_tfidf_clean_text'] = hero.do_pca(df['tfidf_clean_text'])

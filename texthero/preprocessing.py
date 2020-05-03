@@ -87,9 +87,9 @@ def remove_stop_words(input: pd.Series) -> pd.Series:
     return input.str.replace(pat, '')
 
 
-def do_stem(input: pd.Series, stem="snowball") -> pd.Series:
+def do_stem(input: pd.Series, stem="snowball", language="english") -> pd.Series:
     """
-    Stem series using either NLTK 'porter' or 'snowball' stemmers.
+    Stem series using either 'porter' or 'snowball' NLTK stemmers.
 
     Not in the default pipeline.
 
@@ -97,15 +97,18 @@ def do_stem(input: pd.Series, stem="snowball") -> pd.Series:
     ----------
     input
     stem
-        Can be either 'snowball' or 'stemm'
-
+        Can be either 'snowball' or 'porter'. ("snowball" is default)
+    language
+        Supportted languages: 
+            danish dutch english finnish french german hungarian italian 
+            norwegian porter portuguese romanian russian spanish swedish
     """
 
     if stem is "porter":
         stemmer = PorterStemmer()
     elif stem is "snowball":
         stemmer = SnowballStemmer(
-            "english")    # TODO support for other languages.
+            language)
     else:
         raise ValueError("stem argument must be either 'porter' of 'stemmer'")
 

@@ -22,3 +22,8 @@ website/i18n/*
 .idea
 
 alpha
+
+
+# Dataset
+raw
+download.sh

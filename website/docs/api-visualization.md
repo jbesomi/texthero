@@ -8,7 +8,7 @@ title: Visualization
 Visualize insights and statistics of a text-based Pandas DataFrame.
 
 
-### texthero.visualization.scatterplot(df, col, color=None, hover_data=None, title='')
+### texthero.visualization.scatterplot(df, col, color=None, hover_data=None, title='', return_figure=False)
 Show scatterplot using python plotly scatter.
 
 
@@ -20,14 +20,6 @@ Show scatterplot using python plotly scatter.
 
     * **col** – The name of the column of the DataFrame used for x and y axis.
 
-
-### Examples
-
-```python
->>> import texthero
->>> df = pd.DataFrame([(0,1), (1,0)], columns='pca')
->>> texthero.visualization.scatterplot(df, 'pca')
-```
 
 
 ### texthero.visualization.top_words(s, normalize=False)

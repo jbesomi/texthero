@@ -42,8 +42,8 @@ The default preprocessing pipeline is the following:
 
 
 
-### texthero.preprocessing.do_stemm(input, stem='snowball')
-Stem series using either NLTK ‘porter’ or ‘snowball’ stemmers.
+### texthero.preprocessing.do_stem(input, stem='snowball', language='english')
+Stem series using either ‘porter’ or ‘snowball’ NLTK stemmers.
 
 Not in the default pipeline.
 
@@ -54,7 +54,14 @@ Not in the default pipeline.
     * **input** (`Series`) – 
 
 
-    * **stem** – Can be either ‘snowball’ or ‘stemm’
+    * **stem** – Can be either ‘snowball’ or ‘porter’. (“snowball” is default)
+
+
+    * **language** – Supportted languages:
+
+        danish dutch english finnish french german hungarian italian
+        norwegian porter portuguese romanian russian spanish swedish
+
 
 
 
@@ -62,6 +69,20 @@ Not in the default pipeline.
 
     `Series`
 
+
+
+### texthero.preprocessing.drop_no_content(s)
+Drop all rows where has_content is empty.
+
+### Example
+
+```python
+>>> s = pd.Series(["c", np.nan, "   
+", " "])
+>>> drop_no_content(s)
+0    c
+dtype: object
+```
 
 
 ### texthero.preprocessing.fillna(input)
@@ -107,6 +128,23 @@ Return a list with the following function
 
 
 
+### texthero.preprocessing.has_content(s)
+For each row, check that there is content.
+
+### Example
+
+```python
+>>> s = pd.Series(["c", np.nan, "   
+", " "])
+>>> has_content(s)
+0     True
+1    False
+2    False
+3    False
+dtype: bool
+```
+
+
 ### texthero.preprocessing.lowercase(input)
 Lowercase all text.
 
@@ -115,6 +153,47 @@ Lowercase all text.
 
     `Series`
 
+
+
+### texthero.preprocessing.remove_angle_brackets(s)
+Remove content within angle brackets <> and the angle brackets.
+
+### Example
+
+```python
+>>> s = pd.Series("Texthero <is not a superhero!>")
+>>> remove_angle_brackets(s)
+0    Texthero
+dtype: object
+```
+
+
+### texthero.preprocessing.remove_brackets(s)
+Remove content within brackets and the brackets.
+
+Remove content from any kind of brackets, (), [], {}, <>.
+
+### Example
+
+```python
+>>> s = pd.Series("Texthero (round) [square] [curly] [angle]")
+>>> remove_brackets(s)
+0    Texthero
+dtype: object
+```
+
+
+### texthero.preprocessing.remove_curly_brackets(s)
+Remove content within curly brackets {} and the curly brackets.
+
+### Example
+
+```python
+>>> s = pd.Series("Texthero {is not a superhero!}")
+>>> remove_curly_brackets(s)
+0    Texthero
+dtype: object
+```
 
 
 ### texthero.preprocessing.remove_diacritics(input)
@@ -143,14 +222,12 @@ Remove all digits from a series and replace it with a single space.
 ### Examples
 
 ```python
->>> import texthero
->>> import pandas as pd
->>> s = pd.Series(["texthero 1234 He11o"])
->>> texthero.preprocessing.remove_digits(s)
-0    texthero He11o
+>>> s = pd.Series("7ex7hero is fun 1111")
+>>> remove_digits(s)
+0    7ex7hero is fun
 dtype: object
->>> texthero.preprocessing.remove_digits(s, only_blocks=False)
-0    texthero   He o
+>>> remove_digits(s, only_blocks=False)
+0    exhero is fun
 dtype: object
 ```
 
@@ -171,6 +248,32 @@ Replace it with a single space.
 
     `Series`
 
+
+
+### texthero.preprocessing.remove_round_brackets(s)
+Remove content within parentheses () and parentheses.
+
+### Example
+
+```python
+>>> s = pd.Series("Texthero (is not a superhero!)")
+>>> remove_round_brackets(s)
+0    Texthero
+dtype: object
+```
+
+
+### texthero.preprocessing.remove_square_brackets(s)
+Remove content within square brackets [] and the square brackets.
+
+### Example
+
+```python
+>>> s = pd.Series("Texthero [is not a superhero!]")
+>>> remove_square_brackets(s)
+0    Texthero
+dtype: object
+```
 
 
 ### texthero.preprocessing.remove_stop_words(input)

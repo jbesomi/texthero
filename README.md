@@ -126,7 +126,7 @@ Texthero is composed of three modules: [preprocessing.py](/texthero/preprocessin
 
 **Scope:** prepare the **text** data for further analysis.
 
-Complete documentation: [preprocessing](https://jbesomi.github.io/texthero/preprocessing.html)
+Complete documentation: [preprocessing](https://texthero.org/docs/api-preprocessing)
 
 <h3>2. Representation</h3>
 
@@ -142,7 +142,7 @@ Supported dimensionality reduction algorithms:
 1. Principal component analysis (`do_pca`)
 2. Non-negative matrix factorization (`do_nmf`)
 
-Complete documentation: [representation](https://jbesomi.github.io/texthero/representation.html)
+Complete documentation: [representation](https://texthero.org/docs/api-representation)
 
 <h3>3. Visualization</h3>
 
@@ -153,10 +153,9 @@ Most common functions:
    - Most common words
    - Most common words between two entities 
 
-Complete documentation: [visualization](https://jbesomi.github.io/texthero/visualization.html)
+Complete documentation: [visualization](https://texthero.org/docs/api-visualization)
 
 <h2 align="center">Contributions</h2>
-
 
 Pull requests are amazing and most welcome. Start by fork this repository and [open an issue](https://github.com/jbesomi/texthero/issues).
 

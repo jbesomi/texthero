@@ -30,9 +30,9 @@ Perform non-negative matrix factorization.
 Perform PCA.
 
 
-### texthero.representation.do_tfidf(s, max_features=100)
+### texthero.representation.do_tfidf(s, max_features=100, min_df=1)
 Represent input on a TF-IDF vector space.
 
 
-### texthero.representation.do_tsne(s, vector_columns, n_components, perplexity, early_exaggeration, learning_rate, n_iter)
+### texthero.representation.do_tsne(s, n_components=2, perplexity=30.0, early_exaggeration=12.0, learning_rate=200.0, n_iter=1000, n_iter_without_progress=300, min_grad_norm=1e-07, metric='euclidean', init='random', verbose=0, random_state=None, method='barnes_hut', angle=0.5, n_jobs=- 1)
 Perform TSNE.

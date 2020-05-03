@@ -1,0 +1,2 @@
+# requirements.txt left blank by choice
+# All required packages are define on setup.py, under `install_requires`

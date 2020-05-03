@@ -19,6 +19,8 @@ website/yarn.lock
 website/node_modules
 website/i18n/*
 
+*.log
+
 .idea
 
 alpha

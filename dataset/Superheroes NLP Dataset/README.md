@@ -2,7 +2,7 @@
 
 A playground dataset to learn and practice NLP, text mining and data analysis while having fun.
 
-The same dataset can be found on Kaggle: [Superheroes NLP Dataset]().
+The same dataset can be found on Kaggle: [Superheroes NLP Dataset](https://www.kaggle.com/jonathanbesomi/superheroes-nlp-dataset).
 
 All data have been scraped with python from [Superhero Database](https://www.superherodb.com/), credits belongs to them.
 
@@ -47,7 +47,18 @@ If you feel lazy, you can also import it directly from pandas:
 ```python
 import pandas as pd
 
-df = df.read_csv("")
+df = pd.read_csv("https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/Superheroes%20NLP%20Dataset/data/superheroes_nlp_dataset.csv")
 
 df.head()
+```
+
+```bash
+            name               real_name               full_name overall_score  ... has_durability has_stamina  has_agility  has_super_strength
+0        3-D Man     Delroy Garrett, Jr.     Delroy Garrett, Jr.             6  ...            0.0         0.0          0.0                 1.0
+1  514A (Gotham)             Bruce Wayne                     NaN            10  ...            1.0         0.0          0.0                 1.0
+2         A-Bomb  Richard Milhouse Jones  Richard Milhouse Jones            20  ...            1.0         1.0          1.0                 1.0
+3             Aa                      Aa                     NaN            12  ...            0.0         0.0          0.0                 0.0
+4     Aaron Cash              Aaron Cash              Aaron Cash             5  ...            0.0         0.0          0.0                 0.0
+
+[5 rows x 81 columns]
 ```

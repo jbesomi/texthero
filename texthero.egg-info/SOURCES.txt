@@ -1,4 +1,5 @@
 README.md
+setup.cfg
 setup.py
 texthero/__about__.py
 texthero/__init__.py

@@ -10,7 +10,8 @@ def scatterplot(df: pd.DataFrame,
                 col: str,
                 color: str = None,
                 hover_data: [] = None,
-                title="") -> None:
+                title="",
+                return_figure=False):
     """
     Show scatterplot using python plotly scatter.
 
@@ -29,6 +30,9 @@ def scatterplot(df: pd.DataFrame,
         df, x=pca0, y=pca1, color=color, hover_data=hover_data, title=title)
     #fig.show(config={'displayModeBar': False})
     fig.show()
+
+    if return_figure:
+        return fig
 
 
 def top_words(s: pd.Series, normalize=False) -> pd.Series:

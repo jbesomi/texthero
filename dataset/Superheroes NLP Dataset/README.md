@@ -8,8 +8,10 @@ All data have been scraped with python from [Superhero Database](https://www.sup
 
 ## Dataset summary
 
-Size: 10 MB.
+Size: 8 MB.
+
 Num. columns: 81.
+
 Num. superheroes: 1447.
 
 Main columns:
@@ -40,7 +42,7 @@ Main columns:
 
 ## Getting started
 
-You can download the complete dataset directly from Github here: [Superheroes NLP Dataset](./dataset/Superheroes NLP Dataset/data/superheroes_nlp_dataset.csv).
+You can download the complete dataset directly from Github here: [Superheroes NLP Dataset](https://github.com/jbesomi/texthero/tree/master/dataset/Superheroes%20NLP%20Dataset/data).
 
 If you feel lazy, you can also import it directly from pandas:
 

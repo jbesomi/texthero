@@ -16,7 +16,7 @@ __description__ = "Text preprocessing, representation and visualization from zer
 
 __url__ = "https://github.com/jbesomi/texthero"
 
-__version__ = "1.0.5"
+__version__ = "1.0.6"
 
 __author__ = "Jonathan Besomi"
 

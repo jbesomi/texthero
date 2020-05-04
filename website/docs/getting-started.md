@@ -58,7 +58,7 @@ import pandas as pd
 Load the `bbc sport` dataset in a Pandas DataFrame.
 
 ```python
-pd = pd.read_csv(
+df = pd.read_csv(
    "https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv"
 )
 ```
@@ -78,23 +78,26 @@ pd = pd.read_csv(
 To clean the text data all we have to do is:
 
 ```python
-df['text_clean'] = hero.clean(df['text'])
+df['clean_text'] = hero.clean(df['text'])
 ```
 
 Recently, Pandas has introduced the pipe function. You can achieve the same results with
 
 ```python
-df['text_clean'] = df['text'].pipe(hero.clean)
+df['clean_text'] = df['text'].pipe(hero.clean)
 ```
 
-The default pipeline for the clean method is:
+> Tips. When we need to define a new column returned from a function, we prepend the name of the function to the column name. Example: df['tsne_col'] = df['col'].pipe(hero.tsne). This keep the code simple to read and permit to construct complex pipeline.
 
-1. `preprocessing.fillna(s)` Replace not assigned values with empty spaces.
-1. `preprocessing.lowercase(s)` Lowercase all text.
-1. `preprocessing.remove_digits()` Remove all blocks of digits.
-1. `preprocessing.remove_punctuation()` Remove all string.punctuation (!"#$%&\'()\*+,-./:;<=>?@[\\]^\_\`{|}~).
-1. `preprocessing.remove_diacritics()` Remove all accents from strings.
-1. `preprocessing.remove_whitespace()` Remove all white space between words.
+The default pipeline for the `clean` method is the following:
+
+1. `fillna(s)` Replace not assigned values with empty spaces.
+1. `lowercase(s)` Lowercase all text.
+1. `remove_digits()` Remove all blocks of digits.
+1. `remove_punctuation()` Remove all string.punctuation (!"#$%&\'()\*+,-./:;<=>?@[\\]^\_\`{|}~).
+1. `remove_diacritics()` Remove all accents from strings.
+1. `remove_stopwords()` Remove all stop words.
+1. `remove_whitespace()` Remove all white space between words.
 
 > As texthero is still in beta, the default pipeline may undergo some minor changes in the next versions.
 
@@ -107,14 +110,14 @@ from texthero import preprocessing
 
 custom_pipeline = [preprocessing.fillna,
                    preprocessing.lowercase,
-                   preprocessing.remove_whitespaces]
+                   preprocessing.remove_whitespace]
 df['clean_text'] = hero.clean(df['text'])
 ```
 
 or alternatively
 
 ```python
-df['clean_text'] = df['clean_text']).pipe(hero.clean, custom_pipeline)
+df['clean_text'] = df['clean_text'].pipe(hero.clean, custom_pipeline)
 ```
 
 ##### Preprocessing API
@@ -130,7 +133,7 @@ Once cleaned the data, the next natural is to map each document into a vector.
 
 
 ```python
-df['tfidf_clean_text'] = hero.do_tfidf(df['clean_text'])
+df['tfidf_clean_text'] = hero.tfidf(df['clean_text'])
 ```
 
 ##### Dimensionality reduction with PCA
@@ -138,7 +141,7 @@ df['tfidf_clean_text'] = hero.do_tfidf(df['clean_text'])
 To visualize the data, we map each point to a two-dimensional representation with PCA. The principal component analysis algorithms returns the combination of attributes that better account the variance in the data.
 
 ```python
-df['pca_tfidf_clean_text'] = hero.do_pca(df['tfidf_clean_text'])
+df['pca_tfidf_clean_text'] = hero.pca(df['tfidf_clean_text'])
 ```
 
 ##### All in one step
@@ -149,8 +152,8 @@ We can achieve all the three steps show above, _cleaning_, _tf-idf representatio
 df['pca'] = (
             df['text']
             .pipe(hero.clean)
-            .pipe(hero.do_tfidf)
-            .pipe(hero.do_pca)
+            .pipe(hero.tfidf)
+            .pipe(hero.pca)
    )
 ```
 
@@ -164,7 +167,7 @@ The complete representation module API can be found at the following address: [a
 
 
 ```python
-hero.scatterplot(df, col='pca', color='labels', title="PCA BBC Sport news")
+hero.scatterplot(df, col='pca', color='topic', title="PCA BBC Sport news")
 ```
 
 ![](/img/scatterplot_bccsport.svg)
@@ -214,8 +217,8 @@ df = pd.read_csv(
 df['pca'] = (
     df['text']
     .pipe(hero.clean)
-    .pipe(hero.do_tfidf)
-    .pipe(hero.do_pca)
+    .pipe(hero.tfidf)
+    .pipe(hero.pca)
 )
 
 hero.scatterplot(df, col='pca', color='topic', title="PCA BBC Sport news")

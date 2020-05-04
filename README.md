@@ -68,29 +68,29 @@ In case you are an advanced python user, then `help(texthero)` should do the wor
 
 
 ```python
-import texthero.texthero as hero
+import texthero as hero
 import pandas as pd
 
 df = pd.read_csv(
-    "https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv"
+   "https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv"
 )
 
 df['pca'] = (
-    df['text']
-    .pipe(hero.clean)
-    .pipe(hero.do_tfidf)
-    .pipe(hero.do_pca)
+   df['text']
+   .pipe(hero.clean)
+   .pipe(hero.tfidf)
+   .pipe(hero.pca)
 )
 hero.scatterplot(df, 'pca', color='topic', title="PCA BBC Sport news")
 ```
-
-<img src="https://github.com/jbesomi/texthero/raw/master/github/scatterplot_bbcsport.svg">
-
+<p align="center">
+   <img src="https://github.com/jbesomi/texthero/raw/master/github/scatterplot_bbcsport.svg">
+</p>
 
 <h3>Text preprocessing, TF-IDF, K-means and visualization</h3>
 
 ```python
-import texthero.texthero as hero
+import texthero as hero
 import pandas as pd
 
 df = pd.read_csv(
@@ -100,23 +100,25 @@ df = pd.read_csv(
 df['tfidf'] = (
     df['text']
     .pipe(hero.clean)
-    .pipe(hero.do_tfidf)
+    .pipe(hero.tfidf)
 )
 
 df['kmeans_labels'] = (
     df['tfidf']
-    .pipe(hero.do_kmeans, n_clusters=5)
+    .pipe(hero.kmeans, n_clusters=5)
+    .astype(str)
 )
 
 df['pca'] = (
     df['tfidf']
-    .pipe(hero.do_pca)
+    .pipe(hero.pca)
 )
 
 hero.scatterplot(df, 'pca', color='kmeans_labels', title="K-means BBC Sport news")
 ```
-
-<img src="https://github.com/jbesomi/texthero/raw/master/github/scatterplot_bbcsport_kmeans.svg">
+<p align="center">
+   <img src="https://github.com/jbesomi/texthero/raw/master/github/scatterplot_bbcsport_kmeans.svg">
+</p>
 
 <h2 align="center">API</h2>
 

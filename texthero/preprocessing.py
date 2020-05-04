@@ -76,7 +76,7 @@ def remove_whitespace(input: pd.Series) -> pd.Series:
     return input.str.replace(u"\xa0", u" ").str.split().str.join(" ")
 
 
-def remove_stop_words(input: pd.Series) -> pd.Series:
+def remove_stopwords(input: pd.Series) -> pd.Series:
     """
     Remove all stop words using NLTK stopwords list.
 
@@ -87,7 +87,7 @@ def remove_stop_words(input: pd.Series) -> pd.Series:
     return input.str.replace(pat, '')
 
 
-def do_stem(input: pd.Series, stem="snowball", language="english") -> pd.Series:
+def stem(input: pd.Series, stem="snowball", language="english") -> pd.Series:
     """
     Stem series using either 'porter' or 'snowball' NLTK stemmers.
 
@@ -107,8 +107,7 @@ def do_stem(input: pd.Series, stem="snowball", language="english") -> pd.Series:
     if stem is "porter":
         stemmer = PorterStemmer()
     elif stem is "snowball":
-        stemmer = SnowballStemmer(
-            language)
+        stemmer = SnowballStemmer(language)
     else:
         raise ValueError("stem argument must be either 'porter' of 'stemmer'")
 
@@ -129,7 +128,7 @@ def get_default_pipeline() -> []:
      - remove_digits
      - remove_punctuation
      - remove_diacritics
-     - remove_stop_words
+     - remove_stopwords
      - remove_whitespace
     """
     return [
@@ -138,7 +137,7 @@ def get_default_pipeline() -> []:
         remove_digits,
         remove_punctuation,
         remove_diacritics,
-        remove_stop_words,
+        remove_stopwords,
         remove_whitespace,
     ]
 
@@ -154,7 +153,7 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
      - remove_digits
      - remove_punctuation
      - remove_diacritics
-     - remove_stop_words
+     - remove_stopwords
      - remove_whitespace
     """
 

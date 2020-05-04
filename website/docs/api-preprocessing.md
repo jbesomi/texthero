@@ -30,39 +30,10 @@ The default preprocessing pipeline is the following:
 > * remove_diacritics
 
 
-> * remove_stop_words
+> * remove_stopwords
 
 
 > * remove_whitespace
-
-
-* **Return type**
-
-    `Series`
-
-
-
-### texthero.preprocessing.do_stem(input, stem='snowball', language='english')
-Stem series using either ‘porter’ or ‘snowball’ NLTK stemmers.
-
-Not in the default pipeline.
-
-
-* **Parameters**
-
-    
-    * **input** (`Series`) – 
-
-
-    * **stem** – Can be either ‘snowball’ or ‘porter’. (“snowball” is default)
-
-
-    * **language** – Supportted languages:
-
-        danish dutch english finnish french german hungarian italian
-        norwegian porter portuguese romanian russian spanish swedish
-
-
 
 
 * **Return type**
@@ -116,7 +87,7 @@ Return a list with the following function
     * remove_diacritics
 
 
-    * remove_stop_words
+    * remove_stopwords
 
 
     * remove_whitespace
@@ -276,7 +247,7 @@ dtype: object
 ```
 
 
-### texthero.preprocessing.remove_stop_words(input)
+### texthero.preprocessing.remove_stopwords(input)
 Remove all stop words using NLTK stopwords list.
 
 List of stopwords: NLTK ‘english’ stopwords, 179 items.
@@ -290,6 +261,35 @@ List of stopwords: NLTK ‘english’ stopwords, 179 items.
 
 ### texthero.preprocessing.remove_whitespace(input)
 Remove all white spaces between words.
+
+
+* **Return type**
+
+    `Series`
+
+
+
+### texthero.preprocessing.stem(input, stem='snowball', language='english')
+Stem series using either ‘porter’ or ‘snowball’ NLTK stemmers.
+
+Not in the default pipeline.
+
+
+* **Parameters**
+
+    
+    * **input** (`Series`) – 
+
+
+    * **stem** – Can be either ‘snowball’ or ‘porter’. (“snowball” is default)
+
+
+    * **language** – Supportted languages:
+
+        danish dutch english finnish french german hungarian italian
+        norwegian porter portuguese romanian russian spanish swedish
+
+
 
 
 * **Return type**

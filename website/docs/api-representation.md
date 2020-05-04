@@ -6,33 +6,33 @@ title: Representation
 Map words into vectors using different algorithms such as TF-IDF, word2vec or GloVe.
 
 
-### texthero.representation.do_count(s, max_features=100)
+### texthero.representation.count(s, max_features=100)
 Represent input on a Count vector space.
 
 
-### texthero.representation.do_dbscan(s, eps=0.5, min_samples=5, metric='euclidean', metric_params=None, algorithm='auto', leaf_size=30, p=None, n_jobs=None)
+### texthero.representation.dbscan(s, eps=0.5, min_samples=5, metric='euclidean', metric_params=None, algorithm='auto', leaf_size=30, p=None, n_jobs=None)
 Perform DBSCAN clustering.
 
 
-### texthero.representation.do_kmeans(s, n_clusters=5, init='k-means++', n_init=10, max_iter=300, tol=0.0001, precompute_distances='auto', verbose=0, random_state=None, copy_x=True, n_jobs=- 1, algorithm='auto')
+### texthero.representation.kmeans(s, n_clusters=5, init='k-means++', n_init=10, max_iter=300, tol=0.0001, precompute_distances='auto', verbose=0, random_state=None, copy_x=True, n_jobs=- 1, algorithm='auto')
 Perform K-means clustering algorithm.
 
 
-### texthero.representation.do_meanshift(s, bandwidth=None, seeds=None, bin_seeding=False, min_bin_freq=1, cluster_all=True, n_jobs=None, max_iter=300)
+### texthero.representation.meanshift(s, bandwidth=None, seeds=None, bin_seeding=False, min_bin_freq=1, cluster_all=True, n_jobs=None, max_iter=300)
 Perform mean shift clustering.
 
 
-### texthero.representation.do_nmf(s, n_components=2)
+### texthero.representation.nmf(s, n_components=2)
 Perform non-negative matrix factorization.
 
 
-### texthero.representation.do_pca(s, n_components=2)
+### texthero.representation.pca(s, n_components=2)
 Perform PCA.
 
 
-### texthero.representation.do_tfidf(s, max_features=100, min_df=1)
+### texthero.representation.tfidf(s, max_features=100, min_df=1)
 Represent input on a TF-IDF vector space.
 
 
-### texthero.representation.do_tsne(s, n_components=2, perplexity=30.0, early_exaggeration=12.0, learning_rate=200.0, n_iter=1000, n_iter_without_progress=300, min_grad_norm=1e-07, metric='euclidean', init='random', verbose=0, random_state=None, method='barnes_hut', angle=0.5, n_jobs=- 1)
+### texthero.representation.tsne(s, n_components=2, perplexity=30.0, early_exaggeration=12.0, learning_rate=200.0, n_iter=1000, n_iter_without_progress=300, min_grad_norm=1e-07, metric='euclidean', init='random', verbose=0, random_state=None, method='barnes_hut', angle=0.5, n_jobs=- 1)
 Perform TSNE.

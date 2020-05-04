@@ -80,7 +80,7 @@ const GithuButton = props => (
               src="https://ghbtns.com/github-btn.html?user=jbesomi&amp;repo=texthero&amp;type=star&amp;count=true&amp;size=large"
               frameBorder={0}
               scrolling={0}
-              width={120}
+              width={140}
               height={30}
               title="GitHub Stars"
             />

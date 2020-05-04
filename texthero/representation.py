@@ -13,7 +13,7 @@ Vectorization
 """
 
 
-def do_tfidf(s: pd.Series, max_features=100, min_df=1):
+def tfidf(s: pd.Series, max_features=100, min_df=1):
     """
     Represent input on a TF-IDF vector space.
     """
@@ -23,7 +23,7 @@ def do_tfidf(s: pd.Series, max_features=100, min_df=1):
     return pd.Series(tfidf.fit_transform(s).toarray().tolist(), index=s.index)
 
 
-def do_count(s: pd.Series, max_features=100):
+def count(s: pd.Series, max_features=100):
     """
     Represent input on a Count vector space.
     """
@@ -37,7 +37,7 @@ Dimensionality reduction
 """
 
 
-def do_pca(s, n_components=2):
+def pca(s, n_components=2):
     """
     Perform PCA.
     """
@@ -45,7 +45,7 @@ def do_pca(s, n_components=2):
     return pd.Series(pca.fit_transform(list(s)).tolist(), index=s.index)
 
 
-def do_nmf(s, n_components=2):
+def nmf(s, n_components=2):
     """
     Perform non-negative matrix factorization.
     """
@@ -53,21 +53,21 @@ def do_nmf(s, n_components=2):
     return pd.Series(nmf.fit_transform(list(s)).tolist(), index=s.index)
 
 
-def do_tsne(s: pd.Series,
-            n_components=2,
-            perplexity=30.0,
-            early_exaggeration=12.0,
-            learning_rate=200.0,
-            n_iter=1000,
-            n_iter_without_progress=300,
-            min_grad_norm=1e-07,
-            metric='euclidean',
-            init='random',
-            verbose=0,
-            random_state=None,
-            method='barnes_hut',
-            angle=0.5,
-            n_jobs=-1):
+def tsne(s: pd.Series,
+         n_components=2,
+         perplexity=30.0,
+         early_exaggeration=12.0,
+         learning_rate=200.0,
+         n_iter=1000,
+         n_iter_without_progress=300,
+         min_grad_norm=1e-07,
+         metric='euclidean',
+         init='random',
+         verbose=0,
+         random_state=None,
+         method='barnes_hut',
+         angle=0.5,
+         n_jobs=-1):
     """
     Perform TSNE.
     """
@@ -94,18 +94,18 @@ Clustering
 """
 
 
-def do_kmeans(s: pd.Series,
-              n_clusters=5,
-              init='k-means++',
-              n_init=10,
-              max_iter=300,
-              tol=0.0001,
-              precompute_distances='auto',
-              verbose=0,
-              random_state=None,
-              copy_x=True,
-              n_jobs=-1,
-              algorithm='auto'):
+def kmeans(s: pd.Series,
+           n_clusters=5,
+           init='k-means++',
+           n_init=10,
+           max_iter=300,
+           tol=0.0001,
+           precompute_distances='auto',
+           verbose=0,
+           random_state=None,
+           copy_x=True,
+           n_jobs=-1,
+           algorithm='auto'):
     """
     Perform K-means clustering algorithm.
     """
@@ -125,15 +125,15 @@ def do_kmeans(s: pd.Series,
     return pd.Series(kmeans.predict(vectors), index=s.index)
 
 
-def do_dbscan(s,
-              eps=0.5,
-              min_samples=5,
-              metric='euclidean',
-              metric_params=None,
-              algorithm='auto',
-              leaf_size=30,
-              p=None,
-              n_jobs=None):
+def dbscan(s,
+           eps=0.5,
+           min_samples=5,
+           metric='euclidean',
+           metric_params=None,
+           algorithm='auto',
+           leaf_size=30,
+           p=None,
+           n_jobs=None):
     """
     Perform DBSCAN clustering.
     """
@@ -151,14 +151,14 @@ def do_dbscan(s,
         index=s.index)
 
 
-def do_meanshift(s,
-                 bandwidth=None,
-                 seeds=None,
-                 bin_seeding=False,
-                 min_bin_freq=1,
-                 cluster_all=True,
-                 n_jobs=None,
-                 max_iter=300):
+def meanshift(s,
+              bandwidth=None,
+              seeds=None,
+              bin_seeding=False,
+              min_bin_freq=1,
+              cluster_all=True,
+              n_jobs=None,
+              max_iter=300):
     """
     Perform mean shift clustering.
     """

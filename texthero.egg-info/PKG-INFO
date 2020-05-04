@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: texthero
-Version: 1.0.5
+Version: 1.0.6
 Summary: Text preprocessing, representation and visualization from zero to hero.
 Home-page: https://github.com/jbesomi/texthero
 Author: Jonathan Besomi
@@ -71,61 +71,102 @@ Description: <p align="center">
         
         <h2 align="center">Example</h2>
         
+        <h3>Text preprocessing, TF-IDF representation and scatter visualization</h3>
+        
+        
         ```python
-        import texthero.texthero as hero
+        import texthero as hero
         import pandas as pd
         
-        df = pd.DataFrame(["hello world", "hello", "world"], columns='text')
-        df = hero.do_preprocess(df)
-        df = hero.do_tfidf(df)
-        df = hero.do_pca(df)
-        hero.scatterplot(df)
-        ```
+        df = pd.read_csv(
+           "https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv"
+        )
         
-        (The same example can also be found as a "getting-started guide" here: ...)
+        df['pca'] = (
+           df['text']
+           .pipe(hero.clean)
+           .pipe(hero.tfidf)
+           .pipe(hero.pca)
+        )
+        hero.scatterplot(df, 'pca', color='topic', title="PCA BBC Sport news")
+        ```
+        <p align="center">
+           <img src="https://github.com/jbesomi/texthero/raw/master/github/scatterplot_bbcsport.svg">
+        </p>
+        
+        <h3>Text preprocessing, TF-IDF, K-means and visualization</h3>
+        
+        ```python
+        import texthero as hero
+        import pandas as pd
+        
+        df = pd.read_csv(
+            "https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv"
+        )
+        
+        df['tfidf'] = (
+            df['text']
+            .pipe(hero.clean)
+            .pipe(hero.tfidf)
+        )
+        
+        df['kmeans_labels'] = (
+            df['tfidf']
+            .pipe(hero.kmeans, n_clusters=5)
+            .astype(str)
+        )
+        
+        df['pca'] = (
+            df['tfidf']
+            .pipe(hero.pca)
+        )
+        
+        hero.scatterplot(df, 'pca', color='kmeans_labels', title="K-means BBC Sport news")
+        ```
+        <p align="center">
+           <img src="https://github.com/jbesomi/texthero/raw/master/github/scatterplot_bbcsport_kmeans.svg">
+        </p>
         
         <h2 align="center">API</h2>
         
         Texthero is composed of three modules: [preprocessing.py](/texthero/preprocessing.py), [representation.py](/texthero/representation.py) and [visualization.py](/texthero/visualization.py).
         
-        <h3>⚒️ 1. Preprocessing</h3>
+        <h3>1. Preprocessing</h3>
         
         **Scope:** prepare the **text** data for further analysis.
         
-        Complete documentation: [preprocessing](https://jbesomi.github.io/texthero/preprocessing.html)
+        Complete documentation: [preprocessing](https://texthero.org/docs/api-preprocessing)
         
-        <h3>📒 2. Representation</h3>
+        <h3>2. Representation</h3>
         
-        **Job:** map text data into vectors and do dimensionality reduction.
+        **Scope:** map text data into vectors and do dimensionality reduction.
         
         Supported representation algorithms:
         1. Term frequency, inverse document frequency (`do_tfidf`)
-        3. Word2Vec from Gensim 
-        4. GloVe 
-        5. Transformers 
+        
         
         Supported dimensionality reduction algorithms:
         1. Principal component analysis (`do_pca`)
         2. Non-negative matrix factorization (`do_nmf`)
         
-        Complete documentation: [representation](https://jbesomi.github.io/texthero/representation.html)
+        Complete documentation: [representation](https://texthero.org/docs/api-representation)
         
-        <h3>🔮 3. Visualization</h3>
+        <h3>3. Visualization</h3>
         
-        **Job:** collection of functions to both summarize the main facts regarding the data and visualize the results. This part is very opinionated and ideal for anyone that needs a quick solution to visualize on screen the text data for instance during a text exploratory data analysis (EDA).
+        **Scope:** collection of functions to both summarize the main facts regarding the data and visualize the results. This part is very opinionated and ideal for anyone that needs a quick solution to visualize on screen the text data for instance during a text exploratory data analysis (EDA).
         
         Most common functions:
            - Text scatterplot. Handy when coupled with dimensionality reduction algorithms such as pca.
            - Most common words
            - Most common words between two entities 
         
-        Complete documentation: [visualization](https://jbesomi.github.io/texthero/visualization.html)
+        Complete documentation: [visualization](https://texthero.org/docs/api-visualization)
         
         <h2 align="center">Contributions</h2>
         
-        Pull requests are amazing and most welcome.
+        Pull requests are amazing and most welcome. Start by fork this repository and [open an issue](https://github.com/jbesomi/texthero/issues).
         
-        Any help, feedback and contribution are very welcome. You can simply fork this repository and [open an issue](https://github.com/jbesomi/texthero/issues).
+        Also, Texthero is looking for maintainers. In case of interest, just drop a line at jonathanbesomi__AT__gmail.com
         
 Keywords: text analytics
 Platform: UNKNOWN

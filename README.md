@@ -83,6 +83,7 @@ df['pca'] = (
 )
 hero.scatterplot(df, 'pca', color='topic', title="PCA BBC Sport news")
 ```
+
 <p align="center">
    <img src="https://github.com/jbesomi/texthero/raw/master/github/scatterplot_bbcsport.svg">
 </p>
@@ -113,15 +114,16 @@ df['pca'] = df['tfidf'].pipe(hero.pca)
 
 hero.scatterplot(df, 'pca', color='kmeans_labels', title="K-means BBC Sport news")
 ```
+
 <p align="center">
    <img src="https://github.com/jbesomi/texthero/raw/master/github/scatterplot_bbcsport_kmeans.svg">
 </p>
 
 <h3>3. Simple pipeline for text cleaning</h3>
 
-You got some dirty text data
+Say we got some dirty text data we wants to clean. 
 
-```
+```python
 >>> import texthero as hero
 >>> import pandas as pd
 >>> text = "This sèntencé    (123 $) needs to [OK!] be cleaned!   "
@@ -133,7 +135,7 @@ dtype: object
 
 Remove all digits:
 
-```
+```python
 >>> s = hero.remove_digits(s)
 >>> s
 0    This sèntencé    (  $) needs to [OK!] be cleaned!
@@ -142,7 +144,7 @@ dtype: object
 
 Remove all type of brackets and their content.
 
-``` 
+```python
 >>> s = hero.remove_brackets(s)
 >>> s 
 0    This sèntencé    needs to  be cleaned!
@@ -151,7 +153,7 @@ dtype: object
 
 Remove diacritics.
 
-``` 
+```python
 >>> s = hero.remove_diacritics(s)
 >>> s 
 0    This sentence    needs to  be cleaned!
@@ -160,7 +162,7 @@ dtype: object
 
 Remove punctuation.
 
-``` 
+```python
 >>> s = hero.remove_punctuation(s)
 >>> s 
 0    This sentence    needs to  be cleaned
@@ -169,7 +171,7 @@ dtype: object
 
 Remove extra white-spaces.
 
-``` 
+```python
 >>> s = hero.remove_whitespace(s)
 >>> s 
 0    This sentence needs to be cleaned
@@ -178,7 +180,7 @@ dtype: object
 
 Sometimes we also wants to get rid of stop-words.
 
-```
+```python
 >>> s = hero.remove_stopwords(s)
 >>> s
 0    This sentence needs cleaned

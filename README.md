@@ -124,22 +124,22 @@ hero.scatterplot(df, 'pca', color='kmeans_labels', title="K-means BBC Sport news
 
 Say we got some dirty text data we wants to clean. 
 
-```python-repl
+```python
 >>> import texthero as hero
 >>> import pandas as pd
->>> text = "This sèntencé    (123 $) needs to [OK!] be cleaned!   "
+>>> text = "This sèntencé    (123 /) needs to [OK!] be cleaned!   "
 >>> s = pd.Series(text)
 >>> s
-0    This sèntencé    (123 $) needs to [OK!] be cleane...
+0    This sèntencé    (123 /) needs to [OK!] be cleane...
 dtype: object
 ```
 
 Remove all digits:
 
-```bash
+```python
 >>> s = hero.remove_digits(s)
 >>> s
-0    This sèntencé    (  $) needs to [OK!] be cleaned!
+0    This sèntencé    (  /) needs to [OK!] be cleaned!
 dtype: object
 ```
 

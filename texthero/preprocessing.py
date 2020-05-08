@@ -37,17 +37,17 @@ def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
     --------
     >>> s = pd.Series("7ex7hero is fun 1111")
     >>> remove_digits(s)
-    0    7ex7hero is fun 
+    0    7ex7hero is fun  
     dtype: object
     >>> remove_digits(s, only_blocks=False)
-    0    exhero is fun 
+    0     ex hero is fun  
     dtype: object
     """
 
     if only_blocks:
-        return input.str.replace(r"^\d+\s|\s\d+\s|\s\d+$", " ")
+        return input.str.replace(r"(^)\d+(\W)|(\W)\d+(\W)|(\W)\d+($)", r"\1\3\5 \2\4\6")
     else:
-        return input.str.replace(r"\d+", "")
+        return input.str.replace(r"\d+", " ")
 
 
 def remove_punctuation(input: pd.Series) -> pd.Series:

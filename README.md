@@ -64,7 +64,7 @@ In case you are an advanced python user, then `help(texthero)` should do the wor
 
 <h2 align="center">Example</h2>
 
-<h3>Text cleaning, TF-IDF representation and visualization</h3>
+<h3>1. Text cleaning, TF-IDF representation and visualization</h3>
 
 
 ```python
@@ -87,7 +87,7 @@ hero.scatterplot(df, 'pca', color='topic', title="PCA BBC Sport news")
    <img src="https://github.com/jbesomi/texthero/raw/master/github/scatterplot_bbcsport.svg">
 </p>
 
-<h3>Text preprocessing, TF-IDF, K-means and visualization</h3>
+<h3>2. Text preprocessing, TF-IDF, K-means and visualization</h3>
 
 ```python
 import texthero as hero
@@ -116,6 +116,74 @@ hero.scatterplot(df, 'pca', color='kmeans_labels', title="K-means BBC Sport news
 <p align="center">
    <img src="https://github.com/jbesomi/texthero/raw/master/github/scatterplot_bbcsport_kmeans.svg">
 </p>
+
+<h3>3. Simple pipeline for text cleaning</h3>
+
+You got some dirty text data
+
+```
+>>> import texthero as hero
+>>> import pandas as pd
+>>> text = "This sèntencé    (123 $) needs to [OK!] be cleaned!   "
+>>> s = pd.Series(text)
+>>> s
+0    This sèntencé    (123 $) needs to [OK!] be cleane...
+dtype: object
+```
+
+Remove all digits:
+
+```
+>>> s = hero.remove_digits(s)
+>>> s
+0    This sèntencé    (  $) needs to [OK!] be cleaned!
+dtype: object
+```
+
+Remove all type of brackets and their content.
+
+``` 
+>>> s = hero.remove_brackets(s)
+>>> s 
+0    This sèntencé    needs to  be cleaned!
+dtype: object
+```
+
+Remove diacritics.
+
+``` 
+>>> s = hero.remove_diacritics(s)
+>>> s 
+0    This sentence    needs to  be cleaned!
+dtype: object
+```
+
+Remove punctuation.
+
+``` 
+>>> s = hero.remove_punctuation(s)
+>>> s 
+0    This sentence    needs to  be cleaned
+dtype: object
+```
+
+Remove extra white-spaces.
+
+``` 
+>>> s = hero.remove_whitespace(s)
+>>> s 
+0    This sentence needs to be cleaned
+dtype: object
+```
+
+Sometimes we also wants to get rid of stop-words.
+
+```
+>>> s = hero.remove_stopwords(s)
+>>> s
+0    This sentence needs cleaned
+dtype: object
+```
 
 <h2 align="center">API</h2>
 

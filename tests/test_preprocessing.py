@@ -4,15 +4,37 @@ import pandas as pd
 Test `remove_digits`
 """
 
-text = "remove_digits remove all the 1234 digits of a pandas series. H1N1"
-text_preprocessed = "remove_digits remove all the digits of a pandas series. H1N1"
-text_preprocessed_block_false = "remove_digits remove all the  digits of a pandas series. HN"
-assert preprocessing.remove_digits(pd.Series(text)).equals(
-    pd.Series(text_preprocessed))
+# Check block 
+s = pd.Series("remove block of digits 1234 h1n1")
+s_true = pd.Series("remove block of digits   h1n1")
+assert preprocessing.remove_digits(s).equals(s_true)
 
-assert preprocessing.remove_digits(
-    pd.Series(text), only_blocks=False).equals(
-        pd.Series(text_preprocessed_block_false))
+# Check with only_blocks = False
+s = pd.Series("remove block of digits 1234 h1n1")
+s_true = pd.Series("remove block of digits   h n ")
+assert preprocessing.remove_digits(s, only_blocks=False).equals(s_true)
+
+# Check in brackets
+s = pd.Series("Digits in bracket (123 $) needs to be cleaned out")
+s_true = pd.Series("Digits in bracket (  $) needs to be cleaned out")
+assert preprocessing.remove_digits(s).equals(s_true)
+
+# Check start digits
+s = pd.Series("123 starting digits needs to be cleaned out")
+s_true = pd.Series("  starting digits needs to be cleaned out")
+assert preprocessing.remove_digits(s).equals(s_true)
+
+# Check end digits
+s = pd.Series("end digits needs to be cleaned out 123")
+s_true = pd.Series("end digits needs to be cleaned out  ")
+assert preprocessing.remove_digits(s).equals(s_true)
+
+# Check with punctuation
+s = pd.Series("check.with.123.punctuation!?+")
+s_true = pd.Series("check.with. .punctuation!?+")
+assert preprocessing.remove_digits(s).equals(s_true)
+
+
 """
 Test `remove_punctuations`
 """
@@ -32,7 +54,7 @@ text_preprocessed = "hello"
 assert preprocessing.remove_diacritics(pd.Series(text)).equals(
     pd.Series(text_preprocessed))
 """
-Test `removepaces`
+Test `remove whitespaces`
 """
 
 text = "hello   world  hello        world "

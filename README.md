@@ -64,7 +64,7 @@ In case you are an advanced python user, then `help(texthero)` should do the wor
 
 <h2 align="center">Example</h2>
 
-<h3>Text preprocessing, TF-IDF representation and scatter visualization</h3>
+<h3>Text cleaning, TF-IDF representation and visualization</h3>
 
 
 ```python
@@ -109,10 +109,7 @@ df['kmeans_labels'] = (
     .astype(str)
 )
 
-df['pca'] = (
-    df['tfidf']
-    .pipe(hero.pca)
-)
+df['pca'] = df['tfidf'].pipe(hero.pca)
 
 hero.scatterplot(df, 'pca', color='kmeans_labels', title="K-means BBC Sport news")
 ```
@@ -128,35 +125,40 @@ Texthero is composed of three modules: [preprocessing.py](/texthero/preprocessin
 
 **Scope:** prepare the **text** data for further analysis.
 
-Complete documentation: [preprocessing](https://texthero.org/docs/api-preprocessing)
+Full documentation: [preprocessing](https://texthero.org/docs/api-preprocessing)
 
 <h3>2. Representation</h3>
 
 **Scope:** map text data into vectors and do dimensionality reduction.
 
-Supported representation algorithms:
-1. Term frequency, inverse document frequency (`do_tfidf`)
+Supported **representation** algorithms:
+1. Term frequency (`count`)
+1. Term frequency-inverse document frequency (`tfidf`)
 
+Supported **clustering** algorithms:
+1. K-means (`kmeans`)
+1. Density-Based Spatial Clustering of Applications with Noise (`dbscan`)
+1. Meanshift (`meanshift`)
 
-Supported dimensionality reduction algorithms:
-1. Principal component analysis (`do_pca`)
-2. Non-negative matrix factorization (`do_nmf`)
+Supported **dimensionality reduction** algorithms:
+1. Principal component analysis (`pca`)
+1. t-distributed stochastic neighbor embedding (`tsne`)
+1. Non-negative matrix factorization (`nmf`)
 
-Complete documentation: [representation](https://texthero.org/docs/api-representation)
+Full documentation: [representation](https://texthero.org/docs/api-representation)
 
 <h3>3. Visualization</h3>
 
-**Scope:** collection of functions to both summarize the main facts regarding the data and visualize the results. This part is very opinionated and ideal for anyone that needs a quick solution to visualize on screen the text data for instance during a text exploratory data analysis (EDA).
+**Scope:** summarize the main facts regarding the text data and visualize it. This module is opinionable. It's handy for anyone that needs a quick solution to visualize on screen the text data, for instance during a text exploratory data analysis (EDA).
 
-Most common functions:
-   - Text scatterplot. Handy when coupled with dimensionality reduction algorithms such as pca.
-   - Most common words
-   - Most common words between two entities 
+Supported functions:
+   - Text scatterplot (`scatterplot`)
+   - Most common words (`top_words`)
 
-Complete documentation: [visualization](https://texthero.org/docs/api-visualization)
+Full documentation: [visualization](https://texthero.org/docs/api-visualization)
 
 <h2 align="center">Contributions</h2>
 
 Pull requests are amazing and most welcome. Start by fork this repository and [open an issue](https://github.com/jbesomi/texthero/issues).
 
-Also, Texthero is looking for maintainers. In case of interest, just drop a line at jonathanbesomi__AT__gmail.com
+Texthero is also looking for maintainers and contributors. In case of interest, just drop a line at jonathanbesomi__AT__gmail.com

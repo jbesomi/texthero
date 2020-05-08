@@ -31,7 +31,8 @@
   <a href="#zero-to-hero">From zero to hero</a> •
   <a href="#installation">Installation</a> •
   <a href="#getting-started">Getting Started</a> •
-  <a href="#documentation">Documentation</a> •
+  <a href="#examples">Examples</a> •
+  <a href="#api">API</a> •
   <a href="#contributions">Contributions</a>
 </p>
 
@@ -123,7 +124,7 @@ hero.scatterplot(df, 'pca', color='kmeans_labels', title="K-means BBC Sport news
 
 Say we got some dirty text data we wants to clean. 
 
-```python
+```python-repl
 >>> import texthero as hero
 >>> import pandas as pd
 >>> text = "This sèntencé    (123 $) needs to [OK!] be cleaned!   "
@@ -135,7 +136,7 @@ dtype: object
 
 Remove all digits:
 
-```python
+```bash
 >>> s = hero.remove_digits(s)
 >>> s
 0    This sèntencé    (  $) needs to [OK!] be cleaned!

@@ -13,6 +13,5 @@ cd ..
 
 python3 -m unittest discover -s tests -t .
 
-#npm run build
-
-echo "Failed! --" && exit 1
+cd website
+npm run build

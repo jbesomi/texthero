@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "Running pre-commit hook"
+# Run check.
 ./scripts/check.sh
 
 # $? stores exit value of the last command

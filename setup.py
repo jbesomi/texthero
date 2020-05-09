@@ -1,26 +1,46 @@
-import texthero
-import setuptools
-from setuptools import find_packages
-
+from setuptools import find_packages, setup
 import os
+import codecs
+
+
+
+def read(rel_path):
+    here = os.path.abspath(os.path.dirname(__file__))
+    # intentionally *not* adding an encoding option to open, See:
+    #   https://github.com/pypa/virtualenv/issues/201#issuecomment-3145690
+    with codecs.open(os.path.join(here, rel_path), 'r') as fp:
+        return fp.read()
+
+def get_version(rel_path):
+    for line in read(rel_path).splitlines():
+        if line.startswith('__version__'):
+            # __version__ = "0.9"
+            delim = '"' if '"' in line else "'"
+            return line.split(delim)[1]
+    else:
+        raise RuntimeError("Unable to find version string.")
+
+long_description = read('README.md')
 
 with open("requirements.txt") as f:
     install_requires = f.read().splitlines()
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
-
-setuptools.setup(
-    name=texthero.__about__.__name__,
-    version=texthero.__about__.__version__,
-    description=texthero.__about__.__description__,
+setup(
+    name="texthero",
+    version=get_version("texthero/__init__.py"),
+    description="Text preprocessing, representation and visualization from zero to hero.",
     long_description=long_description,
     long_description_content_type='text/markdown',
-    author=texthero.__about__.__author__,
-    url=texthero.__about__.__url__,
+    author="Jonathan Besomi",
+    project_urls={
+        "Documentation": "https://texthero.org",
+        "Source": "https://github.com/jbesomi/texthero"
+        #"Changelog": "",
+    },
+    url="https://github.com/jbesomi/texthero",
     keywords = ['text analytics'],
-    install_requires=['nltk', 'scikit-learn', 'plotly_express'],
-    license=texthero.__about__.__license__,
+    install_requires=install_requires,
+    license="MIT",
     zip_safe=False,
     packages=find_packages(),
     classifiers=[

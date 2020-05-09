@@ -1,6 +1,7 @@
 ---
-title: Text unsupervised learning
+title: Unsupervised text learning
 author: Jonathan Besomi
+unlisted: True
 ---
 
 ## Pandas and Texthero.

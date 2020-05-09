@@ -6,6 +6,7 @@ from . import PandasTestCase
 import unittest
 import string
 
+
 class TestNLP(PandasTestCase):
     """
     Named entity.
@@ -15,11 +16,12 @@ class TestNLP(PandasTestCase):
         s_true = pd.Series([[('New York', 'GPE', 0, 8)]])
         self.assertEqual(nlp.named_entities(s), s_true)
 
-
     """
     Noun chunks.
     """
+
     def test_noun_chunks(self):
         s = pd.Series("Today is such a beautiful day")
-        s_true = pd.Series([[('Today', 'NP', 0, 5), ('such a beautiful day', 'NP', 9, 29)]])
+        s_true = pd.Series([[('Today', 'NP', 0, 5),
+                             ('such a beautiful day', 'NP', 9, 29)]])
         self.assertEqual(nlp.noun_chunks(s), s_true)

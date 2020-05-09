@@ -18,8 +18,9 @@ def tfidf(s: pd.Series, max_features=100, min_df=1):
     Represent input on a TF-IDF vector space.
     """
 
-    tfidf = TfidfVectorizer(
-        use_idf=True, max_features=max_features, min_df=min_df)
+    tfidf = TfidfVectorizer(use_idf=True,
+                            max_features=max_features,
+                            min_df=min_df)
     return pd.Series(tfidf.fit_transform(s).toarray().tolist(), index=s.index)
 
 
@@ -71,21 +72,20 @@ def tsne(s: pd.Series,
     """
     Perform TSNE.
     """
-    tsne = TSNE(
-        n_components=n_components,
-        perplexity=perplexity,
-        early_exaggeration=early_exaggeration,
-        learning_rate=learning_rate,
-        n_iter=n_iter,
-        n_iter_without_progress=n_iter_without_progress,
-        min_grad_norm=min_grad_norm,
-        metric=metric,
-        init=init,
-        verbose=verbose,
-        random_state=random_state,
-        method=method,
-        angle=angle,
-        n_jobs=n_jobs)
+    tsne = TSNE(n_components=n_components,
+                perplexity=perplexity,
+                early_exaggeration=early_exaggeration,
+                learning_rate=learning_rate,
+                n_iter=n_iter,
+                n_iter_without_progress=n_iter_without_progress,
+                min_grad_norm=min_grad_norm,
+                metric=metric,
+                init=init,
+                verbose=verbose,
+                random_state=random_state,
+                method=method,
+                angle=angle,
+                n_jobs=n_jobs)
     return pd.Series(tsne.fit_transform(list(s)).tolist(), index=s.index)
 
 
@@ -110,18 +110,17 @@ def kmeans(s: pd.Series,
     Perform K-means clustering algorithm.
     """
     vectors = list(s)
-    kmeans = KMeans(
-        n_clusters=n_clusters,
-        init=init,
-        n_init=n_init,
-        max_iter=max_iter,
-        tol=tol,
-        precompute_distances=precompute_distances,
-        verbose=verbose,
-        random_state=random_state,
-        copy_x=copy_x,
-        n_jobs=n_jobs,
-        algorithm=algorithm).fit(vectors)
+    kmeans = KMeans(n_clusters=n_clusters,
+                    init=init,
+                    n_init=n_init,
+                    max_iter=max_iter,
+                    tol=tol,
+                    precompute_distances=precompute_distances,
+                    verbose=verbose,
+                    random_state=random_state,
+                    copy_x=copy_x,
+                    n_jobs=n_jobs,
+                    algorithm=algorithm).fit(vectors)
     return pd.Series(kmeans.predict(vectors), index=s.index)
 
 
@@ -138,17 +137,15 @@ def dbscan(s,
     Perform DBSCAN clustering.
     """
 
-    return pd.Series(
-        DBSCAN(
-            eps=eps,
-            min_samples=min_samples,
-            metric=metric,
-            metric_params=metric_params,
-            algorithm=algorithm,
-            leaf_size=leaf_size,
-            p=p,
-            n_jobs=n_jobs).fit_predict(list(s)),
-        index=s.index)
+    return pd.Series(DBSCAN(eps=eps,
+                            min_samples=min_samples,
+                            metric=metric,
+                            metric_params=metric_params,
+                            algorithm=algorithm,
+                            leaf_size=leaf_size,
+                            p=p,
+                            n_jobs=n_jobs).fit_predict(list(s)),
+                     index=s.index)
 
 
 def meanshift(s,
@@ -163,16 +160,14 @@ def meanshift(s,
     Perform mean shift clustering.
     """
 
-    return pd.Series(
-        MeanShift(
-            bandwidth=bandwidth,
-            seeds=seeds,
-            bin_seeding=bin_seeding,
-            min_bin_freq=min_bin_freq,
-            cluster_all=cluster_all,
-            n_jobs=n_jobs,
-            max_iter=max_iter).fit_predict(list(s)),
-        index=s.index)
+    return pd.Series(MeanShift(bandwidth=bandwidth,
+                               seeds=seeds,
+                               bin_seeding=bin_seeding,
+                               min_bin_freq=min_bin_freq,
+                               cluster_all=cluster_all,
+                               n_jobs=n_jobs,
+                               max_iter=max_iter).fit_predict(list(s)),
+                     index=s.index)
 
 
 if __name__ == "__main__":

@@ -38,7 +38,6 @@ def _remove_block_digits(text):
       | \s*
     '''
     return ''.join(t for t in re.findall(pattern, text) if not t.isnumeric())
-    
 
 
 def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
@@ -94,6 +93,7 @@ def remove_whitespace(input: pd.Series) -> pd.Series:
 
     return input.str.replace(u"\xa0", u" ").str.split().str.join(" ")
 
+
 def _remove_stopwords(text):
     """
     Remove block of digits from text.
@@ -101,12 +101,13 @@ def _remove_stopwords(text):
     Example
     -------
     """
-    
+
     stop_words = set(stopwords.words("english"))
-    
-    pattern = r'''\w+(?:-\w+)*|\s*|[][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]''' # TODO. Explanation and double check.
-    
+
+    pattern = r'''\w+(?:-\w+)*|\s*|[][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]'''    # TODO. Explanation and double check.
+
     return ''.join(t for t in re.findall(pattern, text) if t not in stop_words)
+
 
 def remove_stopwords(input: pd.Series) -> pd.Series:
     """

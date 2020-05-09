@@ -6,12 +6,11 @@ from . import PandasTestCase
 import unittest
 import string
 
-class TestPreprocessing(PandasTestCase):
 
+class TestPreprocessing(PandasTestCase):
     """
     Remove digits.
     """
-    
     def test_remove_digits_only_block(self):
         s = pd.Series("remove block of digits 1234 h1n1")
         s_true = pd.Series("remove block of digits  h1n1")
@@ -20,7 +19,8 @@ class TestPreprocessing(PandasTestCase):
     def test_remove_digits_block(self):
         s = pd.Series("remove block of digits 1234 h1n1")
         s_true = pd.Series("remove block of digits  hn")
-        self.assertEqual(preprocessing.remove_digits(s, only_blocks=False), s_true)
+        self.assertEqual(preprocessing.remove_digits(s, only_blocks=False),
+                         s_true)
 
     def test_remove_digits_brackets(self):
         s = pd.Series("Digits in bracket (123 $) needs to be cleaned out")
@@ -53,9 +53,9 @@ class TestPreprocessing(PandasTestCase):
 
     def test_remove_punctation(self):
         s = pd.Series("Remove all! punctuation!! ()")
-        s_true = pd.Series("Remove all  punctuation   ") # TODO maybe just remove space?  
+        s_true = pd.Series(
+            "Remove all  punctuation   ")    # TODO maybe just remove space?
         self.assertEqual(preprocessing.remove_punctuation(s), s_true)
-
 
     """
     Remove diacritics.
@@ -78,7 +78,7 @@ class TestPreprocessing(PandasTestCase):
     """
     Text pipeline.
     """
-    
+
     def test_pipeline_stopwords(self):
         s = pd.Series("E-I-E-I-O\nAnd on")
         s_true = pd.Series("e-i-e-i-o\n ")

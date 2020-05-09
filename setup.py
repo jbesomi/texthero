@@ -2,8 +2,6 @@ from setuptools import find_packages, setup
 import os
 import codecs
 
-
-
 def read(rel_path):
     here = os.path.abspath(os.path.dirname(__file__))
     # intentionally *not* adding an encoding option to open, See:

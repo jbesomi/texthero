@@ -1,8 +1,10 @@
+#!/bin/sh
+
+echo "Test doctest."
 cd tests
 ./test_doctest.sh
+cd ..
 
-python3 test_preprocessing.py
-python3 test_representation.py
-python3 test_nlp.py
+python3 -m unittest discover -s tests -t .
 
-npm run build
+#npm run build

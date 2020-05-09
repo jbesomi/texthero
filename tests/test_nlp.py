@@ -1,19 +1,25 @@
-from texthero import nlp
 import pandas as pd
+from texthero import nlp
 
-"""
-Test named_entity_recognition
-"""
+from . import PandasTestCase
 
-s = pd.Series("New York is a big city")
-s_true = pd.Series(['New York', 'LOC', 0, 7])
-s_true.equals(nlp.named_entities(s_true))
+import unittest
+import string
+
+class TestNLP(PandasTestCase):
+    """
+    Named entity.
+    """
+    def test_named_entities(self):
+        s = pd.Series("New York is a big city")
+        s_true = pd.Series([[('New York', 'GPE', 0, 8)]])
+        self.assertEqual(nlp.named_entities(s), s_true)
 
 
-"""
-Test noun_chunks
-"""
-
-s = pd.Series("Today is such a beautiful day")
-s_true = pd.Series([('Today', 'NP', 0, 5), ('such a beautiful day', 'NP', 9, 29)])
-s_true.equals(nlp.named_entities(s_true))
+    """
+    Noun chunks.
+    """
+    def test_noun_chunks(self):
+        s = pd.Series("Today is such a beautiful day")
+        s_true = pd.Series([[('Today', 'NP', 0, 5), ('such a beautiful day', 'NP', 9, 29)]])
+        self.assertEqual(nlp.noun_chunks(s), s_true)

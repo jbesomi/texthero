@@ -1,5 +1,7 @@
 #!/bin/sh
 
+cd ..
+
 echo "Formatting code ..."
 ./format.sh
 

@@ -1,7 +1,8 @@
 #!/bin/sh
 
+
 echo "Test doctest."
-cd tests
+cd ../tests
 ./test_doctest.sh
 cd ..
 

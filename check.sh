@@ -4,3 +4,5 @@ cd tests
 python3 test_preprocessing.py
 python3 test_representation.py
 python3 test_nlp.py
+
+npm run build

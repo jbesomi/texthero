@@ -38,7 +38,7 @@ def scatterplot(df: pd.DataFrame,
     if return_figure:
         return fig
 
-def wordcloud(df: pd.DataFrame, col: str, 
+def wordcloud(s: pd.Series, 
               title="",
               return_figure=False):
     """
@@ -51,7 +51,7 @@ def wordcloud(df: pd.DataFrame, col: str,
         The name of the column of the DataFrame containing the text data.
 
     """
-    text = " ".join(line for line in df[col])
+    text = s.str.cat(sep=' ')
     
     wordcloud = WordCloud(background_color ='white', min_font_size = 10).generate(text) 
     

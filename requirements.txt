@@ -2,3 +2,4 @@ nltk
 scikit-learn
 plotly_express
 spacy
+wordcloud

@@ -8,6 +8,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA, NMF
 from sklearn.cluster import KMeans, DBSCAN, MeanShift
+
+#from texthero import pandas_ as pd_
 """
 Vectorization
 """
@@ -24,7 +26,10 @@ def term_frequency(s: pd.Series,
     tfidf = CountVectorizer(max_features=max_features,
                             lowercase=lowercase,
                             token_pattern=token_pattern)
-    return pd.Series(tfidf.fit_transform(s).toarray().tolist(), index=s.index)
+    s = pd.Series(tfidf.fit_transform(s).toarray().tolist(), index=s.index)
+    s.feature_names_x = tfidf.get_feature_names()
+    s._metadata += ['feature_names_x']
+    return s
 
 
 def tfidf(s: pd.Series,
@@ -180,6 +185,10 @@ def meanshift(s,
                                max_iter=max_iter).fit_predict(list(s)),
                      index=s.index)
 
+
+"""
+Topic modelling
+"""
 
 if __name__ == "__main__":
     import doctest

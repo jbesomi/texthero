@@ -8,6 +8,16 @@ title: Visualization
 Visualize insights and statistics of a text-based Pandas DataFrame.
 
 
+### class texthero.visualization.WordsAccessor(pandas_obj)
+To access plot directly from a series.
+
+This is just for testing.
+
+### Example
+
+df[‘text’].words.plot()
+
+
 ### texthero.visualization.scatterplot(df, col, color=None, hover_data=None, title='', return_figure=False)
 Show scatterplot using python plotly scatter.
 

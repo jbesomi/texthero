@@ -40,7 +40,7 @@
 
 <h2 align="center">From zero to hero</h2>
 
-**Texthero is a python toolkit that help you work with text-based dataset quickly and effortlessly**. Texthero is very simple to learn and designed to be used on top of Pandas.
+**Texthero is a python toolkit that help you work with text-based dataset quickly and effortlessly**. Texthero is very simple to learn and designed to be used on top of Pandas. Texthero makes the text data analysis journey easier thanks to his expressiveness and power.
 
 You can think of Texthero as a tool to help you _understand_ and work with text-based dataset. Given a tabular dataset, it's easy to _grasp the main concept_. Instead, given a text dataset it's harder to have quick insights of the underline data. 
 

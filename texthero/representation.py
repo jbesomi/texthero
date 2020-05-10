@@ -13,23 +13,34 @@ Vectorization
 """
 
 
-def tfidf(s: pd.Series, max_features=100, min_df=1):
+def term_frequency(s: pd.Series,
+                   max_features=None,
+                   lowercase=False,
+                   token_pattern='\S+'):
+    """
+    Represent input on term frequency.
+    """
+    # TODO. Can be rewritten without sklearn.
+    tfidf = CountVectorizer(max_features=max_features,
+                            lowercase=lowercase,
+                            token_pattern=token_pattern)
+    return pd.Series(tfidf.fit_transform(s).toarray().tolist(), index=s.index)
+
+
+def tfidf(s: pd.Series,
+          max_features=None,
+          min_df=1,
+          token_pattern='\S+',
+          lowercase=False):
     """
     Represent input on a TF-IDF vector space.
     """
 
     tfidf = TfidfVectorizer(use_idf=True,
                             max_features=max_features,
-                            min_df=min_df)
-    return pd.Series(tfidf.fit_transform(s).toarray().tolist(), index=s.index)
-
-
-def count(s: pd.Series, max_features=100):
-    """
-    Represent input on a Count vector space.
-    """
-
-    tfidf = CountVectorizer(use_idf=True, max_features=max_features)
+                            min_df=min_df,
+                            token_pattern=token_pattern,
+                            lowercase=lowercase)
     return pd.Series(tfidf.fit_transform(s).toarray().tolist(), index=s.index)
 
 

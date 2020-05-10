@@ -4,7 +4,7 @@ Visualize insights and statistics of a text-based Pandas DataFrame.
 
 import pandas as pd
 import plotly.express as px
-
+from wordcloud import WordCloud
 
 def scatterplot(df: pd.DataFrame,
                 col: str,
@@ -33,6 +33,29 @@ def scatterplot(df: pd.DataFrame,
                      hover_data=hover_data,
                      title=title)
     #fig.show(config={'displayModeBar': False})
+    fig.show()
+
+    if return_figure:
+        return fig
+
+def wordcloud(df: pd.DataFrame, col: str, 
+              title="",
+              return_figure=False):
+    """
+    Show wordcloud using WordCloud.
+
+    Parameters
+    ----------
+    df
+    col
+        The name of the column of the DataFrame containing the text data.
+
+    """
+    text = " ".join(line for line in df[col])
+    
+    wordcloud = WordCloud(background_color ='white', min_font_size = 10).generate(text) 
+    
+    fig = px.imshow(wordcloud, title=title)
     fig.show()
 
     if return_figure:

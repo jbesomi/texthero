@@ -3,3 +3,4 @@ scikit-learn
 plotly_express
 spacy
 pandas>=1.0.1
+wordcloud

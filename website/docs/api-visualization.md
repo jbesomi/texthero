@@ -49,3 +49,17 @@ Return most common words.
 * **Return type**
 
     `Series`
+
+
+
+### texthero.visualization.wordcloud(s, title='', return_figure=False)
+Show wordcloud using WordCloud.
+
+
+* **Parameters**
+
+    
+    * **df** – 
+
+
+    * **col** – The name of the column of the DataFrame containing the text data.

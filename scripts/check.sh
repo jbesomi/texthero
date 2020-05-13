@@ -21,9 +21,9 @@ cd tests
 ./test_doctest.sh
 cd ..
 
-
+cd scripts
 echo "Unittest."
-python3 -m unittest discover -s tests -t .
+./tests.sh
 
 #cd website
 #npm run build

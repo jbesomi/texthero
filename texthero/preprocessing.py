@@ -1,15 +1,16 @@
 """
 Preprocess text-based Pandas DataFrame.
 """
-
 import re
 import string
-import unidecode
-from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer
-from nltk.stem import SnowballStemmer
-import pandas as pd
+from typing import Optional, Set
+
 import numpy as np
+import pandas as pd
+import unidecode
+from nltk.stem import PorterStemmer, SnowballStemmer
+
+from . import stop_words
 
 
 def fillna(input: pd.Series) -> pd.Series:
@@ -55,10 +56,10 @@ def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
     --------
     >>> s = pd.Series("7ex7hero is fun 1111")
     >>> remove_digits(s)
-    0    7ex7hero is fun 
+    0    7ex7hero is fun
     dtype: object
     >>> remove_digits(s, only_blocks=False)
-    0    exhero is fun 
+    0    exhero is fun
     dtype: object
     """
 
@@ -94,28 +95,27 @@ def remove_whitespace(input: pd.Series) -> pd.Series:
     return input.str.replace(u"\xa0", u" ").str.split().str.join(" ")
 
 
-def _remove_stopwords(text):
+def _remove_stopwords(text: str, words: Set[str]) -> str:
     """
     Remove block of digits from text.
 
     Example
     -------
     """
-
-    stop_words = set(stopwords.words("english"))
-
     pattern = r'''\w+(?:-\w+)*|\s*|[][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]'''    # TODO. Explanation and double check.
+    return ''.join(t for t in re.findall(pattern, text) if t not in words)
 
-    return ''.join(t for t in re.findall(pattern, text) if t not in stop_words)
 
-
-def remove_stopwords(input: pd.Series) -> pd.Series:
+def replace_words(input: pd.Series,
+                  words: Optional[Set[str]] = None) -> pd.Series:
     """
-    Remove all stop words using NLTK stopwords list.
-
-    List of stopwords: NLTK 'english' stopwords, 179 items.
+    Remove all instances of `words`.
+    See `stopwords` for pre-defined lists of stopwords or provide a custom list.
+    By default uses NLTK's english stopword list of 179 words.
     """
-    return input.apply(_remove_stopwords)
+    if words is None:
+        words = stop_words.DEFAULT
+    return input.apply(_remove_stopwords, args=(words, ))
 
 
 def stem(input: pd.Series, stem="snowball", language="english") -> pd.Series:
@@ -168,7 +168,7 @@ def get_default_pipeline() -> []:
         remove_digits,
         remove_punctuation,
         remove_diacritics,
-        remove_stopwords,
+        replace_words,
         remove_whitespace,
     ]
 

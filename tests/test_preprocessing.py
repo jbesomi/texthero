@@ -1,10 +1,9 @@
-import pandas as pd
-from texthero import preprocessing
-
-from . import PandasTestCase
-
-import unittest
 import string
+
+import pandas as pd
+
+from texthero import preprocessing, stop_words
+from . import PandasTestCase
 
 
 class TestPreprocessing(PandasTestCase):
@@ -82,5 +81,23 @@ class TestPreprocessing(PandasTestCase):
     def test_pipeline_stopwords(self):
         s = pd.Series("E-I-E-I-O\nAnd on")
         s_true = pd.Series("e-i-e-i-o\n ")
-        pipeline = [preprocessing.lowercase, preprocessing.remove_stopwords]
+        pipeline = [preprocessing.lowercase, preprocessing.replace_words]
         self.assertEqual(preprocessing.clean(s, pipeline=pipeline), s_true)
+
+    def test_remove_stop_words(self):
+        text = "i am quite intrigued"
+        text_default_preprocessed = "  quite intrigued"
+        text_spacy_preprocessed = "   intrigued"
+        text_custom_preprocessed = "i  quite "
+
+        self.assertEquals(
+            preprocessing.replace_words(pd.Series(text)), pd.Series(text_default_preprocessed)
+        )
+        self.assertEquals(
+            preprocessing.replace_words(pd.Series(text), stop_words.SPACY_EN),
+            pd.Series(text_spacy_preprocessed)
+        )
+        self.assertEquals(
+            preprocessing.replace_words(pd.Series(text), {"am", "intrigued"}),
+            pd.Series(text_custom_preprocessed)
+        )

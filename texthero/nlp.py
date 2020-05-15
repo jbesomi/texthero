@@ -47,6 +47,8 @@ def named_entities(s, package="spacy"):
 def noun_chunks(s):
     """
     Return noun_chunks, flat phrases that have a noun as their head.
+
+    Return group of consecutive words that belong together.
     
     """
     noun_chunks = []

@@ -3,6 +3,16 @@ id: api-representation
 title: Representation
 ---
 
+---
+id: api-representation 
+title: Representation
+---
+
+---
+id: api-representation 
+title: Representation
+---
+
 Map words into vectors using different algorithms such as TF-IDF, word2vec or GloVe.
 
 
@@ -26,11 +36,11 @@ Perform non-negative matrix factorization.
 Perform PCA.
 
 
-### texthero.representation.term_frequency(s, max_features=None, lowercase=False, token_pattern='\\\\S+')
+### texthero.representation.term_frequency(s, max_features=None, lowercase=False, token_pattern='\S+')
 Represent input on term frequency.
 
 
-### texthero.representation.tfidf(s, max_features=None, min_df=1, token_pattern='\\\\S+', lowercase=False)
+### texthero.representation.tfidf(s, max_features=None, min_df=1, token_pattern='\S+', lowercase=False)
 Represent input on a TF-IDF vector space.
 
 

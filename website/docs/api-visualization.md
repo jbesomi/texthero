@@ -3,6 +3,16 @@ id: api-visualization
 title: Visualization
 ---
 
+---
+id: api-visualization 
+title: Visualization
+---
+
+---
+id: api-visualization 
+title: Visualization
+---
+
 # Visualization
 
 Visualize insights and statistics of a text-based Pandas DataFrame.

@@ -28,18 +28,19 @@
 
 
 <p align="center">
-  <a href="#zero-to-hero">From zero to hero</a> •
-  <a href="#installation">Installation</a> •
-  <a href="#getting-started">Getting Started</a> •
-  <a href="#examples">Examples</a> •
-  <a href="#api">API</a> •
-  <a href="#contributions">Contributions</a>
+   <a href="#zero-to-hero">From zero to hero</a> •
+   <a href="#installation">Installation</a> •
+   <a href="#getting-started">Getting Started</a> •
+   <a href="#examples">Examples</a> •
+   <a href="#api">API</a> •
+   <a href="#faq">FAQ</a> •
+   <a href="#contributions">Contributions</a>
 </p>
 
 
 <h2 align="center">From zero to hero</h2>
 
-**Texthero is a python toolkit that help you work with text-based dataset quickly and effortlessly**. Texthero is very simple to learn and designed to be used on top of Pandas.
+**Texthero is a python toolkit that help you work with text-based dataset quickly and effortlessly**. Texthero is very simple to learn and designed to be used on top of Pandas. Texthero makes the text data analysis journey easier thanks to his expressiveness and power.
 
 You can think of Texthero as a tool to help you _understand_ and work with text-based dataset. Given a tabular dataset, it's easy to _grasp the main concept_. Instead, given a text dataset it's harder to have quick insights of the underline data. 
 
@@ -56,6 +57,10 @@ pip install texthero
 ```
 
 > ☝️Under the hoods, Texthero makes use of multiple NLP and machine learning toolkits such as Gensim, NLTK, SpaCy and scikit-learn. You don't need to install them all separately, pip will take care of that.
+
+> For fast performance, make sure you have installed Spacy version >= 2.1 !
+
+> Suggested python version: 3.7.7.
 
 <h2 align="center">Getting started</h2>
 
@@ -143,6 +148,8 @@ Remove all digits:
 dtype: object
 ```
 
+> Remove digits replace only blocks of digits. The digits in the string "hello123" will not be removed. If we want to remove all digits, we need to se the arguments only_blocks to False.
+
 Remove all type of brackets and their content.
 
 ```python
@@ -227,6 +234,21 @@ Supported functions:
    - Most common words (`top_words`)
 
 Full documentation: [visualization](https://texthero.org/docs/api-visualization)
+
+<h2 align="center">FAQ</h2>
+
+<h5>Why Texthero</h5>
+
+Because I couldn't find something like that.
+
+<h5>What is Texthero in a nutshell?</h5>
+
+When you get a bunch of text data, chances are they will need some cleaning and that you want to understand it somehow. Texthero help you do that very efficiently.
+
+<h5>I'm not an NLP expert, is texthero for me?</h5>
+
+Yes, it is. Texthero is very easy to use and has been conceived also for beginners.
+
 
 <h2 align="center">Contributions</h2>
 

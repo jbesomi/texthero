@@ -4,6 +4,8 @@
 
 """
 
+__version__ = "1.0.7"
+
 from . import preprocessing
 from .preprocessing import *
 
@@ -13,5 +15,5 @@ from .representation import *
 from . import visualization
 from .visualization import *
 
-from . import __about__
-from .__about__ import __version__
+from . import nlp
+from .nlp import *

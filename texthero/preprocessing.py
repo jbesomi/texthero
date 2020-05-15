@@ -22,6 +22,24 @@ def lowercase(input: pd.Series) -> pd.Series:
     return input.str.lower()
 
 
+def _remove_block_digits(text):
+    """
+    Remove block of digits from text.
+
+    Example
+    -------
+    >>> _remove_block_digits("hi 123")
+    'hi '
+    """
+    pattern = r'''(?x)          # set flag to allow verbose regexps
+      | \w+(?:-\w+)*        # words with optional internal hyphens
+      | \$?\d+(?:\.\d+)?%?  # currency and percentages, e.g. $12.40, 82%
+      | [][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]    # these are separate tokens; includes ], [
+      | \s*
+    '''
+    return ''.join(t for t in re.findall(pattern, text) if not t.isnumeric())
+
+
 def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
     """
     Remove all digits from a series and replace it with a single space.
@@ -37,17 +55,17 @@ def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
     --------
     >>> s = pd.Series("7ex7hero is fun 1111")
     >>> remove_digits(s)
-    0    7ex7hero is fun  
+    0    7ex7hero is fun 
     dtype: object
     >>> remove_digits(s, only_blocks=False)
-    0     ex hero is fun  
+    0    exhero is fun 
     dtype: object
     """
 
     if only_blocks:
-        return input.str.replace(r"(^)\d+(\W)|(\W)\d+(\W)|(\W)\d+($)", r"\1\3\5 \2\4\6")
+        return input.apply(_remove_block_digits)
     else:
-        return input.str.replace(r"\d+", " ")
+        return input.str.replace(r"\d+", "")
 
 
 def remove_punctuation(input: pd.Series) -> pd.Series:
@@ -76,15 +94,28 @@ def remove_whitespace(input: pd.Series) -> pd.Series:
     return input.str.replace(u"\xa0", u" ").str.split().str.join(" ")
 
 
+def _remove_stopwords(text):
+    """
+    Remove block of digits from text.
+
+    Example
+    -------
+    """
+
+    stop_words = set(stopwords.words("english"))
+
+    pattern = r'''\w+(?:-\w+)*|\s*|[][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]'''    # TODO. Explanation and double check.
+
+    return ''.join(t for t in re.findall(pattern, text) if t not in stop_words)
+
+
 def remove_stopwords(input: pd.Series) -> pd.Series:
     """
     Remove all stop words using NLTK stopwords list.
 
     List of stopwords: NLTK 'english' stopwords, 179 items.
     """
-    stop_words = set(stopwords.words("english"))
-    pat = r'\b(?:{})\b'.format('|'.join(stop_words))
-    return input.str.replace(pat, '')
+    return input.apply(_remove_stopwords)
 
 
 def stem(input: pd.Series, stem="snowball", language="english") -> pd.Series:

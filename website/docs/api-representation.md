@@ -6,10 +6,6 @@ title: Representation
 Map words into vectors using different algorithms such as TF-IDF, word2vec or GloVe.
 
 
-### texthero.representation.count(s, max_features=100)
-Represent input on a Count vector space.
-
-
 ### texthero.representation.dbscan(s, eps=0.5, min_samples=5, metric='euclidean', metric_params=None, algorithm='auto', leaf_size=30, p=None, n_jobs=None)
 Perform DBSCAN clustering.
 
@@ -30,7 +26,11 @@ Perform non-negative matrix factorization.
 Perform PCA.
 
 
-### texthero.representation.tfidf(s, max_features=100, min_df=1)
+### texthero.representation.term_frequency(s, max_features=None, lowercase=False, token_pattern='\\\\S+')
+Represent input on term frequency.
+
+
+### texthero.representation.tfidf(s, max_features=None, min_df=1, token_pattern='\\\\S+', lowercase=False)
 Represent input on a TF-IDF vector space.
 
 

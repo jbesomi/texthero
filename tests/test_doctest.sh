@@ -2,6 +2,6 @@
 
 cd ../texthero/
 
-python preprocessing.py
-python representation.py
+python3 preprocessing.py
+python3 representation.py
 #python visualization.py

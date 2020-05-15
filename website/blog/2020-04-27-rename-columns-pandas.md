@@ -1,6 +1,7 @@
 ---
 title: Groupby and rename columns in pandas
 author: Jonathan Besomi
+unlisted: True
 ---
 
 

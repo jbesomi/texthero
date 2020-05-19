@@ -3,9 +3,6 @@
 
 
 """
-
-__version__ = "1.0.7"
-
 from . import preprocessing
 from .preprocessing import *
 

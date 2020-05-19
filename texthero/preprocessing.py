@@ -32,13 +32,13 @@ def _remove_block_digits(text):
     >>> _remove_block_digits("hi 123")
     'hi '
     """
-    pattern = r'''(?x)          # set flag to allow verbose regexps
+    pattern = r"""(?x)          # set flag to allow verbose regexps
       | \w+(?:-\w+)*        # words with optional internal hyphens
       | \$?\d+(?:\.\d+)?%?  # currency and percentages, e.g. $12.40, 82%
       | [][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]    # these are separate tokens; includes ], [
       | \s*
-    '''
-    return ''.join(t for t in re.findall(pattern, text) if not t.isnumeric())
+    """
+    return "".join(t for t in re.findall(pattern, text) if not t.isnumeric())
 
 
 def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
@@ -75,8 +75,7 @@ def remove_punctuation(input: pd.Series) -> pd.Series:
 
     Replace it with a single space.
     """
-    RE_PUNCT = re.compile(r'([%s])+' % re.escape(string.punctuation),
-                          re.UNICODE)
+    RE_PUNCT = re.compile(r"([%s])+" % re.escape(string.punctuation), re.UNICODE)
     return input.str.replace(RE_PUNCT, " ")
 
 
@@ -102,12 +101,11 @@ def _remove_stopwords(text: str, words: Set[str]) -> str:
     Example
     -------
     """
-    pattern = r'''\w+(?:-\w+)*|\s*|[][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]'''    # TODO. Explanation and double check.
-    return ''.join(t for t in re.findall(pattern, text) if t not in words)
+    pattern = r"""\w+(?:-\w+)*|\s*|[][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]"""  # TODO. Explanation and double check.
+    return "".join(t for t in re.findall(pattern, text) if t not in words)
 
 
-def replace_words(input: pd.Series,
-                  words: Optional[Set[str]] = None) -> pd.Series:
+def replace_words(input: pd.Series, words: Optional[Set[str]] = None) -> pd.Series:
     """
     Remove all instances of `words`.
     See `stopwords` for pre-defined lists of stopwords or provide a custom list.
@@ -115,7 +113,7 @@ def replace_words(input: pd.Series,
     """
     if words is None:
         words = stop_words.DEFAULT
-    return input.apply(_remove_stopwords, args=(words, ))
+    return input.apply(_remove_stopwords, args=(words,))
 
 
 def stem(input: pd.Series, stem="snowball", language="english") -> pd.Series:
@@ -317,10 +315,15 @@ def remove_brackets(s: pd.Series):
     remove_angle_brackets(s)
 
     """
-    return (s.pipe(remove_round_brackets).pipe(remove_curly_brackets).pipe(
-        remove_square_brackets).pipe(remove_angle_brackets))
+    return (
+        s.pipe(remove_round_brackets)
+        .pipe(remove_curly_brackets)
+        .pipe(remove_square_brackets)
+        .pipe(remove_angle_brackets)
+    )
 
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()

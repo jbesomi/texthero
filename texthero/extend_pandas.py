@@ -14,7 +14,7 @@ class TextheroPandas:
     @staticmethod
     def _validate(obj):
         # verify there is a column latitude and a column longitude
-        #if 'latitude' not in obj.columns or 'longitude' not in obj.columns:
+        # if 'latitude' not in obj.columns or 'longitude' not in obj.columns:
         #    raise AttributeError("Must have 'latitude' and 'longitude'.")
         pass
 

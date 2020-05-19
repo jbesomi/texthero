@@ -34,12 +34,13 @@ def named_entities(s, package="spacy"):
     """
     entities = []
 
-    nlp = spacy.load('en_core_web_sm', disable=["tagger", "parser"])
+    nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser"])
     # nlp.pipe is now 'ner'
 
     for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
-        entities.append([(ent.text, ent.label_, ent.start_char, ent.end_char)
-                         for ent in doc.ents])
+        entities.append(
+            [(ent.text, ent.label_, ent.start_char, ent.end_char) for ent in doc.ents]
+        )
 
     return pd.Series(entities, index=s.index)
 
@@ -53,12 +54,16 @@ def noun_chunks(s):
     """
     noun_chunks = []
 
-    nlp = spacy.load('en_core_web_sm', disable=["ner"])
+    nlp = spacy.load("en_core_web_sm", disable=["ner"])
     # nlp.pipe is now "tagger", "parser"
 
-    for doc in nlp.pipe(s.astype('unicode').values, batch_size=32):
-        noun_chunks.append([(chunk.text, chunk.label_, chunk.start_char,
-                             chunk.end_char) for chunk in doc.noun_chunks])
+    for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
+        noun_chunks.append(
+            [
+                (chunk.text, chunk.label_, chunk.start_char, chunk.end_char)
+                for chunk in doc.noun_chunks
+            ]
+        )
 
     return pd.Series(noun_chunks, index=s.index)
 

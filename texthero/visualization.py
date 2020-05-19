@@ -21,6 +21,7 @@ class WordsAccessor:
 
     
     """
+
     def __init__(self, pandas_obj):
         self._validate(pandas_obj)
         self._obj = pandas_obj
@@ -30,7 +31,7 @@ class WordsAccessor:
         # verify there is a column latitude and a column longitude
         # keeping as an example
         return
-        if 'pca' not in obj.columns:
+        if "pca" not in obj.columns:
             raise AttributeError("Must have 'latitude' and 'longitude'.")
 
     @property
@@ -48,16 +49,19 @@ class WordsAccessor:
         df = px.data.tips()
         fig = px.bar(x=top[:num_words].index, y=top[:num_words].values)
         fig.update_traces(
-            marker=dict(colorscale='Portland', color=top[:num_words].values))
+            marker=dict(colorscale="Portland", color=top[:num_words].values)
+        )
         fig.show()
 
 
-def scatterplot(df: pd.DataFrame,
-                col: str,
-                color: str = None,
-                hover_data: [] = None,
-                title="",
-                return_figure=False):
+def scatterplot(
+    df: pd.DataFrame,
+    col: str,
+    color: str = None,
+    hover_data: [] = None,
+    title="",
+    return_figure=False,
+):
     """
     Show scatterplot using python plotly scatter.
 
@@ -72,13 +76,10 @@ def scatterplot(df: pd.DataFrame,
     pca0 = df[col].apply(lambda x: x[0])
     pca1 = df[col].apply(lambda x: x[1])
 
-    fig = px.scatter(df,
-                     x=pca0,
-                     y=pca1,
-                     color=color,
-                     hover_data=hover_data,
-                     title=title)
-    #fig.show(config={'displayModeBar': False})
+    fig = px.scatter(
+        df, x=pca0, y=pca1, color=color, hover_data=hover_data, title=title
+    )
+    # fig.show(config={'displayModeBar': False})
     fig.show()
 
     if return_figure:
@@ -96,10 +97,9 @@ def wordcloud(s: pd.Series, title="", return_figure=False):
         The name of the column of the DataFrame containing the text data.
 
     """
-    text = s.str.cat(sep=' ')
+    text = s.str.cat(sep=" ")
 
-    wordcloud = WordCloud(background_color='white',
-                          min_font_size=10).generate(text)
+    wordcloud = WordCloud(background_color="white", min_font_size=10).generate(text)
 
     fig = px.imshow(wordcloud, title=title)
     fig.show()
@@ -121,10 +121,10 @@ def top_words(s: pd.Series, normalize=False) -> pd.Series:
 
     """
     WHITESPACE_SPLITTER = r"\W+"
-    return s.str.split(WHITESPACE_SPLITTER).explode().value_counts(
-        normalize=normalize)
+    return s.str.split(WHITESPACE_SPLITTER).explode().value_counts(normalize=normalize)
 
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()

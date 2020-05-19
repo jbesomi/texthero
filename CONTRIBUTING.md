@@ -93,12 +93,12 @@ The time to submit the PR has come. Head to your forked repository on Github. Th
 ## Scripts folder
 
 - `./check.sh`
-   - format the code with yapf (`format.sh`)
+   - format the code with black (`format.sh`)
    - update the Sphinx documentation for the website
    - Execute all test with `unittest` (`check.sh`)
    - **This is the only and main file that must be called.**
 - `./formath.sh`
-   - format all code with yapf (soon to be replaced with black)
+   - format all code with [black](https://github.com/psf/black)
 
 ## Conventions
 

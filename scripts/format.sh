@@ -2,5 +2,5 @@
 
 cd ..
 
-yapf texthero --recursive -i
-yapf tests --recursive -i
+black texthero
+black tests

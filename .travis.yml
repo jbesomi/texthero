@@ -1,0 +1,12 @@
+language: python
+python:
+  - 3.5
+  - 3.6
+  - 3.7
+before_install:
+  - python --version
+  - pip install -U pip
+install:
+  - pip install ".[dev]" .
+script:
+ - python -m unittest discover -s tests -t .

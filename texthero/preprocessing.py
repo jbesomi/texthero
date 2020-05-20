@@ -32,9 +32,9 @@ def _remove_block_digits(text):
     >>> _remove_block_digits("hi 123")
     'hi '
     """
-    pattern = r"""(?x)          # set flag to allow verbose regexps
-      | \w+(?:-\w+)*        # words with optional internal hyphens
-      | \$?\d+(?:\.\d+)?%?  # currency and percentages, e.g. $12.40, 82%
+    pattern = r"""(?x)                          # set flag to allow verbose regexps
+      \w+(?:-\w+)*                              # words with optional internal hyphens
+      | \$?\d+(?:\.\d+)?%?                      # currency and percentages, e.g. $12.40, 82%
       | [][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]    # these are separate tokens; includes ], [
       | \s*
     """

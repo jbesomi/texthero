@@ -8,21 +8,15 @@ cd "${0%/*}/.."
 
 cd scripts
 
-echo "Formatting code."
+echo "Format code."
 ./format.sh
 
 
-echo "Updating documentation."
+echo "Update documentation."
 ./update_documentation.sh
 
-cd ..
-echo "Test doctest."
-cd tests
-./test_doctest.sh
-cd ..
 
-cd scripts
-echo "Unittest."
+echo "Test code."
 ./tests.sh
 
 #cd website

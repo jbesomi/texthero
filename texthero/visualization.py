@@ -122,9 +122,3 @@ def top_words(s: pd.Series, normalize=False) -> pd.Series:
     """
     WHITESPACE_SPLITTER = r"\W+"
     return s.str.split(WHITESPACE_SPLITTER).explode().value_counts(normalize=normalize)
-
-
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod()

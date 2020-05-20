@@ -10,7 +10,7 @@ import pandas as pd
 import unidecode
 from nltk.stem import PorterStemmer, SnowballStemmer
 
-from . import stop_words
+from texthero import stopwords
 
 
 def fillna(input: pd.Series) -> pd.Series:
@@ -27,7 +27,7 @@ def _remove_block_digits(text):
     """
     Remove block of digits from text.
 
-    Example
+    Examples
     -------
     >>> _remove_block_digits("hi 123")
     'hi '
@@ -47,19 +47,18 @@ def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
 
     Parameters
     ----------
-
     input : pd.Series
     only_blocks : bool
                   Remove only blocks of digits. For instance, `hel1234lo 1234` becomes `hel1234lo`.
 
-    Examples
+    # Exampless
     --------
     >>> s = pd.Series("7ex7hero is fun 1111")
     >>> remove_digits(s)
-    0    7ex7hero is fun
+    0    7ex7hero is fun 
     dtype: object
     >>> remove_digits(s, only_blocks=False)
-    0    exhero is fun
+    0    exhero is fun 
     dtype: object
     """
 
@@ -98,9 +97,10 @@ def _remove_stopwords(text: str, words: Set[str]) -> str:
     """
     Remove block of digits from text.
 
-    Example
+    Examples
     -------
     """
+
     pattern = r"""\w+(?:-\w+)*|\s*|[][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]"""  # TODO. Explanation and double check.
     return "".join(t for t in re.findall(pattern, text) if t not in words)
 
@@ -112,7 +112,7 @@ def replace_words(input: pd.Series, words: Optional[Set[str]] = None) -> pd.Seri
     By default uses NLTK's english stopword list of 179 words.
     """
     if words is None:
-        words = stop_words.DEFAULT
+        words = stopwords.DEFAULT
     return input.apply(_remove_stopwords, args=(words,))
 
 
@@ -152,13 +152,13 @@ def get_default_pipeline() -> []:
     Return a list contaning all the methods used in the default cleaning pipeline.
 
     Return a list with the following function
-     - fillna
-     - lowercase
-     - remove_digits
-     - remove_punctuation
-     - remove_diacritics
-     - remove_stopwords
-     - remove_whitespace
+    - fillna
+    - lowercase
+    - remove_digits
+    - remove_punctuation
+    - remove_diacritics
+    - remove_stopwords
+    - remove_whitespace
     """
     return [
         fillna,
@@ -177,13 +177,13 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
 
     For information regarding a specific function type `help(texthero.preprocessing.func_name)`.
     The default preprocessing pipeline is the following:
-     - fillna
-     - lowercase
-     - remove_digits
-     - remove_punctuation
-     - remove_diacritics
-     - remove_stopwords
-     - remove_whitespace
+    - fillna
+    - lowercase
+    - remove_digits
+    - remove_punctuation
+    - remove_diacritics
+    - remove_stopwords
+    - remove_whitespace
     """
 
     if not pipeline:
@@ -198,7 +198,7 @@ def has_content(s: pd.Series):
     """
     For each row, check that there is content.
 
-    Example
+    Examples
     -------
 
     >>> s = pd.Series(["c", np.nan, "\t\\n", " "])
@@ -217,7 +217,7 @@ def drop_no_content(s: pd.Series):
     """
     Drop all rows where has_content is empty.
 
-    Example
+    Examples
     -------
 
     >>> s = pd.Series(["c", np.nan, "\t\\n", " "])
@@ -233,7 +233,7 @@ def remove_round_brackets(s: pd.Series):
     """
     Remove content within parentheses () and parentheses.
 
-    Example
+    Examples
     -------
 
     >>> s = pd.Series("Texthero (is not a superhero!)")
@@ -249,7 +249,7 @@ def remove_curly_brackets(s: pd.Series):
     """
     Remove content within curly brackets {} and the curly brackets.
 
-    Example
+    Examples
     -------
 
     >>> s = pd.Series("Texthero {is not a superhero!}")
@@ -265,7 +265,7 @@ def remove_square_brackets(s: pd.Series):
     """
     Remove content within square brackets [] and the square brackets.
 
-    Example
+    Examples
     -------
 
     >>> s = pd.Series("Texthero [is not a superhero!]")
@@ -281,7 +281,7 @@ def remove_angle_brackets(s: pd.Series):
     """
     Remove content within angle brackets <> and the angle brackets.
 
-    Example
+    Examples
     -------
 
     >>> s = pd.Series("Texthero <is not a superhero!>")
@@ -299,7 +299,7 @@ def remove_brackets(s: pd.Series):
 
     Remove content from any kind of brackets, (), [], {}, <>.
 
-    Example
+    Examples
     -------
 
     >>> s = pd.Series("Texthero (round) [square] [curly] [angle]")
@@ -321,9 +321,3 @@ def remove_brackets(s: pd.Series):
         .pipe(remove_square_brackets)
         .pipe(remove_angle_brackets)
     )
-
-
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod()

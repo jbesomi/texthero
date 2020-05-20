@@ -1,9 +1,20 @@
 import string
 
 import pandas as pd
+import doctest
 
-from texthero import preprocessing, stop_words
+from texthero import preprocessing, stopwords
 from . import PandasTestCase
+
+
+"""
+Test doctest
+"""
+
+
+def load_tests(loader, tests, ignore):
+    tests.addTests(doctest.DocTestSuite(preprocessing))
+    return tests
 
 
 class TestPreprocessing(PandasTestCase):
@@ -76,7 +87,7 @@ class TestPreprocessing(PandasTestCase):
         self.assertEqual(preprocessing.remove_whitespace(s), s_true)
 
     """
-    Text pipeline.
+    Test pipeline.
     """
 
     def test_pipeline_stopwords(self):
@@ -85,21 +96,30 @@ class TestPreprocessing(PandasTestCase):
         pipeline = [preprocessing.lowercase, preprocessing.replace_words]
         self.assertEqual(preprocessing.clean(s, pipeline=pipeline), s_true)
 
-    def test_remove_stop_words(self):
+    """
+    Test stopwords
+    """
+
+    def test_replace_words(self):
         text = "i am quite intrigued"
         text_default_preprocessed = "  quite intrigued"
         text_spacy_preprocessed = "   intrigued"
         text_custom_preprocessed = "i  quite "
 
-        self.assertEquals(
+        self.assertEqual(
             preprocessing.replace_words(pd.Series(text)),
             pd.Series(text_default_preprocessed),
         )
-        self.assertEquals(
-            preprocessing.replace_words(pd.Series(text), stop_words.SPACY_EN),
+        self.assertEqual(
+            preprocessing.replace_words(pd.Series(text), stopwords.SPACY_EN),
             pd.Series(text_spacy_preprocessed),
         )
-        self.assertEquals(
+        self.assertEqual(
             preprocessing.replace_words(pd.Series(text), {"am", "intrigued"}),
             pd.Series(text_custom_preprocessed),
         )
+
+    def test_stopwords_are_set(self):
+        self.assertEqual(type(stopwords.DEFAULT), set)
+        self.assertEqual(type(stopwords.NLTK_EN), set)
+        self.assertEqual(type(stopwords.SPACY_EN), set)

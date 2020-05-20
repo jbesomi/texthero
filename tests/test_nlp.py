@@ -2,9 +2,18 @@ import pandas as pd
 from texthero import nlp
 
 from . import PandasTestCase
-
+import doctest
 import unittest
 import string
+
+"""
+Test doctest
+"""
+
+
+def load_tests(loader, tests, ignore):
+    tests.addTests(doctest.DocTestSuite(nlp))
+    return tests
 
 
 class TestNLP(PandasTestCase):

@@ -136,3 +136,27 @@ class TestPreprocessing(PandasTestCase):
         s = pd.Series("<html>remove <br>html</br> tags<html> &nbsp;")
         s_true = pd.Series("remove html tags ")
         self.assertEqual(preprocessing.remove_html_tags(s), s_true)
+
+    """
+    Text tokenization
+    """
+
+    def test_tokenize(self):
+        s = pd.Series("text to tokenize")
+        s_true = pd.Series([["text", "to", "tokenize"]])
+        self.assertEqual(preprocessing.tokenize(s), s_true)
+
+    def test_tokenize_multirows(self):
+        s = pd.Series(["first row", "second row"])
+        s_true = pd.Series([["first", "row"], ["second", "row"]])
+        self.assertEqual(preprocessing.tokenize(s), s_true)
+
+    def test_tokenize_split_punctuation(self):
+        s = pd.Series(["ready. set, go!"])
+        s_true = pd.Series([["ready", ".", "set", ",", "go", "!"]])
+        self.assertEqual(preprocessing.tokenize(s), s_true)
+
+    def test_tokenize_not_split_in_between_punctuation(self):
+        s = pd.Series(["don't say hello-world"])
+        s_true = pd.Series([["don't", "say", "hello-world"]])
+        self.assertEqual(preprocessing.tokenize(s), s_true)

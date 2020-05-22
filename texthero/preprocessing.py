@@ -12,6 +12,8 @@ from nltk.stem import PorterStemmer, SnowballStemmer
 
 from texthero import stopwords as _stopwords
 
+from typing import List
+
 
 def fillna(input: pd.Series) -> pd.Series:
     """Replace not assigned values with empty spaces."""
@@ -386,6 +388,12 @@ def tokenize(s: pd.Series) -> pd.Series:
     """
     Tokenize each row of the given Series.
 
-    Algorithm (simple yet-efficient): separate from 
+    Algorithm: add a space closer to a punctuation symbol at
+    exception if the symbol is between two alphanumeric character and split.
     """
-    raise NotImplementedError
+
+    pattern = (
+        rf"((\w)([{string.punctuation}])(?:\B|$)|(?:^|\B)([{string.punctuation}])(\w))"
+    )
+
+    return s.str.replace(pattern, r"\2 \3 \4 \5").str.split()

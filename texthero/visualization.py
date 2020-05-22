@@ -126,11 +126,11 @@ def top_words(s: pd.Series, normalize=False) -> pd.Series:
     """
 
     # Replace all punctuation that are NOT in-between chacarters
-    # This means, they have either a non character \W, are at the start ^, or at the end $
+    # This means, they have either a non word-bounding \B, are at the start ^, or at the end $
     # As re.sub replace all and not just the matching group, add matching parenthesis to the character
     # to keep during replacement.
     pattern = (
-        rf"((\w)[{string.punctuation}](?:\W|$)|(?:^|\W)[{string.punctuation}](\w))"
+        rf"((\w)[{string.punctuation}](?:\B|$)|(?:^|\B)[{string.punctuation}](\w))"
     )
 
     return (

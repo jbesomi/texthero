@@ -41,3 +41,13 @@ class TestVisualization(PandasTestCase):
         s = pd.Series("stop. please!")
         s_true = pd.Series([1, 1], index=["please", "stop"])
         self.assertEqual(visualization.top_words(s).sort_index(), s_true)
+
+    def test_top_words_digits(self):
+        s = pd.Series("123 hello h1n1")
+        s_true = pd.Series([1, 1, 1], index=["123", "h1n1", "hello"])
+        self.assertEqual(visualization.top_words(s).sort_index(), s_true)
+
+    def test_top_words_digits_punctuation(self):
+        s = pd.Series("123. .321 -h1n1 -cov2")
+        s_true = pd.Series([1, 1, 1, 1], index=["123", "321", "cov2", "h1n1"])
+        self.assertEqual(visualization.top_words(s).sort_index(), s_true)

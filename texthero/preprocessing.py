@@ -10,7 +10,7 @@ import pandas as pd
 import unidecode
 from nltk.stem import PorterStemmer, SnowballStemmer
 
-from texthero import stopwords
+from texthero import stopwords as _stopwords
 
 
 def fillna(input: pd.Series) -> pd.Series:
@@ -28,7 +28,7 @@ def _remove_block_digits(text):
     Remove block of digits from text.
 
     Examples
-    -------
+    --------
     >>> _remove_block_digits("hi 123")
     'hi '
     """
@@ -43,7 +43,7 @@ def _remove_block_digits(text):
 
 def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
     """
-    Remove all digits from a series and replace it with a single space.
+    Remove all digits from a series and replace it with an empty space.
 
     Parameters
     ----------
@@ -51,8 +51,8 @@ def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
     only_blocks : bool
                   Remove only blocks of digits. For instance, `hel1234lo 1234` becomes `hel1234lo`.
 
-    # Exampless
-    --------
+    # Examples
+    ----------
     >>> s = pd.Series("7ex7hero is fun 1111")
     >>> remove_digits(s)
     0    7ex7hero is fun 
@@ -74,8 +74,16 @@ def remove_punctuation(input: pd.Series) -> pd.Series:
 
     Replace it with a single space.
     """
+    return replace_punctuation(input, " ")
+
+
+def replace_punctuation(input: pd.Series, symbol: str) -> pd.Series:
+    """
+    Replace string.punctuation (!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~) with symbol argument.
+    """
+
     RE_PUNCT = re.compile(r"([%s])+" % re.escape(string.punctuation), re.UNICODE)
-    return input.str.replace(RE_PUNCT, " ")
+    return input.str.replace(RE_PUNCT, symbol)
 
 
 def remove_diacritics(input: pd.Series) -> pd.Series:
@@ -87,7 +95,7 @@ def remove_diacritics(input: pd.Series) -> pd.Series:
 
 def remove_whitespace(input: pd.Series) -> pd.Series:
     """
-    Remove all white spaces between words.
+    Remove all extra white spaces between words.
     """
 
     return input.str.replace(u"\xa0", u" ").str.split().str.join(" ")
@@ -98,22 +106,48 @@ def _remove_stopwords(text: str, words: Set[str]) -> str:
     Remove block of digits from text.
 
     Examples
-    -------
+    --------
     """
 
-    pattern = r"""\w+(?:-\w+)*|\s*|[][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]"""  # TODO. Explanation and double check.
+    pattern = r"""(?x)                          # Set flag to allow verbose regexps
+      \w+(?:-\w+)*                              # Words with optional internal hyphens 
+      | \s*                                     # Any space
+      | [][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]    # Any symbol 
+    """
+
     return "".join(t for t in re.findall(pattern, text) if t not in words)
 
 
-def replace_words(input: pd.Series, words: Optional[Set[str]] = None) -> pd.Series:
+def replace_stopwords(
+    input: pd.Series, symbol: str, stopwords: Optional[Set[str]] = None
+) -> pd.Series:
     """
-    Remove all instances of `words`.
-    See `stopwords` for pre-defined lists of stopwords or provide a custom list.
-    By default uses NLTK's english stopword list of 179 words.
+    Replace all stopwords with symbol.
+
+    By default uses NLTK's english stopwords of 179 words.
+
+    Examples
+    --------
+    >>> s = pd.Series("the book of the jungle")
+    >>> replace_stopwords(s, "X")
+    0     book   jungle
+    dtype: object
+
     """
-    if words is None:
-        words = stopwords.DEFAULT
-    return input.apply(_remove_stopwords, args=(words,))
+    if stopwords is None:
+        stopwords = _stopwords.DEFAULT
+    return input.apply(_remove_stopwords, args=(stopwords,))
+
+
+def remove_stopwords(
+    input: pd.Series, stopwords: Optional[Set[str]] = None
+) -> pd.Series:
+    """
+    Remove all instances of `words` and replace it with an empty space.
+
+    By default uses NLTK's english stopwords of 179 words.
+    """
+    return replace_stopwords(input, symbol=" ", stopwords=stopwords)
 
 
 def stem(input: pd.Series, stem="snowball", language="english") -> pd.Series:
@@ -128,9 +162,9 @@ def stem(input: pd.Series, stem="snowball", language="english") -> pd.Series:
     stem
         Can be either 'snowball' or 'porter'. ("snowball" is default)
     language
-        Supportted languages: 
+        Supported languages: 
             danish dutch english finnish french german hungarian italian 
-            norwegian porter portuguese romanian russian spanish swedish
+            norwegian portuguese romanian russian spanish swedish
     """
 
     if stem is "porter":
@@ -151,7 +185,7 @@ def get_default_pipeline() -> []:
     """
     Return a list contaning all the methods used in the default cleaning pipeline.
 
-    Return a list with the following function
+    Return a list with the following functions:
     - fillna
     - lowercase
     - remove_digits
@@ -166,7 +200,7 @@ def get_default_pipeline() -> []:
         remove_digits,
         remove_punctuation,
         remove_diacritics,
-        replace_words,
+        remove_stopwords,
         remove_whitespace,
     ]
 
@@ -195,13 +229,13 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
 
 
 def has_content(s: pd.Series):
-    """
+    r"""
     For each row, check that there is content.
 
     Examples
-    -------
+    --------
 
-    >>> s = pd.Series(["c", np.nan, "\t\\n", " "])
+    >>> s = pd.Series(["c", np.nan, "\t\n", " "])
     >>> has_content(s)
     0     True
     1    False
@@ -214,13 +248,12 @@ def has_content(s: pd.Series):
 
 
 def drop_no_content(s: pd.Series):
-    """
+    r"""
     Drop all rows where has_content is empty.
 
     Examples
-    -------
-
-    >>> s = pd.Series(["c", np.nan, "\t\\n", " "])
+    --------
+    >>> s = pd.Series(["c", np.nan, "\t\n", " "])
     >>> drop_no_content(s)
     0    c
     dtype: object
@@ -234,7 +267,7 @@ def remove_round_brackets(s: pd.Series):
     Remove content within parentheses () and parentheses.
 
     Examples
-    -------
+    --------
 
     >>> s = pd.Series("Texthero (is not a superhero!)")
     >>> remove_round_brackets(s)
@@ -266,7 +299,7 @@ def remove_square_brackets(s: pd.Series):
     Remove content within square brackets [] and the square brackets.
 
     Examples
-    -------
+    --------
 
     >>> s = pd.Series("Texthero [is not a superhero!]")
     >>> remove_square_brackets(s)
@@ -282,7 +315,7 @@ def remove_angle_brackets(s: pd.Series):
     Remove content within angle brackets <> and the angle brackets.
 
     Examples
-    -------
+    --------
 
     >>> s = pd.Series("Texthero <is not a superhero!>")
     >>> remove_angle_brackets(s)
@@ -300,7 +333,7 @@ def remove_brackets(s: pd.Series):
     Remove content from any kind of brackets, (), [], {}, <>.
 
     Examples
-    -------
+    --------
 
     >>> s = pd.Series("Texthero (round) [square] [curly] [angle]")
     >>> remove_brackets(s)
@@ -313,8 +346,8 @@ def remove_brackets(s: pd.Series):
     remove_curly_brackets(s)
     remove_square_brackets(s)
     remove_angle_brackets(s)
-
     """
+
     return (
         s.pipe(remove_round_brackets)
         .pipe(remove_curly_brackets)

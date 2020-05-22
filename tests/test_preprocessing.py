@@ -19,7 +19,7 @@ def load_tests(loader, tests, ignore):
 
 class TestPreprocessing(PandasTestCase):
     """
-    Remove digits.
+    Test remove digits.
     """
 
     def test_remove_digits_only_block(self):
@@ -93,29 +93,33 @@ class TestPreprocessing(PandasTestCase):
     def test_pipeline_stopwords(self):
         s = pd.Series("E-I-E-I-O\nAnd on")
         s_true = pd.Series("e-i-e-i-o\n ")
-        pipeline = [preprocessing.lowercase, preprocessing.replace_words]
+        pipeline = [preprocessing.lowercase, preprocessing.remove_stopwords]
         self.assertEqual(preprocessing.clean(s, pipeline=pipeline), s_true)
 
     """
-    Test stopwords
+    Test stopwords.
     """
 
-    def test_replace_words(self):
+    def test_remove_stopwords(self):
         text = "i am quite intrigued"
         text_default_preprocessed = "  quite intrigued"
         text_spacy_preprocessed = "   intrigued"
         text_custom_preprocessed = "i  quite "
 
         self.assertEqual(
-            preprocessing.replace_words(pd.Series(text)),
+            preprocessing.remove_stopwords(pd.Series(text)),
             pd.Series(text_default_preprocessed),
         )
         self.assertEqual(
-            preprocessing.replace_words(pd.Series(text), stopwords.SPACY_EN),
+            preprocessing.remove_stopwords(
+                pd.Series(text), stopwords=stopwords.SPACY_EN
+            ),
             pd.Series(text_spacy_preprocessed),
         )
         self.assertEqual(
-            preprocessing.replace_words(pd.Series(text), {"am", "intrigued"}),
+            preprocessing.remove_stopwords(
+                pd.Series(text), stopwords={"am", "intrigued"}
+            ),
             pd.Series(text_custom_preprocessed),
         )
 

@@ -134,6 +134,9 @@ def replace_stopwords(
     dtype: object
 
     """
+
+    # FIX ME. Replace with custom symbol is not working and the docstring example is clearly wrong.
+
     if stopwords is None:
         stopwords = _stopwords.DEFAULT
     return input.apply(_remove_stopwords, args=(stopwords,))

@@ -6,6 +6,10 @@ import pandas as pd
 import plotly.express as px
 
 from wordcloud import WordCloud
+from nltk import NLTKWordTokenizer
+
+from texthero import preprocessing
+import string
 
 
 @pd.api.extensions.register_series_accessor("words")
@@ -109,16 +113,31 @@ def wordcloud(s: pd.Series, title="", return_figure=False):
 
 
 def top_words(s: pd.Series, normalize=False) -> pd.Series:
-    """
-    Return most common words.
+    r"""
+    Return a pandas series with index the top words and as value the count.
 
+    Tokenization: split by space and remove all punctuations that are not between characters.
+    
     Parameters
     ----------
-
-    s
     normalize :
-        Default is False. If set to True, returns normalized values.
+        When set to true, return normalized values.
 
     """
-    WHITESPACE_SPLITTER = r"\W+"
-    return s.str.split(WHITESPACE_SPLITTER).explode().value_counts(normalize=normalize)
+
+    # Replace all punctuation that are NOT in-between chacarters
+    # This means, they have either a non character \W, are at the start ^, or at the end $
+    # As re.sub replace all and not just the matching group, add matching parenthesis to the character
+    # to keep during replacement.
+    pattern = (
+        rf"((\w)[{string.punctuation}](?:\W|$)|(?:^|\W)[{string.punctuation}](\w))"
+    )
+
+    return (
+        s.str.replace(
+            pattern, r"\2 \3"
+        )  # \2 and \3 permits to keep the character around the punctuation.
+        .str.split()  # now split by space
+        .explode()  # one word for each line
+        .value_counts(normalize=normalize)
+    )

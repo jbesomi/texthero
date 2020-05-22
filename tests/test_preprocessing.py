@@ -1,6 +1,7 @@
 import string
 
 import pandas as pd
+import numpy as np
 import doctest
 
 from texthero import preprocessing, stopwords

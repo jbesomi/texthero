@@ -357,3 +357,26 @@ def remove_brackets(s: pd.Series):
         .pipe(remove_square_brackets)
         .pipe(remove_angle_brackets)
     )
+
+
+def remove_html_tags(s: pd.Series) -> pd.Series:
+    """
+    Remove html tags from given input Pandas Series.
+
+    Remove all tags of type <.*?>, such as <html>, <p>, <div class="hello">.
+    Remove all html tags of type &nbsp;
+
+    Examples
+    --------
+    >>> s = pd.Series("<html><h1>Title</h1></html>")
+    >>> remove_html_tags(s)
+    0    Title
+    dtype: object
+    """
+
+    pattern = r"""(?x)                              # Turn on free-spacing
+      <[^>]+>                                       # Remove <html> tags
+      | &([a-z0-9]+|\#[0-9]{1,6}|\#x[0-9a-f]{1,6}); # Remove &nbsp;
+      """
+
+    return s.str.replace(pattern, "")

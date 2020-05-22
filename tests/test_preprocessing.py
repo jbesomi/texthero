@@ -127,3 +127,12 @@ class TestPreprocessing(PandasTestCase):
         self.assertEqual(type(stopwords.DEFAULT), set)
         self.assertEqual(type(stopwords.NLTK_EN), set)
         self.assertEqual(type(stopwords.SPACY_EN), set)
+
+    """
+    Test remove html tags
+    """
+
+    def test_remove_html_tags(self):
+        s = pd.Series("<html>remove <br>html</br> tags<html> &nbsp;")
+        s_true = pd.Series("remove html tags ")
+        self.assertEqual(preprocessing.remove_html_tags(s), s_true)

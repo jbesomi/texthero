@@ -82,8 +82,7 @@ def replace_punctuation(input: pd.Series, symbol: str) -> pd.Series:
     Replace string.punctuation (!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~) with symbol argument.
     """
 
-    RE_PUNCT = re.compile(r"([%s])+" % re.escape(string.punctuation), re.UNICODE)
-    return input.str.replace(RE_PUNCT, symbol)
+    return input.str.replace(rf"([{string.punctuation}])+", symbol)
 
 
 def remove_diacritics(input: pd.Series) -> pd.Series:
@@ -98,7 +97,7 @@ def remove_whitespace(input: pd.Series) -> pd.Series:
     Remove all extra white spaces between words.
     """
 
-    return input.str.replace(u"\xa0", u" ").str.split().str.join(" ")
+    return input.str.replace("\xa0", " ").str.split().str.join(" ")
 
 
 def _remove_stopwords(text: str, words: Set[str]) -> str:
@@ -381,3 +380,12 @@ def remove_html_tags(s: pd.Series) -> pd.Series:
       """
 
     return s.str.replace(pattern, "")
+
+
+def tokenize(s: pd.Series) -> pd.Series:
+    """
+    Tokenize each row of the given Series.
+
+    Algorithm (simple yet-efficient): separate from 
+    """
+    raise NotImplementedError

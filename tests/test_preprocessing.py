@@ -20,7 +20,7 @@ def load_tests(loader, tests, ignore):
 
 class TestPreprocessing(PandasTestCase):
     """
-    Remove digits.
+    Test remove digits.
     """
 
     def test_remove_digits_only_block(self):
@@ -94,29 +94,33 @@ class TestPreprocessing(PandasTestCase):
     def test_pipeline_stopwords(self):
         s = pd.Series("E-I-E-I-O\nAnd on")
         s_true = pd.Series("e-i-e-i-o\n ")
-        pipeline = [preprocessing.lowercase, preprocessing.replace_words]
+        pipeline = [preprocessing.lowercase, preprocessing.remove_stopwords]
         self.assertEqual(preprocessing.clean(s, pipeline=pipeline), s_true)
 
     """
-    Test stopwords
+    Test stopwords.
     """
 
-    def test_replace_words(self):
+    def test_remove_stopwords(self):
         text = "i am quite intrigued"
         text_default_preprocessed = "  quite intrigued"
         text_spacy_preprocessed = "   intrigued"
         text_custom_preprocessed = "i  quite "
 
         self.assertEqual(
-            preprocessing.replace_words(pd.Series(text)),
+            preprocessing.remove_stopwords(pd.Series(text)),
             pd.Series(text_default_preprocessed),
         )
         self.assertEqual(
-            preprocessing.replace_words(pd.Series(text), stopwords.SPACY_EN),
+            preprocessing.remove_stopwords(
+                pd.Series(text), stopwords=stopwords.SPACY_EN
+            ),
             pd.Series(text_spacy_preprocessed),
         )
         self.assertEqual(
-            preprocessing.replace_words(pd.Series(text), {"am", "intrigued"}),
+            preprocessing.remove_stopwords(
+                pd.Series(text), stopwords={"am", "intrigued"}
+            ),
             pd.Series(text_custom_preprocessed),
         )
 
@@ -126,7 +130,40 @@ class TestPreprocessing(PandasTestCase):
         self.assertEqual(type(stopwords.SPACY_EN), set)
 
     """
-    Has content
+    Test remove html tags
+    """
+
+    def test_remove_html_tags(self):
+        s = pd.Series("<html>remove <br>html</br> tags<html> &nbsp;")
+        s_true = pd.Series("remove html tags ")
+        self.assertEqual(preprocessing.remove_html_tags(s), s_true)
+
+    """
+    Text tokenization
+    """
+
+    def test_tokenize(self):
+        s = pd.Series("text to tokenize")
+        s_true = pd.Series([["text", "to", "tokenize"]])
+        self.assertEqual(preprocessing.tokenize(s), s_true)
+
+    def test_tokenize_multirows(self):
+        s = pd.Series(["first row", "second row"])
+        s_true = pd.Series([["first", "row"], ["second", "row"]])
+        self.assertEqual(preprocessing.tokenize(s), s_true)
+
+    def test_tokenize_split_punctuation(self):
+        s = pd.Series(["ready. set, go!"])
+        s_true = pd.Series([["ready", ".", "set", ",", "go", "!"]])
+        self.assertEqual(preprocessing.tokenize(s), s_true)
+
+    def test_tokenize_not_split_in_between_punctuation(self):
+        s = pd.Series(["don't say hello-world"])
+        s_true = pd.Series([["don't", "say", "hello-world"]])
+        self.assertEqual(preprocessing.tokenize(s), s_true)
+
+    """
+     Has content
     """
 
     def test_has_content(self):

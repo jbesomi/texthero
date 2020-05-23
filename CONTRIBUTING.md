@@ -146,7 +146,11 @@ Terms of style: PEP 8
 - You can reference relevant issues using an hastag plus the number of the issue. Example: `#1`
 
 
-### Tests
+### Test-driven development
+
+
+Texthero is serious about testing. You are strongly encouraged contributors to embrace [test-driven development (TDD)](https://en.wikipedia.org/wiki/Test-driven_development).
+
 
 Tests are made with `unittest`.
 To execute all test, you can simply

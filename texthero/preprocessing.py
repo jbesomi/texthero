@@ -397,3 +397,11 @@ def tokenize(s: pd.Series) -> pd.Series:
     )
 
     return s.str.replace(pattern, r"\2 \3 \4 \5").str.split()
+
+
+def remove_urls(s: pd.Series) -> pd.Series:
+    """Remove all urls from a given Series."""
+
+    pattern = r"http\S+"
+
+    return s.str.replace(pattern, "")

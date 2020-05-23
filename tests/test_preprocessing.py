@@ -130,7 +130,7 @@ class TestPreprocessing(PandasTestCase):
     """
 
     def test_has_content(self):
-        s = pd.Series(["c", np.nan, "\t\\n", " ", "", "has content", None])
+        s = pd.Series(["c", np.nan, "\t\n", " ", "", "has content", None])
         s_true = pd.Series([True, False, False, False, False, True, False])
         self.assertEqual(preprocessing.has_content(s), s_true)
 

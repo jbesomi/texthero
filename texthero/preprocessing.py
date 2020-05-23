@@ -90,7 +90,7 @@ def remove_whitespace(input: pd.Series) -> pd.Series:
     Remove all white spaces between words.
     """
 
-    return input.str.replace(u"\xa0", u" ").str.decode('unicode_escape').str.split().str.join(" ")
+    return input.str.replace(u"\xa0", u" ").str.split().str.join(" ")
 
 
 def _remove_stopwords(text: str, words: Set[str]) -> str:

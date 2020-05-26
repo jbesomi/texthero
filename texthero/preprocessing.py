@@ -53,8 +53,8 @@ def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
     only_blocks : bool
                   Remove only blocks of digits. For instance, `hel1234lo 1234` becomes `hel1234lo`.
 
-    # Examples
-    ----------
+    Examples
+    --------
     >>> s = pd.Series("7ex7hero is fun 1111")
     >>> remove_digits(s)
     0    7ex7hero is fun 
@@ -214,6 +214,7 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
     Clean pandas series by appling a preprocessing pipeline.
 
     For information regarding a specific function type `help(texthero.preprocessing.func_name)`.
+
     The default preprocessing pipeline is the following:
     - fillna
     - lowercase

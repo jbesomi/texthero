@@ -1,6 +1,7 @@
 import string
 
 import pandas as pd
+import numpy as np
 import doctest
 
 from texthero import preprocessing, stopwords
@@ -162,20 +163,39 @@ class TestPreprocessing(PandasTestCase):
         self.assertEqual(preprocessing.tokenize(s), s_true)
 
     """
-    Test remove urls
+     Has content
     """
 
-    def test_remove_urls(self):
-        s = pd.Series("http://tests.com http://www.tests.com")
-        s_true = pd.Series(" ")
-        self.assertEqual(preprocessing.remove_urls(s), s_true)
+    def test_has_content(self):
+        s = pd.Series(["c", np.nan, "\t\n", " ", "", "has content", None])
+        s_true = pd.Series([True, False, False, False, False, True, False])
+        self.assertEqual(preprocessing.has_content(s), s_true)
 
-    def test_remove_urls_https(self):
-        s = pd.Series("https://tests.com https://www.tests.com")
-        s_true = pd.Series(" ")
-        self.assertEqual(preprocessing.remove_urls(s), s_true)
+    """
+    Remove brackets
+    """
 
-    def test_remove_urls_multiline(self):
-        s = pd.Series("https://tests.com \n https://tests.com")
-        s_true = pd.Series(" \n ")
-        self.assertEqual(preprocessing.remove_urls(s), s_true)
+    def test_remove_round_brackets(self):
+        s = pd.Series("Remove all (brackets)(){/}[]<>")
+        s_true = pd.Series("Remove all {/}[]<>")
+        self.assertEqual(preprocessing.remove_round_brackets(s), s_true)
+
+    def test_remove_curly_brackets(self):
+        s = pd.Series("Remove all (brackets)(){/}[]<> { }")
+        s_true = pd.Series("Remove all (brackets)()[]<> ")
+        self.assertEqual(preprocessing.remove_curly_brackets(s), s_true)
+    
+    def test_remove_square_brackets(self):
+        s = pd.Series("Remove all [brackets](){/}[]<>")
+        s_true = pd.Series("Remove all (){/}<>")
+        self.assertEqual(preprocessing.remove_square_brackets(s), s_true)
+
+    def test_remove_angle_brackets(self):
+        s = pd.Series("Remove all <brackets>(){/}[]<>")
+        s_true = pd.Series("Remove all (){/}[]")
+        self.assertEqual(preprocessing.remove_angle_brackets(s), s_true)
+
+    def test_remove_brackets(self):
+        s = pd.Series("Remove all [square_brackets]{/curly_brackets}(round_brackets)<angle_brackets>")
+        s_true = pd.Series("Remove all ")
+        self.assertEqual(preprocessing.remove_brackets(s), s_true)

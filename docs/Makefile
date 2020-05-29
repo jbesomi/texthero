@@ -18,4 +18,4 @@ help:
 %: Makefile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 	@./to_docusaurus.py
-	@cp -u ./_build/html/_static/basic.css ../website/static/css/sphinx_basic.css
+	@rsync -u ./_build/html/_static/basic.css ../website/static/css/sphinx_basic.css

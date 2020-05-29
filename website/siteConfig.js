@@ -102,7 +102,7 @@ const siteConfig = {
     'https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js',
     '/js/code-block-buttons.js',
    ],
-  stylesheets: ['/css/code-block-buttons.css'],
+  stylesheets: ['/css/code-block-buttons.css', '/css/sphinx_basic.css'],
 
   // On page navigation for the current documentation page.
   onPageNav: 'separate',
@@ -119,7 +119,7 @@ const siteConfig = {
 
   // For sites with a sizable amount of content, set collapsible to true.
   // Expand/collapse the links and subcategories under categories.
-  // docsSideNavCollapsible: true,
+  docsSideNavCollapsible: true,
 
   // Show documentation's last contributor's name.
   // enableUpdateBy: true,

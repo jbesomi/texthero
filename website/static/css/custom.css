@@ -5,9 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-/*
-Contains custom styles for whole site.
-*/
 
 html {
     box-sizing: border-box;
@@ -21,6 +18,11 @@ body {
     min-height: 100vh;
 }
 
+/* remove default margin-top*/
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
+}
+
 .mainContainer .wrapper .post h4 {
    color: #3f88c5;
 }
@@ -28,17 +30,6 @@ body {
 .homeContainer h3 {
    font-weight: 400;
 }
-
-/*
-.navPusher {
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-    justify-content: space-between;
-    min-height: 100%;
-    height: auto;
-}
-*/
 
 .footer-logo {
     padding-top: 1em;
@@ -52,7 +43,7 @@ body {
 }
 
 
-/* HOME _____________________________________________________________________________________________________________ */
+/* HOME */
 
 .homeContainer {
     flex: 1 0 auto;
@@ -76,21 +67,23 @@ body {
 }
 
 
-/* DOCS _____________________________________________________________________________________________________________ */
+/* DOCS  */
 
 .docMainWrapper {
     width: 100%;
 }
 
 
-/* HEADINGS _________________________________________________________________________________________________________ */
+/* HEADINGS */
+
+/* TODO, do we really needs all that? */
 
 .mainContainer .wrapper .post h2,
 .mainContainer .wrapper .post h3,
 .mainContainer .wrapper .post h4,
 .mainContainer .wrapper .post h5,
 .mainContainer .wrapper .post h6 {
-    margin-top: 2.5rem;
+    /* margin-top: 2.5rem; */
 }
 
 .mainContainer .wrapper .post .postHeader h1 {
@@ -141,4 +134,90 @@ body {
 }
 
 @media only screen and (min-width: 1500px) {
+}
+
+
+/*
+    CODE
+*/
+
+code {
+    padding: 0;
+    border: 0;
+}
+
+/* 
+    API PAGES
+*/
+
+/* make scrollbar transparent */
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; 
+}
+
+
+/* Sidebar: if text is too long, clip it. */
+
+.navItem {
+    text-overflow: clip;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/* Do not wrap the first column of API tables */
+table td:first-child {
+    white-space:nowrap;
+}
+
+/* Define box around code example */
+pre {
+    padding: 10px;
+    color: #222;
+    line-height: 1.2em;
+    border: 1px solid #aaa;
+    margin: 5px 0;
+    box-shadow: 1px 1px 1px #d8d8d8;
+}
+
+/* remove space in descname 
+.section dt {
+    display: flex; 
+}
+*/
+
+
+/* Add blue color to 'name_function' in descname */
+code.descname {
+    color: #3f88c5;
+}
+
+/* reduce space between x : y */
+.classifier:before {
+    font-style: normal;
+    margin: 0.3em;
+    content: ":";
+}
+
+/* Allineate examples to parameters */
+p.rubric, .doctest {
+    padding-left: 0.5em;
+}
+
+/* Less space between parameters and examples */
+p.rubric {
+    margin-top: 10px;
+}
+
+.highlight{
+    font-size: 15px;
+    color: grey;
+}
+
+/* Larger sidebar */
+
+@media only screen and (min-width: 1024px) {
+    .separateOnPageNav .docsNavContainer {
+        flex: 0 0 280px;
+    }
 }

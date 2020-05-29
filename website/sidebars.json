@@ -1,8 +1,55 @@
 {
   "docs": {
-    "Getting Started": ["getting-started"]
+    "Getting Started": [
+      "getting-started"
+    ]
   },
   "api": {
-    "API": ["api-preprocessing", "api-representation", "api-visualization"]
+    "Preprocessing": [
+      "api-preprocessing",
+      "api/texthero.preprocessing.clean",
+      "api/texthero.preprocessing.drop_no_content",
+      "api/texthero.preprocessing.get_default_pipeline",
+      "api/texthero.preprocessing.has_content",
+      "api/texthero.preprocessing.remove_angle_brackets",
+      "api/texthero.preprocessing.remove_brackets",
+      "api/texthero.preprocessing.remove_curly_brackets",
+      "api/texthero.preprocessing.remove_diacritics",
+      "api/texthero.preprocessing.remove_digits",
+      "api/texthero.preprocessing.remove_html_tags",
+      "api/texthero.preprocessing.remove_punctuation",
+      "api/texthero.preprocessing.remove_round_brackets",
+      "api/texthero.preprocessing.remove_square_brackets",
+      "api/texthero.preprocessing.remove_stopwords",
+      "api/texthero.preprocessing.remove_urls",
+      "api/texthero.preprocessing.remove_whitespace",
+      "api/texthero.preprocessing.replace_punctuation",
+      "api/texthero.preprocessing.replace_stopwords",
+      "api/texthero.preprocessing.stem",
+      "api/texthero.preprocessing.tokenize"
+    ],
+    "NLP": [
+      "api-nlp",
+      "api/texthero.nlp.dependency_parse",
+      "api/texthero.nlp.named_entities",
+      "api/texthero.nlp.noun_chunks"
+    ],
+    "Representation": [
+      "api-representation",
+      "api/texthero.representation.dbscan",
+      "api/texthero.representation.kmeans",
+      "api/texthero.representation.meanshift",
+      "api/texthero.representation.nmf",
+      "api/texthero.representation.pca",
+      "api/texthero.representation.term_frequency",
+      "api/texthero.representation.tfidf",
+      "api/texthero.representation.tsne"
+    ],
+    "Visualization": [
+      "api-visualization",
+      "api/texthero.visualization.scatterplot",
+      "api/texthero.visualization.top_words",
+      "api/texthero.visualization.wordcloud"
+    ]
   }
 }

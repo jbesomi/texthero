@@ -1,2 +1,0 @@
-.. automodule:: texthero.representation
-   :members:

@@ -1,6 +1,7 @@
 """
-Preprocess text-based Pandas DataFrame.
+The texthero.preprocess module allow for efficient pre-processing of text-based Pandas Series and DataFrame.
 """
+
 import re
 import string
 from typing import Optional, Set
@@ -12,10 +13,10 @@ from nltk.stem import PorterStemmer, SnowballStemmer
 
 from texthero import stopwords as _stopwords
 
-from typing import List
+from typing import List, Callable
 
 
-def fillna(input: pd.Series) -> pd.Series:
+def _fillna(input: pd.Series) -> pd.Series:
     """Replace not assigned values with empty spaces."""
     return input.fillna("").astype("str")
 
@@ -25,63 +26,108 @@ def lowercase(input: pd.Series) -> pd.Series:
     return input.str.lower()
 
 
-def _remove_block_digits(text):
+def replace_digits(input: pd.Series, symbols: str = " ", only_blocks=True) -> pd.Series:
     """
-    Remove block of digits from text.
+    Replace all digits with symbols.
 
-    Examples
-    --------
-    >>> _remove_block_digits("hi 123")
-    'hi '
-    """
-    pattern = r"""(?x)                          # set flag to allow verbose regexps
-      \w+(?:-\w+)*                              # words with optional internal hyphens
-      | \$?\d+(?:\.\d+)?%?                      # currency and percentages, e.g. $12.40, 82%
-      | [][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]    # these are separate tokens; includes ], [
-      | \s*
-    """
-    return "".join(t for t in re.findall(pattern, text) if not t.isnumeric())
+    By default, only replace "blocks" of digits, i.e tokens composed of only numbers.
 
-
-def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
-    """
-    Remove all digits from a series and replace it with an empty space.
+    When `only_blocks` is set to ´False´, replace any digits.
 
     Parameters
     ----------
-    input : pd.Series
+    input : Pandas Series
+    symbols : str (Default single empty space " ")
+        Symbols to replace
     only_blocks : bool
-                  Remove only blocks of digits. For instance, `hel1234lo 1234` becomes `hel1234lo`.
+        When set to False, remove any digits.
+    
+    Returns
+    -------
+    Pandas Series
 
     Examples
     --------
-    >>> s = pd.Series("7ex7hero is fun 1111")
-    >>> remove_digits(s)
-    0    7ex7hero is fun 
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("1234 falcon9")
+    >>> hero.preprocessing.replace_digits(s, "X")
+    0    X falcon9
     dtype: object
-    >>> remove_digits(s, only_blocks=False)
-    0    exhero is fun 
+    >>> hero.preprocessing.replace_digits(s, "X", only_blocks=False)
+    0    X falconX
     dtype: object
     """
 
     if only_blocks:
-        return input.apply(_remove_block_digits)
+        pattern = r"\b\d+\b"
+        return input.str.replace(pattern, symbols)
     else:
-        return input.str.replace(r"\d+", "")
+        return input.str.replace(r"\d+", symbols)
+
+
+def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
+    """
+    Remove all digits and replace it with a single space.
+
+    By default, only removes "blocks" of digits. For instance, `1234 falcon9` becomes ` falcon9`.
+
+    When the arguments `only_blocks` is set to ´False´, remove any digits.
+
+    Parameters
+    ----------
+    input : Pandas Series
+    only_blocks : bool
+        Remove only blocks of digits.
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("7ex7hero is fun 1111")
+    >>> hero.preprocessing.remove_digits(s)
+    0    7ex7hero is fun  
+    dtype: object
+    >>> hero.preprocessing.remove_digits(s, only_blocks=False)
+    0     ex hero is fun  
+    dtype: object
+    """
+
+    return replace_digits(input, " ", only_blocks)
 
 
 def remove_punctuation(input: pd.Series) -> pd.Series:
-    """
-    Remove string.punctuation (!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~).
+    r"""
+    Replace all punctuation with a single space (" ").
 
-    Replace it with a single space.
+    `remove_punctuation` removes all punctuation from the given Pandas Series and replace it with a single space. Consider as punctuation characters all :data:`string.punctuation` symbols `!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~).`
+
+    See also :meth:`replace_punctuation` to replace punctuation with a custom symbol.
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("Finnaly.")
+    >>> hero.remove_punctuation(s)
+    0    Finnaly 
+    dtype: object
     """
     return replace_punctuation(input, " ")
 
 
-def replace_punctuation(input: pd.Series, symbol: str) -> pd.Series:
-    """
-    Replace string.punctuation (!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~) with symbol argument.
+def replace_punctuation(input: pd.Series, symbol: str = " ") -> pd.Series:
+    f"""
+    Replace all punctuation with a given symbol.
+
+    Parameters
+    ----------
+    input : Pandas Series
+    symbol : str (" " by Default)
+        Symbol to use as replacement for all string punctuation. 
+
+         
+
     """
 
     return input.str.replace(rf"([{string.punctuation}])+", symbol)
@@ -185,13 +231,13 @@ def stem(input: pd.Series, stem="snowball", language="english") -> pd.Series:
     return input.str.split().apply(_stem)
 
 
-def get_default_pipeline() -> []:
+def get_default_pipeline() -> List[Callable[[pd.Series], pd.Series]]:
     """
     Return a list contaning all the methods used in the default cleaning pipeline.
 
     Return a list with the following functions:
-    - fillna
-    - lowercase
+    - _fillna
+    -  lowercase
     - remove_digits
     - remove_punctuation
     - remove_diacritics
@@ -199,7 +245,7 @@ def get_default_pipeline() -> []:
     - remove_whitespace
     """
     return [
-        fillna,
+        _fillna,
         lowercase,
         remove_digits,
         remove_punctuation,
@@ -216,8 +262,8 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
     For information regarding a specific function type `help(texthero.preprocessing.func_name)`.
 
     The default preprocessing pipeline is the following:
-    - fillna
-    - lowercase
+    - _fillna
+    -  lowercase
     - remove_digits
     - remove_punctuation
     - remove_diacritics
@@ -288,8 +334,7 @@ def remove_curly_brackets(s: pd.Series):
     Remove content within curly brackets {} and the curly brackets.
 
     Examples
-    -------
-
+    --------
     >>> s = pd.Series("Texthero {is not a superhero!}")
     >>> remove_curly_brackets(s)
     0    Texthero 
@@ -345,12 +390,7 @@ def remove_brackets(s: pd.Series):
     0    Texthero    
     dtype: object
 
-    See also
-    --------
-    remove_round_brackets(s)
-    remove_curly_brackets(s)
-    remove_square_brackets(s)
-    remove_angle_brackets(s)
+
     """
 
     return (

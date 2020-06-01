@@ -28,7 +28,7 @@
 
 
 <p align="center">
-   <a href="#zero-to-hero">From zero to hero</a> •
+   <a href="#from-zero-to-hero">From zero to hero</a> •
    <a href="#installation">Installation</a> •
    <a href="#getting-started">Getting Started</a> •
    <a href="#examples">Examples</a> •

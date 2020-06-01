@@ -13,6 +13,8 @@
 import os
 import sys
 
+import matplotlib
+
 sys.path.insert(0, os.path.abspath("."))
 
 
@@ -36,6 +38,8 @@ extensions = [
     "sphinx.ext.autodoc",  # automatically construct the documentation.
     "sphinx.ext.autosummary",
     # prefer numpydoc at sphinx.ext.napoleon as it looks nicer.
+    "sphinx.ext.intersphinx",
+    "matplotlib.sphinxext.plot_directive",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -51,6 +55,9 @@ add_module_names = False
 autosummary_generate = True
 
 autodoc_typehints = "none"
+
+
+intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
 
 # -- Options for HTML output -------------------------------------------------
 

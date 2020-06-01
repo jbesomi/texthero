@@ -1,19 +1,16 @@
 #!/bin/sh
 
-cd ..
-
 echo "Formatting code ..."
 ./format.sh
-
 
 echo "Checking code ..."
 ./check.sh
 
 echo "Updating doc ..."
-cd website/docs
-./create_docs_with_sphinx.sh
-
-cd -
+cd ../docs/
+make html
+./to_docusaurus.py
+cd ..
 
 python3 setup.py sdist bdist_wheel
-twine upload dist/*
+twine upload --skip-existing dist/*

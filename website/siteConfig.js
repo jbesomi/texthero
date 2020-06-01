@@ -101,6 +101,7 @@ const siteConfig = {
     'https://buttons.github.io/buttons.js',
     'https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js',
     '/js/code-block-buttons.js',
+    "//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js",
    ],
   stylesheets: ['/css/code-block-buttons.css', '/css/sphinx_basic.css'],
 

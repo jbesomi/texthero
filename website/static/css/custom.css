@@ -171,7 +171,7 @@ table td:first-child {
 }
 
 /* Define box around code example */
-pre {
+.highlight pre {
     padding: 10px;
     color: #222;
     line-height: 1.2em;
@@ -241,4 +241,91 @@ cite {
 /* Make docs-prevnext button 1px smaller */
 .docs-prevnext .button {
     font-size: 13px;
+}
+
+
+.showcase {
+    width: 70%;
+    margin: auto;
+    text-align: left;
+}
+
+.homebox {
+    width: 45%;
+}
+
+.left {
+    margin-left: 0px;
+    margin-right: auto;
+}
+
+.right {
+    margin-left: auto;
+    margin-right: 0px;
+}
+
+.home_separator {
+    width: 60%;
+    border-top: 2px solid #3f88c5;
+    margin: 0px auto 20px auto;
+}
+
+/* Homepage code box */
+
+/* basically copy the code from pygments. TODO unite pygments and highlight.js */
+.hljs {
+    text-align: left;
+    padding: 10px;
+    color: #222;
+    line-height: 1.2em;
+    border: 1px solid #3f88c552;
+    margin: 5px 0;
+    box-shadow: 1px 1px 1px #d8d8d8;
+    background: #f8f8f8;
+}
+
+.hljs-keyword {
+    color: #3f88c5;
+    font-weight: bold;
+}
+
+/* Table size a bit smaller ... */
+
+.showcase table {
+    font-size: 80%;
+}
+
+.showcase table td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 280px;
+}
+
+.showcase blockquote {
+    background-color: rgba(255, 229, 100, 0.3);
+    border-left: 8px solid #ffe564;
+    font-size: 80%;
+    padding: 5px 30px 5px 15px;
+}
+
+.showcase blockquote a {
+    color: black;
+    font-weight: 400;
+}
+
+.hljs-string {
+    color: #3f88c5cf;
+}
+
+.showcase .projectTitle > small {
+    display: block;
+    font-weight: normal;
+    font-size: 50%;
+    line-height: 1em;
+    margin: 0;
+}
+
+.showcase .btnIcon {
+    display: none;
 }

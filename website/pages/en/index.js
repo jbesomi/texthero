@@ -76,6 +76,7 @@ const PromoSection = props => (
 );
 
 const GithuButton = props => (
+
    <iframe
               src="https://ghbtns.com/github-btn.html?user=jbesomi&amp;repo=texthero&amp;type=star&amp;count=true&amp;size=large"
               frameBorder={0}
@@ -83,7 +84,9 @@ const GithuButton = props => (
               width={140}
               height={30}
               title="GitHub Stars"
+              style={{margin: "20px"}}
             />
+
 );
 
 const Introduction = props => (
@@ -127,28 +130,285 @@ const Features = () => (
    </Block>
 )
 
-  /* <AnnouncementBar /> */
+
+const HomeBox = props => (
+    <div class={"homebox " + props.position}>
+        {props.children}
+    </div>
+)
+
+
+const Separator = () => (
+    <div className="home_separator"></div>
+)
+
+
+const Code = props => (
+    <pre>
+        <code className="python">
+            {props.children}
+        </code>
+    </pre>
+)
 
 class HomeSplash extends React.Component {
 
-
-
   render() {
     return (
-      <SplashContainer>
+    <SplashContainer>
 
         <Logo img_src={assetUrl('texthero.png')} />
         <div className="inner">
-          <ProjectTitle />
-          <PromoSection>
+            <ProjectTitle />
+            <PromoSection>
             <Button href={docUrl('getting-started')} >Getting started</Button>
             <Button href={siteConfig.baseUrl + 'blog'}>Tutorial</Button>
             <Button href={docUrl('api-preprocessing')}>API</Button>
             <Button href='https://github.com/jbesomi/texthero'>Github</Button>
-          </PromoSection>
-          <GithuButton />
+            </PromoSection>
+
+            <GithuButton />
+
+            <Separator />
+
+            <div class="showcase">
+
+                <HomeBox position="left">
+                    <h2 className="projectTitle">
+                        <small>Import texthero ... </small>
+                    </h2>
+                    <Code>{`import texthero as hero
+import pandas as pd`
+                    }</Code>
+                </HomeBox>
+
+                <HomeBox position="right">
+                    <h2 className="projectTitle">
+                        <small>... load any text dataset with Pandas</small>
+                    </h2>
+                    <Code>{`df = pd.read_csv(
+    "https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv"
+)
+df.head(2)`}</Code>
+                    
+                    <table border="1" class="dataframe">
+                      <thead>
+                        <tr>
+                          <th></th>
+                          <th>text</th>
+                          <th>topic</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <th>0</th>
+                          <td>Claxton hunting first major medal\n\nBritish h...</td>
+                          <td>athletics</td>
+                        </tr>
+                        <tr>
+                          <th>1</th>
+                          <td>O'Sullivan could run in Worlds\n\nSonia O'Sull...</td>
+                          <td>athletics</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                </HomeBox>
+
+                <HomeBox position="left">
+                    <h2 className="projectTitle">
+                        <small>Preprocess it ...</small>
+                    </h2>
+                    <Code>{`df['text'] = hero.clean(df['text'])`}
+                    
+                    </Code>
+
+                    <table border="1" class="dataframe">
+                      <thead>
+                        <tr>
+                          <th></th>
+                          <th>text</th>
+                          <th>topic</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <th>0</th>
+                          <td>claxton hunting first major medal british hurd...</td>
+                          <td>athletics</td>
+                        </tr>
+                        <tr>
+                          <th>1</th>
+                          <td>sullivan could run worlds sonia sullivan indic...</td>
+                          <td>athletics</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    <MarkdownBlock>
+                    > Look at the [preprocessing API](/docs/api-preprocessing) for more customization 
+                    </MarkdownBlock>
+
+
+                </HomeBox>
+
+
+                <HomeBox position="right">
+                    <h2 className="projectTitle">
+                        <small>... represent it</small>
+                    </h2>
+                    <Code>{`df['tfidf'] = (
+    hero.tfidf(df['text'], max_features=100)
+)
+df[["tfidf", "topic"]].head(2)
+                        `}
+                    
+                    </Code>
+
+                    <table border="1" class="dataframe">
+                      <thead>
+                        <tr>
+                          <th></th>
+                          <th>tfidf</th>
+                          <th>topic</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <th>0</th>
+                          <td>[0.0, 0.13194458247285848, 0.0, 0.0, 0.0, 0.0,...</td>
+                          <td>athletics</td>
+                        </tr>
+                        <tr>
+                          <th>1</th>
+                          <td>[0.0, 0.13056235989725676, 0.0, 0.205187581391...</td>
+                          <td>athletics</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    <MarkdownBlock>
+                    > There are [many other ways](/docs/api-representation) to represent the data
+                    </MarkdownBlock>
+
+                </HomeBox>
+
+
+
+
+                <HomeBox position="left">
+                    <h2 className="projectTitle">
+                        <small>Reduce dimension and visualize the vector space</small>
+                    </h2>
+                    <Code>{`df['pca'] = hero.pca(df['tfidf'])
+hero.scatterplot(
+    df, 
+    col='pca', 
+    color='topic', 
+    title="PCA BBC Sport news"
+)`}
+                    
+                    </Code>
+                    
+                    <img src="/img/scatterplot_bccsport.svg" alt="" />
+
+                </HomeBox>
+
+
+                <HomeBox position="right">
+                    <h2 className="projectTitle">
+                        <small>... need more? find named entities</small>
+                    </h2>
+                    <Code>{`df['named_entities'] = (
+    hero.named_entities(df['text']
+)
+df[['named_entities', 'topic']].head(2)
+                        `}
+                    
+                    </Code>
+
+                    <table border="1" class="dataframe">
+                      <thead>
+                        <tr>
+                          <th></th>
+                          <th>named_entities</th>
+                          <th>topic</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <th>0</th>
+                          <td>[(claxton, ORG, 0, 7), (first, ORDINAL, 16, 21...</td>
+                          <td>athletics</td>
+                        </tr>
+                        <tr>
+                          <th>1</th>
+                          <td>[(sullivan, ORG, 0, 8), (sonia sullivan, PERSO...</td>
+                          <td>athletics</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                </HomeBox>
+
+
+
+
+                <HomeBox position="left">
+                    <h2 className="projectTitle">
+                        <small>Show top words ...</small>
+                    </h2>
+                    <Code>{`NUM_TOP_WORDS = 5
+hero.top_words(df['text'])[:NUM_TOP_WORDS]
+                        `}
+                    
+                    </Code>
+
+                        <table border="1" class="dataframe">
+                          <thead>
+                            <tr>
+                              <th></th>
+                              <th>text</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <th>said</th>
+                              <td>1338</td>
+                            </tr>
+                            <tr>
+                              <th>first</th>
+                              <td>790</td>
+                            </tr>
+                            <tr>
+                              <th>england</th>
+                              <td>749</td>
+                            </tr>
+                            <tr>
+                              <th>game</th>
+                              <td>681</td>
+                            </tr>
+                            <tr>
+                              <th>one</th>
+                              <td>671</td>
+                            </tr>
+                          </tbody>
+                        </table>
+
+                </HomeBox>
+
+
+                <HomeBox position="right">
+                    <h2 className="projectTitle">
+                        <small>And much more !</small>
+                    </h2>
+                </HomeBox>
+
+
+            </div>
+
         </div>
-      </SplashContainer>
+    </SplashContainer>
     );
   }
 }

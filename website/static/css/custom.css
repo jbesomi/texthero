@@ -175,7 +175,7 @@ pre {
     padding: 10px;
     color: #222;
     line-height: 1.2em;
-    border: 1px solid #aaa;
+    border: 1px solid #3f88c552;
     margin: 5px 0;
     box-shadow: 1px 1px 1px #d8d8d8;
 }
@@ -220,4 +220,25 @@ p.rubric {
     .separateOnPageNav .docsNavContainer {
         flex: 0 0 280px;
     }
+}
+
+/* Reduce section title to allow it in one line. */
+.section h1 {
+    font-size: 27px;
+}
+
+/* Make cite behave like code */
+cite {
+    background-color: rgba(27, 31, 35, 0.05);
+    border-radius: 3px;
+    color: inherit;
+    font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-size: 85%;
+    margin: 0;
+    padding: 3.2px 3.2px;
+}
+
+/* Make docs-prevnext button 1px smaller */
+.docs-prevnext .button {
+    font-size: 13px;
 }

@@ -37,15 +37,10 @@ class TestRepresentation(PandasTestCase):
         s_true = pd.Series([[1, 1]])
         self.assertEqual(representation.term_frequency(s), s_true)
 
-    def test_term_frequency_lowercase(self):
-        s = pd.Series(["one ONE"])
-        s_true = pd.Series([[2]])
-        self.assertEqual(representation.term_frequency(s, lowercase=True), s_true)
-
     def test_term_frequency_punctuation_are_kept(self):
         s = pd.Series(["one !"])
         s_true = pd.Series([[1, 1]])
-        self.assertEqual(representation.term_frequency(s, lowercase=True), s_true)
+        self.assertEqual(representation.term_frequency(s), s_true)
 
     """
     TF-IDF
@@ -62,8 +57,3 @@ class TestRepresentation(PandasTestCase):
         s = pd.Series("ONE one")
         s_true = pd.Series([[tfidf_single_smooth, tfidf_single_smooth]])
         self.assertEqual(representation.tfidf(s), s_true)
-
-    def test_idf_single_lowercase(self):
-        s = pd.Series("ONE one")
-        s_true = pd.Series([[1.0]])
-        self.assertEqual(representation.tfidf(s, lowercase=True), s_true)

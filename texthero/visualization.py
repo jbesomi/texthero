@@ -11,6 +11,8 @@ from nltk import NLTKWordTokenizer
 from texthero import preprocessing
 import string
 
+# from typing import Boolean
+
 
 @pd.api.extensions.register_series_accessor("words")
 class WordsAccessor:
@@ -74,7 +76,6 @@ def scatterplot(
     df
     col
         The name of the column of the DataFrame used for x and y axis.
-
     """
 
     pca0 = df[col].apply(lambda x: x[0])
@@ -90,20 +91,92 @@ def scatterplot(
         return fig
 
 
-def wordcloud(s: pd.Series, title="", return_figure=False):
+"""
+
+"""
+
+
+def wordcloud(
+    s: pd.Series,
+    font_path: str = None,
+    width: int = 400,
+    height: int = 200,
+    margin=2,
+    ranks_only=None,
+    prefer_horizontal=0.9,
+    mask=None,
+    scale=1,
+    color_func=None,
+    max_words=200,
+    min_font_size=4,
+    stopwords=None,
+    random_state=None,
+    background_color="black",
+    max_font_size=None,
+    font_step=1,
+    mode="RGB",
+    relative_scaling="auto",
+    regexp=None,
+    collocations=True,
+    colormap=None,
+    normalize_plurals=True,
+    contour_width=0,
+    contour_color="black",
+    repeat=False,
+    include_numbers=False,
+    min_word_length=0,
+    collocation_threshold=30,
+    return_figure=False,
+):
     """
-    Show wordcloud using WordCloud.
+    Plot wordcloud image using WordCloud from word_cloud package.
+
+    Most of the arguments are very similar if not equal to the mother function. In constrast, all words are taken into account when computing the wordcloud, inclusive stopwords. They can be easily removed with preprocessing.remove_stopwords.
+
+    Word are compute using generate_from_frequencies.
 
     Parameters
     ----------
-    df
-    col
-        The name of the column of the DataFrame containing the text data.
-
+    s : pd.Series
+    font_path : str
+        Font path to the font that will be used (OTF or TTF). Defaults to DroidSansMono path on a Linux machine. If you are on another OS or don't have this font, you need to adjust this path.
+    width : int
+        Width of the canvas.
+    height : int
+        Height of the canvas.
+    max_words : number (default=200)
+        The maximum number of words.
+    mask : nd-array or None (default=None)
+        When set, gives a binary mask on where to draw words. When set, width and height will be ignored and the shape of mask will be used instead. All white (#FF or #FFFFFF) entries will be considerd "masked out" while other entries will be free to draw on.
+    contour_width: float (default=0)
+        If mask is not None and contour_width > 0, draw the mask contour.
+    contour_color: color value (default="black")
+        Mask contour color.
+    min_font_size : int (default=4)
+        Smallest font size to use. Will stop when there is no more room in this size.
+    background_color : color value (default="black")
+        Background color for the word cloud image.
+    max_font_size : int or None (default=None)
+        Maximum font size for the largest word. If None, height of the image is used.
+    relative_scaling : float (default='auto')
+        Importance of relative word frequencies for font-size.  With
+        relative_scaling=0, only word-ranks are considered.  With
+        relative_scaling=1, a word that is twice as frequent will have twice
+        the size.  If you want to consider the word frequencies and not only
+        their rank, relative_scaling around .5 often looks good.
+        If 'auto' it will be set to 0.5 unless repeat is true, in which
+        case it will be set to 0.
+    colormap : string or matplotlib colormap, default="viridis"
+        Matplotlib colormap to randomly draw colors from for each word.
     """
-    text = s.str.cat(sep=" ")
+    # text = s.str.cat(sep=" ")
 
-    wordcloud = WordCloud(background_color="white", min_font_size=10).generate(text)
+    wordcloud = WordCloud(
+        background_color="white",
+        min_font_size=10,
+        stopwords=[],  # will use generate from frequencies.
+        normalize_plurals=False,
+    ).generate_from(text)
 
     fig = px.imshow(wordcloud, title=title)
     fig.show()

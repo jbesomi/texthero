@@ -193,17 +193,17 @@ class TestPreprocessing(PandasTestCase):
 
     def test_remove_urls(self):
         s = pd.Series("http://tests.com http://www.tests.com")
-        s_true = pd.Series(" ")
+        s_true = pd.Series("   ")
         self.assertEqual(preprocessing.remove_urls(s), s_true)
 
     def test_remove_urls_https(self):
         s = pd.Series("https://tests.com https://www.tests.com")
-        s_true = pd.Series(" ")
+        s_true = pd.Series("   ")
         self.assertEqual(preprocessing.remove_urls(s), s_true)
 
     def test_remove_urls_multiline(self):
         s = pd.Series("https://tests.com \n https://tests.com")
-        s_true = pd.Series(" \n ")
+        s_true = pd.Series("  \n  ")
         self.assertEqual(preprocessing.remove_urls(s), s_true)
 
     """

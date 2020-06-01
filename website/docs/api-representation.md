@@ -25,16 +25,16 @@ hide_title: false
 <td><p>Perform non-negative matrix factorization.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/texthero.representation.pca.html#texthero.representation.pca" title="texthero.representation.pca"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pca</span></code></a>(s[, n_components])</p></td>
-<td><p>Perform PCA.</p></td>
+<td><p>Perform principal component analysis on the given Pandas Series.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/texthero.representation.term_frequency.html#texthero.representation.term_frequency" title="texthero.representation.term_frequency"><code class="xref py py-obj docutils literal notranslate"><span class="pre">term_frequency</span></code></a>(s[, max_features, lowercase, …])</p></td>
-<td><p>Represent input on term frequency.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/texthero.representation.term_frequency.html#texthero.representation.term_frequency" title="texthero.representation.term_frequency"><code class="xref py py-obj docutils literal notranslate"><span class="pre">term_frequency</span></code></a>(s, max_features, NoneType] = None)</p></td>
+<td><p>Represent a text-based Pandas Series using term_frequency.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/texthero.representation.tfidf.html#texthero.representation.tfidf" title="texthero.representation.tfidf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tfidf</span></code></a>(s[, max_features, min_df, …])</p></td>
-<td><p>Represent input on a TF-IDF vector space.</p></td>
+<td><p>Represent a text-based Pandas Series using TF-IDF.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/texthero.representation.tsne.html#texthero.representation.tsne" title="texthero.representation.tsne"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tsne</span></code></a>(s[, n_components, perplexity, …])</p></td>
-<td><p>Perform TSNE.</p></td>
+<td><p>Perform TSNE on the given pandas series.</p></td>
 </tr>
 </tbody>
 </table>

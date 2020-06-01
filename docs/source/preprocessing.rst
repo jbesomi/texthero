@@ -18,10 +18,10 @@
       remove_square_brackets
       remove_stopwords
       remove_urls
+      replace_urls
       remove_whitespace
       replace_punctuation
       replace_stopwords
-      stem
       tokenize
    
    

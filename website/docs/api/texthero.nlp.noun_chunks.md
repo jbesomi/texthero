@@ -10,8 +10,7 @@ hide_title: true
 <dl class="py function">
 <dt id="texthero.nlp.noun_chunks">
 <code class="sig-name descname">noun_chunks</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span></em><span class="sig-paren">)</span><a class="headerlink" href="#texthero.nlp.noun_chunks" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return noun_chunks, flat phrases that have a noun as their head.</p>
-<p>Return group of consecutive words that belong together.</p>
+<dd><p>Return noun_chunks, group of consecutive words that belong together.</p>
 </dd></dl>
 </div>
 </div>

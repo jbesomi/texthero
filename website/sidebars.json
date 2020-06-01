@@ -25,6 +25,7 @@
       "api/texthero.preprocessing.remove_whitespace",
       "api/texthero.preprocessing.replace_punctuation",
       "api/texthero.preprocessing.replace_stopwords",
+      "api/texthero.preprocessing.replace_urls",
       "api/texthero.preprocessing.stem",
       "api/texthero.preprocessing.tokenize"
     ],

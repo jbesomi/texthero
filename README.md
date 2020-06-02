@@ -28,7 +28,7 @@
 
 
 <p align="center">
-   <a href="#zero-to-hero">From zero to hero</a> •
+   <a href="#from-zero-to-hero">From zero to hero</a> •
    <a href="#installation">Installation</a> •
    <a href="#getting-started">Getting Started</a> •
    <a href="#examples">Examples</a> •
@@ -73,7 +73,7 @@ The best way to learn Texthero is through the <a href="https://texthero.org/docs
 
 In case you are an advanced python user, then `help(texthero)` should do the work.
 
-<h2 align="center">Example</h2>
+<h2 align="center">Examples</h2>
 
 <h3>1. Text cleaning, TF-IDF representation and visualization</h3>
 

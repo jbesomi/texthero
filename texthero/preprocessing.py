@@ -15,6 +15,8 @@ from texthero import stopwords as _stopwords
 
 from typing import List, Callable
 
+import pkg_resources
+from symspellpy import SymSpell, Verbosity
 
 def fillna(input: pd.Series) -> pd.Series:
     """Replace not assigned values with empty spaces."""
@@ -614,3 +616,32 @@ def remove_urls(s: pd.Series) -> pd.Series:
     """
 
     return replace_urls(s, " ")
+
+
+def correct_mistakes(s: pd.Series) -> pd.Series:
+    r""" Correct spelling mistakes
+
+    `correct_mistakes` finds all spelling mistakes from the given Pandas Series and replace them with suggested words.
+
+    Examples
+    --------
+
+    >>> import pandas as pd
+    >>> import texthero as hero
+    >>> s = pd.Series(["whereis th elove hehad dated forImuch of thepast who couqdn'tread in sixtgrade and ins pired him"])
+    >>> hero.correct_mistakes(s)
+    0    where is the love he had dated for much of the past who couldn't read in six grade and inspired him
+    dtype: object
+    
+    """
+    sym_spell = SymSpell(max_dictionary_edit_distance=2, prefix_length=7)
+    dictionary_path = pkg_resources.resource_filename("symspellpy", "frequency_dictionary_en_82_765.txt")
+    bigram_path = pkg_resources.resource_filename("symspellpy", "frequency_bigramdictionary_en_243_342.txt")
+
+    sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
+    sym_spell.load_bigram_dictionary(bigram_path, term_index=0, count_index=2)
+
+    return s.apply(_correct_mistakes, args=(sym_spell,))
+
+def _correct_mistakes(text: str, sym_spell: SymSpell) -> str:
+    return sym_spell.lookup_compound(text, max_edit_distance=2)[0].term

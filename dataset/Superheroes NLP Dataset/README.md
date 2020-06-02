@@ -49,7 +49,7 @@ If you feel lazy, you can also import it directly from pandas:
 ```python
 import pandas as pd
 
-df = pd.read_csv("https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/Superheroes%20NLP%20Dataset/data/superheroes_nlp_dataset.csv")
+df = pd.read_csv("https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/superheroes_nlp_dataset.csv")
 
 df.head()
 ```

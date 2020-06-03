@@ -6,7 +6,6 @@ import pandas as pd
 import plotly.express as px
 
 from wordcloud import WordCloud
-from nltk import NLTKWordTokenizer
 
 from texthero import preprocessing
 import string

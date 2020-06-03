@@ -200,8 +200,9 @@ def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
     >>> symbol = "$"
     >>> stopwords = ["the", "of"]
     >>> _replace_stopwords(s, symbol, stopwords)
-    >>> "$ book $ $ jungle"
-
+    0   "$ book $ $ jungle"
+    dtype: str
+    
     """
 
     pattern = r"""(?x)                          # Set flag to allow verbose regexps
@@ -235,9 +236,9 @@ def replace_stopwords(
     --------
     >>> s = pd.Series("the book of the jungle")
     >>> replace_stopwords(s, "X")
-    0     book   jungle
+    0   X book X X jungle
     dtype: object
-
+    
     """
 
     if stopwords is None:

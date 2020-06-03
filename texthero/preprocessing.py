@@ -184,7 +184,7 @@ def remove_whitespace(input: pd.Series) -> pd.Series:
 
 def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
     """
-    Remove words in list from a text, replacing them with a symbol.
+    Remove words in a set from a string, replacing them with a symbol.
 
     Parameters
     ----------

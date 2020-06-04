@@ -72,6 +72,31 @@ class TestRepresentation(PandasTestCase):
 
         s = preprocessing.tokenize(s)
 
-        self.assertEqual(
-            representation.word2vec(s, min_count=1, seed=1).shape, df_true.shape
-        )
+        df_embedding = representation.word2vec(s, min_count=1, seed=1)
+
+        self.assertEqual(type(df_embedding), pd.DataFrame)
+
+        self.assertEqual(df_embedding.shape, df_true.shape)
+
+    def test_most_similar_simple(self):
+        s = pd.Series(["one one one"])
+        s = preprocessing.tokenize(s)
+        df_embeddings = representation.word2vec(s, min_count=1, seed=1)
+
+        to = "one"
+        most_similar = representation.most_similar(df_embeddings, to)
+
+        self.assertEqual(most_similar.shape, (1,))
+
+    def test_most_similar_raise_with_series(self):
+        s_embed = pd.Series({"one": 1})
+        to = "one"
+
+        with self.assertRaisesRegex(ValueError, r"Pandas|pandas"):
+            representation.most_similar(s_embed, to)
+
+    def test_most_similar_raise_with_not_in_index(self):
+        s_embed = pd.DataFrame(data=[1], index=["one"])
+        to = "two"
+        with self.assertRaisesRegex(ValueError, r"index"):
+            representation.most_similar(s_embed, to)

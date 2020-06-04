@@ -246,16 +246,15 @@ class TestPreprocessing(PandasTestCase):
         s_true = pd.Series("where is the love he had dated for much of the past who couldn't read in sixth grade and inspired him")
         self.assertEqual(preprocessing.correct_mistakes(s), s_true)
 
-    def test_correct_spacing(self):
+    def test_correct_mistakes_spacing(self):
         s = pd.Series("thequickbrownfoxjumpsoverthelazydog")
         s_true = pd.Series("the quick brown fox jumps over the lazy dog")
-        self.assertEqual(preprocessing.correct_spacing(s), s_true)
+        self.assertEqual(preprocessing.correct_mistakes(s, True), s_true)
 
         s = pd.Series("itwasthebestoftimesitwastheworstoftimesitwastheageofwisdomitwastheageoffoolishness")
         s_true = pd.Series("it was the best of times it was the worst of times it was the age of wisdom it was the age of foolishness")
-        self.assertEqual(preprocessing.correct_spacing(s), s_true)
+        self.assertEqual(preprocessing.correct_mistakes(s, True), s_true)
 
-    def test_correct_mistakes_spacing(self):
         s = pd.Series("sometimes spacing is notcorrecta nd shoul dbe fixed")
         s_true = pd.Series("sometimes spacing is not correct and should be fixed")
         self.assertEqual(preprocessing.correct_mistakes(s, True), s_true)

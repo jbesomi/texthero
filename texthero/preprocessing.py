@@ -190,12 +190,26 @@ def remove_whitespace(input: pd.Series) -> pd.Series:
     return input.str.replace("\xa0", " ").str.split().str.join(" ")
 
 
-def _remove_stopwords(text: str, words: Set[str]) -> str:
+def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
     """
-    Remove block of digits from text.
+    Remove words in a set from a string, replacing them with a symbol.
+
+    Parameters
+    ----------
+    text: str
+    stopwords : Set[str]
+        Set of stopwords string to remove.
+    symbol: str, Optional
+        Character(s) to replace words with; defaults to a space.
 
     Examples
     --------
+    >>> s = "the book of the jungle"
+    >>> symbol = "$"
+    >>> stopwords = ["the", "of"]
+    >>> _replace_stopwords(s, stopwords, symbol)
+    '$ book $ $ jungle'
+    
     """
 
     pattern = r"""(?x)                          # Set flag to allow verbose regexps
@@ -204,38 +218,46 @@ def _remove_stopwords(text: str, words: Set[str]) -> str:
       | [][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]    # Any symbol 
     """
 
-    return "".join(t for t in re.findall(pattern, text) if t not in words)
+    return "".join(t if t not in words else symbol for t in re.findall(pattern, text))
 
 
 def replace_stopwords(
     input: pd.Series, symbol: str, stopwords: Optional[Set[str]] = None
 ) -> pd.Series:
     """
-    Replace all stopwords with symbol.
+    Replace all instances of `words` with symbol.
 
     By default uses NLTK's english stopwords of 179 words.
+
+    Parameters
+    ----------
+
+    input : Pandas Series
+    symbol: str
+        Character(s) to replace words with.
+    stopwords : Set[str], Optional
+        Set of stopwords string to remove. If not passed, by default it used NLTK English stopwords. 
+
 
     Examples
     --------
     >>> s = pd.Series("the book of the jungle")
     >>> replace_stopwords(s, "X")
-    0     book   jungle
+    0    X book X X jungle
     dtype: object
 
     """
 
-    # FIX ME. Replace with custom symbol is not working and the docstring example is clearly wrong.
-
     if stopwords is None:
         stopwords = _stopwords.DEFAULT
-    return input.apply(_remove_stopwords, args=(stopwords,))
+    return input.apply(_replace_stopwords, args=(stopwords, symbol))
 
 
 def remove_stopwords(
     input: pd.Series, stopwords: Optional[Set[str]] = None, remove_str_numbers=False
 ) -> pd.Series:
     """
-    Remove all instances of `words` and replace it with an empty space.
+    Remove all instances of `words`.
 
     By default uses NLTK's english stopwords of 179 words:
 
@@ -272,7 +294,7 @@ def remove_stopwords(
 
 
     """
-    return replace_stopwords(input, symbol=" ", stopwords=stopwords)
+    return replace_stopwords(input, symbol="", stopwords=stopwords)
 
 
 def stem(input: pd.Series, stem="snowball", language="english") -> pd.Series:

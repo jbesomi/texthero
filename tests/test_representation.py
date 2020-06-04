@@ -1,5 +1,6 @@
 import pandas as pd
 from texthero import representation
+from texthero import preprocessing
 
 from . import PandasTestCase
 
@@ -57,3 +58,20 @@ class TestRepresentation(PandasTestCase):
         s = pd.Series("ONE one")
         s_true = pd.Series([[tfidf_single_smooth, tfidf_single_smooth]])
         self.assertEqual(representation.tfidf(s), s_true)
+
+    """
+    Word2Vec
+    """
+
+    def test_word2vec(self):
+        s = pd.Series(["today is a beautiful day", "today is not that beautiful"])
+        df_true = pd.DataFrame(
+            [[0.0] * 300] * 7,
+            index=["a", "beautiful", "day", "is", "not", "that", "today"],
+        )
+
+        s = preprocessing.tokenize(s)
+
+        self.assertEqual(
+            representation.word2vec(s, min_count=1, seed=1).shape, df_true.shape
+        )

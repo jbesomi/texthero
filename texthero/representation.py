@@ -8,8 +8,11 @@ from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA, NMF
 from sklearn.cluster import KMeans, DBSCAN, MeanShift
+from sklearn.metrics.pairwise import cosine_similarity
 
 from typing import Optional
+
+from gensim.models import Word2Vec
 
 # from texthero import pandas_ as pd_
 """
@@ -303,3 +306,82 @@ def meanshift(
 """
 Topic modelling
 """
+
+# TODO.
+
+"""
+Word2Vec
+"""
+
+
+def word2vec(
+    s: pd.Series,
+    size=300,
+    epochs=30,
+    min_count=5,
+    window=5,
+    alpha=0.03,
+    max_vocab_size=None,
+    sample=0.001,
+    seed=None,
+    min_alpha=0.0001,
+    negative=5,
+):
+    """Word2vec on the given Pandas Series
+    
+    Return a Pandas Dataframe of shape (vocabulary_size, vectors_size)
+    
+    Examples
+    --------
+    
+    Parameters
+    ----------
+    s : Pandas Series
+    size : int, optional. Default is 300.
+    epochs : int, optional. Default is 30.
+    min_count : int, optional. Default is 5.
+    window : int, optional. Default is 5.
+    alpha : double, optional
+    max_vocab_size
+    sample
+    seed
+    min_alpha
+    negative
+    
+    """
+
+    w2v_model = Word2Vec(
+        size=size,
+        min_count=min_count,
+        window=window,
+        alpha=alpha,
+        max_vocab_size=max_vocab_size,
+        sample=sample,
+        seed=seed,
+        min_alpha=min_alpha,
+        negative=negative,
+    )
+
+    w2v_model.build_vocab(s.values, progress_per=10000)
+
+    if len(w2v_model.wv.vocab.keys()) == 0:
+        print("Vocabulary ...")
+
+    w2v_model.train(
+        s.values, total_examples=w2v_model.corpus_count, epochs=5, report_delay=1
+    )
+
+    all_vocabulary = sorted(list(set(w2v_model.wv.vocab.keys())))
+
+    return pd.DataFrame(data=w2v_model.wv[all_vocabulary], index=all_vocabulary)
+
+
+def most_similar(df, to):
+    """
+    
+    """
+
+    return pd.Series(
+        cosine_similarity(df, df.loc[to].to_numpy().reshape(1, -1)).reshape(1, -1)[0],
+        index=df.index,
+    ).sort_values(ascending=True)

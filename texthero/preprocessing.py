@@ -16,6 +16,14 @@ from texthero import stopwords as _stopwords
 from typing import List, Callable
 
 
+# Ignore gensim annoying warnings
+import warnings
+
+warnings.filterwarnings(action="ignore", category=UserWarning, module="gensim")
+
+from gensim.sklearn_api.phrases import PhrasesTransformer
+
+
 def fillna(input: pd.Series) -> pd.Series:
     """Replace not assigned values with empty spaces."""
     return input.fillna("").astype("str")
@@ -224,7 +232,7 @@ def replace_stopwords(
 
 
 def remove_stopwords(
-    input: pd.Series, stopwords: Optional[Set[str]] = None
+    input: pd.Series, stopwords: Optional[Set[str]] = None, remove_str_numbers=False
 ) -> pd.Series:
     """
     Remove all instances of `words` and replace it with an empty space.
@@ -236,7 +244,7 @@ def remove_stopwords(
     
     input : Pandas Series
     stopwords : Set[str], Optional
-        Set of stopwords string to remove. If not passed, by default it used NLTK English stopwords. 
+        Set of stopwords string to remove. If not passed, by default it used NLTK English stopwords.
 
     Examples
     --------
@@ -566,6 +574,47 @@ def tokenize(s: pd.Series) -> pd.Series:
     )
 
     return s.str.replace(pattern, r"\2 \3 \4 \5").str.split()
+
+
+def tokenize_with_phrases(s: pd.Series, min_count: int = 5, threshold: int = 10):
+    r"""Tokenize and group up collocations words
+    
+    Tokenize the given pandas Series and group up bigrams where each tokens has at least min_count term frequrncy and where the threshold is larger than the underline formula.
+    
+    :math:`\frac{(bigram\_a\_b\_count - min\_count)* len\_vocab }{ (word\_a\_count * word\_b\_count)}`.
+    
+    
+    Parameters
+    ----------
+        s : Pandas Series
+        min_count : Int, optional. Default is 5.
+            ignore tokens with frequency less than this
+        threshold : Int, optional. Default is 10.
+            ignore tokens with a score under that threshold
+            
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> import texthero as hero
+    >>> s = pd.Series(["New York is a beautiful city", "Look: New York!"])
+    >>> hero.tokenize_with_phrases(s, min_count=1, threshold=1)
+    0    [New_York, is, a, beautiful, city]
+    1                [Look, :, New_York, !]
+    dtype: object
+            
+    Reference
+    --------
+    `Mikolov, et. al: "Distributed Representations of Words and Phrases and their Compositionality"
+        <https://arxiv.org/abs/1310.4546>`_
+    
+    """
+
+    if type(s.iloc[0]) != str:
+        raise ValueError("Input series should be a list of string.")
+
+    s = tokenize(s)
+    phrases = PhrasesTransformer(min_count=min_count, threshold=threshold)
+    return pd.Series(phrases.fit_transform(s.values), index=s.index)
 
 
 def replace_urls(s: pd.Series, symbol: str) -> pd.Series:

@@ -12,6 +12,10 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from typing import Optional
 
+import logging
+
+logging.getLogger("gensim").setLevel(logging.WARNING)
+
 from gensim.models import Word2Vec
 
 # from texthero import pandas_ as pd_
@@ -368,7 +372,7 @@ def word2vec(
         print("Vocabulary ...")
 
     w2v_model.train(
-        s.values, total_examples=w2v_model.corpus_count, epochs=5, report_delay=1
+        s.values, total_examples=w2v_model.corpus_count, epochs=epochs, report_delay=1
     )
 
     all_vocabulary = sorted(list(set(w2v_model.wv.vocab.keys())))

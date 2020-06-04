@@ -618,7 +618,7 @@ def remove_urls(s: pd.Series) -> pd.Series:
     return replace_urls(s, " ")
 
 
-def correct_mistakes(s: pd.Series) -> pd.Series:
+def correct_mistakes(s: pd.Series, fix_spacing=False) -> pd.Series:
     r""" Correct spelling mistakes
 
     `correct_mistakes` finds all spelling mistakes from the given Pandas Series and replace them with suggested words.
@@ -628,20 +628,48 @@ def correct_mistakes(s: pd.Series) -> pd.Series:
 
     >>> import pandas as pd
     >>> import texthero as hero
-    >>> s = pd.Series(["whereis th elove hehad dated forImuch of thepast who couqdn'tread in sixtgrade and ins pired him"])
+    >>> s = pd.Series(["he couldd spellit correctlly"])
     >>> hero.correct_mistakes(s)
-    0    where is the love he had dated for much of the past who couldn't read in six grade and inspired him
+    0    he could spell it correctly
     dtype: object
     
     """
-    sym_spell = SymSpell(max_dictionary_edit_distance=2, prefix_length=7)
+    sym_spell = SymSpell(max_dictionary_edit_distance=3, prefix_length=7)
     dictionary_path = pkg_resources.resource_filename("symspellpy", "frequency_dictionary_en_82_765.txt")
     bigram_path = pkg_resources.resource_filename("symspellpy", "frequency_bigramdictionary_en_243_342.txt")
 
     sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
     sym_spell.load_bigram_dictionary(bigram_path, term_index=0, count_index=2)
 
+    if fix_spacing is True:
+        s = correct_spacing(s)
+
     return s.apply(_correct_mistakes, args=(sym_spell,))
 
 def _correct_mistakes(text: str, sym_spell: SymSpell) -> str:
-    return sym_spell.lookup_compound(text, max_edit_distance=2)[0].term
+    return sym_spell.lookup_compound(text, max_edit_distance=3)[0].term
+
+def correct_spacing(s: pd.Series) -> pd.Series:
+    r""" Correct spacing in noisy text
+
+    `correct_spacing` finds and add all missing spaces in the given Pandas Series.
+
+    Examples
+    --------
+
+    >>> import pandas as pd
+    >>> import texthero as hero
+    >>> s = pd.Series(["thequickbrownfoxjumpsoverthelazydog"])
+    >>> hero.correct_spacing(s)
+    0    the quick brown fox jumps over the lazy dog
+    dtype: object
+    
+    """
+    sym_spell = SymSpell(max_dictionary_edit_distance=0, prefix_length=7)
+    dictionary_path = pkg_resources.resource_filename("symspellpy", "frequency_dictionary_en_82_765.txt")
+    sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
+
+    return s.apply(_correct_word_spacing, args=(sym_spell,))
+
+def _correct_word_spacing(text: str, sym_spell: SymSpell) -> str:
+    return sym_spell.word_segmentation(text).segmented_string

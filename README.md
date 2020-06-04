@@ -269,3 +269,4 @@ Texthero is also looking for maintainers and contributors. In case of interest, 
 
 - [Selim Al Awwa](https://github.com/selimelawwa/)
 - [Parth Gandhi](https://github.com/ParthGandhi)
+- [Dan Keefe](https://github.com/Peritract)

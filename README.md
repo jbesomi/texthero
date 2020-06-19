@@ -55,6 +55,10 @@ Texthero is free, open source and [well documented](https://texthero.org/docs) (
 
 We hope you will find pleasure working with Texthero as we had during his development.
 
+<h2 align="center">Feedback</h2>
+
+Texthero is growing fast and it needs your help. Any feedback and advice are highly appreciated. This includes suggestions for new functionalities or any other kind of improvement. If anything, please open an [issue](https://github.com/jbesomi/texthero/issues), we will be glad to get back to you as soon as possible!  
+
 <h2 align="center">Installation</h2>
 
 Install texthero via `pip`:

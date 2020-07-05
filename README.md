@@ -38,6 +38,10 @@
 </p>
 
 
+<p align="center">
+    <img src="https://github.com/jbesomi/texthero/raw/master/github/screencast.gif">
+</p>
+
 <h2 align="center">From zero to hero</h2>
 
 Texthero is a python toolkit to work with text-based dataset quickly and effortlessly. Texthero is very simple to learn and designed to be used on top of Pandas. Texthero has the same expressiveness and power of Pandas and is extensively documented. Texthero is modern and conceived for programmers of the 2020 decade with little knowledge if any in linguistic. 

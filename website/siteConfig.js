@@ -114,8 +114,8 @@ const siteConfig = {
   gaTrackingId: 'UA-164631738-1',
 
   // Open Graph and Twitter card images.
-  ogImage: 'img/undraw_online.svg',
-  twitterImage: 'img/undraw_tweetstorm.svg',
+  ogImage: 'img/favicon.png',
+  twitterImage: 'img/favicon.png',
 
   favicon: 'img/favicon.png',
 

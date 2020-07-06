@@ -10,6 +10,11 @@ from wordcloud import WordCloud
 from texthero import preprocessing
 import string
 
+from matplotlib.colors import LinearSegmentedColormap as lsg
+import matplotlib.pyplot as plt
+
+from collections import Counter
+
 
 def scatterplot(
     df: pd.DataFrame,
@@ -52,31 +57,13 @@ def wordcloud(
     font_path: str = None,
     width: int = 400,
     height: int = 200,
-    margin=2,
-    ranks_only=None,
-    prefer_horizontal=0.9,
-    mask=None,
-    scale=1,
-    color_func=None,
     max_words=200,
-    min_font_size=4,
-    stopwords=None,
-    random_state=None,
-    background_color="black",
-    max_font_size=None,
-    font_step=1,
-    mode="RGB",
-    relative_scaling="auto",
-    regexp=None,
-    collocations=True,
-    colormap=None,
-    normalize_plurals=True,
+    mask=None,
     contour_width=0,
-    contour_color="black",
-    repeat=False,
-    include_numbers=False,
-    min_word_length=0,
-    collocation_threshold=30,
+    contour_color="PAPAYAWHIP",
+    background_color="PAPAYAWHIP",
+    relative_scaling="auto",
+    colormap=None,
     return_figure=False,
 ):
     """
@@ -101,11 +88,11 @@ def wordcloud(
         When set, gives a binary mask on where to draw words. When set, width and height will be ignored and the shape of mask will be used instead. All white (#FF or #FFFFFF) entries will be considerd "masked out" while other entries will be free to draw on.
     contour_width: float (default=0)
         If mask is not None and contour_width > 0, draw the mask contour.
-    contour_color: color value (default="black")
+    contour_color: color value (default="PAPAYAWHIP")
         Mask contour color.
     min_font_size : int (default=4)
         Smallest font size to use. Will stop when there is no more room in this size.
-    background_color : color value (default="black")
+    background_color : color value (default="PAPAYAWHIP")
         Background color for the word cloud image.
     max_font_size : int or None (default=None)
         Maximum font size for the largest word. If None, height of the image is used.
@@ -120,17 +107,47 @@ def wordcloud(
     colormap : string or matplotlib colormap, default="viridis"
         Matplotlib colormap to randomly draw colors from for each word.
     """
-    # text = s.str.cat(sep=" ")
+    text = s.str.cat(sep=" ")
+
+    if colormap is None:
+
+        # Custom palette.
+        # TODO move it under tools.
+        corn = (255.0 / 256, 242.0 / 256, 117.0 / 256)
+        mango_tango = (255.0 / 256, 140.0 / 256, 66.0 / 256)
+        crayola = (63.0 / 256, 136.0 / 256, 197.0 / 256)
+        crimson = (215.0 / 256, 38.0 / 256, 61.0 / 256)
+        oxford_blue = (2.0 / 256, 24.0 / 256, 43.0 / 256)
+
+        texthero_cm = lsg.from_list(
+            "texthero", [corn, mango_tango, crayola, crimson, oxford_blue]
+        )
+
+        colormap = texthero_cm
+
+    words = s.str.cat(sep=" ").split()
 
     wordcloud = WordCloud(
-        background_color="white",
-        min_font_size=10,
-        stopwords=[],  # will use generate from frequencies.
-        normalize_plurals=False,
-    ).generate_from(text)
+        font_path=font_path,
+        width=width,
+        height=height,
+        max_words=max_words,
+        mask=mask,
+        contour_width=contour_width,
+        contour_color=contour_color,
+        background_color=background_color,
+        relative_scaling=relative_scaling,
+        colormap=colormap,
+        # stopwords=[],  # TODO. Will use generate from frequencies.
+        # normalize_plurals=False,  # TODO.
+    ).generate_from_frequencies(dict(Counter(words)))
 
-    fig = px.imshow(wordcloud, title=title)
-    fig.show()
+    # fig = px.imshow(wordcloud)
+    # fig.show()
+
+    fig, ax = plt.subplots(figsize=(20, 10))
+    ax.imshow(wordcloud, interpolation="bilinear")
+    ax.axis("off")
 
     if return_figure:
         return fig

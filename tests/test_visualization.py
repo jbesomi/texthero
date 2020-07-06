@@ -51,3 +51,11 @@ class TestVisualization(PandasTestCase):
         s = pd.Series("123. .321 -h1n1 -cov2")
         s_true = pd.Series([1, 1, 1, 1], index=["123", "321", "cov2", "h1n1"])
         self.assertEqual(visualization.top_words(s).sort_index(), s_true)
+
+    """
+    Test worcloud
+    """
+
+    def test_wordcloud(self):
+        s = pd.Series("one two three")
+        self.assertEqual(visualization.wordcloud(s), None)

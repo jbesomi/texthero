@@ -10,54 +10,6 @@ from wordcloud import WordCloud
 from texthero import preprocessing
 import string
 
-# from typing import Boolean
-
-
-@pd.api.extensions.register_series_accessor("words")
-class WordsAccessor:
-    """
-    To access plot directly from a series.
-
-    This is just for testing.
-
-    Example
-    -------
-    df['text'].words.plot()
-
-    
-    """
-
-    def __init__(self, pandas_obj):
-        self._validate(pandas_obj)
-        self._obj = pandas_obj
-
-    @staticmethod
-    def _validate(obj):
-        # verify there is a column latitude and a column longitude
-        # keeping as an example
-        return
-        if "pca" not in obj.columns:
-            raise AttributeError("Must have 'latitude' and 'longitude'.")
-
-    @property
-    def center(self):
-        # return the geographic center point of this DataFrame
-        # keeping as an example
-        return
-        lat = self._obj.latitude
-        lon = self._obj.longitude
-        return (float(lon.mean()), float(lat.mean()))
-
-    def plot(self, num_words=20, a=None):
-
-        top = top_words(self._obj)
-        df = px.data.tips()
-        fig = px.bar(x=top[:num_words].index, y=top[:num_words].values)
-        fig.update_traces(
-            marker=dict(colorscale="Portland", color=top[:num_words].values)
-        )
-        fig.show()
-
 
 def scatterplot(
     df: pd.DataFrame,
@@ -91,7 +43,7 @@ def scatterplot(
 
 
 """
-
+Wordcloud
 """
 
 
@@ -201,6 +153,9 @@ def top_words(s: pd.Series, normalize=False) -> pd.Series:
     # This means, they have either a non word-bounding \B, are at the start ^, or at the end $
     # As re.sub replace all and not just the matching group, add matching parenthesis to the character
     # to keep during replacement.
+
+    # TODO replace it with tokenizer.
+
     pattern = (
         rf"((\w)[{string.punctuation}](?:\B|$)|(?:^|\B)[{string.punctuation}](\w))"
     )

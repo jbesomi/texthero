@@ -59,9 +59,14 @@ Texthero is free, open source and [well documented](https://texthero.org/docs) (
 
 We hope you will find pleasure working with Texthero as we had during his development.
 
-<h2 align="center">Feedback</h2>
 
-Texthero is growing fast and it needs your help. Any feedback and advice are highly appreciated. This includes suggestions for new functionalities or any other kind of improvement. If anything, please open an [issue](https://github.com/jbesomi/texthero/issues), we will be glad to get back to you as soon as possible!  
+<h2 align="center">Hablas español?</h2>
+
+Texthero has been developed for the whole NLP community. We know of hard is to deal with different NLP tools (NLTK, SpaCy, Gensim, TextBlob, Sklearn): that's why we developed Texthero, to simplify things.
+
+Now, the next main milestone is to provide *multilingual support* and for this big step, we need the help of all of you. ¿Hablas español? Sie sprechen Deutsch? 你会说中文？ 日本語が話せるのか？ Fala português? Parli Italiano? Вы говорите по-русски? If yes or you speak another language not mentioned, then you might help us develop multilingual support! Even if you haven't contributed before or you just started with NLP contact us or open a Github issue, there is always a first time :) We promise you will learn a lot, and, ... who knows? It might help you find your new job as an NLP-developer!
+
+For improving the python toolkit and provide an even better experience, your aid and feedback are crucial. If you have any problem or suggestion please open a Github [issue](https://github.com/jbesomi/texthero/issues), we will be glad to support you and help you.
 
 <h2 align="center">Installation</h2>
 

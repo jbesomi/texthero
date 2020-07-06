@@ -50,15 +50,14 @@ You can think of Texthero as a tool to help you _understand_ and work with text-
 
 Texthero include tools for:
 * Preprocess text data: it offers both out-of-the-box solutions but it's also flexible for custom-solutions.
-* Natural Language Processing: keyphrases and keywords extraction, named entity recognition and much more.
-* Text representation: TF-IDF, term frequency, pre-trained and custom word-embeddings.
-* Vector space analysis: clustering (K-means, Meanshift, DBSAN and Hierarchical), topic modelling (LDA and LSI) and interpretation.
-* Text visualization: keywords visualization, vector space visualization, place localization on maps.
+* Natural Language Processing: keyphrases and keywords extraction, and named entity recognition.
+* Text representation: TF-IDF, term frequency, and custom word-embeddings (wip)
+* Vector space analysis: clustering (K-means, Meanshift, DBSAN and Hierarchical), topic modelling (wip) and interpretation.
+* Text visualization: vector space visualization, place localization on maps (wip).
 
 Texthero is free, open source and [well documented](https://texthero.org/docs) (and that's what we love most by the way!). 
 
 We hope you will find pleasure working with Texthero as we had during his development.
-
 
 <h2 align="center">Hablas español?</h2>
 
@@ -264,13 +263,8 @@ Full documentation: [visualization](https://texthero.org/docs/api-visualization)
 
 Sometimes we just want things done, right? Texthero help with that. It helps makes things easier and give to the developer more time to focus on his custom requirements. We believe that start cleaning text should just take a minute. Same for finding the most important part of a text and same for representing it.
 
-In a very pragmatic way, texthero has just one goal: make the developer spare time. Working with text data can be a pain and in most cases, a default pipeline can be quite good to start. There is always the time to come back and improve the preprocessing steps for instance.
+In a very pragmatic way, texthero has just one goal: make the developer spare time. Working with text data can be a pain and in most cases, a default pipeline can be quite good to start. There is always the time to come back and improve the preprocessing pipeline.
 
-<!--
-<h5>Integration with Pandas</h5>
-
-You receive a _csv_ file regarding the most common movies of the last decade and you are asked to compute the average length of the movies.  
--->
 
 <h2 align="center">Contributions</h2>
 

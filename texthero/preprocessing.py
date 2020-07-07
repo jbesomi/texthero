@@ -329,9 +329,9 @@ def stem(input: pd.Series, stem="snowball", language="english") -> pd.Series:
     dtype: object
     """
 
-    if stem is "porter":
+    if stem == "porter":
         stemmer = PorterStemmer()
-    elif stem is "snowball":
+    elif stem == "snowball":
         stemmer = SnowballStemmer(language)
     else:
         raise ValueError("stem argument must be either 'porter' of 'stemmer'")

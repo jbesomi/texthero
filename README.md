@@ -70,9 +70,11 @@ For improving the python toolkit and provide an even better experience, your aid
 
 <h2 align="center">Beta version</h2>
 
-Texthero's community is growing faster. Texthero though is still in a beta version; soon, a faster and better version will be released and it will bring some major changes.
+Texthero's community is growing fast. Texthero though is still in a beta version; soon, a faster and better version will be released and it will bring some major changes.
 
-For instance, to give a more granular control over the pipeline, starting from the next version on, all `preprocessing` functions will require as argument an already tokenized text. 
+For instance, to give a more granular control over the pipeline, starting from the next version on, all `preprocessing` functions will require as argument an already tokenized text. This will be a major changes.
+
+Once released the stable version (Texthero 2.0), backward compatibility will be respected. Until this point, backward compatibility will be present but it will be weaker.
 
 If you want to be part of this fast-growing movements, do not hesitate to contribute: [CONTRIBUTING](blob/master/CONTRIBUTING.md)!
 

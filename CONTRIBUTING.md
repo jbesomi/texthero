@@ -73,7 +73,7 @@ $ ...
 
 1. Test your changes
 
-Before opening a new pull-request, you should make sure that all tests still pass with the new changes. Also, if you implement a new function or enhance an existing one, please **add all the necessary** unittests. PR without a properly unit-tested code will not be accepted as we want to avoid at all costs bugs in the project.
+Before opening a new pull-request, you should make sure that all tests still pass with the new changes. Also, if you implement a new function or enhance an existing one, please **add all the necessary** unittests. PR without a properly unit-tested code will not be accepted as we want to avoid at all costs bugs in the project. This is also known as [Shift-left testing](https://en.wikipedia.org/wiki/Shift-left_testing).
 
 **Important.** If you worked on a bug, you should add a test that checks the bug is not present anymore. This is extremely useful as it avoids to re-introduce the same bug again in the future.
 

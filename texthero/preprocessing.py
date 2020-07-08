@@ -685,3 +685,41 @@ def remove_urls(s: pd.Series) -> pd.Series:
     """
 
     return replace_urls(s, " ")
+
+
+def remove_tags(s: pd.Series) -> pd.Series:
+    r"""Remove all @ tags from a given Pandas Series.
+
+    `remove_tags` remove any @ and replace it with a single empty space.
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("instagram @texthero")
+    >>> hero.remove_tags(s)
+    0    instagram texthero
+    dtype: object 
+
+
+    """
+    return s.str.replace('@','')
+
+
+def remove_hashtags(s: pd.Series) -> pd.Series:
+    r"""Remove all # tags from a given Pandas Series.
+
+    `remove_hashtags` remove any # and replace it with a single empty space.
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("instagram #texthero")
+    >>> hero.remove_hashtags(s)
+    0    instagram texthero
+    dtype: object 
+
+
+    """
+    return s.str.replace('#','')

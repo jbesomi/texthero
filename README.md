@@ -59,13 +59,24 @@ Texthero is free, open-source and [well documented](https://texthero.org/docs) (
 
 We hope you will find pleasure working with Texthero as we had during his development.
 
-<h2 align="center">Hablas español?</h2>
+<h2 align="center">Hablas español? क्या आप भारतीय बोलते हैं? 日本語が話せるのか？</h2>
 
-Texthero has been developed for the whole NLP community. We know of hard is to deal with different NLP tools (NLTK, SpaCy, Gensim, TextBlob, Sklearn): that's why we developed Texthero, to simplify things.
+Texthero has been developed for the whole NLP community. We know how hard is to deal with different NLP tools (NLTK, SpaCy, Gensim, TextBlob, Sklearn): that's why we developed Texthero, to simplify things.
 
 Now, the next main milestone is to provide *multilingual support* and for this big step, we need the help of all of you. ¿Hablas español? Sie sprechen Deutsch? 你会说中文？ 日本語が話せるのか？ Fala português? Parli Italiano? Вы говорите по-русски? If yes or you speak another language not mentioned, then you might help us develop multilingual support! Even if you haven't contributed before or you just started with NLP contact us or open a Github issue, there is always a first time :) We promise you will learn a lot, and, ... who knows? It might help you find your new job as an NLP-developer!
 
 For improving the python toolkit and provide an even better experience, your aid and feedback are crucial. If you have any problem or suggestion please open a Github [issue](https://github.com/jbesomi/texthero/issues), we will be glad to support you and help you.
+
+
+<h2 align="center">Beta version</h2>
+
+Texthero's community is growing fast. Texthero though is still in a beta version; soon, a faster and better version will be released and it will bring some major changes.
+
+For instance, to give a more granular control over the pipeline, starting from the next version on, all `preprocessing` functions will require as argument an already tokenized text. This will be a major changes.
+
+Once released the stable version (Texthero 2.0), backward compatibility will be respected. Until this point, backward compatibility will be present but it will be weaker.
+
+If you want to be part of this fast-growing movements, do not hesitate to contribute: [CONTRIBUTING](blob/master/CONTRIBUTING.md)!
 
 <h2 align="center">Installation</h2>
 

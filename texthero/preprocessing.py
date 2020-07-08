@@ -685,3 +685,21 @@ def remove_urls(s: pd.Series) -> pd.Series:
     """
 
     return replace_urls(s, " ")
+
+def remove_hashtags(input : pd.Series):
+    '''
+    >>> s = "My friend is @BillGates!"
+    >>> sr = pd.Series(s)
+    >>> remove_hashtag(sr)
+    'My friend is!'
+    '''
+    return input.str.replace(r'@[A-Za-z_\-\?0-9]+', '').str.split().str.join(' ')
+
+def remove_tags(input : pd.Series):
+    '''
+    >>> s = "Github is amazing #github"
+    >>> sr = pd.Series(s)
+    >>> remove_tags(sr)
+    'Github is amazing'
+    '''
+    return input.str.replace(r'#[A-Za-z_\-\?0-9]+', '').str.split().str.join(' ')

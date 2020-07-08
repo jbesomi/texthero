@@ -1,6 +1,7 @@
 import string
 
 import pandas as pd
+import numpy as np
 import doctest
 
 from texthero import visualization
@@ -59,3 +60,16 @@ class TestVisualization(PandasTestCase):
     def test_wordcloud(self):
         s = pd.Series("one two three")
         self.assertEqual(visualization.wordcloud(s), None)
+
+    """
+    Test automated readability index
+    """
+
+    def test_ari(self):
+        s = pd.Series(["New York is a beautiful city.", "Look: New York!", "Wow"])
+        s_true = pd.Series([3.0, 6.0, np.nan])
+        self.assertEqual(visualization.automated_readability_index(s), s_true)
+
+    def test_ari_numeric(self):
+        s = pd.Series([1.0, 2.0])
+        self.assertRaises(ValueError, visualization.automated_readability_index, s)

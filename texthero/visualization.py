@@ -3,6 +3,7 @@ Visualize insights and statistics of a text-based Pandas DataFrame.
 """
 
 import pandas as pd
+import numpy as np
 import plotly.express as px
 
 from wordcloud import WordCloud
@@ -185,3 +186,63 @@ def top_words(s: pd.Series, normalize=False) -> pd.Series:
         .explode()  # one word for each line
         .value_counts(normalize=normalize)
     )
+
+
+def automated_readability_index(s: pd.Series) -> pd.Series:
+    """
+    Calculate the automated readability index (ARI).
+
+    Calculate ARI for each item in the given Pandas Series. Return a Pandas Series with the ARI scores.
+    Score is NaN if it cannot be computed (e.g. if the number of sentences is 0).
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["New York is a beautiful city.", "Look: New York!", "Wow"])
+    >>> hero.automated_readability_index(s)
+    0    3.0
+    1    6.0
+    2    NaN
+    dtype: float64
+
+    Reference
+    --------
+    `Automated Readability Index <https://en.wikipedia.org/wiki/Automated_readability_index>`_
+
+    """
+    try:
+        s = preprocessing.remove_whitespace(
+            s
+        )  # Whitespace is used to calculate number of words.
+    except:
+        raise ValueError("Input series has non-string items.")
+
+    def _ari(text: str):
+        # Computes the ARI for one string.
+        # Straightforward implementation of the Wikipedia description.
+        if not isinstance(text, str):
+            return np.nan
+
+        characters = sentences = words = 0
+
+        for char in text:
+            if char.isalnum():
+                characters += 1
+            elif char == " ":
+                words += 1
+            elif char in [".", "!", "?"]:
+                sentences += 1
+            else:
+                continue
+
+        # Avoid 0-division.
+        if words > 0 and sentences > 0:
+            score = 4.71 * (characters / words) + 0.5 * (words / sentences) - 21.43
+            score = np.ceil(score)
+        else:
+            score = np.nan
+
+        return score
+
+    return s.apply(_ari)

@@ -75,15 +75,56 @@ class TestPreprocessing(PandasTestCase):
         )
 
     """
+    Replace punctuation.
+    """
+
+    def test_replace_punctuation(self):
+        s = pd.Series("replace? all punctuation.")
+        s_true = pd.Series("replaceX all punctuationX")
+        self.assertEqual(preprocessing.replace_punctuation(s, "X"), s_true)
+
+    def test_replace_punctuation_with_keep_tokens_enabled(self):
+        s = pd.Series("spider-man?")
+        s_true = pd.Series("spider-manX")
+        self.assertEqual(
+            preprocessing.replace_punctuation(s, "X", keep_tokens=True), s_true
+        )
+
+    def test_replace_punctuation_leaves_sentence_unchanged(self):
+        s = pd.Series("unchanged")
+        s_true = pd.Series("unchanged")
+        self.assertEqual(preprocessing.replace_punctuation(s, "X"), s_true)
+        self.assertEqual(
+            preprocessing.replace_punctuation(s, "X", keep_tokens=True), s_true
+        )
+
+    def test_replace_consecutive_punctuation(self):
+        s = pd.Series("spider...")
+        s_true = pd.Series("spiderX")
+        self.assertEqual(preprocessing.replace_punctuation(s, "X"), s_true)
+
+    def test_replace_consecutive_punctuation_with_keep_tokens_enabled(self):
+        s = pd.Series("spider-man...")
+        s_true = pd.Series("spider-manX")
+        self.assertEqual(
+            preprocessing.replace_punctuation(s, "X", keep_tokens=True), s_true
+        )
+
+    """
     Remove punctuation.
     """
 
     def test_remove_punctation(self):
-        s = pd.Series("Remove all! punctuation!! ()")
+        s = pd.Series("remove all! punctuation!! ()")
         s_true = pd.Series(
-            "Remove all  punctuation   "
+            "remove all  punctuation   "
         )  # TODO maybe just remove space?
         self.assertEqual(preprocessing.remove_punctuation(s), s_true)
+
+    def test_remove_punctation_with_keep_tokens_enabled(self):
+        s = pd.Series("retain? in-token punctuation!! ()")
+        s_true = pd.Series("retain  in-token punctuation    ")
+        self.assertEqual(preprocessing.remove_punctuation(s, keep_tokens=True), s_true)
 
     """
     Remove diacritics.
@@ -179,7 +220,7 @@ class TestPreprocessing(PandasTestCase):
         self.assertEqual(preprocessing.tokenize(s), s_true)
 
     """
-     Has content
+    Has content
     """
 
     def test_has_content(self):

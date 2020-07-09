@@ -36,3 +36,14 @@ class TestNLP(PandasTestCase):
             [[("Today", "NP", 0, 5), ("such a beautiful day", "NP", 9, 29)]]
         )
         self.assertEqual(nlp.noun_chunks(s), s_true)
+    """
+    POS tagging
+    """
+
+    def test_pos(self):
+        s = pd.Series("This is a text.")
+        s_true = pd.Series(
+            [[("This", "DET", "DT"), ("is", "VERB", "VBZ"),
+              ("a", "DET", "DT"), ("text", "NOUN", "NN"), (".", "PUNCT", ".")]]
+        )
+        self.assertEqual(nlp.pos(s), s_true)

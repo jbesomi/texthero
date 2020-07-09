@@ -11,11 +11,11 @@ def named_entities(s, package="spacy"):
     Return named-entities.
 
     Return a Pandas Series where each rows contains a list of tuples containing information regarding the given named entities.
-    
+
     Tuple: (`entity'name`, `entity'label`, `starting character`, `ending character`)
 
     Under the hood, `named_entities` make use of Spacy name entity recognition.
-    
+
     List of labels:
      - `PERSON`: People, including fictional.
      - `NORP`: Nationalities or religious or political groups.
@@ -51,7 +51,8 @@ def named_entities(s, package="spacy"):
 
     for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
         entities.append(
-            [(ent.text, ent.label_, ent.start_char, ent.end_char) for ent in doc.ents]
+            [(ent.text, ent.label_, ent.start_char, ent.end_char)
+             for ent in doc.ents]
         )
 
     return pd.Series(entities, index=s.index)
@@ -76,3 +77,25 @@ def noun_chunks(s):
         )
 
     return pd.Series(noun_chunks, index=s.index)
+
+
+def pos(s):
+    """
+    Return POS tags
+
+    Tuple :(`token name`,`Coarse-grained POS tag`,`Fine-grained POS tag`)
+    """
+
+    pos_tags = []
+
+    nlp = spacy.load("en_core_web_sm", disable=["parser", "ner"])
+    # nlp.pipe is now "tagger"
+
+    for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
+        pos_tags.append(
+            [
+                (token.text, token.pos_, token.tag_)
+                for token in doc
+            ]
+        )
+    return pd.Series(pos_tags, index=s.index)

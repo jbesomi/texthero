@@ -312,7 +312,6 @@ If you have just other questions or inquiry drop me a line at jonathanbesomi__AT
 - [Dan Keefe](https://github.com/Peritract)
 - [Christian Claus](https://github.com/cclauss)
 - [bobfang1992](https://github.com/bobfang1992)
-- [Ishan Arora](https://github.com/ishanarora04)
 
 
 <h2 align="center"><a href="./LICENSE">License</a></h2>

@@ -11,11 +11,11 @@ def named_entities(s, package="spacy"):
     Return named-entities.
 
     Return a Pandas Series where each rows contains a list of tuples containing information regarding the given named entities.
-    
+
     Tuple: (`entity'name`, `entity'label`, `starting character`, `ending character`)
 
     Under the hood, `named_entities` make use of Spacy name entity recognition.
-    
+
     List of labels:
      - `PERSON`: People, including fictional.
      - `NORP`: Nationalities or religious or political groups.
@@ -81,7 +81,8 @@ def noun_chunks(s):
 def count_sentences(s: pd.Series) -> pd.Series:
     """
     Count the number of sentences per item in a Pandas Series.
-    Return a new Pandas Series with the results.
+
+    Return a new Pandas Series with the number of sentences per item.
 
     This makes use of the SpaCy `sentencizer`.
 
@@ -95,15 +96,12 @@ def count_sentences(s: pd.Series) -> pd.Series:
     1    3
     dtype: int64
     """
-    if not pd.api.types.is_string_dtype(s):
-        raise ValueError("Series items must be strings.")
-
     number_of_sentences = []
 
     nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser", "ner"])
     nlp.add_pipe(nlp.create_pipe("sentencizer"))  # Pipe is only "sentencizer"
 
-    for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
+    for doc in nlp.pipe(s.values, batch_size=32):
         sentences = len(list(doc.sents))
         number_of_sentences.append(sentences)
 

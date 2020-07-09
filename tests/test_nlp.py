@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from texthero import nlp
 
 from . import PandasTestCase
@@ -38,14 +39,23 @@ class TestNLP(PandasTestCase):
         self.assertEqual(nlp.noun_chunks(s), s_true)
 
     """
-    Number of sentences.
+    Count sentences.
     """
 
-    def test_number_sentences(self):
+    def test_count_sentences(self):
         s = pd.Series("I think ... it counts correctly. Doesn't it? Great!")
         s_true = pd.Series(3)
         self.assertEqual(nlp.count_sentences(s), s_true)
 
-    def test_number_sentences_numeric(self):
+    def test_count_sentences_numeric(self):
         s = pd.Series([13.0, 42.0])
-        self.assertRaises(ValueError, nlp.count_sentences, s)
+        self.assertRaises(TypeError, nlp.count_sentences, s)
+
+    def test_count_sentences_missing_value(self):
+        s = pd.Series(["Test.", np.nan])
+        self.assertRaises(TypeError, nlp.count_sentences, s)
+
+    def test_count_sentences_index(self):
+        s = pd.Series(["Test"], index=[5])
+        s_true = pd.Series([1], index=[5])
+        self.assertEqual(nlp.count_sentences(s), s_true)

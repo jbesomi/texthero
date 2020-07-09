@@ -685,3 +685,53 @@ def remove_urls(s: pd.Series) -> pd.Series:
     """
 
     return replace_urls(s, " ")
+
+
+def replace_tags(s: pd.Series, symbol: str) -> pd.Series:
+
+    r"""Replace all tags from a given Pandas Series
+
+    `replace_tags` replace all tags in the given Pandas Series with symbol
+    
+    A tag is a string formed by @ concatenated with a sequence composed of characters and digits. Example: @texthero123
+
+    Parameters
+    ----------
+        s : Pandas Series
+        symbol : The tag will be replaced by this symbol
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("Hi @texthero123, we will replace you")
+    >>> hero.replace_tags(s, symbol='TAG')
+    0    Hi TAG, we will replace you
+    dtype: object
+ 
+    """
+
+    pattern = r"@([a-zA-Z0-9]+)"
+    return s.str.replace(pattern, symbol)
+
+
+def remove_tags(s: pd.Series) -> pd.Series:
+
+    r"""Remove all tags from a given Pandas Series
+    
+    `remove_tags` removes any tags and replaces them with an empty space.
+
+    A tag is a string formed by @ concatenated with a sequence composed of characters and digits. Example: @texthero123
+    
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("Hi @tag, we will remove you")
+    >>> hero.remove_tags(s)
+    0    Hi  , we will remove you
+    dtype: object
+ 
+    """
+
+    return replace_tags(s, " ")

@@ -76,3 +76,35 @@ def noun_chunks(s):
         )
 
     return pd.Series(noun_chunks, index=s.index)
+
+
+def count_sentences(s: pd.Series) -> pd.Series:
+    """
+    Count the number of sentences per item in a Pandas Series.
+    Return a new Pandas Series with the results.
+
+    This makes use of the SpaCy `sentencizer`.
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["Yesterday I was in NY with Bill de Blasio. Great story...", "This is the F.B.I.! What? Open up!"])
+    >>> hero.count_sentences(s)
+    0    2
+    1    3
+    dtype: int64
+    """
+    if not pd.api.types.is_string_dtype(s):
+        raise ValueError("Series items must be strings.")
+
+    number_of_sentences = []
+
+    nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser", "ner"])
+    nlp.add_pipe(nlp.create_pipe("sentencizer"))  # Pipe is only "sentencizer"
+
+    for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
+        sentences = len(list(doc.sents))
+        number_of_sentences.append(sentences)
+
+    return pd.Series(number_of_sentences, index=s.index)

@@ -36,3 +36,16 @@ class TestNLP(PandasTestCase):
             [[("Today", "NP", 0, 5), ("such a beautiful day", "NP", 9, 29)]]
         )
         self.assertEqual(nlp.noun_chunks(s), s_true)
+
+    """
+    Number of sentences.
+    """
+
+    def test_number_sentences(self):
+        s = pd.Series("I think ... it counts correctly. Doesn't it? Great!")
+        s_true = pd.Series(3)
+        self.assertEqual(nlp.count_sentences(s), s_true)
+
+    def test_number_sentences_numeric(self):
+        s = pd.Series([13.0, 42.0])
+        self.assertRaises(ValueError, nlp.count_sentences, s)

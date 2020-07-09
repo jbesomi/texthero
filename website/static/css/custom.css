@@ -123,8 +123,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 10px 0;
 }
 
-@media only screen and (min-device-width: 360px) and (max-device-width: 736px) {
-}
+
 
 
 @media only screen and (max-width: 1023px) {
@@ -263,6 +262,23 @@ cite {
     margin-left: auto;
     margin-right: 0px;
 }
+
+/* for small screen, do not position box to left and right */
+
+/* @media only screen and (min-device-width: 360px) and (max-device-width: 736px) { */
+
+@media only screen and (max-width: 750px){
+    .right {
+        margin-left: 0px;
+        margin-right: auto;
+    }
+
+    .homebox {
+        width: 100%;
+    }
+}
+
+
 
 .home_separator {
     width: 60%;

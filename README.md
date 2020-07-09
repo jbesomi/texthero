@@ -59,7 +59,7 @@ Texthero is free, open-source and [well documented](https://texthero.org/docs) (
 
 We hope you will find pleasure working with Texthero as we had during his development.
 
-<h2 align="center">Hablas español? क्या आप भारतीय बोलते हैं? 日本語が話せるのか？</h2>
+<h2 align="center">Hablas español? क्या आप हिंदी बोलते हैं? 日本語が話せるのか？</h2>
 
 Texthero has been developed for the whole NLP community. We know how hard is to deal with different NLP tools (NLTK, SpaCy, Gensim, TextBlob, Sklearn): that's why we developed Texthero, to simplify things.
 

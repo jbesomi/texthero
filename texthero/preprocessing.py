@@ -688,17 +688,15 @@ def remove_urls(s: pd.Series) -> pd.Series:
 
 
 def replace_tags(s: pd.Series, symbol: str) -> pd.Series:
-
-    r"""Replace all tags from a given Pandas Series
-
-    `replace_tags` replace all tags in the given Pandas Series with symbol
+    """Replace all tags from a given Pandas Series with symbol.
     
-    A tag is a string formed by @ concatenated with a sequence composed of characters and digits. Example: @texthero123
+    A tag is a string formed by @ concatenated with a sequence of characters and digits. Example: @texthero123.
 
     Parameters
     ----------
-        s : Pandas Series
-        symbol : The tag will be replaced by this symbol
+    s : Pandas Series
+    symbols : str
+        Symbols to replace
 
     Examples
     --------
@@ -708,7 +706,7 @@ def replace_tags(s: pd.Series, symbol: str) -> pd.Series:
     >>> hero.replace_tags(s, symbol='TAG')
     0    Hi TAG, we will replace you
     dtype: object
- 
+
     """
 
     pattern = r"@([a-zA-Z0-9]+)"
@@ -716,12 +714,9 @@ def replace_tags(s: pd.Series, symbol: str) -> pd.Series:
 
 
 def remove_tags(s: pd.Series) -> pd.Series:
-
-    r"""Remove all tags from a given Pandas Series
+    """Remove all tags from a given Pandas Series.
     
-    `remove_tags` removes any tags and replaces them with an empty space.
-
-    A tag is a string formed by @ concatenated with a sequence composed of characters and digits. Example: @texthero123
+    A tag is a string formed by @ concatenated with a sequence of characters and digits. Example: @texthero123. Tags are replaceb by an empty space ` `.
     
     Examples
     --------
@@ -731,7 +726,9 @@ def remove_tags(s: pd.Series) -> pd.Series:
     >>> hero.remove_tags(s)
     0    Hi  , we will remove you
     dtype: object
- 
-    """
 
+    See also
+    --------
+    :meth:`texthero.preprocessing.replace_tags` for replacing a tag with a custom symbol.
+    """
     return replace_tags(s, " ")

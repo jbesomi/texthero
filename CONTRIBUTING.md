@@ -1,30 +1,143 @@
-# Contributing
+# CONTRIBUTING
 
-Hello there!
+Hello and welcome to Texthero!
 
-Thank you for being here. Texthero is maintained by [jbesomi](https://github.com/jbesomi). He is glad to receive your help.
+This document contains all the important information you need to get started contributing.
 
-## Getting started
 
-If you feel you want to help and do not know where to start, you may start with the `good first issue` [issues](https://github.com/jbesomi/texthero/issues).
+## Vision
+
+In case you are interested in the Texthero's vision as well as the core-principle, have a look at [PURPOSE.md](./PURPOSE.md)
+
+
+## Quality
+
+Texthero's main goal is to make the NLP-developer life _easier_. It does so by
+1. Provide a simple-yet-complete tool for NLP and text analytics
+2. Empower the NLP developer with great documentation, simple getting started docs as well as (work in progress) clear and concise tutorials (blog).
+
+To achieve all of this, Texthero's code and documentation must be of high quality. Having a clean, readable, and **tested** code drastically reduces the likelihood of introducing bugs, and having great documentation will facilitate the work of many NLP developers as well as the work of Texther's maintainers.
+
+
+## Shift-left testing
+
+Texthero follows an approach known as shift-left testing. According to [Wikipedia](https://en.wikipedia.org/wiki/Shift-left_testing):
+
+> Shift-left testing is an approach to software testing and system testing in which testing is performed earlier in the lifecycle.
+
+Shift-left testing reduces the number of bugs by attempting to solve the problem at the origin. Often many programming defects are not uncovered and fixed until after significant effort has been wasted on their implementation. Texthero's attempt to avoid this kind of issue.
+
+
+## Improve documentation!
+
+A very important yet not particularly complex task consists in improving the documentation: many Texthero's users will be deeply grateful for your effort.
+
+For instance, as of now, [texthero.representation.nmf](https://texthero.org/docs/api/texthero.representation.nmf) is very poor.
+
+> Interested in improving this? It's pretty easy. Just copy-paste the docstring from texthero.representation.nmf and replace 'pca' with 'nmf' :D
+
+
+## How to create a successful Pull Request on Texthero
+
+Making sure your pull requests do not break the code and bring something valuable to the project means that only _high quality_ pull requests are approved.
+
+The following link gives some advice on how to submit a successful pull request.
+
+1. Submit a successful PR is not hard. Have a look at all [previous PR](https://github.com/jbesomi/texthero/pulls?q=is%3Apr+is%3Aclosed) already approved.
+1. **Extensively test your code**. Think at all possible edge cases. Look at similar tests for ideas.
+1. In most cases, there exist an example of function or docstring very similar to your specific use-case. Before writing your own-code, look at what the other functions look like.
+1. Before submitting, **test locally** that you pass all tests (see below under `testing`).
+1. Respect the best practice (see below `best practice`)
+1. Make sure your code is black-formatted (`./format.sh`, see `formatting`)
+
+<!--
+1. Make use of the PR template (see `PR template` ) -->
+
+
+## Ask questions!
+
+We are there for you! If everything is unclear, just ask. We will do our best to answer you quickly.
+
+## Propose new ideas!
+
+Texthero is there for the NLP-community. If you have an idea on how we can improve it, let us know by opening a new [issues](https://github.com/jbesomi/texthero/issues). We will be glad to hear from you!
+
+## Best practices
+
+1. Read and respect the [numpydoc docstring guide](https://numpydoc.readthedocs.io/en/latest/format.html). Look at the code for similarity.
+1. Give to your branch a meaningful name. Avoid using the master branch. 
+
+## Good first issue
+
+If this is your first time contributing to Texthero, you might start by choosing a `good first issue` [issues](https://github.com/jbesomi/texthero/issues).
+
+
+## Testing
+
+As you understood, Texthero is serious about testing. We strongly encourage contributors to embrace [test-driven development (TDD)](https://en.wikipedia.org/wiki/Test-driven_development).
+
+Tests are made with `unittest` from the python standard library: [Unit testing framework](https://docs.python.org/3/library/unittest.html)
+ 
+To execute all tests, you can simply
+```
+$ cd scripts
+$ ./tests.sh
+```
+
+Calling `./test.sh` is equivalent to execute form the _root_ `python3 -m unittest discover -s tests -t .`
+
+
+**Important.** If you worked on a bug, you should add a test that checks the bug is not present anymore. This is extremely useful as it avoids to re-introduce the same bug again in the future.
+
+
+### Passing doctests
+
+When executing `./test.sh` it will also check that the Examples in the docstrings are correct (doctests).
+
+Passing doctests might be a bit annoying sometimes. Let's look at this example for instance:
+
+```
+File "/home/travis/build/jbesomi/texthero/texthero/preprocessing.py", line 700, in texthero.preprocessing.remove_tags
+Failed example:
+    hero.remove_tags(s)
+Expected:
+    0    instagram texthero
+    dtype: object 
+Got:
+    0    instagram texthero
+    dtype: object
+```
+
+The docstring failed? Why? The reason is that somewhere in the `Example` section of docstring, we missed one or more white spaces ` `.
+
+### Travis CI
+
+When you submit your code, all code will be tested on different operating systems using Travis CI: [TRAVIS CI texthero](https://travis-ci.com/github/jbesomi/texthero).
+
+Make sure you pass all your test locally before opening a pull request!
+
+## Formatting
+
+Before submitting, make sure your code is formatted. Code formatting is done with [black](https://github.com/psf/black).
+
+```
+cd scripts
+./format.sh
+```
+
+Travis CI will check that the whole code is black-formatted. Make sure you format before submitting!
+
+> It's handy to install the black formatter directly on your IDE.
+
 
 ## Development workflow
 
-The next steps will guide you towards making contributions to this repository. You just have to follows step-by-step. If anything is not clear or you have an idea on how to improve this document, feel free to edit it and open a pull request.
-
-In case you need a more broad vision on how contributions work on Github, please refers to the [Github Guides](https://guides.github.com/). For getting started, read also [Creating a pull request from a fork](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork).
-
-If you are used to the Github workflow, you can find at the end of this document a summary of the most important parts.
+In case you need a more broad vision on how contributions work on Github, please refers to the [Github Guides](https://guides.github.com/). For getting started, you might find [Creating a pull request from a fork](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork) useful.
 
 1. Fork the repository
-   Click the `fork` button in the GitHub repository; this will create a copy of Texthero in your Github account.
 
 1. Clone the repository
-   To do that, you need to have [git](https://git-scm.com/) installed. Open the terminal and type
 
-```
-$ git clone git@github.com:YOUR_USERNAME/texthero.git
-```
 1. Connect your cloned repository to the _original_ repo
 
 ```
@@ -32,7 +145,7 @@ $ cd texthero
 $ git remote add upstream git@github.com:jbesomi/texthero.git
 ```
 
-> This first step needs to be done only once. If in the future you will want to make new changes, make sure your repository is synchronized with respect to the upstream: [Syncing a fork](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/syncing-a-fork).
+> This first step needs to be done only once. But, in the future when you will want to make new changes, make sure your repository is synchronized with respect to the upstream: [Syncing a fork](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/syncing-a-fork).
 
 1. Install texthero locally and his dev-dependencies
 
@@ -44,7 +157,7 @@ $ pip install -e .
 
 > The `-e` will install the python package in 'development' mode. That way your changes will take effect immediately without the need to reinstall the package again.
 
-1. Install development dependencies
+1. Install development dependencies (only required if you want to change the website doc)
 
 Development dependencies need to be installed to update the website documentation, i.e the content in texthero.org. 
 
@@ -53,7 +166,6 @@ In most cases, you **do not need** to update this. Changes from pull requests wi
 ```
 pip install -e '.[dev]'
 ```
-
 
 1. Create a new working branch
 
@@ -77,17 +189,6 @@ Before opening a new pull-request, you should make sure that all tests still pas
 
 **Important.** If you worked on a bug, you should add a test that checks the bug is not present anymore. This is extremely useful as it avoids to re-introduce the same bug again in the future.
 
-In this part, you need to execute:
- - `./format.sh` that will format all code with `black`
-- `./test.sh` that will test all unittests and doctests. 
-
-> In the scripts folder there is also a `check.sh` shell script. Other than executing all tests, `check.sh` script will format again all the repository code and [update the documentation](#documentation) with the new changes. In most cases, you don't need to execute this one. To properly execute the check command, you need to make sure you have installed all the required dependencies, in particular Sphinx.
-
-```
-cd scripts
-./format.sh
-./test.sh
-```
 
 1. Open a Pull Request (PR)
 
@@ -100,32 +201,14 @@ The time to submit the PR has come. Head to your forked repository on Github. Th
 - `./formath.sh`
    - format all code with [black](https://github.com/psf/black)
 - `./check.sh`
-   - format the code with black (`format.sh`)
-   - update the Sphinx documentation for the website
+   - Format the code with black (`format.sh`)
+   - Update the Sphinx documentation for the website
    - Execute all test with `unittest` (`check.sh`)
-   - **This is the only and main file that must be called.**
 
-## Good to know
 
-1. Passing doctests might be a bit annoying sometimes. Let's look at this example for instance:
 
-```
-File "/home/travis/build/jbesomi/texthero/texthero/preprocessing.py", line 700, in texthero.preprocessing.remove_tags
-Failed example:
-    hero.remove_tags(s)
-Expected:
-    0    instagram texthero
-    dtype: object 
-Got:
-    0    instagram texthero
-    dtype: object
-```
 
-The docstring failed but it's not particularly clear why, right? Here, the reason is that somewhere on the docstring `Example`, we missed one or more white spaces ` `.
-
-## Conventions
-
-### Documentation and website
+## Documentation: docstring
 
 Texthero docstring follows [NumPy/SciPy](https://numpydoc.readthedocs.io/en/latest/format.html) docstring style. For example:
 
@@ -154,7 +237,6 @@ def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
    ...
 ```
 
-
 ### Git commits
 
 - Strive for atomicity: 1 commit = 1 context.
@@ -162,16 +244,4 @@ def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
 - You can reference relevant issues using a hashtag plus the number of the issue. Example: `#1`
 
 
-## Test-driven development
-
-Texthero is serious about testing. We strongly encourage contributors to embrace [test-driven development (TDD)](https://en.wikipedia.org/wiki/Test-driven_development).
-
-Tests are made with `unittest` from the python standard library: [Unit testing framework](https://docs.python.org/3/library/unittest.html)
- 
-To execute all tests, you can simply
-```
-$ cd scripts
-$ ./tests.sh
-```
-
-Calling `./test.sh` is equivalent to execute form the _root_ `python3 -m unittest discover -s tests -t .`
+**Work in progress:** this document is a work in progress. If you spot a mistake or you want to make something clear, open a pull request!

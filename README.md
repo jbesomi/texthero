@@ -318,8 +318,7 @@ If you have just other questions or inquiry drop me a line at jonathanbesomi__AT
 
 The MIT License (MIT)
 
-Texthero is licensed under the following MIT license: The MIT License (MIT)
-Copyright © 2020 Texthero, https://texthero.org
+Copyright (c) 2020 Texthero
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -51,8 +51,7 @@ def named_entities(s, package="spacy"):
 
     for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
         entities.append(
-            [(ent.text, ent.label_, ent.start_char, ent.end_char)
-             for ent in doc.ents]
+            [(ent.text, ent.label_, ent.start_char, ent.end_char) for ent in doc.ents]
         )
 
     return pd.Series(entities, index=s.index)
@@ -92,10 +91,5 @@ def pos(s):
     # nlp.pipe is now "tagger" and "parser"
 
     for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
-        pos_tags.append(
-            [
-                (token.text, token.pos_, token.tag_)
-                for token in doc
-            ]
-        )
+        pos_tags.append([(token.text, token.pos_, token.tag_) for token in doc])
     return pd.Series(pos_tags, index=s.index)

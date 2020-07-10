@@ -80,11 +80,11 @@ def noun_chunks(s):
 
 def count_sentences(s: pd.Series) -> pd.Series:
     """
-    Count the number of sentences per item in a Pandas Series.
+    Count the number of sentences per cell in a Pandas Series.
 
-    Return a new Pandas Series with the number of sentences per item.
+    Return a new Pandas Series with the number of sentences per cell.
 
-    This makes use of the SpaCy `sentencizer`.
+    This makes use of the SpaCy `sentencizer <https://spacy.io/api/sentencizer>`.
 
     Examples
     --------

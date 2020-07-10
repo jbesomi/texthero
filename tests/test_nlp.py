@@ -57,5 +57,14 @@ class TestNLP(PandasTestCase):
 
     def test_count_sentences_index(self):
         s = pd.Series(["Test"], index=[5])
-        s_true = pd.Series([1], index=[5])
-        self.assertEqual(nlp.count_sentences(s), s_true)
+        counted_sentences_s = nlp.count_sentences(s)
+        t_same_index = pd.Series([""], index=[5])
+
+        self.assertTrue(counted_sentences_s.index.equals(t_same_index.index))
+
+    def test_count_sentences_wrong_index(self):
+        s = pd.Series(["Test", "Test"], index=[5, 6])
+        counted_sentences_s = nlp.count_sentences(s)
+        t_different_index = pd.Series(["", ""], index=[5, 7])
+
+        self.assertFalse(counted_sentences_s.index.equals(t_different_index.index))

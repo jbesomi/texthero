@@ -43,7 +43,7 @@ class TestNLP(PandasTestCase):
     def test_pos(self):
         s = pd.Series("This is a text.")
         s_true = pd.Series(
-            [[("This", "DET", "DT"), ("is", "VERB", "VBZ"),
+            [[("This", "DET", "DT"), ("is", "AUX", "VBZ"),
               ("a", "DET", "DT"), ("text", "NOUN", "NN"), (".", "PUNCT", ".")]]
         )
         self.assertEqual(nlp.pos(s), s_true)

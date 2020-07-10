@@ -88,8 +88,8 @@ def pos(s):
 
     pos_tags = []
 
-    nlp = spacy.load("en_core_web_sm", disable=["parser", "ner"])
-    # nlp.pipe is now "tagger"
+    nlp = spacy.load("en_core_web_sm", disable=["ner"])
+    # nlp.pipe is now "tagger" and "parser"
 
     for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
         pos_tags.append(

@@ -749,7 +749,7 @@ def replace_hashtags(s: pd.Series, symbol: str) -> pd.Series:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Hi #hashtag, we will replace you.")
+    >>> s = pd.Series("Hi #texthero_123, we will replace you.")
     >>> hero.replace_hashtags(s, symbol='HASHTAG')
     0    Hi HASHTAG, we will replace you.
     dtype: object
@@ -768,13 +768,13 @@ def remove_hashtags(s: pd.Series) -> pd.Series:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Hi #hashtag, we will remove you.")
+    >>> s = pd.Series("Hi #texthero_123, we will remove you.")
     >>> hero.remove_hashtags(s)
     0    Hi  , we will remove you.
     dtype: object
 
     See also
     --------
-    :meth:`texthero.preprocessing.replace_hashtags` for replacing a tag with a custom symbol.
+    :meth:`texthero.preprocessing.replace_hashtags` for replacing a hashtag with a custom symbol.
     """
     return replace_hashtags(s, " ")

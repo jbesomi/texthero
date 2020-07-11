@@ -185,7 +185,9 @@ class TokenSeries(HeroSeries):
             raise TypeError("{} type must be Pandas Series.".format(input_output))
 
         def is_list_of_strings(cell):
-            return all(isinstance(s, str) for s in cell) and isinstance(cell, (list, tuple))
+            return all(isinstance(s, str) for s in cell) and isinstance(
+                cell, (list, tuple)
+            )
 
         try:
             if not s.map(lambda cell: is_list_of_strings(cell)).all():

@@ -755,7 +755,7 @@ def replace_hashtags(s: pd.Series, symbol: str) -> pd.Series:
     dtype: object
 
     """
-    pattern = "#[a-zA-Z0-9_]+"
+    pattern = r"#[a-zA-Z0-9_]+"
     return s.str.replace(pattern, symbol)
 
 

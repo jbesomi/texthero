@@ -709,7 +709,7 @@ def replace_tags(s: pd.Series, symbol: str) -> pd.Series:
 
     """
 
-    pattern = r"@([a-zA-Z0-9]+)"
+    pattern = r"@[a-zA-Z0-9]+"
     return s.str.replace(pattern, symbol)
 
 

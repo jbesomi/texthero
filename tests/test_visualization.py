@@ -59,3 +59,25 @@ class TestVisualization(PandasTestCase):
     def test_wordcloud(self):
         s = pd.Series("one two three")
         self.assertEqual(visualization.wordcloud(s), None)
+
+    """
+    Test automated readability index
+    """
+
+    def test_automated_readability_index(self):
+        s = pd.Series(["New York is a beautiful city.", "Look: New York!", "Wow"])
+        s_true = pd.Series([3.0, 6.0, 0.0])
+        self.assertEqual(visualization.automated_readability_index(s), s_true)
+
+    def test_automated_readability_index_index(self):
+        s = pd.Series(
+            ["New York is a beautiful city.", "Look: New York!", "Wow"],
+            index=[5, 6, 7],
+        )
+        self.assertTrue(
+            visualization.automated_readability_index(s).index.equals(s.index)
+        )
+
+    def test_automated_readability_index_numeric(self):
+        s = pd.Series([1.0, 2.0])
+        self.assertRaises(TypeError, visualization.automated_readability_index, s)

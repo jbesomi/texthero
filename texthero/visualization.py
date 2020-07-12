@@ -3,6 +3,7 @@ Visualize insights and statistics of a text-based Pandas DataFrame.
 """
 
 import pandas as pd
+import numpy as np
 import plotly.express as px
 
 from wordcloud import WordCloud
@@ -217,9 +218,7 @@ def automated_readability_index(s: pd.Series) -> pd.Series:
     characters_s = s.str.count(r"[a-zA-Z0-9]")  # Regex for alphanumeric.
     sentences_s = nlp.count_sentences(s)
 
-    score_s = (
-        4.71 * (characters_s / words_s) + 0.5 * (words_s / sentences_s) - 21.43
-    )
+    score_s = 4.71 * (characters_s / words_s) + 0.5 * (words_s / sentences_s) - 21.43
     score_s = np.ceil(score_s)
 
     # Pandas does not raise an Error when dividing by zero -> remove

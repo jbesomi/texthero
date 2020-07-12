@@ -90,8 +90,8 @@ class TestPreprocessing(PandasTestCase):
     """
 
     def test_remove_diactitics(self):
-        s = pd.Series("hèllo")
-        s_true = pd.Series("hello")
+        s = pd.Series("Montréal, über, 12.89, Mère, Françoise, noël, 889, اِس, اُس")
+        s_true = pd.Series("Montreal, uber, 12.89, Mere, Francoise, noel, 889, اس, اس")
         self.assertEqual(preprocessing.remove_diacritics(s), s_true)
 
     """

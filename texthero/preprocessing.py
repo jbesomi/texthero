@@ -2,9 +2,11 @@
 The texthero.preprocess module allow for efficient pre-processing of text-based Pandas Series and DataFrame.
 """
 
+from gensim.sklearn_api.phrases import PhrasesTransformer
 import re
 import string
 from typing import Optional, Set
+import unicodedata
 
 import numpy as np
 import pandas as pd
@@ -20,8 +22,6 @@ from typing import List, Callable
 import warnings
 
 warnings.filterwarnings(action="ignore", category=UserWarning, module="gensim")
-
-from gensim.sklearn_api.phrases import PhrasesTransformer
 
 
 def fillna(input: pd.Series) -> pd.Series:
@@ -49,7 +49,7 @@ def replace_digits(input: pd.Series, symbols: str = " ", only_blocks=True) -> pd
         Symbols to replace
     only_blocks : bool
         When set to False, remove any digits.
-    
+
     Returns
     -------
     Pandas Series
@@ -151,6 +151,24 @@ def remove_punctuation(input: pd.Series) -> pd.Series:
     return replace_punctuation(input, " ")
 
 
+def _remove_diacritics(text: str) -> str:
+    """
+    Remove diacritics and accents from one string.
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> text = "Montréal, über, 12.89, Mère, Françoise, noël, 889, اِس, اُس"
+    >>> _remove_diacritics(text)
+    'Montreal, uber, 12.89, Mere, Francoise, noel, 889, اس, اس'
+    """
+    nfkd_form = unicodedata.normalize("NFKD", text)
+    # unicodedata.combinding(char) checks if the character is in
+    # composed form (consisting of several unicode chars combined), i.e. a diacritic
+    return "".join([char for char in nfkd_form if not unicodedata.combining(char)])
+
+
 def remove_diacritics(input: pd.Series) -> pd.Series:
     """
     Remove all diacritics and accents.
@@ -161,12 +179,11 @@ def remove_diacritics(input: pd.Series) -> pd.Series:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Noël means Christmas in French")
-    >>> hero.remove_diacritics(s)
-    0    Noel means Christmas in French
-    dtype: object
+    >>> s = pd.Series("Montréal, über, 12.89, Mère, Françoise, noël, 889, اِس, اُس")
+    >>> hero.remove_diacritics(s)[0]
+    'Montreal, uber, 12.89, Mere, Francoise, noel, 889, اس, اس'
     """
-    return input.apply(unidecode.unidecode)
+    return input.astype("unicode").apply(_remove_diacritics)
 
 
 def remove_whitespace(input: pd.Series) -> pd.Series:
@@ -209,7 +226,7 @@ def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
     >>> stopwords = ["the", "of"]
     >>> _replace_stopwords(s, stopwords, symbol)
     '$ book $ $ jungle'
-    
+
     """
 
     pattern = r"""(?x)                          # Set flag to allow verbose regexps
@@ -263,7 +280,7 @@ def remove_stopwords(
 
     Parameters
     ----------
-    
+
     input : Pandas Series
     stopwords : Set[str], Optional
         Set of stopwords string to remove. If not passed, by default it used NLTK English stopwords.
@@ -317,7 +334,7 @@ def stem(input: pd.Series, stem="snowball", language="english") -> pd.Series:
     Notes
     -----
     By default NLTK stemming algorithms lowercase all text.
-    
+
 
     Examples
     --------
@@ -370,7 +387,7 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
     """
     Pre-process a text-based Pandas Series.
 
-    
+
     Default pipeline:
      1. :meth:`texthero.preprocessing.fillna`
      2. :meth:`texthero.preprocessing.lowercase`
@@ -559,7 +576,7 @@ def remove_html_tags(s: pd.Series) -> pd.Series:
     >>> remove_html_tags(s)
     0    Title
     dtype: object
-    
+
     """
 
     pattern = r"""(?x)                    # Turn on free-spacing
@@ -600,12 +617,12 @@ def tokenize(s: pd.Series) -> pd.Series:
 
 def tokenize_with_phrases(s: pd.Series, min_count: int = 5, threshold: int = 10):
     r"""Tokenize and group up collocations words
-    
+
     Tokenize the given pandas Series and group up bigrams where each tokens has at least min_count term frequrncy and where the threshold is larger than the underline formula.
-    
+
     :math:`\frac{(bigram\_a\_b\_count - min\_count)* len\_vocab }{ (word\_a\_count * word\_b\_count)}`.
-    
-    
+
+
     Parameters
     ----------
         s : Pandas Series
@@ -613,7 +630,7 @@ def tokenize_with_phrases(s: pd.Series, min_count: int = 5, threshold: int = 10)
             ignore tokens with frequency less than this
         threshold : Int, optional. Default is 10.
             ignore tokens with a score under that threshold
-            
+
     Examples
     --------
     >>> import pandas as pd
@@ -623,12 +640,12 @@ def tokenize_with_phrases(s: pd.Series, min_count: int = 5, threshold: int = 10)
     0    [New_York, is, a, beautiful, city]
     1                [Look, :, New_York, !]
     dtype: object
-            
+
     Reference
     --------
     `Mikolov, et. al: "Distributed Representations of Words and Phrases and their Compositionality"
         <https://arxiv.org/abs/1310.4546>`_
-    
+
     """
 
     if type(s.iloc[0]) != str:
@@ -689,7 +706,7 @@ def remove_urls(s: pd.Series) -> pd.Series:
 
 def replace_tags(s: pd.Series, symbol: str) -> pd.Series:
     """Replace all tags from a given Pandas Series with symbol.
-    
+
     A tag is a string formed by @ concatenated with a sequence of characters and digits. Example: @texthero123.
 
     Parameters
@@ -715,9 +732,9 @@ def replace_tags(s: pd.Series, symbol: str) -> pd.Series:
 
 def remove_tags(s: pd.Series) -> pd.Series:
     """Remove all tags from a given Pandas Series.
-    
+
     A tag is a string formed by @ concatenated with a sequence of characters and digits. Example: @texthero123. Tags are replaceb by an empty space ` `.
-    
+
     Examples
     --------
     >>> import texthero as hero

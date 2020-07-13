@@ -259,3 +259,41 @@ class TestPreprocessing(PandasTestCase):
         self.assertEqual(
             preprocessing.tokenize_with_phrases(s, min_count=3, threshold=1), s_true
         )
+
+    """
+    Test replace and remove tags
+    """
+
+    def test_replace_tags(self):
+        s = pd.Series("Hi @tag, we will replace you")
+        s_true = pd.Series("Hi TAG, we will replace you")
+
+        self.assertEqual(preprocessing.replace_tags(s, symbol="TAG"), s_true)
+
+    def test_remove_tags_alphabets(self):
+        s = pd.Series("Hi @tag, we will remove you")
+        s_true = pd.Series("Hi  , we will remove you")
+
+        self.assertEqual(preprocessing.remove_tags(s), s_true)
+
+    def test_remove_tags_numeric(self):
+        s = pd.Series("Hi @123, we will remove you")
+        s_true = pd.Series("Hi  , we will remove you")
+
+        self.assertEqual(preprocessing.remove_tags(s), s_true)
+
+    """
+    Test replace and remove hashtags
+    """
+
+    def test_replace_hashtags(self):
+        s = pd.Series("Hi #hashtag, we will replace you")
+        s_true = pd.Series("Hi HASHTAG, we will replace you")
+
+        self.assertEqual(preprocessing.replace_hashtags(s, symbol="HASHTAG"), s_true)
+
+    def test_remove_hashtags(self):
+        s = pd.Series("Hi #hashtag_trending123, we will remove you")
+        s_true = pd.Series("Hi  , we will remove you")
+
+        self.assertEqual(preprocessing.remove_hashtags(s), s_true)

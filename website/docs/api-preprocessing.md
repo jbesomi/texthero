@@ -51,8 +51,8 @@ hide_title: false
 <tr class="row-odd"><td><p><a class="reference internal" href="api/texthero.preprocessing.remove_square_brackets.html#texthero.preprocessing.remove_square_brackets" title="texthero.preprocessing.remove_square_brackets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_square_brackets</span></code></a>(s)</p></td>
 <td><p>Remove content within square brackets [] and the square brackets.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/texthero.preprocessing.remove_stopwords.html#texthero.preprocessing.remove_stopwords" title="texthero.preprocessing.remove_stopwords"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_stopwords</span></code></a>(input, stopwords, …)</p></td>
-<td><p>Remove all instances of <cite>words</cite> and replace it with an empty space.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/texthero.preprocessing.remove_stopwords.html#texthero.preprocessing.remove_stopwords" title="texthero.preprocessing.remove_stopwords"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_stopwords</span></code></a>(input, stopwords, …[, …])</p></td>
+<td><p>Remove all instances of <cite>words</cite>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/texthero.preprocessing.remove_urls.html#texthero.preprocessing.remove_urls" title="texthero.preprocessing.remove_urls"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_urls</span></code></a>(s)</p></td>
 <td><p>Remove all urls from a given Pandas Series.</p></td>
@@ -67,7 +67,7 @@ hide_title: false
 <td><p>Replace all punctuation with a given symbol.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/texthero.preprocessing.replace_stopwords.html#texthero.preprocessing.replace_stopwords" title="texthero.preprocessing.replace_stopwords"><code class="xref py py-obj docutils literal notranslate"><span class="pre">replace_stopwords</span></code></a>(input, symbol, stopwords, …)</p></td>
-<td><p>Replace all stopwords with symbol.</p></td>
+<td><p>Replace all instances of <cite>words</cite> with symbol.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/texthero.preprocessing.tokenize.html#texthero.preprocessing.tokenize" title="texthero.preprocessing.tokenize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tokenize</span></code></a>(s)</p></td>
 <td><p>Tokenize each row of the given Series.</p></td>

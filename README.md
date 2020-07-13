@@ -46,26 +46,37 @@
 
 Texthero is a python toolkit to work with text-based dataset quickly and effortlessly. Texthero is very simple to learn and designed to be used on top of Pandas. Texthero has the same expressiveness and power of Pandas and is extensively documented. Texthero is modern and conceived for programmers of the 2020 decade with little knowledge if any in linguistic. 
 
-You can think of Texthero as a tool to help you _understand_ and work with text-based dataset. Given a tabular dataset, it's easy to _grasp the main concept_. Instead, given a text dataset, it's harder to have quick insights into the underline data. With Texthero, preprocessing text data, map it into vectors and visualize the obtained vector space takes just a couple of lines.
+You can think of Texthero as a tool to help you _understand_ and work with text-based dataset. Given a tabular dataset, it's easy to _grasp the main concept_. Instead, given a text dataset, it's harder to have quick insights into the underline data. With Texthero, preprocessing text data, map it into vectors, and visualize the obtained vector space takes just a couple of lines.
 
 Texthero include tools for:
 * Preprocess text data: it offers both out-of-the-box solutions but it's also flexible for custom-solutions.
 * Natural Language Processing: keyphrases and keywords extraction, and named entity recognition.
 * Text representation: TF-IDF, term frequency, and custom word-embeddings (wip)
-* Vector space analysis: clustering (K-means, Meanshift, DBSAN and Hierarchical), topic modelling (wip) and interpretation.
+* Vector space analysis: clustering (K-means, Meanshift, DBSAN and Hierarchical), topic modeling (wip) and interpretation.
 * Text visualization: vector space visualization, place localization on maps (wip).
 
-Texthero is free, open source and [well documented](https://texthero.org/docs) (and that's what we love most by the way!). 
+Texthero is free, open-source and [well documented](https://texthero.org/docs) (and that's what we love most by the way!). 
 
 We hope you will find pleasure working with Texthero as we had during his development.
 
-<h2 align="center">Hablas español?</h2>
+<h2 align="center">Hablas español? क्या आप हिंदी बोलते हैं? 日本語が話せるのか？</h2>
 
-Texthero has been developed for the whole NLP community. We know of hard is to deal with different NLP tools (NLTK, SpaCy, Gensim, TextBlob, Sklearn): that's why we developed Texthero, to simplify things.
+Texthero has been developed for the whole NLP community. We know how hard is to deal with different NLP tools (NLTK, SpaCy, Gensim, TextBlob, Sklearn): that's why we developed Texthero, to simplify things.
 
 Now, the next main milestone is to provide *multilingual support* and for this big step, we need the help of all of you. ¿Hablas español? Sie sprechen Deutsch? 你会说中文？ 日本語が話せるのか？ Fala português? Parli Italiano? Вы говорите по-русски? If yes or you speak another language not mentioned, then you might help us develop multilingual support! Even if you haven't contributed before or you just started with NLP contact us or open a Github issue, there is always a first time :) We promise you will learn a lot, and, ... who knows? It might help you find your new job as an NLP-developer!
 
 For improving the python toolkit and provide an even better experience, your aid and feedback are crucial. If you have any problem or suggestion please open a Github [issue](https://github.com/jbesomi/texthero/issues), we will be glad to support you and help you.
+
+
+<h2 align="center">Beta version</h2>
+
+Texthero's community is growing fast. Texthero though is still in a beta version; soon, a faster and better version will be released and it will bring some major changes.
+
+For instance, to give a more granular control over the pipeline, starting from the next version on, all `preprocessing` functions will require as argument an already tokenized text. This will be a major changes.
+
+Once released the stable version (Texthero 2.0), backward compatibility will be respected. Until this point, backward compatibility will be present but it will be weaker.
+
+If you want to be part of this fast-growing movements, do not hesitate to contribute: [CONTRIBUTING](blob/master/CONTRIBUTING.md)!
 
 <h2 align="center">Installation</h2>
 
@@ -165,7 +176,7 @@ dtype: object
 
 > Remove digits replace only blocks of digits. The digits in the string "hello123" will not be removed. If we want to remove all digits, you need to set only_blocks to false.
 
-Remove all type of brackets and their content.
+Remove all types of brackets and their content.
 
 ```python
 >>> s = hero.remove_brackets(s)
@@ -201,7 +212,7 @@ Remove extra white-spaces.
 dtype: object
 ```
 
-Sometimes we also wants to get rid of stop-words.
+Sometimes we also want to get rid of stop-words.
 
 ```python
 >>> s = hero.remove_stopwords(s)
@@ -261,19 +272,69 @@ Full documentation: [visualization](https://texthero.org/docs/api-visualization)
 
 <h5>Why Texthero</h5>
 
-Sometimes we just want things done, right? Texthero help with that. It helps makes things easier and give to the developer more time to focus on his custom requirements. We believe that start cleaning text should just take a minute. Same for finding the most important part of a text and same for representing it.
+Sometimes we just want things done, right? Texthero help with that. It helps make things easier and give the developer more time to focus on his custom requirements. We believe that start cleaning text should just take a minute. Same for finding the most important part of a text and the same for representing it.
 
-In a very pragmatic way, texthero has just one goal: make the developer spare time. Working with text data can be a pain and in most cases, a default pipeline can be quite good to start. There is always the time to come back and improve the preprocessing pipeline.
+In a very pragmatic way, texthero has just one goal: make the developer spare time. Working with text data can be a pain and in most cases, a default pipeline can be quite good to start. There is always time to come back and improve previous work.
 
 
 <h2 align="center">Contributions</h2>
 
-Pull requests are amazing and most welcome. Start by fork this repository and [open an issue](https://github.com/jbesomi/texthero/issues).
+> "Texthero has been developed by a member of the NLP community for the whole NLP-community"
 
-Texthero is also looking for maintainers and contributors. In case of interest, just drop a line at jonathanbesomi__AT__gmail.com
+Texthero is for all of us NLP-developers and it can continue to exist with the precious contribution of the community.
+
+Your level of expertise of python and NLP does not matter, anyone can help and anyone is more than welcomed to contribute!
+
+**Are you an NLP expert?**
+
+- [open an issue](https://github.com/jbesomi/texthero/issues) and tell us what you like and dislike of Texthero and what we can do better!
+
+**Are you good at creating websites?**
+
+The website will be soon moved from Docusaurus to Sphinx: read the [open issue there](https://github.com/jbesomi/texthero/issues/40). Good news: the website will look like now :) Average news: we need to do some web-development to adapt [this Sphinx template](https://github.com/jbesomi/texthero/issues/40) to our needs. Can you help us?
+
+**Are you good at writing?**
+
+Probably this is the most important piece missing now on Texthero: more tutorials and more "Getting Started" guide. 
+
+If you are good at writing you can help us! Why don't you start by [Adding a FAQ page to the website](https://github.com/jbesomi/texthero/issues/41) or explain how to [create a custom pipeline](https://github.com/jbesomi/texthero/issues/38)? Need help? We are there for you.
+
+**Are you good in python?**
+
+There are a lot of [open issues](https://github.com/jbesomi/texthero/issues) for techie guys. Which one do you choose?
+
+If you have just other questions or inquiry drop me a line at jonathanbesomi__AT__gmail.com
 
 <h3>Contributors (in chronological order)</h3>
 
 - [Selim Al Awwa](https://github.com/selimelawwa/)
 - [Parth Gandhi](https://github.com/ParthGandhi)
 - [Dan Keefe](https://github.com/Peritract)
+- [Christian Claus](https://github.com/cclauss)
+- [bobfang1992](https://github.com/bobfang1992)
+- [Ishan Arora](https://github.com/ishanarora04)
+
+
+<h2 align="center"><a href="./LICENSE">License</a></h2>
+
+The MIT License (MIT)
+
+Copyright (c) 2020 Texthero
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

@@ -685,3 +685,96 @@ def remove_urls(s: pd.Series) -> pd.Series:
     """
 
     return replace_urls(s, " ")
+
+
+def replace_tags(s: pd.Series, symbol: str) -> pd.Series:
+    """Replace all tags from a given Pandas Series with symbol.
+    
+    A tag is a string formed by @ concatenated with a sequence of characters and digits. Example: @texthero123.
+
+    Parameters
+    ----------
+    s : Pandas Series
+    symbols : str
+        Symbols to replace
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("Hi @texthero123, we will replace you")
+    >>> hero.replace_tags(s, symbol='TAG')
+    0    Hi TAG, we will replace you
+    dtype: object
+
+    """
+
+    pattern = r"@[a-zA-Z0-9]+"
+    return s.str.replace(pattern, symbol)
+
+
+def remove_tags(s: pd.Series) -> pd.Series:
+    """Remove all tags from a given Pandas Series.
+    
+    A tag is a string formed by @ concatenated with a sequence of characters and digits. Example: @texthero123. Tags are replaceb by an empty space ` `.
+    
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("Hi @tag, we will remove you")
+    >>> hero.remove_tags(s)
+    0    Hi  , we will remove you
+    dtype: object
+
+    See also
+    --------
+    :meth:`texthero.preprocessing.replace_tags` for replacing a tag with a custom symbol.
+    """
+    return replace_tags(s, " ")
+
+
+def replace_hashtags(s: pd.Series, symbol: str) -> pd.Series:
+    """Replace all hashtags from a Pandas Series with symbol
+
+    A hashtag is a string formed by # concatenated with a sequence of characters, digits and underscores. Example: #texthero_123. 
+
+    Parameters
+    ----------
+    s : Pandas Series
+    symbols : str
+        Symbols to replace
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("Hi #texthero_123, we will replace you.")
+    >>> hero.replace_hashtags(s, symbol='HASHTAG')
+    0    Hi HASHTAG, we will replace you.
+    dtype: object
+
+    """
+    pattern = r"#[a-zA-Z0-9_]+"
+    return s.str.replace(pattern, symbol)
+
+
+def remove_hashtags(s: pd.Series) -> pd.Series:
+    """Remove all hashtags from a given Pandas Series
+
+    A hashtag is a string formed by # concatenated with a sequence of characters, digits and underscores. Example: #texthero_123. 
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("Hi #texthero_123, we will remove you.")
+    >>> hero.remove_hashtags(s)
+    0    Hi  , we will remove you.
+    dtype: object
+
+    See also
+    --------
+    :meth:`texthero.preprocessing.replace_hashtags` for replacing a hashtag with a custom symbol.
+    """
+    return replace_hashtags(s, " ")

@@ -193,7 +193,6 @@ def automated_readability_index(s: pd.Series) -> pd.Series:
     Calculate the automated readability index (ARI).
 
     Calculate ARI for each item in the given Pandas Series. Return a Pandas Series with the ARI scores.
-    Score is NaN if it cannot be computed (e.g. if the number of sentences is 0).
 
     Examples
     --------
@@ -211,8 +210,11 @@ def automated_readability_index(s: pd.Series) -> pd.Series:
     `Automated Readability Index <https://en.wikipedia.org/wiki/Automated_readability_index>`_
 
     """
-    if not pd.api.types.is_string_dtype(s):
-        raise TypeError("Non-string values in given Series.")
+    # Check if type is strings only.
+    if not s.map(type).eq(str).all():
+        raise TypeError(
+            "Non-string values in series. Use hero.drop_no_content(s) to drop those values."
+        )
 
     words_s = s.str.split().str.len() - 1
     characters_s = s.str.count(r"[a-zA-Z0-9]")  # Regex for alphanumeric.

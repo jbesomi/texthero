@@ -1,6 +1,7 @@
 import string
 
 import pandas as pd
+import numpy as np
 import doctest
 
 from texthero import visualization
@@ -80,4 +81,8 @@ class TestVisualization(PandasTestCase):
 
     def test_automated_readability_index_numeric(self):
         s = pd.Series([1.0, 2.0])
+        self.assertRaises(TypeError, visualization.automated_readability_index, s)
+
+    def test_automated_readability_index_nan(self):
+        s = pd.Series(["Test", np.nan])
         self.assertRaises(TypeError, visualization.automated_readability_index, s)

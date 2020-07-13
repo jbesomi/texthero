@@ -79,9 +79,9 @@ def noun_chunks(s):
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("The monuments in New Delhi glorify the settler colonialism.")
+    >>> s = pd.Series("The spotted puppy is sleeping.")
     >>> hero.noun_chunks(s)
-    0    [('The monuments', 'NP', 0, 13), ('New Delhi', 'NP', 17, 26), ('the settler colonialism', 'NP', 35, 58)]
+    0    [(The spotted puppy, NP, 0, 17)]
     dtype: object
     """
 

@@ -59,7 +59,30 @@ def named_entities(s, package="spacy"):
 
 def noun_chunks(s):
     """
-    Return noun_chunks, group of consecutive words that belong together.
+    Return noun chunks (noun phrases).
+
+    Return a Pandas Series where each row contains a tuple that has information regarding the noun chunk.
+    
+    Tuple: (`chunk'text`, `chunk'label`, `starting index`, `ending index`)
+
+    Noun chunks or noun phrases are phrases that have noun at their head or nucleus 
+    i.e., they ontain the noun and other words that describe that noun. 
+    A detailed explanation on noun chunks: https://en.wikipedia.org/wiki/Noun_phrase
+    Internally `noun_chunks` makes use of Spacy's dependency parsing:
+    https://spacy.io/usage/linguistic-features#dependency-parse
+
+    Parameters
+    ----------
+    input : Pandas Series
+    
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("The monuments in New Delhi glorify the settler colonialism.")
+    >>> hero.noun_chunks(s)
+    0    [('The monuments', 'NP', 0, 13), ('New Delhi', 'NP', 17, 26), ('the settler colonialism', 'NP', 35, 58)]
+    dtype: object
     """
 
     noun_chunks = []

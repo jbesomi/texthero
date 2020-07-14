@@ -157,7 +157,7 @@ def padding_list(l, size):
     curr_size = len(l)
     diff = size - curr_size
     for t in l:
-        padding_tuple(t, 2*diff)
+        padding_tuple(t, 2 * diff)
 
 
 def padding_tuple(t, size):
@@ -170,8 +170,8 @@ def padding_tuple(t, size):
     curr_size = len(t)
     if curr_size < size:
         while curr_size != size:
-            t+=(None)
-            curr_size+=1
+            t += None
+            curr_size += 1
 
 
 def detect_language(spacy_object):
@@ -184,10 +184,10 @@ def detect_language(spacy_object):
         res = {}
         for it in detected_language:
             prob_str = str(it.prob)
-            parts = prob_str.split('.')
+            parts = prob_str.split(".")
             integer = parts[0]
             digits = parts[1][0:5]
-            res[str(it.lang)] = integer + '.' + digits
+            res[str(it.lang)] = integer + "." + digits
         return {"result": res}
     except LangDetectException:
         return {"UNKNOWN": 0.0}
@@ -231,7 +231,7 @@ def infer_lang(s):
             padding_list(infer_languages, curr_size)
             max_list_size = curr_size
         elif curr_size < max_list_size:
-            padding_tuple(t,max_list_size)
+            padding_tuple(t, max_list_size)
         infer_languages.append(t)
 
     return pd.Series(infer_languages, index=s.index)

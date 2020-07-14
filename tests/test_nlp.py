@@ -74,4 +74,3 @@ class TestNLP(PandasTestCase):
         s_true = pd.Series([("en", "0.99999")])
         s_result = nlp.infer_lang(s)
         self.assertEqual(s_result, s_true)
-

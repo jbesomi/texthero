@@ -13,10 +13,10 @@ In case you are interested in the Texthero's vision as well as the core-principl
 ## Quality
 
 Texthero's main goal is to make the NLP-developer life _easier_. It does so by
-1. Provide a simple-yet-complete tool for NLP and text analytics
-2. Empower the NLP developer with great documentation, simple getting started docs as well as (work in progress) clear and concise tutorials (blog).
+1. Providing a simple-yet-complete tool for NLP and text analytics
+2. Empowering the NLP developer with great documentation, simple getting started docs as well as (work in progress) clear and concise tutorials (blog).
 
-To achieve all of this, Texthero's code and documentation must be of high quality. Having a clean, readable, and **tested** code drastically reduces the likelihood of introducing bugs, and having great documentation will facilitate the work of many NLP developers as well as the work of Texther's maintainers.
+To achieve all of this, Texthero's code and documentation must be of high quality. Having a clean, readable, and **tested** code drastically reduces the likelihood of introducing bugs, and having great documentation will facilitate the work of many NLP developers as well as the work of Texthero's maintainers.
 
 
 ## Shift-left testing
@@ -43,12 +43,12 @@ Making sure your pull requests do not break the code and bring something valuabl
 
 The following link gives some advice on how to submit a successful pull request.
 
-1. Submit a successful PR is not hard. Have a look at all [previous PR](https://github.com/jbesomi/texthero/pulls?q=is%3Apr+is%3Aclosed) already approved.
+1. Submitting a successful PR is not hard. Have a look at all [previous PR](https://github.com/jbesomi/texthero/pulls?q=is%3Apr+is%3Aclosed) already approved.
 1. **Extensively test your code**. Think at all possible edge cases. Look at similar tests for ideas.
-1. In most cases, there exist an example of function or docstring very similar to your specific use-case. Before writing your own-code, look at what the other functions look like.
+1. In most cases, there exists an example of function or docstring very similar to your specific use-case. Before writing your own-code, look at what the other functions look like.
 1. Before submitting, **test locally** that you pass all tests (see below under `testing`).
-1. Respect the best practice (see below `best practice`)
-1. Make sure your code is black-formatted (`./format.sh`, see `formatting`)
+1. Respect the best practices (see below `best practices`).
+1. Make sure your code is black-formatted (`./format.sh`, see `formatting`).
 
 <!--
 1. Make use of the PR template (see `PR template` ) -->
@@ -171,13 +171,15 @@ pip install -e '.[dev]'
 
 You can name it as you wish. A good practice is to give the branch a meaningful name so others know what you are working on.
 
+**Example branch name**: `33-fixing-wordcloud-issue`. Here `33` indicates this [issue tracker ID](https://github.com/jbesomi/texthero/issues/33), `fixing-wordcloud-issue` is a short and actionable description of what your PR is about. Use hyphens as separators. 
+
 ```
 $ git checkout -b new-branch
 ```
 
 1. Add your changes
 
-Try to commit regularly. In addition, whenever possible, group changes into distinct commits. It will be easier for the rest of us to understand what you worked just by reading the description of your commit.
+Try to commit regularly. In addition, whenever possible, group changes into distinct commits. It will be easier for the rest of us to understand what you worked on just by reading the description of your commit.
 
 ```
 $ ...
@@ -185,7 +187,7 @@ $ ...
 
 1. Test your changes
 
-Before opening a new pull-request, you should make sure that all tests still pass with the new changes. Also, if you implement a new function or enhance an existing one, please **add all the necessary** unittests. PR without a properly unit-tested code will not be accepted as we want to avoid at all costs bugs in the project. This is also known as [Shift-left testing](https://en.wikipedia.org/wiki/Shift-left_testing).
+Before opening a new pull-request, you should make sure that all tests still pass with the new changes. Also, if you implement a new function or enhance an existing one, please **add all the necessary** unittests. PR without a properly unit-tested code will not be accepted as we want to avoid bugs at all costs in the project. This is also known as [Shift-left testing](https://en.wikipedia.org/wiki/Shift-left_testing).
 
 **Important.** If you worked on a bug, you should add a test that checks the bug is not present anymore. This is extremely useful as it avoids to re-introduce the same bug again in the future.
 

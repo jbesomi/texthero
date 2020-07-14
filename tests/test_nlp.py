@@ -71,5 +71,7 @@ class TestNLP(PandasTestCase):
 
     def test_infer_lang(self):
         s = pd.Series("This is an English text!.")
-        s_true = pd.Series([("en", 0.9999980507990403)])
-        self.assertEqual(nlp.infer_lang(s), s_true)
+        s_true = pd.Series([("en", "0.99999")])
+        s_result = nlp.infer_lang(s)
+        self.assertEqual(s_result, s_true)
+

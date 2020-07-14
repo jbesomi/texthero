@@ -147,7 +147,7 @@ def foldl(func, acc, xs):
     return functools.reduce(func, xs, acc)
 
 
-def padding(l, size):
+def padding_list(l, size):
     """
     all the tuples in the list  will be None padding (size - len(l)) times
     :param l: list of tuples
@@ -157,8 +157,21 @@ def padding(l, size):
     curr_size = len(l)
     diff = size - curr_size
     for t in l:
-        for i in range(2 * diff):
-            t += None
+        padding_tuple(t, 2*diff)
+
+
+def padding_tuple(t, size):
+    """
+    The tuple will be None padding size times
+    :param t: list of tuples
+    :param size: target size
+    :return:
+    """
+    curr_size = len(t)
+    if curr_size < size:
+        while curr_size != size:
+            t+=(None)
+            curr_size+=1
 
 
 def detect_language(spacy_object):
@@ -170,7 +183,11 @@ def detect_language(spacy_object):
         detected_language = detect_langs(spacy_object.text)
         res = {}
         for it in detected_language:
-            res[str(it.lang)] = float(it.prob)
+            prob_str = str(it.prob)
+            parts = prob_str.split('.')
+            integer = parts[0]
+            digits = parts[1][0:5]
+            res[str(it.lang)] = integer + '.' + digits
         return {"result": res}
     except LangDetectException:
         return {"UNKNOWN": 0.0}
@@ -196,7 +213,7 @@ def infer_lang(s):
     >>> import pandas as pd
     >>> s = pd.Series("This is an English text!.")
     >>> hero.infer_lang(s)
-    0    (en, 0.9999980507990403)
+    0    (en, 0.99999)
     dtype: object
     """
 
@@ -209,10 +226,12 @@ def infer_lang(s):
     for doc in nlp.pipe(s.values, batch_size=32):
         l = list(doc._.language["result"].items())
         curr_size = len(l)
-        l = foldl(operator.add, (), l)
+        t = foldl(operator.add, (), l)
         if max_list_size < curr_size:
-            padding(infer_languages, curr_size)
+            padding_list(infer_languages, curr_size)
             max_list_size = curr_size
-        infer_languages.append(l)
+        elif curr_size < max_list_size:
+            padding_tuple(t,max_list_size)
+        infer_languages.append(t)
 
     return pd.Series(infer_languages, index=s.index)

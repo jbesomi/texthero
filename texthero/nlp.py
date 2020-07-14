@@ -7,8 +7,7 @@ import pandas as pd
 from spacy_langdetect import LanguageDetector
 from langdetect import detect_langs
 from langdetect.lang_detect_exception import LangDetectException
-import functools
-import operator
+from langdetect.language import Language
 
 
 def named_entities(s, package="spacy"):
@@ -136,76 +135,78 @@ def count_sentences(s: pd.Series) -> pd.Series:
     return pd.Series(number_of_sentences, index=s.index)
 
 
-def foldl(func, acc, xs):
-    """
-    func(func(func(acc,xs[0]),xs[1])....xs[n])
-
-    :param func: (T, T) -> T
-    :param acc: T
-    :param xs: list of T
-    """
-    return functools.reduce(func, xs, acc)
+def _Language_to_dict(lang: Language):
+    return (str(lang.lang), "%.5f" % float(lang.prob))
 
 
-def padding_list(l, size):
-    """
-    all the tuples in the list  will be None padding (size - len(l)) times
-    :param l: list of tuples
-    :param size: target size
-    :return:
-    """
-    curr_size = len(l)
-    diff = size - curr_size
-    for t in l:
-        padding_tuple(t, 2 * diff)
-
-
-def padding_tuple(t, size):
-    """
-    The tuple will be None padding size times
-    :param t: list of tuples
-    :param size: target size
-    :return:
-    """
-    curr_size = len(t)
-    if curr_size < size:
-        while curr_size != size:
-            t += None
-            curr_size += 1
-
-
-def detect_language(spacy_object):
+def _detect_language_list(spaCy_object):
     """
     gured out appling detect_langs function on spacy_object
     :param spacy_object
     """
     try:
-        detected_language = detect_langs(spacy_object.text)
-        res = {}
-        for it in detected_language:
-            prob_str = str(it.prob)
-            parts = prob_str.split(".")
-            integer = parts[0]
-            digits = parts[1][0:5]
-            res[str(it.lang)] = integer + "." + digits
-        return {"result": res}
+        detected_language = list(
+            map(_Language_to_dict, detect_langs(spaCy_object.text))
+        )
+        return detected_language
     except LangDetectException:
-        return {"UNKNOWN": 0.0}
+        return ("UNKNOWN", 0.0)
 
 
-def infer_lang(s):
+def _detect_language(spaCy_object):
+    """
+    gured out appling detect_langs function on spacy_object
+    :param spacy_object
+    """
+    try:
+        detected_language = _Language_to_dict(detect_langs(spaCy_object.text)[0])
+        return detected_language
+    except LangDetectException:
+        return ("UNKNOWN", 0.0)
+
+
+def _infer_lang_ret_list(s, nlp, infer_languages):
+    nlp.add_pipe(
+        LanguageDetector(_detect_language_list), name="language_detector", last=True
+    )
+    for doc in nlp.pipe(s.values, batch_size=32):
+        infer_languages.append(doc._.language)
+
+    return pd.Series(infer_languages, index=s.index)
+
+
+def _infer_lang(s, nlp, infer_languages):
+    nlp.add_pipe(
+        LanguageDetector(_detect_language), name="language_detector", last=True
+    )
+    for doc in nlp.pipe(s.values, batch_size=32):
+        infer_languages.append(doc._.language)
+
+    return pd.Series(infer_languages, index=s.index)
+
+
+def infer_lang(s, ret_list=False):
     """
     Return languages and their probabilities.
 
-    Return a Pandas Series where each row contains a tuple that has information regarding to the infer languages.
+    Return a Pandas Series where each row contains a tuple that has information regarding to the "average" infer language.
 
-    Tuple: ( `language_1`, `probability_1`, ...)
+    Tuple : (language, probability)
 
-    Note: If exist row that has more then one language the return Pandas Series will be pad with None
+    If ret_list = True then each row contains a list of tuples
+
+    Note: infer_lang is nondeterministic function
 
     Parameters
     ----------
-    input : Pandas Series
+    s : Pandas Series
+    ret_list (optional) : boolean
+
+    supports 55 languages out of the box (ISO 639-1 codes)
+    ------------------------------------------------------
+    af, ar, bg, bn, ca, cs, cy, da, de, el, en, es, et, fa, fi, fr, gu, he,
+    hi, hr, hu, id, it, ja, kn, ko, lt, lv, mk, ml, mr, ne, nl, no, pa, pl,
+    pt, ro, ru, sk, sl, so, sq, sv, sw, ta, te, th, tl, tr, uk, ur, vi, zh-cn, zh-tw
 
     Examples
     --------
@@ -213,25 +214,15 @@ def infer_lang(s):
     >>> import pandas as pd
     >>> s = pd.Series("This is an English text!.")
     >>> hero.infer_lang(s)
-    0    (en, 0.99999)
+    0    (en, 1.00000)
     dtype: object
+
     """
 
     infer_languages = []
-    max_list_size = 0
-
     nlp = spacy.load("en_core_web_sm")
-    nlp.add_pipe(LanguageDetector(detect_language), name="language_detector", last=True)
 
-    for doc in nlp.pipe(s.values, batch_size=32):
-        l = list(doc._.language["result"].items())
-        curr_size = len(l)
-        t = foldl(operator.add, (), l)
-        if max_list_size < curr_size:
-            padding_list(infer_languages, curr_size)
-            max_list_size = curr_size
-        elif curr_size < max_list_size:
-            padding_tuple(t, max_list_size)
-        infer_languages.append(t)
-
-    return pd.Series(infer_languages, index=s.index)
+    if ret_list:
+        return _infer_lang_ret_list(s, nlp, infer_languages)
+    else:
+        return _infer_lang(s, nlp, infer_languages)

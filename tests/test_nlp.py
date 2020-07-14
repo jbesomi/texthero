@@ -70,7 +70,22 @@ class TestNLP(PandasTestCase):
         self.assertFalse(counted_sentences_s.index.equals(t_different_index.index))
 
     def test_infer_lang(self):
-        s = pd.Series("This is an English text!.")
-        s_true = pd.Series([("en", "0.99999")])
+
+        s = pd.Series(
+            [
+                "This is English text.",
+                " Er lebt mit seinen Eltern und seiner Schwester in Berlin.",
+                " Yo me divierto todos los días en el parque. ",
+                "Je m'appelle Angélica Summer, j'ai 12 ans et je suis canadienne.",
+            ]
+        )
+        s_true = pd.Series(
+            [
+                ("en", "%.5f" % float(1)),
+                ("de", "%.5f" % float(1)),
+                ("es", "%.5f" % float(1)),
+                ("fr", "%.5f" % float(1)),
+            ]
+        )
         s_result = nlp.infer_lang(s)
         self.assertEqual(s_result, s_true)

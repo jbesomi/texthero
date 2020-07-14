@@ -4,6 +4,11 @@ Common NLP tasks such as named_entities, noun_chunks, etc.
 
 import spacy
 import pandas as pd
+from spacy_langdetect import LanguageDetector
+from langdetect import detect_langs
+from langdetect.lang_detect_exception import LangDetectException
+import functools
+import operator
 
 
 def named_entities(s, package="spacy"):
@@ -129,3 +134,85 @@ def count_sentences(s: pd.Series) -> pd.Series:
         number_of_sentences.append(sentences)
 
     return pd.Series(number_of_sentences, index=s.index)
+
+
+def foldl(func, acc, xs):
+    """
+    func(func(func(acc,xs[0]),xs[1])....xs[n])
+
+    :param func: (T, T) -> T
+    :param acc: T
+    :param xs: list of T
+    """
+    return functools.reduce(func, xs, acc)
+
+
+def padding(l, size):
+    """
+    all the tuples in the list  will be None padding (size - len(l)) times
+    :param l: list of tuples
+    :param size: target size
+    :return:
+    """
+    curr_size = len(l)
+    diff = size - curr_size
+    for t in l:
+        for i in range(2 * diff):
+            t += None
+
+
+def detect_language(spacy_object):
+    """
+    gured out appling detect_langs function on spacy_object
+    :param spacy_object
+    """
+    try:
+        detected_language = detect_langs(spacy_object.text)
+        res = {}
+        for it in detected_language:
+            res[str(it.lang)] = float(it.prob)
+        return {"result": res}
+    except LangDetectException:
+        return {"UNKNOWN": 0.0}
+
+
+def infer_lang(s):
+    """
+    Return languages and their probabilities.
+
+    Return a Pandas Series where each row contains a tuple that has information regarding to the infer languages.
+
+    Tuple: ( `language_1`, `probability_1`, ...)
+
+    Note: If exist row that has more then one language the return Pandas Series will be pad with None
+
+    Parameters
+    ----------
+    input : Pandas Series
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("This is an English text!.")
+    >>> hero.infer_lang(s)
+    0    (en, 0.9999980507990403)
+    dtype: object
+    """
+
+    infer_languages = []
+    max_list_size = 0
+
+    nlp = spacy.load("en_core_web_sm")
+    nlp.add_pipe(LanguageDetector(detect_language), name="language_detector", last=True)
+
+    for doc in nlp.pipe(s.values, batch_size=32):
+        l = list(doc._.language["result"].items())
+        curr_size = len(l)
+        l = foldl(operator.add, (), l)
+        if max_list_size < curr_size:
+            padding(infer_languages, curr_size)
+            max_list_size = curr_size
+        infer_languages.append(l)
+
+    return pd.Series(infer_languages, index=s.index)

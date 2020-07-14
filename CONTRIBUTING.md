@@ -25,7 +25,7 @@ Texthero follows an approach known as shift-left testing. According to [Wikipedi
 
 > Shift-left testing is an approach to software testing and system testing in which testing is performed earlier in the lifecycle.
 
-Shift-left testing reduces the number of bugs by attempting to solve the problem at the origin. Often many programming defects are not uncovered and fixed until after significant effort has been wasted on their implementation. Texthero's attempt to avoid this kind of issue.
+Shift-left testing reduces the number of bugs by attempting to solve the problem at the origin. Often many programming defects are not uncovered and fixed until after significant effort has been wasted on their implementation. Texthero attempts to avoid these kind of issues.
 
 
 ## Improve documentation!
@@ -56,7 +56,7 @@ The following link gives some advice on how to submit a successful pull request.
 
 ## Ask questions!
 
-We are there for you! If everything is unclear, just ask. We will do our best to answer you quickly.
+We are there for you! If anything is unclear, just ask. We will do our best to answer you quickly.
 
 ## Propose new ideas!
 
@@ -84,7 +84,7 @@ $ cd scripts
 $ ./tests.sh
 ```
 
-Calling `./test.sh` is equivalent to execute form the _root_ `python3 -m unittest discover -s tests -t .`
+Calling `./tests.sh` is equivalent to executing it from the _root_ `python3 -m unittest discover -s tests -t .`
 
 
 **Important.** If you worked on a bug, you should add a test that checks the bug is not present anymore. This is extremely useful as it avoids to re-introduce the same bug again in the future.
@@ -92,7 +92,7 @@ Calling `./test.sh` is equivalent to execute form the _root_ `python3 -m unittes
 
 ### Passing doctests
 
-When executing `./test.sh` it will also check that the Examples in the docstrings are correct (doctests).
+When executing `./tests.sh` it will also check that the Examples in the docstrings are correct (doctests).
 
 Passing doctests might be a bit annoying sometimes. Let's look at this example for instance:
 
@@ -114,7 +114,7 @@ The docstring failed? Why? The reason is that somewhere in the `Example` section
 
 When you submit your code, all code will be tested on different operating systems using Travis CI: [TRAVIS CI texthero](https://travis-ci.com/github/jbesomi/texthero).
 
-Make sure you pass all your test locally before opening a pull request!
+Make sure you pass all your tests locally before opening a pull request!
 
 ## Formatting
 
@@ -182,7 +182,8 @@ $ git checkout -b new-branch
 Try to commit regularly. In addition, whenever possible, group changes into distinct commits. It will be easier for the rest of us to understand what you worked on just by reading the description of your commit.
 
 ```
-$ ...
+$ git add README.md
+$ git commit -m "added README.md"
 ```
 
 1. Test your changes
@@ -200,7 +201,7 @@ The time to submit the PR has come. Head to your forked repository on Github. Th
 
 - `./test.sh`
    - Execute unittests as well as test all doctests
-- `./formath.sh`
+- `./format.sh`
    - format all code with [black](https://github.com/psf/black)
 - `./check.sh`
    - Format the code with black (`format.sh`)

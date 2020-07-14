@@ -1,6 +1,6 @@
 # PURPOSE
 
-This document attempt at defining the purpose of Texthero and it's futures enhancements.
+This document attempts at defining the purpose of Texthero and it's future enhancements.
 
 ### Motivation
 
@@ -14,7 +14,7 @@ We can decompose the objective of Texthero in two parts:
 
 1. ** Offer an efficient tool to deal with text-based datasets (The texthero python package). Texthero is mainly a teaching tool and therefore easy to use and understand, but at the same time quite efficient and should be able to handle large quantities of data.
 
-2. ** Provide a sustain to newcomers in the NLP word to efficiently learn all the main core topics (tf-idf, text cleaning, regular expression, etc). As there are many other tutorials, the main approach is to redirect users to valuable resources and explain better any missing point. This part is done mainly through the *tutorials* on texthero.org.
+2. ** Provide a sustain to newcomers in the NLP world to efficiently learn all the main core topics (tf-idf, text cleaning, regular expression, etc). As there are many other tutorials, the main approach is to redirect users to valuable resources and explain better any missing point. This part is done mainly through the *tutorials* on texthero.org.
 
 
 ### Channels
@@ -33,23 +33,23 @@ We can decompose the objective of Texthero in two parts:
 
 ### Python package
 
-For future development, is important to have a clear idea in mind of the purpose of Texthero as a python package.
+For future development, it is important to have a clear idea in mind of the purpose of Texthero as a python package.
 
 
 **Package core purpose**
 
 The goal is to extract insights from the whole corpora, i.e collection of document and not from the single element.
 
-Generally, the corpora are composed of a __long__ collection of documents and therefore the require techniques need to be efficient to deal with a large amount of text.
+Generally, the corpora are composed of a __long__ collection of documents and therefore the required techniques need to be efficient to deal with a large amount of text.
 
 **Neural network**
 
 Texthero function (as of now) does not make use of a neural network solution. The main reason is that there is no need for that as there are mature libraries (PyTorch and Tensorflow to name a few).
 
-What Texthero offers is a tool to be used in addition to any other machine learning libraries. Ideally, texthero should be used before applying any "sophisticated" approach to the dataset; to first better understand the underline data before applying any complex model.
+What Texthero offers is a tool to be used in addition to any other machine learning libraries. Ideally, texthero should be used before applying any "sophisticated" approach to the dataset; to first better understand the underlying data before applying any complex model.
 
 
-Note: a text corpus or collection of documents need always to be in form of a Pandas Series. "do that on a text corpus" or "do that on a Pandas Series" refers to the same act.
+Note: a text corpus or collection of documents need to be always in form of a Pandas Series. "do that on a text corpus" or "do that on a Pandas Series" refers to the same act.
 
 **Common usage**:
  - Clean a text Pandas Series

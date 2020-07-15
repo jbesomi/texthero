@@ -149,6 +149,8 @@ $ git remote add upstream git@github.com:jbesomi/texthero.git
 
 1. Install texthero locally **and** his dev-dependencies
 
+Install texthero locally directly from the source code. This makes sure you are working on the latest version and that you will install all the required dependencies.
+
 ```
 $ pip install -e .
 ```
@@ -168,10 +170,8 @@ pip install -e '.[dev]'
 
 **Why?**
 
-1.  Because it would instantaneously change the website.
-2.  Changes from pull requests will be available to everyone only after a new release. Imagine you add a new function as a PR, if your PR also updates the documentation then the function will appear under the APIs which is not yet present in the installable pip version. That would be really confusing, isn't it?
-
-Install texthero locally directly from the source code. This makes sure you are working on the latest version and that you will install all the required dependencies.
+- Because it would instantaneously change the website.
+- Changes from pull requests will be available to everyone only after a new release. Imagine you add a new function as a PR, if your PR also updates the documentation then the function will appear under the APIs which is not yet present in the installable pip version. That would be really confusing, isn't it?
 
 
 1. Create a new working branch

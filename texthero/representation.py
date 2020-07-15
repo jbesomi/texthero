@@ -105,7 +105,7 @@ def count(s: pd.Series, max_features: Optional[int] = None, return_feature_names
     Represent a text-based Pandas Series using count.
 
     The input Series should already be tokenized. If not, it will
-    be tokenized before term_frequency is calculated.
+    be tokenized before count is calculated.
 
     Parameters
     ----------
@@ -163,6 +163,9 @@ def term_frequency(
 
     """
     Represent a text-based Pandas Series using term frequency.
+
+    The input Series should already be tokenized. If not, it will
+    be tokenized before term_frequency is calculated.
 
     Parameters
     ----------

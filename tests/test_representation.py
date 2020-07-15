@@ -60,8 +60,20 @@ class TestRepresentation(PandasTestCase):
     def test_tfidf_formula(self):
         s = pd.Series(["Hi Bye", "Test Bye Bye"])
         s = preprocessing.tokenize(s)
-        s_true = pd.Series([[1.0 * (math.log(3/3)+1), 1.0 * (math.log(3/2)+1), 0.0 * (math.log(3/2)+1)],
-                            [2.0 * (math.log(3/3)+1), 0.0 * (math.log(3/2)+1), 1.0 * (math.log(3/2)+1)]])
+        s_true = pd.Series(
+            [
+                [
+                    1.0 * (math.log(3 / 3) + 1),
+                    1.0 * (math.log(3 / 2) + 1),
+                    0.0 * (math.log(3 / 2) + 1),
+                ],
+                [
+                    2.0 * (math.log(3 / 3) + 1),
+                    0.0 * (math.log(3 / 2) + 1),
+                    1.0 * (math.log(3 / 2) + 1),
+                ],
+            ]
+        )
         s_true.rename_axis("document", inplace=True)
         self.assertEqual(representation.tfidf(s), s_true)
 

@@ -86,7 +86,6 @@ def term_frequency(
     tf = CountVectorizer(
         max_features=max_features,
         lowercase=False,
-        token_pattern="\S+",
         tokenizer=lambda x: x,
         preprocessor=lambda x: x,
     )
@@ -150,7 +149,6 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, return_feature_names=False)
         use_idf=True,
         max_features=max_features,
         min_df=min_df,
-        token_pattern="\S+",
         lowercase=False,
         tokenizer=lambda x: x,
         preprocessor=lambda x: x,

@@ -149,6 +149,15 @@ $ git remote add upstream git@github.com:jbesomi/texthero.git
 
 1. Install texthero locally **and** his dev-dependencies
 
+```
+$ pip install -e .
+```
+> The `-e` will install the python package in 'development' mode. That way your changes will take effect immediately without the need to reinstall the package again.
+
+```
+pip install -e '.[dev]'
+```
+
 - All contributors are expected to install the development dependencies as well.
 
 - Some of the [dev-dependencies](https://github.com/jbesomi/texthero/blob/6e6b8f70432979a81a09d48826fc907adc67cba7/setup.cfg#L43) will be used by any contributor of TextHero to execute the [tests.sh](./scripts/tests.sh) locally.
@@ -163,15 +172,6 @@ $ git remote add upstream git@github.com:jbesomi/texthero.git
 2.  Changes from pull requests will be available to everyone only after a new release. Imagine you add a new function as a PR, if your PR also updates the documentation then the function will appear under the APIs which is not yet present in the installable pip version. That would be really confusing, isn't it?
 
 Install texthero locally directly from the source code. This makes sure you are working on the latest version and that you will install all the required dependencies.
-
-```
-$ pip install -e .
-```
-> The `-e` will install the python package in 'development' mode. That way your changes will take effect immediately without the need to reinstall the package again.
-
-```
-pip install -e '.[dev]'
-```
 
 
 1. Create a new working branch

@@ -163,7 +163,7 @@ The complete representation module API can be found at the following address: [a
 
 ### Visualization
 
-`texthero.visualization` provide some helpers functions to visualize the tarnsformed Dataframe. All visualization utilize under the hoods the [Plotly Python Open Source Graphing Library](https://plotly.com/python/).
+`texthero.visualization` provide some helpers functions to visualize the transformed Dataframe. All visualization utilize under the hoods the [Plotly Python Open Source Graphing Library](https://plotly.com/python/).
 
 
 ```python

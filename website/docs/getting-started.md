@@ -111,7 +111,7 @@ from texthero import preprocessing
 custom_pipeline = [preprocessing.fillna,
                    preprocessing.lowercase,
                    preprocessing.remove_whitespace]
-df['clean_text'] = hero.clean(df['text'])
+df['clean_text'] = hero.clean(df['text'], custom_pipeline)
 ```
 
 or alternatively

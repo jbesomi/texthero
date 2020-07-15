@@ -8,6 +8,7 @@ import doctest
 import unittest
 import string
 import math
+import warnings
 
 """
 Test doctest
@@ -51,7 +52,13 @@ class TestRepresentation(PandasTestCase):
     def test_term_frequency_not_tokenized_yet(self):
         s = pd.Series("a b c c")
         s_true = pd.Series([[1, 1, 2]])
-        self.assertEqual(representation.term_frequency(s), s_true)
+
+        with warnings.catch_warnings():  # avoid print warning
+            warnings.simplefilter("ignore")
+            self.assertEqual(representation.term_frequency(s), s_true)
+
+        with self.assertWarns(DeprecationWarning):  # check raise warning
+            representation.term_frequency(s)
 
     """
     TF-IDF
@@ -88,7 +95,13 @@ class TestRepresentation(PandasTestCase):
         s = pd.Series("a")
         s_true = pd.Series([[1]])
         s_true.rename_axis("document", inplace=True)
-        self.assertEqual(representation.tfidf(s), s_true)
+
+        with warnings.catch_warnings():  # avoid print warning
+            warnings.simplefilter("ignore")
+            self.assertEqual(representation.tfidf(s), s_true)
+
+        with self.assertWarns(DeprecationWarning):  # check raise warning
+            representation.tfidf(s)
 
     def test_tfidf_single_not_lowercase(self):
         s = pd.Series("ONE one")
@@ -96,58 +109,3 @@ class TestRepresentation(PandasTestCase):
         s_true = pd.Series([[1.0, 1.0]])
         s_true.rename_axis("document", inplace=True)
         self.assertEqual(representation.tfidf(s), s_true)
-
-    """
-    Word2Vec
-    """
-
-    def test_word2vec(self):
-        s = pd.Series(["today is a beautiful day", "today is not that beautiful"])
-        df_true = pd.DataFrame(
-            [[0.0] * 300] * 7,
-            index=["a", "beautiful", "day", "is", "not", "that", "today"],
-        )
-
-        s = preprocessing.tokenize(s)
-
-        df_embedding = representation.word2vec(s, min_count=1, seed=1)
-
-        self.assertEqual(type(df_embedding), pd.DataFrame)
-
-        self.assertEqual(df_embedding.shape, df_true.shape)
-
-    def test_word2vec_not_tokenized_yet(self):
-        s = pd.Series(["today is a beautiful day", "today is not that beautiful"])
-        df_true = pd.DataFrame(
-            [[0.0] * 300] * 7,
-            index=["a", "beautiful", "day", "is", "not", "that", "today"],
-        )
-
-        df_embedding = representation.word2vec(s, min_count=1, seed=1)
-
-        self.assertEqual(type(df_embedding), pd.DataFrame)
-
-        self.assertEqual(df_embedding.shape, df_true.shape)
-
-    def test_most_similar_simple(self):
-        s = pd.Series(["one one one"])
-        s = preprocessing.tokenize(s)
-        df_embeddings = representation.word2vec(s, min_count=1, seed=1)
-
-        to = "one"
-        most_similar = representation.most_similar(df_embeddings, to)
-
-        self.assertEqual(most_similar.shape, (1,))
-
-    def test_most_similar_raise_with_series(self):
-        s_embed = pd.Series({"one": 1})
-        to = "one"
-
-        with self.assertRaisesRegex(ValueError, r"Pandas|pandas"):
-            representation.most_similar(s_embed, to)
-
-    def test_most_similar_raise_with_not_in_index(self):
-        s_embed = pd.DataFrame(data=[1], index=["one"])
-        to = "two"
-        with self.assertRaisesRegex(ValueError, r"index"):
-            representation.most_similar(s_embed, to)

@@ -7,6 +7,7 @@ from . import PandasTestCase
 import doctest
 import unittest
 import string
+import math
 
 """
 Test doctest
@@ -56,23 +57,32 @@ class TestRepresentation(PandasTestCase):
     TF-IDF
     """
 
-    def test_idf_single_document(self):
-        s = pd.Series("a")
+    def test_tfidf_formula(self):
+        s = pd.Series(["Hi Bye", "Test Bye Bye"])
         s = preprocessing.tokenize(s)
-        s_true = pd.Series([[1]])
+        s_true = pd.Series([[1.0 * (math.log(3/3)+1), 1.0 * (math.log(3/2)+1), 0.0 * (math.log(3/2)+1)],
+                            [2.0 * (math.log(3/3)+1), 0.0 * (math.log(3/2)+1), 1.0 * (math.log(3/2)+1)]])
+        s_true.rename_axis("document", inplace=True)
         self.assertEqual(representation.tfidf(s), s_true)
 
-    def test_idf_not_tokenized_yet(self):
+    def test_tfidf_single_document(self):
+        s = pd.Series("a", index=["yo"])
+        s = preprocessing.tokenize(s)
+        s_true = pd.Series([[1]], index=["yo"])
+        s_true.rename_axis("document", inplace=True)
+        self.assertEqual(representation.tfidf(s), s_true)
+
+    def test_tfidf_not_tokenized_yet(self):
         s = pd.Series("a")
         s_true = pd.Series([[1]])
+        s_true.rename_axis("document", inplace=True)
         self.assertEqual(representation.tfidf(s), s_true)
 
-    def test_idf_single_not_lowercase(self):
-        tfidf_single_smooth = 0.7071067811865475  # TODO
-
+    def test_tfidf_single_not_lowercase(self):
         s = pd.Series("ONE one")
         s = preprocessing.tokenize(s)
-        s_true = pd.Series([[tfidf_single_smooth, tfidf_single_smooth]])
+        s_true = pd.Series([[1.0, 1.0]])
+        s_true.rename_axis("document", inplace=True)
         self.assertEqual(representation.tfidf(s), s_true)
 
     """

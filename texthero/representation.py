@@ -100,11 +100,9 @@ Vectorization
 """
 
 
-def term_frequency(
-    s: pd.Series, max_features: Optional[int] = None, return_feature_names=False
-):
+def count(s: pd.Series, max_features: Optional[int] = None, return_feature_names=False):
     """
-    Represent a text-based Pandas Series using term_frequency.
+    Represent a text-based Pandas Series using count.
 
     The input Series should already be tokenized. If not, it will
     be tokenized before term_frequency is calculated.
@@ -115,7 +113,7 @@ def term_frequency(
     max_features : int, optional
         Maximum number of features to keep.
     return_features_names : Boolean, False by Default
-        If True, return a tuple (*term_frequency_series*, *features_names*)
+        If True, return a tuple (*count_series*, *features_names*)
 
 
     Examples
@@ -159,9 +157,57 @@ def term_frequency(
         return s
 
 
-def tfidf(
-    s: pd.Series, max_features=None, min_df=1, max_df=1.0, return_feature_names=False
-) -> pd.Series.sparse:
+def term_frequency(
+    s: pd.Series, max_features: Optional[int] = None, return_feature_names=False
+):
+
+    """
+    Represent a text-based Pandas Series using term frequency.
+
+    Parameters
+    ----------
+    s : Pandas Series
+    max_features : int, optional
+        Maximum number of features to keep.
+    return_features_names : Boolean, False by Default
+        If True, return a tuple (*count_series*, *features_names*)
+
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["Sentence one", "Sentence two"])
+    >>> hero.term_frequency(s)
+    0    [2, 1, 1]
+    dtype: object
+    
+    To return the features_names:
+    
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["Sentence one", "Sentence two"])
+    >>> hero.term_frequency(s, return_feature_names=True)
+    (0    [2, 1, 1]
+    dtype: object, ['Sentence', 'one', 'two'])
+
+    """
+
+    tf = CountVectorizer(
+        max_features=max_features, lowercase=False, token_pattern="\S+"
+    )
+
+    series = np.asarray(tf.fit_transform(s).sum(axis=0))
+
+    s = pd.Series(series.tolist(), index=[0])
+
+    if return_feature_names:
+        return (s, tf.get_feature_names())
+    else:
+        return s
+
+
+def tfidf(s: pd.Series, max_features=None, min_df=1, return_feature_names=False):
     """
     Represent a text-based Pandas Series using TF-IDF.
 

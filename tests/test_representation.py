@@ -23,32 +23,32 @@ def load_tests(loader, tests, ignore):
 
 class TestRepresentation(PandasTestCase):
     """
-    Term Frequency.
+    Count.
     """
 
-    def test_term_frequency_single_document(self):
+    def test_count_single_document(self):
         s = pd.Series("a b c c")
         s = preprocessing.tokenize(s)
         s_true = pd.Series([[1, 1, 2]])
-        self.assertEqual(representation.term_frequency(s), s_true)
+        self.assertEqual(representation.count(s), s_true)
 
-    def test_term_frequency_multiple_documents(self):
+    def test_count_multiple_documents(self):
         s = pd.Series(["doc_one", "doc_two"])
         s = preprocessing.tokenize(s)
         s_true = pd.Series([[1, 1, 1, 0], [1, 1, 0, 1]])
         self.assertEqual(representation.term_frequency(s), s_true)
 
-    def test_term_frequency_not_lowercase(self):
+    def test_count_not_lowercase(self):
         s = pd.Series(["one ONE"])
         s = preprocessing.tokenize(s)
         s_true = pd.Series([[1, 1]])
-        self.assertEqual(representation.term_frequency(s), s_true)
+        self.assertEqual(representation.count(s), s_true)
 
-    def test_term_frequency_punctuation_are_kept(self):
+    def test_count_punctuation_are_kept(self):
         s = pd.Series(["one !"])
         s = preprocessing.tokenize(s)
         s_true = pd.Series([[1, 1]])
-        self.assertEqual(representation.term_frequency(s), s_true)
+        self.assertEqual(representation.count(s), s_true)
 
     def test_term_frequency_not_tokenized_yet(self):
         s = pd.Series("a b c c")
@@ -111,21 +111,4 @@ class TestRepresentation(PandasTestCase):
         s_true.rename_axis("document", inplace=True)
         self.assertEqual(representation.tfidf(s), s_true)
 
-    def test_tfidf_max_features(self):
-        s = pd.Series("one one two")
-        s = preprocessing.tokenize(s)
-        s_true = pd.Series([[2.0]])
-        s_true.rename_axis("document", inplace=True)
-        self.assertEqual(representation.tfidf(s, max_features=1), s_true)
 
-    def test_tfidf_min_df(self):
-        s = pd.Series([["one"], ["one", "two"]])
-        s_true = pd.Series([[1.0], [1.0]])
-        s_true.rename_axis("document", inplace=True)
-        self.assertEqual(representation.tfidf(s, min_df=2), s_true)
-
-    def test_tfidf_max_df(self):
-        s = pd.Series([["one"], ["one", "two"]])
-        s_true = pd.Series([[0.0], [1.4054651081081644]])
-        s_true.rename_axis("document", inplace=True)
-        self.assertEqual(representation.tfidf(s, max_df=1), s_true)

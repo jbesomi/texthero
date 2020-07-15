@@ -25,22 +25,31 @@ class TestRepresentation(PandasTestCase):
 
     def test_term_frequency_single_document(self):
         s = pd.Series("a b c c")
+        s = preprocessing.tokenize(s)
         s_true = pd.Series([[1, 1, 2]])
         self.assertEqual(representation.term_frequency(s), s_true)
 
     def test_term_frequency_multiple_documents(self):
         s = pd.Series(["doc_one", "doc_two"])
-        s_true = pd.Series([[1, 0], [0, 1]])
+        s = preprocessing.tokenize(s)
+        s_true = pd.Series([[1, 1, 1, 0], [1, 1, 0, 1]])
         self.assertEqual(representation.term_frequency(s), s_true)
 
     def test_term_frequency_not_lowercase(self):
         s = pd.Series(["one ONE"])
+        s = preprocessing.tokenize(s)
         s_true = pd.Series([[1, 1]])
         self.assertEqual(representation.term_frequency(s), s_true)
 
     def test_term_frequency_punctuation_are_kept(self):
         s = pd.Series(["one !"])
+        s = preprocessing.tokenize(s)
         s_true = pd.Series([[1, 1]])
+        self.assertEqual(representation.term_frequency(s), s_true)
+
+    def test_term_frequency_not_tokenized_yet(self):
+        s = pd.Series("a b c c")
+        s_true = pd.Series([[1, 1, 2]])
         self.assertEqual(representation.term_frequency(s), s_true)
 
     """
@@ -49,6 +58,12 @@ class TestRepresentation(PandasTestCase):
 
     def test_idf_single_document(self):
         s = pd.Series("a")
+        s = preprocessing.tokenize(s)
+        s_true = pd.Series([[1]])
+        self.assertEqual(representation.tfidf(s), s_true)
+
+    def test_idf_not_tokenized_yet(self):
+        s = pd.Series("a")
         s_true = pd.Series([[1]])
         self.assertEqual(representation.tfidf(s), s_true)
 
@@ -56,6 +71,7 @@ class TestRepresentation(PandasTestCase):
         tfidf_single_smooth = 0.7071067811865475  # TODO
 
         s = pd.Series("ONE one")
+        s = preprocessing.tokenize(s)
         s_true = pd.Series([[tfidf_single_smooth, tfidf_single_smooth]])
         self.assertEqual(representation.tfidf(s), s_true)
 
@@ -71,6 +87,19 @@ class TestRepresentation(PandasTestCase):
         )
 
         s = preprocessing.tokenize(s)
+
+        df_embedding = representation.word2vec(s, min_count=1, seed=1)
+
+        self.assertEqual(type(df_embedding), pd.DataFrame)
+
+        self.assertEqual(df_embedding.shape, df_true.shape)
+
+    def test_word2vec_not_tokenized_yet(self):
+        s = pd.Series(["today is a beautiful day", "today is not that beautiful"])
+        df_true = pd.DataFrame(
+            [[0.0] * 300] * 7,
+            index=["a", "beautiful", "day", "is", "not", "that", "today"],
+        )
 
         df_embedding = representation.word2vec(s, min_count=1, seed=1)
 

@@ -18,7 +18,18 @@ logging.getLogger("gensim").setLevel(logging.WARNING)
 
 from gensim.models import Word2Vec
 
+from texthero import preprocessing
+
 # from texthero import pandas_ as pd_
+
+# Warning message for not-tokenized inputs
+_not_tokenized_warning_message = (
+    "🤔 It seems like the given Pandas Series s is not tokenized. This function will"
+    " tokenize it automatically using hero.tokenize(s) first. You should consider"
+    " tokenizing it yourself first with hero.tokenize(s) in the future."
+)
+
+
 """
 Vectorization
 """
@@ -29,6 +40,9 @@ def term_frequency(
 ):
     """
     Represent a text-based Pandas Series using term_frequency.
+
+    The input Series should already be tokenized. If not, it will
+    be tokenized before term_frequency is calculated.
 
     Parameters
     ----------
@@ -44,6 +58,7 @@ def term_frequency(
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"])
+    >>> s = hero.tokenize(s)
     >>> hero.term_frequency(s)
     0    [1, 1, 0]
     1    [1, 0, 1]
@@ -54,6 +69,7 @@ def term_frequency(
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"])
+    >>> s = hero.tokenize(s)
     >>> hero.term_frequency(s, return_feature_names=True)
     (0    [1, 1, 0]
     1    [1, 0, 1]
@@ -61,8 +77,18 @@ def term_frequency(
 
     """
     # TODO. Can be rewritten without sklearn.
+
+    # Check if input is tokenized. Else, print warning and tokenize.
+    if not isinstance(s.iloc[0], list):
+        print(_not_tokenized_warning_message)
+        s = preprocessing.tokenize(s)
+
     tf = CountVectorizer(
-        max_features=max_features, lowercase=False, token_pattern="\S+"
+        max_features=max_features,
+        lowercase=False,
+        token_pattern="\S+",
+        tokenizer=lambda x: x,
+        preprocessor=lambda x: x,
     )
     s = pd.Series(tf.fit_transform(s).toarray().tolist(), index=s.index)
 
@@ -75,6 +101,9 @@ def term_frequency(
 def tfidf(s: pd.Series, max_features=None, min_df=1, return_feature_names=False):
     """
     Represent a text-based Pandas Series using TF-IDF.
+
+    The input Series should already be tokenized. If not, it will
+    be tokenized before tfidf is calculated.
 
     Parameters
     ----------
@@ -92,6 +121,7 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, return_feature_names=False)
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"])
+    >>> s = hero.tokenize(s)
     >>> hero.tfidf(s)
     0    [0.5797386715376657, 0.8148024746671689, 0.0]
     1    [0.5797386715376657, 0.0, 0.8148024746671689]
@@ -102,6 +132,7 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, return_feature_names=False)
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"])
+    >>> s = hero.tokenize(s)
     >>> hero.tfidf(s, return_feature_names=True)
     (0    [0.5797386715376657, 0.8148024746671689, 0.0]
     1    [0.5797386715376657, 0.0, 0.8148024746671689]
@@ -110,12 +141,19 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, return_feature_names=False)
 
     # TODO. In docstring show formula to compute TF-IDF and also avoid using sk-learn if possible.
 
+    # Check if input is tokenized. Else, print warning and tokenize.
+    if not isinstance(s.iloc[0], list):
+        print(_not_tokenized_warning_message)
+        s = preprocessing.tokenize(s)
+
     tfidf = TfidfVectorizer(
         use_idf=True,
         max_features=max_features,
         min_df=min_df,
         token_pattern="\S+",
         lowercase=False,
+        tokenizer=lambda x: x,
+        preprocessor=lambda x: x,
     )
     s = pd.Series(tfidf.fit_transform(s).toarray().tolist(), index=s.index)
 
@@ -340,6 +378,10 @@ def word2vec(
     Word2vec is a two-layer neural network used to map each word to its vector representation. In general, its input is a text corpus and its output is a set of vectors: feature vectors that represent words in that corpus. In this specific case, the input is a Pandas Series containing in each cell a tokenized text and the output is a Pandas DataFrame where indexes are words and columns are the vector dimensions.
 
     Under the hoods, this function makes use of Gensim Word2Vec module.
+
+    The input Series should already be tokenized. If not, it will
+    be tokenized before word2vec is applied.
+
     
     Parameters
     ----------
@@ -380,6 +422,10 @@ def word2vec(
     `Word2Vec Tutorial - The Skip-Gram Model <http://mccormickml.com/2016/04/19/word2vec-tutorial-the-skip-gram-model/>`_ and `Word2Vec Tutorial Part 2 - Negative Sampling <http://mccormickml.com/2017/01/11/word2vec-tutorial-part-2-negative-sampling/>`_ for two great tutorial on Word2Vec
 
     """
+    # Check if input is tokenized. Else, print warning and tokenize.
+    if not isinstance(s.iloc[0], list):
+        print(_not_tokenized_warning_message)
+        s = preprocessing.tokenize(s)
 
     if algorithm == "cbow":
         sg = 0

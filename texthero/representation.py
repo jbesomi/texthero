@@ -12,9 +12,10 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from typing import Optional
 
-import logging
-
 from texthero import preprocessing
+
+import logging
+import warnings
 
 # from texthero import pandas_ as pd_
 
@@ -76,7 +77,7 @@ def term_frequency(
 
     # Check if input is tokenized. Else, print warning and tokenize.
     if not isinstance(s.iloc[0], list):
-        print(_not_tokenized_warning_message)
+        warnings.warn(_not_tokenized_warning_message, DeprecationWarning)
         s = preprocessing.tokenize(s)
 
     tf = CountVectorizer(
@@ -138,7 +139,7 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, return_feature_names=False)
 
     # Check if input is tokenized. Else, print warning and tokenize.
     if not isinstance(s.iloc[0], list):
-        print(_not_tokenized_warning_message)
+        warnings.warn(_not_tokenized_warning_message, DeprecationWarning)
         s = preprocessing.tokenize(s)
 
     tfidf = TfidfVectorizer(

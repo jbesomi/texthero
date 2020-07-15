@@ -7,6 +7,7 @@ from . import PandasTestCase
 import doctest
 import unittest
 import string
+import warnings
 
 """
 Test doctest
@@ -50,7 +51,13 @@ class TestRepresentation(PandasTestCase):
     def test_term_frequency_not_tokenized_yet(self):
         s = pd.Series("a b c c")
         s_true = pd.Series([[1, 1, 2]])
-        self.assertEqual(representation.term_frequency(s), s_true)
+
+        with warnings.catch_warnings():  # avoid print warning
+            warnings.simplefilter("ignore")
+            self.assertEqual(representation.term_frequency(s), s_true)
+
+        with self.assertWarns(DeprecationWarning):  # check raise warning
+            representation.term_frequency(s)
 
     """
     TF-IDF
@@ -65,7 +72,13 @@ class TestRepresentation(PandasTestCase):
     def test_idf_not_tokenized_yet(self):
         s = pd.Series("a")
         s_true = pd.Series([[1]])
-        self.assertEqual(representation.tfidf(s), s_true)
+
+        with warnings.catch_warnings():  # avoid print warning
+            warnings.simplefilter("ignore")
+            self.assertEqual(representation.tfidf(s), s_true)
+
+        with self.assertWarns(DeprecationWarning):  # check raise warning
+            representation.tfidf(s)
 
     def test_idf_single_not_lowercase(self):
         tfidf_single_smooth = 0.7071067811865475  # TODO

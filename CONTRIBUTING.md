@@ -147,25 +147,32 @@ $ git remote add upstream git@github.com:jbesomi/texthero.git
 
 > This first step needs to be done only once. But, in the future when you will want to make new changes, make sure your repository is synchronized with respect to the upstream: [Syncing a fork](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/syncing-a-fork).
 
-1. Install texthero locally and his dev-dependencies
+1. Install texthero locally **and** his dev-dependencies
+
+- All contributors are expected to install the development dependencies as well.
+
+- Some of the [dev-dependencies](https://github.com/jbesomi/texthero/blob/6e6b8f70432979a81a09d48826fc907adc67cba7/setup.cfg#L43) will be used by any contributor of TextHero to execute the [tests.sh](./scripts/tests.sh) locally.
+
+## **IMPORTANT NOTE**
+
+- Some of the [dev-dependencies](https://github.com/jbesomi/texthero/blob/6e6b8f70432979a81a09d48826fc907adc67cba7/setup.cfg#L43) are necessary **IF** the contributor wants to update the website or run the website locally but please remember that one **shouldn't be sending these kind of changes as a Pull Request**.
+
+**Why?**
+
+1.  Because it would instantaneously change the website.
+2.  Changes from pull requests will be available to everyone only after a new release. Imagine you add a new function as a PR, if your PR also updates the documentation then the function will appear under the APIs which is not yet present in the installable pip version. That would be really confusing, isn't it?
 
 Install texthero locally directly from the source code. This makes sure you are working on the latest version and that you will install all the required dependencies.
 
 ```
 $ pip install -e .
 ```
-
 > The `-e` will install the python package in 'development' mode. That way your changes will take effect immediately without the need to reinstall the package again.
-
-1. Install development dependencies (only required if you want to change the website doc)
-
-Development dependencies need to be installed to update the website documentation, i.e the content in texthero.org. 
-
-In most cases, you **do not need** to update this. Changes from pull requests will be available to everyone only after a new release.
 
 ```
 pip install -e '.[dev]'
 ```
+
 
 1. Create a new working branch
 

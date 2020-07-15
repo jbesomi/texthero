@@ -24,7 +24,7 @@ from texthero import preprocessing
 
 # Warning message for not-tokenized inputs
 _not_tokenized_warning_message = (
-    "🤔 It seems like the given Pandas Series s is not tokenized. This function will"
+    "It seems like the given Pandas Series s is not tokenized. This function will"
     " tokenize it automatically using hero.tokenize(s) first. You should consider"
     " tokenizing it yourself first with hero.tokenize(s) in the future."
 )

@@ -105,23 +105,3 @@ class AbstractIndexTest(PandasTestCase):
         result_s = test_function(*valid_input)
         t_different_index = pd.Series(s.values, index=None)
         self.assertFalse(result_s.index.equals(t_different_index.index))
-
-    """
-    Separate tests for functions that take different / more complicated inputs.
-    """
-
-    """
-    representation.most_similar
-    """
-
-    def test_correct_index_most_similar(self):
-        s = pd.DataFrame([[1.0], [2.0]], index=["word1", "word2"])
-        result_s = representation.most_similar(s, "word1")
-        t_same_index = pd.DataFrame(s.values, s.index)
-        self.assertTrue(result_s.index.equals(t_same_index.index))
-
-    def test_incorrect_index_most_similar(self):
-        s = pd.DataFrame([[1.0], [2.0]], index=["word1", "word2"])
-        result_s = representation.most_similar(s, "word1")
-        t_different_index = pd.DataFrame(s.values, index=None)
-        self.assertFalse(result_s.index.equals(t_different_index.index))

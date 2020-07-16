@@ -31,7 +31,8 @@ def fillna(input: pd.Series) -> pd.Series:
 
 def lowercase(input: pd.Series) -> pd.Series:
     """Lowercase all text."""
-    return input.str.lower()
+    input[~input.isna()] = input[~input.isna()].str.lower()
+    return input
 
 
 def replace_digits(input: pd.Series, symbols: str = " ", only_blocks=True) -> pd.Series:
@@ -69,9 +70,11 @@ def replace_digits(input: pd.Series, symbols: str = " ", only_blocks=True) -> pd
 
     if only_blocks:
         pattern = r"\b\d+\b"
-        return input.str.replace(pattern, symbols)
+        input[~input.isna()] = input[~input.isna()].str.replace(pattern, symbols)
+        return input
     else:
-        return input.str.replace(r"\d+", symbols)
+        input[~input.isna()] = input[~input.isna()].str.replace(r"\d+", symbols)
+        return input
 
 
 def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
@@ -127,8 +130,8 @@ def replace_punctuation(input: pd.Series, symbol: str = " ") -> pd.Series:
     0    Finnaly <PUNCT> 
     dtype: object
     """
-
-    return input.str.replace(rf"([{string.punctuation}])+", symbol)
+    input[~input.isna()] = input[~input.isna()].str.replace(rf"([{string.punctuation}])+", symbol)
+    return input
 
 
 def remove_punctuation(input: pd.Series) -> pd.Series:
@@ -183,7 +186,8 @@ def remove_diacritics(input: pd.Series) -> pd.Series:
     >>> hero.remove_diacritics(s)[0]
     'Montreal, uber, 12.89, Mere, Francoise, noel, 889, اس, اس'
     """
-    return input.astype("unicode").apply(_remove_diacritics)
+    input[~input.isna()] = input[~input.isna()].astype("unicode").apply(_remove_diacritics)
+    return input
 
 
 def remove_whitespace(input: pd.Series) -> pd.Series:
@@ -203,8 +207,8 @@ def remove_whitespace(input: pd.Series) -> pd.Series:
     0    Title Subtitle ...
     dtype: object
     """
-
-    return input.str.replace("\xa0", " ").str.split().str.join(" ")
+    input[~input.isna()] = input[~input.isna()].str.replace("\xa0", " ").str.split().str.join(" ")
+    return input
 
 
 def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
@@ -267,7 +271,8 @@ def replace_stopwords(
 
     if stopwords is None:
         stopwords = _stopwords.DEFAULT
-    return input.apply(_replace_stopwords, args=(stopwords, symbol))
+    input[~input.isna()] = input[~input.isna()].apply(_replace_stopwords, args=(stopwords, symbol))
+    return input
 
 
 def remove_stopwords(
@@ -356,7 +361,8 @@ def stem(input: pd.Series, stem="snowball", language="english") -> pd.Series:
     def _stem(text):
         return " ".join([stemmer.stem(word) for word in text])
 
-    return input.str.split().apply(_stem)
+    input[~input.isna()] = input[~input.isna()].str.split().apply(_stem)
+    return input
 
 
 def get_default_pipeline() -> List[Callable[[pd.Series], pd.Series]]:
@@ -461,7 +467,8 @@ def remove_round_brackets(s: pd.Series):
     :meth:`remove_square_brackets`
 
     """
-    return s.str.replace(r"\([^()]*\)", "")
+    s[~s.isna()] = s[~s.isna()].str.replace(r"\([^()]*\)", "")
+    return s
 
 
 def remove_curly_brackets(s: pd.Series):
@@ -483,7 +490,8 @@ def remove_curly_brackets(s: pd.Series):
     :meth:`remove_square_brackets`
 
     """
-    return s.str.replace(r"\{[^{}]*\}", "")
+    s[~s.isna()] = s[~s.isna()].str.replace(r"\{[^{}]*\}", "")
+    return s
 
 
 def remove_square_brackets(s: pd.Series):
@@ -507,7 +515,8 @@ def remove_square_brackets(s: pd.Series):
 
 
     """
-    return s.str.replace(r"\[[^\[\]]*\]", "")
+    s[~s.isna()] = s[~s.isna()].str.replace(r"\[[^\[\]]*\]", "")
+    return s
 
 
 def remove_angle_brackets(s: pd.Series):
@@ -530,7 +539,8 @@ def remove_angle_brackets(s: pd.Series):
     :meth:`remove_square_brackets`
 
     """
-    return s.str.replace(r"<[^<>]*>", "")
+    s[~s.isna()] = s[~s.isna()].str.replace(r"<[^<>]*>", "")
+    return s
 
 
 def remove_brackets(s: pd.Series):
@@ -583,8 +593,8 @@ def remove_html_tags(s: pd.Series) -> pd.Series:
       <[^>]+>                             # Remove <html> tags
       | &([a-z0-9]+|\#[0-9]{1,6}|\#x[0-9a-f]{1,6}); # Remove &nbsp;
       """
-
-    return s.str.replace(pattern, "")
+    s[~s.isna()] = s[~s.isna()].str.replace(pattern, "")
+    return s
 
 
 def tokenize(s: pd.Series) -> pd.Series:
@@ -611,8 +621,8 @@ def tokenize(s: pd.Series) -> pd.Series:
     pattern = (
         rf"((\w)([{string.punctuation}])(?:\B|$)|(?:^|\B)([{string.punctuation}])(\w))"
     )
-
-    return s.str.replace(pattern, r"\2 \3 \4 \5").str.split()
+    s[~s.isna()] = s[~s.isna()].str.replace(pattern, r"\2 \3 \4 \5").str.split()
+    return s
 
 
 def tokenize_with_phrases(s: pd.Series, min_count: int = 5, threshold: int = 10):
@@ -678,7 +688,8 @@ def replace_urls(s: pd.Series, symbol: str) -> pd.Series:
 
     pattern = r"http\S+"
 
-    return s.str.replace(pattern, symbol)
+    s[~s.isna()] = s[~s.isna()].str.replace(pattern, symbol)
+    return s
 
 
 def remove_urls(s: pd.Series) -> pd.Series:
@@ -727,7 +738,8 @@ def replace_tags(s: pd.Series, symbol: str) -> pd.Series:
     """
 
     pattern = r"@[a-zA-Z0-9]+"
-    return s.str.replace(pattern, symbol)
+    s[~s.isna()] = s[~s.isna()].str.replace(pattern, symbol)
+    return s
 
 
 def remove_tags(s: pd.Series) -> pd.Series:
@@ -773,7 +785,8 @@ def replace_hashtags(s: pd.Series, symbol: str) -> pd.Series:
 
     """
     pattern = r"#[a-zA-Z0-9_]+"
-    return s.str.replace(pattern, symbol)
+    s[~s.isna()] = s[~s.isna()].str.replace(pattern, symbol)
+    return s
 
 
 def remove_hashtags(s: pd.Series) -> pd.Series:

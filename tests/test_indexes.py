@@ -9,6 +9,7 @@ from parameterized import parameterized
 
 # Define valid inputs for different functions.
 s_text = pd.Series(["Test"], index=[5])
+s_text_list = pd.Series([["Test", "Test2"]], index=[5])
 s_numeric = pd.Series([5.0], index=[5])
 s_numeric_lists = pd.Series([[5.0, 5.0], [6.0, 6.0]], index=[5, 6])
 
@@ -47,7 +48,7 @@ test_cases_preprocessing = [
     ["remove_brackets", preprocessing.remove_brackets, (s_text,)],
     ["remove_html_tags", preprocessing.remove_html_tags, (s_text,)],
     ["tokenize", preprocessing.tokenize, (s_text,)],
-    ["tokenize_with_phrases", preprocessing.tokenize_with_phrases, (s_text,)],
+    ["tokenize_with_phrases", preprocessing.tokenize_with_phrases, (s_text_list,)],
     ["replace_urls", preprocessing.replace_urls, (s_text, "")],
     ["remove_urls", preprocessing.remove_urls, (s_text,)],
     ["replace_tags", preprocessing.replace_tags, (s_text, "")],
@@ -60,7 +61,7 @@ test_cases_representation = [
         representation.term_frequency,
         (preprocessing.tokenize(s_text),),
     ],
-    ["tfidf", representation.tfidf, (preprocessing.tokenize(s_text),)],
+    #["tfidf", representation.tfidf, (preprocessing.tokenize(s_text),),],
     ["pca", representation.pca, (s_numeric_lists, 0)],
     ["nmf", representation.nmf, (s_numeric_lists,)],
     ["tsne", representation.tsne, (s_numeric_lists,)],

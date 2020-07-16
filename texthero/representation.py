@@ -76,14 +76,14 @@ def term_frequency(
     # TODO. Can be rewritten without sklearn.
 
     # Check if input is tokenized. Else, print warning and tokenize.
-    if not isinstance(s.iloc[0], list):
+    if not isinstance(s[~s.isna()].iloc[0], list):
         warnings.warn(_not_tokenized_warning_message, DeprecationWarning)
         s = preprocessing.tokenize(s)
 
     tf = CountVectorizer(
         max_features=max_features, tokenizer=lambda x: x, preprocessor=lambda x: x,
     )
-    s = pd.Series(tf.fit_transform(s).toarray().tolist(), index=s.index)
+    s[~s.isna()] = pd.Series(tf.fit_transform(s[~s.isna()]).toarray().tolist(), index=s[~s.isna()].index)
 
     if return_feature_names:
         return (s, tf.get_feature_names())
@@ -135,7 +135,7 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, return_feature_names=False)
     # TODO. In docstring show formula to compute TF-IDF and also avoid using sk-learn if possible.
 
     # Check if input is tokenized. Else, print warning and tokenize.
-    if not isinstance(s.iloc[0], list):
+    if not isinstance(s[~s.isna()].iloc[0], list):
         warnings.warn(_not_tokenized_warning_message, DeprecationWarning)
         s = preprocessing.tokenize(s)
 
@@ -146,7 +146,7 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, return_feature_names=False)
         tokenizer=lambda x: x,
         preprocessor=lambda x: x,
     )
-    s = pd.Series(tfidf.fit_transform(s).toarray().tolist(), index=s.index)
+    s[~s.isna()] = pd.Series(tfidf.fit_transform(s[~s.isna()]).toarray().tolist(), index=s[~s.isna()].index)
 
     if return_feature_names:
         return (s, tfidf.get_feature_names())
@@ -179,7 +179,7 @@ def pca(s, n_components=2):
  
     """
     pca = PCA(n_components=n_components)
-    return pd.Series(pca.fit_transform(list(s)).tolist(), index=s.index)
+    return pd.Series(pca.fit_transform(list(s[~s.isna()])).tolist(), index=s[~s.isna()].index)
 
 
 def nmf(s, n_components=2):
@@ -189,7 +189,7 @@ def nmf(s, n_components=2):
     
     """
     nmf = NMF(n_components=n_components, init="random", random_state=0)
-    return pd.Series(nmf.fit_transform(list(s)).tolist(), index=s.index)
+    return pd.Series(nmf.fit_transform(list(s[~s.isna()])).tolist(), index=s[~s.isna()].index)
 
 
 def tsne(
@@ -236,7 +236,7 @@ def tsne(
         angle=angle,
         n_jobs=n_jobs,
     )
-    return pd.Series(tsne.fit_transform(list(s)).tolist(), index=s.index)
+    return pd.Series(tsne.fit_transform(list(s[~s.isna()])).tolist(), index=s[~s.isna()].index)
 
 
 """
@@ -263,7 +263,7 @@ def kmeans(
 
     Return a "category" Pandas Series.
     """
-    vectors = list(s)
+    vectors = list(s[~s.isna()])
     kmeans = KMeans(
         n_clusters=n_clusters,
         init=init,
@@ -277,7 +277,7 @@ def kmeans(
         n_jobs=n_jobs,
         algorithm=algorithm,
     ).fit(vectors)
-    return pd.Series(kmeans.predict(vectors), index=s.index).astype("category")
+    return pd.Series(kmeans.predict(vectors), index=s[~s.isna()].index).astype("category")
 
 
 def dbscan(
@@ -307,8 +307,8 @@ def dbscan(
             leaf_size=leaf_size,
             p=p,
             n_jobs=n_jobs,
-        ).fit_predict(list(s)),
-        index=s.index,
+        ).fit_predict(list(s[~s.isna()])),
+        index=s[~s.isna()].index,
     ).astype("category")
 
 
@@ -337,8 +337,8 @@ def meanshift(
             cluster_all=cluster_all,
             n_jobs=n_jobs,
             max_iter=max_iter,
-        ).fit_predict(list(s)),
-        index=s.index,
+        ).fit_predict(list(s[~s.isna()])),
+        index=s[~s.isna()].index,
     ).astype("category")
 
 

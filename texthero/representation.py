@@ -73,7 +73,6 @@ def representation_series_to_flat_series(
 
     """
     s = s.unstack(fill_value=fill_missing_with)
-    # s.fillna(value=fill_nans_with, inplace=True)
 
     if index is not None:
         s = s.reindex(index, fill_value=fill_missing_with)

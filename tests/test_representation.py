@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from texthero import representation
 from texthero import preprocessing
 
@@ -96,6 +97,25 @@ class TestRepresentation(PandasTestCase):
         s_true = pd.Series([[1.0, 1.0]])
         s_true.rename_axis("document", inplace=True)
         self.assertEqual(representation.tfidf(s), s_true)
+
+    def test_tfidf_max_features(self):
+        s = pd.Series("one one two")
+        s = preprocessing.tokenize(s)
+        s_true = pd.Series([[2.0]])
+        s_true.rename_axis("document", inplace=True)
+        self.assertEqual(representation.tfidf(s, max_features=1), s_true)
+
+    def test_tfidf_min_df(self):
+        s = pd.Series([["one"], ["one", "two"]])
+        s_true = pd.Series([[1.0], [1.0]])
+        s_true.rename_axis("document", inplace=True)
+        self.assertEqual(representation.tfidf(s, min_df=2), s_true)
+
+    def test_tfidf_max_df(self):
+        s = pd.Series([["one"], ["one", "two"]])
+        s_true = pd.Series([[0.0], [1.4054651081081644]])
+        s_true.rename_axis("document", inplace=True)
+        self.assertEqual(representation.tfidf(s, max_df=1), s_true)
 
     """
     Word2Vec

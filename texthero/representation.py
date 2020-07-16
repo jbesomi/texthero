@@ -32,7 +32,7 @@ Helper
 def representation_series_to_flat_series(
     s: Union[pd.Series, pd.Series.sparse],
     index: pd.Index = None,
-    fill_nans_with: Any = np.nan,
+    fill_missing_with: Any = np.nan,
 ) -> pd.Series:
     """
     Transform a Pandas Representation Series to a "normal" (flattened) Pandas Series.
@@ -48,8 +48,11 @@ def representation_series_to_flat_series(
         The multiindexed Pandas Series to flatten.
     index : Pandas Index, optional, default to None
         The index the flattened Series should have.
-    fill_nans_with : Any, default to np.nan
-        Value to fill the NaNs (missing values) with.
+    fill_missing_with : Any, default to np.nan
+        Value to fill the NaNs (missing values) with. This _does not_ mean
+        that existing values that are np.nan are replaced, but rather that
+        features that are not present in one document but present in others
+        are filled with fill_missing_with. See example below.
 
 
     Examples
@@ -65,22 +68,25 @@ def representation_series_to_flat_series(
               Word3    NaN
     doc1      Word2    4.0
     dtype: float64
-    >>> hero.representation_series_to_flat_series(s, fill_nans_with=0.0)
+    >>> hero.representation_series_to_flat_series(s, fill_missing_with=0.0)
     document
-    doc0    [3.0, 0.0, 0.0]
+    doc0    [3.0, 0.0, nan]
     doc1    [0.0, 4.0, 0.0]
     dtype: object
 
     """
-    s = s.unstack()
+    s = s.unstack(fill_value=fill_missing_with)
+    # s.fillna(value=fill_nans_with, inplace=True)
 
-    if fill_nans_with is not np.nan:
-        s.fillna(fill_nans_with, inplace=True)
+    if index is not None:
+        s = s.reindex(index, fill_value=fill_missing_with)
+        # Reindexing makes the documents for which no values
+        # are present in the Sparse Representation Series
+        # "reappear" correctly.
 
     s = pd.Series(s.values.tolist(), index=s.index)
 
-    if index is not None:
-        s.index = index
+    s.rename_axis("document", inplace=True)
 
     return s
 
@@ -179,14 +185,22 @@ def tfidf(
 
     Finally, tf-idf(document d, term t) = tf(d, t) * idf(t).
 
+    Different from the `sklearn-implementation of tfidf <https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html>`,
+    this function does *not* normalize the output in any way,
+    so the result is exactly what you
+    get applying the formula described above.
+
     The input Series should already be tokenized. If not, it will
     be tokenized before tfidf is calculated.
+
+    If working with big pandas Series, you might want to limit
+    the number of features through the max_features parameter.
 
     Parameters
     ----------
     s : Pandas Series (tokenized)
-    max_features : int, optional, default to 300
-        Maximum number of features to keep.
+    max_features : int, optional, default to None.
+        If not None, only the max_features most frequent tokens are used.
     min_df : int, optional, default to 1.
         When building the vocabulary, ignore terms that have a document 
         frequency (number of documents a term appears in) strictly lower than the given threshold.
@@ -220,7 +234,6 @@ def tfidf(
         max_features=max_features,
         min_df=min_df,
         max_df=max_df,
-        lowercase=False,
         tokenizer=lambda x: x,
         preprocessor=lambda x: x,
         norm=None,  # Disable l1/l2 normalization.
@@ -241,7 +254,9 @@ def tfidf(
 
     # NOTE: Currently: still convert to flat series instead of representation series.
     # Will change to return representation series directly in Version 2.
-    s_out = representation_series_to_flat_series(s_out, fill_nans_with=0.0)
+    s_out = representation_series_to_flat_series(
+        s_out, fill_missing_with=0.0, index=s.index
+    )
 
     if return_feature_names:
         return s_out, feature_names

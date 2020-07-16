@@ -260,6 +260,8 @@ def kmeans(
 ):
     """
     Perform K-means clustering algorithm.
+
+    Return a "category" Pandas Series.
     """
     vectors = list(s)
     kmeans = KMeans(
@@ -275,7 +277,7 @@ def kmeans(
         n_jobs=n_jobs,
         algorithm=algorithm,
     ).fit(vectors)
-    return pd.Series(kmeans.predict(vectors), index=s.index)
+    return pd.Series(kmeans.predict(vectors), index=s.index).astype("category")
 
 
 def dbscan(
@@ -291,6 +293,8 @@ def dbscan(
 ):
     """
     Perform DBSCAN clustering.
+
+    Return a "category" Pandas Series.
     """
 
     return pd.Series(
@@ -305,7 +309,7 @@ def dbscan(
             n_jobs=n_jobs,
         ).fit_predict(list(s)),
         index=s.index,
-    )
+    ).astype("category")
 
 
 def meanshift(
@@ -320,6 +324,8 @@ def meanshift(
 ):
     """
     Perform mean shift clustering.
+
+    Return a "category" Pandas Series.
     """
 
     return pd.Series(
@@ -333,7 +339,7 @@ def meanshift(
             max_iter=max_iter,
         ).fit_predict(list(s)),
         index=s.index,
-    )
+    ).astype("category")
 
 
 """

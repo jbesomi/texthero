@@ -135,72 +135,50 @@ def count_sentences(s: pd.Series) -> pd.Series:
     return pd.Series(number_of_sentences, index=s.index)
 
 
-def _Language_to_dict(lang: Language):
+def _Language_to_tuple(lang: Language):
     return (str(lang.lang), "%.5f" % float(lang.prob))
 
 
-def _detect_language_list(spaCy_object):
+def _detect_language_probability(s):
     """
-    gured out appling detect_langs function on spacy_object
-    :param spacy_object
+    gured out appling detect_langs function on sentence
+    :param s
     """
     try:
-        detected_language = list(
-            map(_Language_to_dict, detect_langs(spaCy_object.text))
-        )
+        detected_language = list(map(_Language_to_tuple, detect_langs(s)))
         return detected_language
     except LangDetectException:
         return ("UNKNOWN", 0.0)
 
 
-def _detect_language(spaCy_object):
+def _detect_language(s):
     """
-    gured out appling detect_langs function on spacy_object
-    :param spacy_object
+    gured out appling detect_langs function on sentence
+    :param s
     """
     try:
-        detected_language = _Language_to_dict(detect_langs(spaCy_object.text)[0])
+        detected_language = str(detect_langs(s)[0].lang)
         return detected_language
     except LangDetectException:
-        return ("UNKNOWN", 0.0)
+        return "UNKNOWN"
 
 
-def _infer_lang_ret_list(s, nlp, infer_languages):
-    nlp.add_pipe(
-        LanguageDetector(_detect_language_list), name="language_detector", last=True
-    )
-    for doc in nlp.pipe(s.values, batch_size=32):
-        infer_languages.append(doc._.language)
-
-    return pd.Series(infer_languages, index=s.index)
-
-
-def _infer_lang(s, nlp, infer_languages):
-    nlp.add_pipe(
-        LanguageDetector(_detect_language), name="language_detector", last=True
-    )
-    for doc in nlp.pipe(s.values, batch_size=32):
-        infer_languages.append(doc._.language)
-
-    return pd.Series(infer_languages, index=s.index)
-
-
-def infer_lang(s, ret_list=False):
+def infer_lang(s, probability=False):
     """
     Return languages and their probabilities.
 
-    Return a Pandas Series where each row contains a tuple that has information regarding to the "average" infer language.
+    Return a Pandas Series where each row contains a ISO nomenclature of the "average" infer language.
+
+    If probability = True then each row contains a list of tuples
 
     Tuple : (language, probability)
-
-    If ret_list = True then each row contains a list of tuples
 
     Note: infer_lang is nondeterministic function
 
     Parameters
     ----------
     s : Pandas Series
-    ret_list (optional) : boolean
+    probability (optional) : boolean
 
     supports 55 languages out of the box (ISO 639-1 codes)
     ------------------------------------------------------
@@ -214,15 +192,12 @@ def infer_lang(s, ret_list=False):
     >>> import pandas as pd
     >>> s = pd.Series("This is an English text!.")
     >>> hero.infer_lang(s)
-    0    (en, 1.00000)
+    0    en
     dtype: object
 
     """
 
-    infer_languages = []
-    nlp = spacy.load("en_core_web_sm")
-
-    if ret_list:
-        return _infer_lang_ret_list(s, nlp, infer_languages)
+    if probability:
+        return s.apply(_detect_language_probability)
     else:
-        return _infer_lang(s, nlp, infer_languages)
+        return s.apply(_detect_language)

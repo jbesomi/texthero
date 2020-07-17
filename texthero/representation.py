@@ -202,9 +202,9 @@ def term_frequency(
         max_features=max_features, lowercase=False, token_pattern="\S+"
     )
 
-    series = np.asarray(tf.fit_transform(s).sum(axis=0))
-
-    s = pd.Series(series.tolist(), index=[0])
+    cv_fit_transform = tf.fit_transform(s).toarray()
+    total_count = np.sum(cv_fit_transform)
+    s = pd.Series(np.divide(cv_fit_transform, total_count).tolist(), index=s.index)
 
     if return_feature_names:
         return (s, tf.get_feature_names())
@@ -212,7 +212,7 @@ def term_frequency(
         return s
 
 
-def tfidf(s: pd.Series, max_features=None, min_df=1, return_feature_names=False):
+def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=300, return_feature_names=False):
     """
     Represent a text-based Pandas Series using TF-IDF.
 

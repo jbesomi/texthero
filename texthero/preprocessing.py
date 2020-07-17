@@ -615,10 +615,10 @@ def tokenize(s: pd.Series) -> pd.Series:
     return s.str.replace(pattern, r"\2 \3 \4 \5").str.split()
 
 
-def tokenize_with_phrases(s: pd.Series, min_count: int = 5, threshold: int = 10):
-    r"""Tokenize and group up collocations words
+def phrases(s: pd.Series, min_count: int = 5, threshold: int = 10, symbol: str = "_"):
+    r"""Group up collocations words
 
-    Tokenize the given pandas Series and group up bigrams where each tokens has at least min_count term frequrncy and where the threshold is larger than the underline formula.
+    Given a pandas Series of tokenized strings, group together bigrams where each tokens has at least min_count term frequrncy and where the threshold is larger than the underline formula.
 
     :math:`\frac{(bigram\_a\_b\_count - min\_count)* len\_vocab }{ (word\_a\_count * word\_b\_count)}`.
 
@@ -630,13 +630,15 @@ def tokenize_with_phrases(s: pd.Series, min_count: int = 5, threshold: int = 10)
             ignore tokens with frequency less than this
         threshold : Int, optional. Default is 10.
             ignore tokens with a score under that threshold
+        symbol : Str, optional. Default is '_'.
+            character used to join collocation words
 
     Examples
     --------
     >>> import pandas as pd
     >>> import texthero as hero
-    >>> s = pd.Series(["New York is a beautiful city", "Look: New York!"])
-    >>> hero.tokenize_with_phrases(s, min_count=1, threshold=1)
+    >>> s = pd.Series([['New', 'York', 'is', 'a', 'beautiful', 'city'], ['Look', ':', 'New', 'York', '!']])
+    >>> hero.phrases(s, min_count=1, threshold=1)
     0    [New_York, is, a, beautiful, city]
     1                [Look, :, New_York, !]
     dtype: object
@@ -648,11 +650,13 @@ def tokenize_with_phrases(s: pd.Series, min_count: int = 5, threshold: int = 10)
 
     """
 
-    if type(s.iloc[0]) != str:
+    if not isinstance(s.iloc[0], list) or not isinstance(s.iloc[0][0], str):
         raise ValueError("Input series should be a list of string.")
 
-    s = tokenize(s)
-    phrases = PhrasesTransformer(min_count=min_count, threshold=threshold)
+    delimiter = symbol.encode("utf-8")
+    phrases = PhrasesTransformer(
+        min_count=min_count, threshold=threshold, delimiter=delimiter
+    )
     return pd.Series(phrases.fit_transform(s.values), index=s.index)
 
 

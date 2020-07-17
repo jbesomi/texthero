@@ -9,6 +9,7 @@ from parameterized import parameterized
 
 # Define valid inputs for different functions.
 s_text = pd.Series(["Test"], index=[5])
+s_tokenized_lists = pd.Series([["Test", "Test2"], ["Test3"]], index=[5, 6])
 s_numeric = pd.Series([5.0], index=[5])
 s_numeric_lists = pd.Series([[5.0, 5.0], [6.0, 6.0]], index=[5, 6])
 
@@ -47,11 +48,14 @@ test_cases_preprocessing = [
     ["remove_brackets", preprocessing.remove_brackets, (s_text,)],
     ["remove_html_tags", preprocessing.remove_html_tags, (s_text,)],
     ["tokenize", preprocessing.tokenize, (s_text,)],
-    ["tokenize_with_phrases", preprocessing.tokenize_with_phrases, (s_text,)],
     ["replace_urls", preprocessing.replace_urls, (s_text, "")],
     ["remove_urls", preprocessing.remove_urls, (s_text,)],
     ["replace_tags", preprocessing.replace_tags, (s_text, "")],
     ["remove_tags", preprocessing.remove_tags, (s_text,)],
+]
+
+test_cases_preprocessing_phrases = [
+    ["phrases", preprocessing.phrases, (s_tokenized_lists,)]
 ]
 
 test_cases_representation = [
@@ -74,6 +78,7 @@ test_cases_visualization = []
 test_cases = (
     test_cases_nlp
     + test_cases_preprocessing
+    + test_cases_preprocessing_phrases
     + test_cases_representation
     + test_cases_visualization
 )

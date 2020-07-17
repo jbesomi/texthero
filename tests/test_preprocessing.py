@@ -238,26 +238,28 @@ class TestPreprocessing(PandasTestCase):
         self.assertEqual(preprocessing.remove_brackets(s), s_true)
 
     """
-    Test tokenize_with_phrases
+    Test phrases
     """
 
-    def test_tokenize_with_phrases(self):
+    def test_phrases(self):
         s = pd.Series(
-            [
-                "New York is a beautiful city",
-                "Look: New York!",
-                "Very beautiful city New York",
-            ]
-        )
-        s_true = pd.Series(
             [
                 ["New", "York", "is", "a", "beautiful", "city"],
                 ["Look", ":", "New", "York", "!"],
                 ["Very", "beautiful", "city", "New", "York"],
             ]
         )
+
+        s_true = pd.Series(
+            [
+                ["New->York", "is", "a", "beautiful", "city"],
+                ["Look", ":", "New->York", "!"],
+                ["Very", "beautiful", "city", "New->York"],
+            ]
+        )
+
         self.assertEqual(
-            preprocessing.tokenize_with_phrases(s, min_count=3, threshold=1), s_true
+            preprocessing.phrases(s, min_count=2, threshold=1, symbol="->"), s_true
         )
 
     """

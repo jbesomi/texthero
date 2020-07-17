@@ -182,7 +182,8 @@ def term_frequency(
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"])
     >>> hero.term_frequency(s)
-    0    [2, 1, 1]
+    0    [0.25, 0.25, 0.0]
+    1    [0.25, 0.0, 0.25]
     dtype: object
     
     To return the features_names:
@@ -191,7 +192,8 @@ def term_frequency(
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"])
     >>> hero.term_frequency(s, return_feature_names=True)
-    (0    [2, 1, 1]
+    (0    [0.25, 0.25, 0.0]
+    1    [0.25, 0.0, 0.25]
     dtype: object, ['Sentence', 'one', 'two'])
 
     """

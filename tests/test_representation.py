@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from texthero import representation
 from texthero import preprocessing
 
@@ -7,6 +8,7 @@ from . import PandasTestCase
 import doctest
 import unittest
 import string
+import math
 import warnings
 
 """
@@ -63,15 +65,37 @@ class TestRepresentation(PandasTestCase):
     TF-IDF
     """
 
-    def test_idf_single_document(self):
-        s = pd.Series("a")
+    def test_tfidf_formula(self):
+        s = pd.Series(["Hi Bye", "Test Bye Bye"])
         s = preprocessing.tokenize(s)
-        s_true = pd.Series([[1]])
+        s_true = pd.Series(
+            [
+                [
+                    1.0 * (math.log(3 / 3) + 1),
+                    1.0 * (math.log(3 / 2) + 1),
+                    0.0 * (math.log(3 / 2) + 1),
+                ],
+                [
+                    2.0 * (math.log(3 / 3) + 1),
+                    0.0 * (math.log(3 / 2) + 1),
+                    1.0 * (math.log(3 / 2) + 1),
+                ],
+            ]
+        )
+        s_true.rename_axis("document", inplace=True)
         self.assertEqual(representation.tfidf(s), s_true)
 
-    def test_idf_not_tokenized_yet(self):
+    def test_tfidf_single_document(self):
+        s = pd.Series("a", index=["yo"])
+        s = preprocessing.tokenize(s)
+        s_true = pd.Series([[1]], index=["yo"])
+        s_true.rename_axis("document", inplace=True)
+        self.assertEqual(representation.tfidf(s), s_true)
+
+    def test_tfidf_not_tokenized_yet(self):
         s = pd.Series("a")
         s_true = pd.Series([[1]])
+        s_true.rename_axis("document", inplace=True)
 
         with warnings.catch_warnings():  # avoid print warning
             warnings.simplefilter("ignore")
@@ -80,10 +104,28 @@ class TestRepresentation(PandasTestCase):
         with self.assertWarns(DeprecationWarning):  # check raise warning
             representation.tfidf(s)
 
-    def test_idf_single_not_lowercase(self):
-        tfidf_single_smooth = 0.7071067811865475  # TODO
-
+    def test_tfidf_single_not_lowercase(self):
         s = pd.Series("ONE one")
         s = preprocessing.tokenize(s)
-        s_true = pd.Series([[tfidf_single_smooth, tfidf_single_smooth]])
+        s_true = pd.Series([[1.0, 1.0]])
+        s_true.rename_axis("document", inplace=True)
         self.assertEqual(representation.tfidf(s), s_true)
+
+    def test_tfidf_max_features(self):
+        s = pd.Series("one one two")
+        s = preprocessing.tokenize(s)
+        s_true = pd.Series([[2.0]])
+        s_true.rename_axis("document", inplace=True)
+        self.assertEqual(representation.tfidf(s, max_features=1), s_true)
+
+    def test_tfidf_min_df(self):
+        s = pd.Series([["one"], ["one", "two"]])
+        s_true = pd.Series([[1.0], [1.0]])
+        s_true.rename_axis("document", inplace=True)
+        self.assertEqual(representation.tfidf(s, min_df=2), s_true)
+
+    def test_tfidf_max_df(self):
+        s = pd.Series([["one"], ["one", "two"]])
+        s_true = pd.Series([[0.0], [1.4054651081081644]])
+        s_true.rename_axis("document", inplace=True)
+        self.assertEqual(representation.tfidf(s, max_df=1), s_true)

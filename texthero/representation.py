@@ -3,14 +3,16 @@ Map words into vectors using different algorithms such as TF-IDF, word2vec or Gl
 """
 
 import pandas as pd
+import numpy as np
 
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA, NMF
 from sklearn.cluster import KMeans, DBSCAN, MeanShift
 from sklearn.metrics.pairwise import cosine_similarity
+from scipy.sparse import coo_matrix
 
-from typing import Optional
+from typing import Optional, Union, Any
 
 from texthero import preprocessing
 
@@ -18,6 +20,72 @@ import logging
 import warnings
 
 # from texthero import pandas_ as pd_
+
+"""
+Helper
+"""
+
+
+def representation_series_to_flat_series(
+    s: Union[pd.Series, pd.Series.sparse],
+    index: pd.Index = None,
+    fill_missing_with: Any = np.nan,
+) -> pd.Series:
+    """
+    Transform a Pandas Representation Series to a "normal" (flattened) Pandas Series.
+
+    The given Series should have a multiindex with first level being the document
+    and second level being individual features of that document (e.g. tdidf scores per word).
+    The flattened Series has one cell per document, with the cell being a list of all
+    the individual features of that document.
+
+    Parameters
+    ----------
+    s : Sparse Pandas Series or Pandas Series
+        The multiindexed Pandas Series to flatten.
+    index : Pandas Index, optional, default to None
+        The index the flattened Series should have.
+    fill_missing_with : Any, default to np.nan
+        Value to fill the NaNs (missing values) with. This _does not_ mean
+        that existing values that are np.nan are replaced, but rather that
+        features that are not present in one document but present in others
+        are filled with fill_missing_with. See example below.
+
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> index = pd.MultiIndex.from_tuples([("doc0", "Word1"), ("doc0", "Word3"), ("doc1", "Word2")], names=['document', 'word'])
+    >>> s = pd.Series([3, np.nan, 4], index=index)
+    >>> s
+    document  word 
+    doc0      Word1    3.0
+              Word3    NaN
+    doc1      Word2    4.0
+    dtype: float64
+    >>> hero.representation_series_to_flat_series(s, fill_missing_with=0.0)
+    document
+    doc0    [3.0, 0.0, nan]
+    doc1    [0.0, 4.0, 0.0]
+    dtype: object
+
+    """
+    s = s.unstack(fill_value=fill_missing_with)
+
+    if index is not None:
+        s = s.reindex(index, fill_value=fill_missing_with)
+        # Reindexing makes the documents for which no values
+        # are present in the Sparse Representation Series
+        # "reappear" correctly.
+
+    s = pd.Series(s.values.tolist(), index=s.index)
+
+    s.rename_axis("document", inplace=True)
+
+    return s
+
 
 # Warning message for not-tokenized inputs
 _not_tokenized_warning_message = (
@@ -91,48 +159,63 @@ def term_frequency(
         return s
 
 
-def tfidf(s: pd.Series, max_features=None, min_df=1, return_feature_names=False):
+def tfidf(
+    s: pd.Series, max_features=None, min_df=1, max_df=1.0, return_feature_names=False
+) -> pd.Series.sparse:
     """
     Represent a text-based Pandas Series using TF-IDF.
+
+    *Term Frequency - Inverse Document Frequency (TF-IDF)* is a formula to
+    calculate the _relative importance_ of the words in a document, taking
+    into account the words' occurences in other documents. It consists of two parts:
+
+    The *term frequency (tf)* tells us how frequently a term is present in a document,
+    so tf(document d, term t) = number of times t appears in d.
+
+    The *inverse document frequency (idf)* measures how _important_ or _characteristic_
+    a term is among the whole corpus (i.e. among all documents).
+    Thus, idf(term t) = log((1 + number of documents) / (1 + number of documents where t is present)) + 1.
+
+    Finally, tf-idf(document d, term t) = tf(d, t) * idf(t).
+
+    Different from the `sklearn-implementation of tfidf <https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html>`,
+    this function does *not* normalize the output in any way,
+    so the result is exactly what you
+    get applying the formula described above.
 
     The input Series should already be tokenized. If not, it will
     be tokenized before tfidf is calculated.
 
+    If working with big pandas Series, you might want to limit
+    the number of features through the max_features parameter.
+
     Parameters
     ----------
-    s : Pandas Series
-    max_features : int, optional
-        Maximum number of features to keep.
-    min_df : int, optional. Default to 1.
-        When building the vocabulary ignore terms that have a document frequency strictly lower than the given threshold.
-    return_features_names : Boolean. Default to False.
-        If True, return a tuple (*tfidf_series*, *features_names*)
+    s : Pandas Series (tokenized)
+    max_features : int, optional, default to None.
+        If not None, only the max_features most frequent tokens are used.
+    min_df : int, optional, default to 1.
+        When building the vocabulary, ignore terms that have a document 
+        frequency (number of documents a term appears in) strictly lower than the given threshold.
+    max_df : int or double, optional, default to 1.0
+        When building the vocabulary, ignore terms that have a document
+        frequency (number of documents a term appears in) strictly higher than the given threshold. This arguments basically permits to remove corpus-specific stop words. When the argument is a float [0.0, 1.0], the parameter represents a proportion of documents.
+    return_feature_names: Boolean, optional, default to False
+        Whether to return the feature (i.e. word) names with the output.
 
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Sentence one", "Sentence two"])
-    >>> s = hero.tokenize(s)
-    >>> hero.tfidf(s)
-    0    [0.5797386715376657, 0.8148024746671689, 0.0]
-    1    [0.5797386715376657, 0.0, 0.8148024746671689]
-    dtype: object
-    
-    To return the *feature_names*:
-    
-    >>> import texthero as hero
-    >>> import pandas as pd
-    >>> s = pd.Series(["Sentence one", "Sentence two"])
+    >>> s = pd.Series(["Hi Bye", "Test Bye Bye"])
     >>> s = hero.tokenize(s)
     >>> hero.tfidf(s, return_feature_names=True)
-    (0    [0.5797386715376657, 0.8148024746671689, 0.0]
-    1    [0.5797386715376657, 0.0, 0.8148024746671689]
-    dtype: object, ['Sentence', 'one', 'two'])
+    (document
+    0    [1.0, 1.4054651081081644, 0.0]
+    1    [2.0, 0.0, 1.4054651081081644]
+    dtype: object, ['Bye', 'Hi', 'Test'])
     """
-
-    # TODO. In docstring show formula to compute TF-IDF and also avoid using sk-learn if possible.
 
     # Check if input is tokenized. Else, print warning and tokenize.
     if not isinstance(s[~s.isna()].iloc[0], list):
@@ -143,15 +226,35 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, return_feature_names=False)
         use_idf=True,
         max_features=max_features,
         min_df=min_df,
+        max_df=max_df,
         tokenizer=lambda x: x,
         preprocessor=lambda x: x,
+        norm=None,  # Disable l1/l2 normalization.
     )
-    s[~s.isna()] = pd.Series(tfidf.fit_transform(s[~s.isna()]).toarray().tolist(), index=s[~s.isna()].index)
+
+    tfidf_vectors_csr = tfidf.fit_transform(s)
+
+    # Result from sklearn is in Compressed Sparse Row format.
+    # Pandas Sparse Series can only be initialized from Coordinate format.
+    tfidf_vectors_coo = coo_matrix(tfidf_vectors_csr)
+    s_out = pd.Series.sparse.from_coo(tfidf_vectors_coo)
+
+    # Map word index to word name and keep original index of documents.
+    feature_names = tfidf.get_feature_names()
+    s_out.index = s_out.index.map(lambda x: (s.index[x[0]], feature_names[x[1]]))
+
+    s_out.rename_axis(["document", "word"], inplace=True)
+
+    # NOTE: Currently: still convert to flat series instead of representation series.
+    # Will change to return representation series directly in Version 2.
+    s_out = representation_series_to_flat_series(
+        s_out, fill_missing_with=0.0, index=s.index
+    )
 
     if return_feature_names:
-        return (s, tfidf.get_feature_names())
+        return s_out, feature_names
     else:
-        return s
+        return s_out
 
 
 """

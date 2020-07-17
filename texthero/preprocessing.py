@@ -106,49 +106,92 @@ def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
     return replace_digits(input, " ", only_blocks)
 
 
-def replace_punctuation(input: pd.Series, symbol: str = " ") -> pd.Series:
+def replace_punctuation(
+    input: pd.Series, symbol: str = " ", keep_tokens: bool = False
+) -> pd.Series:
     """
     Replace all punctuation with a given symbol.
 
     `replace_punctuation` replace all punctuation from the given Pandas Series and replace it with a custom symbol. It consider as punctuation characters all :data:`string.punctuation` symbols `!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~).`
 
+    Punctuation within tokens can be preserved by setting `keep_tokens=True`.
+
     Parameters
     ----------
     input : Pandas Series
     symbol : str (default single empty space)
-        Symbol to use as replacement for all string punctuation. 
+        Symbol to use as replacement for all string punctuation.
+    keep_tokens : bool (default False)
+        Flag denoting whether preserve punctuation within tokens. 
 
     Examples
     --------
+    
+    Replace all punctuation:
+    
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series("Finnaly.")
     >>> hero.replace_punctuation(s, " <PUNCT> ")
     0    Finnaly <PUNCT> 
     dtype: object
+    
+    Preserve in token punctuation:
+    
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("spider-man is powerful, isn't he?")
+    >>> hero.replace_punctuation(s, " <PUNCT> ", keep_tokens=True)
+    0    spider-man is powerful <PUNCT>  isn't he <PUNCT> 
+    dtype: object
     """
+
+    if keep_tokens:
+        pattern = rf"((\b)([{string.punctuation}])+(?:\B|$)|(?:^|\B)([{string.punctuation}])(\B))"
+        return input.str.replace(pattern, symbol)
 
     return input.str.replace(rf"([{string.punctuation}])+", symbol)
 
 
-def remove_punctuation(input: pd.Series) -> pd.Series:
+def remove_punctuation(input: pd.Series, keep_tokens: bool = False) -> pd.Series:
     """
     Replace all punctuation with a single space (" ").
 
     `remove_punctuation` removes all punctuation from the given Pandas Series and replace it with a single space. It consider as punctuation characters all :data:`string.punctuation` symbols `!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~).`
 
+    Punctuation within tokens can be preserved by setting `keep_tokens=True`.
+
     See also :meth:`replace_punctuation` to replace punctuation with a custom symbol.
+
+    Parameters
+    ----------
+    input : Pandas Series
+    keep_tokens : bool (default False)
+        Flag denoting whether preserve punctuation within tokens.
 
     Examples
     --------
+    
+    Remove all punctuation:
+    
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series("Finnaly.")
     >>> hero.remove_punctuation(s)
     0    Finnaly 
     dtype: object
+    
+    Preserve in token punctuation:
+    
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("spider-man is powerful, isn't?")
+    >>> hero.remove_punctuation(s, keep_tokens=True)
+    0    spider-man is powerful  isn't 
+    dtype: object
     """
-    return replace_punctuation(input, " ")
+
+    return replace_punctuation(input, " ", keep_tokens)
 
 
 def _remove_diacritics(text: str) -> str:

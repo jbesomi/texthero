@@ -4,7 +4,6 @@ Common NLP tasks such as named_entities, noun_chunks, etc.
 
 import spacy
 import pandas as pd
-from spacy_langdetect import LanguageDetector
 from langdetect import detect_langs
 from langdetect.lang_detect_exception import LangDetectException
 from langdetect.language import Language

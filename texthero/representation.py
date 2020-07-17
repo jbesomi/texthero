@@ -15,6 +15,7 @@ from scipy.sparse import coo_matrix
 from typing import Optional, Union, Any
 
 from texthero import preprocessing
+from texthero._helper import handle_nans
 
 import logging
 import warnings
@@ -100,6 +101,7 @@ Vectorization
 """
 
 
+@handle_nans
 def term_frequency(
     s: pd.Series, max_features: Optional[int] = None, return_feature_names=False
 ):
@@ -144,14 +146,14 @@ def term_frequency(
     # TODO. Can be rewritten without sklearn.
 
     # Check if input is tokenized. Else, print warning and tokenize.
-    if not isinstance(s[~s.isna()].iloc[0], list):
+    if not isinstance(s.iloc[0], list):
         warnings.warn(_not_tokenized_warning_message, DeprecationWarning)
         s = preprocessing.tokenize(s)
 
     tf = CountVectorizer(
         max_features=max_features, tokenizer=lambda x: x, preprocessor=lambda x: x,
     )
-    s[~s.isna()] = pd.Series(tf.fit_transform(s[~s.isna()]).toarray().tolist(), index=s[~s.isna()].index)
+    s = pd.Series(tf.fit_transform(s).toarray().tolist(), index=s.index)
 
     if return_feature_names:
         return (s, tf.get_feature_names())
@@ -159,6 +161,7 @@ def term_frequency(
         return s
 
 
+@handle_nans
 def tfidf(
     s: pd.Series, max_features=None, min_df=1, max_df=1.0, return_feature_names=False
 ) -> pd.Series.sparse:
@@ -218,7 +221,7 @@ def tfidf(
     """
 
     # Check if input is tokenized. Else, print warning and tokenize.
-    if not isinstance(s[~s.isna()].iloc[0], list):
+    if not isinstance(s.iloc[0], list):
         warnings.warn(_not_tokenized_warning_message, DeprecationWarning)
         s = preprocessing.tokenize(s)
 
@@ -262,6 +265,7 @@ Dimensionality reduction
 """
 
 
+@handle_nans
 def pca(s, n_components=2):
     """
     Perform principal component analysis on the given Pandas Series.
@@ -282,9 +286,10 @@ def pca(s, n_components=2):
  
     """
     pca = PCA(n_components=n_components)
-    return pd.Series(pca.fit_transform(list(s[~s.isna()])).tolist(), index=s[~s.isna()].index)
+    return pd.Series(pca.fit_transform(list(s)).tolist(), index=s.index)
 
 
+@handle_nans
 def nmf(s, n_components=2):
     """
     Perform non-negative matrix factorization.
@@ -292,9 +297,10 @@ def nmf(s, n_components=2):
     
     """
     nmf = NMF(n_components=n_components, init="random", random_state=0)
-    return pd.Series(nmf.fit_transform(list(s[~s.isna()])).tolist(), index=s[~s.isna()].index)
+    return pd.Series(nmf.fit_transform(list(s)).tolist(), index=s.index)
 
 
+@handle_nans
 def tsne(
     s: pd.Series,
     n_components=2,
@@ -339,7 +345,7 @@ def tsne(
         angle=angle,
         n_jobs=n_jobs,
     )
-    return pd.Series(tsne.fit_transform(list(s[~s.isna()])).tolist(), index=s[~s.isna()].index)
+    return pd.Series(tsne.fit_transform(list(s)).tolist(), index=s.index)
 
 
 """
@@ -347,6 +353,7 @@ Clustering
 """
 
 
+@handle_nans
 def kmeans(
     s: pd.Series,
     n_clusters=5,
@@ -366,7 +373,7 @@ def kmeans(
 
     Return a "category" Pandas Series.
     """
-    vectors = list(s[~s.isna()])
+    vectors = list(s)
     kmeans = KMeans(
         n_clusters=n_clusters,
         init=init,
@@ -380,9 +387,10 @@ def kmeans(
         n_jobs=n_jobs,
         algorithm=algorithm,
     ).fit(vectors)
-    return pd.Series(kmeans.predict(vectors), index=s[~s.isna()].index).astype("category")
+    return pd.Series(kmeans.predict(vectors), index=s.index).astype("category")
 
 
+@handle_nans
 def dbscan(
     s,
     eps=0.5,
@@ -410,11 +418,12 @@ def dbscan(
             leaf_size=leaf_size,
             p=p,
             n_jobs=n_jobs,
-        ).fit_predict(list(s[~s.isna()])),
-        index=s[~s.isna()].index,
+        ).fit_predict(list(s)),
+        index=s.index,
     ).astype("category")
 
 
+@handle_nans
 def meanshift(
     s,
     bandwidth=None,
@@ -440,8 +449,8 @@ def meanshift(
             cluster_all=cluster_all,
             n_jobs=n_jobs,
             max_iter=max_iter,
-        ).fit_predict(list(s[~s.isna()])),
-        index=s[~s.isna()].index,
+        ).fit_predict(list(s)),
+        index=s.index,
     ).astype("category")
 
 

@@ -9,7 +9,7 @@ from parameterized import parameterized
 
 # Define valid inputs for different functions.
 s_nan = pd.Series([np.NaN, "test"])
-s_numeric_and_nan_lists = pd.Series([[5.0, np.NaN], [6.0, 6.0]])
+s_numeric_and_nan_lists = pd.Series([[5.0, 5.0], [6.0, 6.0], np.nan])
 
 # Define all test cases. Every test case is a list
 # of [name of test case, function to test, tuple of valid input for the function].
@@ -27,7 +27,6 @@ test_cases_nlp = [
 ]
 
 test_cases_preprocessing = [
-    ["fillna", preprocessing.fillna, (s_nan,)],
     ["lowercase", preprocessing.lowercase, (s_nan,)],
     ["replace_digits", preprocessing.replace_digits, (s_nan, "")],
     ["remove_digits", preprocessing.remove_digits, (s_nan,)],
@@ -38,7 +37,6 @@ test_cases_preprocessing = [
     ["replace_stopwords", preprocessing.replace_stopwords, (s_nan, "")],
     ["remove_stopwords", preprocessing.remove_stopwords, (s_nan,)],
     ["stem", preprocessing.stem, (s_nan,)],
-    ["clean", preprocessing.clean, (s_nan,)],
     ["remove_round_brackets", preprocessing.remove_round_brackets, (s_nan,)],
     ["remove_curly_brackets", preprocessing.remove_curly_brackets, (s_nan,)],
     ["remove_square_brackets", preprocessing.remove_square_brackets, (s_nan,)],
@@ -59,7 +57,7 @@ test_cases_representation = [
         representation.term_frequency,
         (preprocessing.tokenize(s_nan),),
     ],
-    #["tfidf", representation.tfidf, (preprocessing.tokenize(s_nan),)],
+    # ["tfidf", representation.tfidf, (preprocessing.tokenize(s_nan),)],
     ["pca", representation.pca, (s_numeric_and_nan_lists, 0)],
     ["nmf", representation.nmf, (s_numeric_and_nan_lists,)],
     ["tsne", representation.tsne, (s_numeric_and_nan_lists,)],

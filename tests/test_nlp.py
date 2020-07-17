@@ -44,15 +44,11 @@ class TestNLP(PandasTestCase):
 
     def test_count_sentences(self):
         s = pd.Series("I think ... it counts correctly. Doesn't it? Great!")
-        s_true = pd.Series(3)
+        s_true = pd.Series(3, dtype=object)
         self.assertEqual(nlp.count_sentences(s), s_true)
 
     def test_count_sentences_numeric(self):
         s = pd.Series([13.0, 42.0])
-        self.assertRaises(TypeError, nlp.count_sentences, s)
-
-    def test_count_sentences_missing_value(self):
-        s = pd.Series(["Test.", np.nan])
         self.assertRaises(TypeError, nlp.count_sentences, s)
 
     def test_count_sentences_index(self):

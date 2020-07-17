@@ -5,7 +5,10 @@ Common NLP tasks such as named_entities, noun_chunks, etc.
 import spacy
 import pandas as pd
 
+from texthero._helper import handle_nans
 
+
+@handle_nans
 def named_entities(s, package="spacy"):
     """
     Return named-entities.
@@ -57,6 +60,7 @@ def named_entities(s, package="spacy"):
     return pd.Series(entities, index=s.index)
 
 
+@handle_nans
 def noun_chunks(s):
     """
     Return noun chunks (noun phrases).
@@ -101,6 +105,7 @@ def noun_chunks(s):
     return pd.Series(noun_chunks, index=s.index)
 
 
+@handle_nans
 def count_sentences(s: pd.Series) -> pd.Series:
     """
     Count the number of sentences per cell in a Pandas Series.
@@ -117,7 +122,7 @@ def count_sentences(s: pd.Series) -> pd.Series:
     >>> hero.count_sentences(s)
     0    2
     1    3
-    dtype: int64
+    dtype: object
     """
     number_of_sentences = []
 

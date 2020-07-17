@@ -50,13 +50,13 @@ class TestRepresentation(PandasTestCase):
         s_true = pd.Series([[1, 1]])
         self.assertEqual(representation.count(s), s_true)
 
-    def test_term_frequency_not_tokenized_yet(self):
+    def test_count_not_tokenized_yet(self):
         s = pd.Series("a b c c")
         s_true = pd.Series([[1, 1, 2]])
 
         with warnings.catch_warnings():  # avoid print warning
             warnings.simplefilter("ignore")
-            self.assertEqual(representation.term_frequency(s), s_true)
+            self.assertEqual(representation.count(s), s_true)
 
         with self.assertWarns(DeprecationWarning):  # check raise warning
             representation.term_frequency(s)

@@ -151,8 +151,9 @@ def term_frequency(
         s = preprocessing.tokenize(s)
 
     tf = CountVectorizer(
-        max_features=max_features, tokenizer=lambda x: x, preprocessor=lambda x: x,
+        max_features=max_features, tokenizer=lambda x: x, preprocessor=lambda x: x
     )
+
     s = pd.Series(tf.fit_transform(s).toarray().tolist(), index=s.index)
 
     if return_feature_names:

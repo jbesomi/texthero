@@ -57,13 +57,16 @@ def handle_nans(wrapped=None, input_only=False):
         # Get first input argument (the series).
         s = args[0]
         nan_mask = ~s.isna()
-
         # Need a copy as changing s[nan_mask] would change the original input.
         s_result = s.copy()
-        s_without_nans = s[nan_mask]
+        s_result_without_nans = s_result[nan_mask]
 
         # Change input Series so the function will only work on the non-nan fields.
-        args = (s_without_nans,) + args[1:] if args[1:] else (s_without_nans,)
+        args = (
+            (s_result_without_nans,) + args[1:]
+            if args[1:]
+            else (s_result_without_nans,)
+        )
 
         # Execute the function and get the result.
         output = wrapped(*args, **kwargs)

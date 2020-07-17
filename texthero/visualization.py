@@ -54,7 +54,6 @@ Wordcloud
 """
 
 
-@handle_nans(input_only=True)
 def wordcloud(
     s: pd.Series,
     font_path: str = None,
@@ -160,7 +159,6 @@ def wordcloud(
         return fig
 
 
-@handle_nans(input_only=True)
 def top_words(s: pd.Series, normalize=False) -> pd.Series:
     r"""
     Return a pandas series with index the top words and as value the count.

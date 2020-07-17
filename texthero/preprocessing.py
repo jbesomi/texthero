@@ -30,13 +30,11 @@ def fillna(s: pd.Series) -> pd.Series:
     return s.fillna("").astype("str")
 
 
-@handle_nans
 def lowercase(s: pd.Series) -> pd.Series:
     """Lowercase all text."""
     return s.str.lower()
 
 
-@handle_nans
 def replace_digits(s: pd.Series, symbols: str = " ", only_blocks=True) -> pd.Series:
     """
     Replace all digits with symbols.
@@ -109,7 +107,6 @@ def remove_digits(s: pd.Series, only_blocks=True) -> pd.Series:
     return replace_digits(s, " ", only_blocks)
 
 
-@handle_nans
 def replace_punctuation(s: pd.Series, symbol: str = " ") -> pd.Series:
     """
     Replace all punctuation with a given symbol.
@@ -170,7 +167,10 @@ def _remove_diacritics(text: str) -> str:
     nfkd_form = unicodedata.normalize("NFKD", text)
     # unicodedata.combinding(char) checks if the character is in
     # composed form (consisting of several unicode chars combined), i.e. a diacritic
-    return "".join([char for char in nfkd_form if not unicodedata.combining(char)])
+    if text is np.nan or text is pd.NA:
+        return text
+    else:
+        return "".join([char for char in nfkd_form if not unicodedata.combining(char)])
 
 
 @handle_nans
@@ -191,7 +191,6 @@ def remove_diacritics(s: pd.Series) -> pd.Series:
     return s.astype("unicode").apply(_remove_diacritics)
 
 
-@handle_nans
 def remove_whitespace(s: pd.Series) -> pd.Series:
     r"""
     Remove any extra white spaces.
@@ -241,10 +240,14 @@ def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
       | [][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]    # Any symbol 
     """
 
-    return "".join(t if t not in words else symbol for t in re.findall(pattern, text))
+    if text is np.nan or text is pd.NA:
+        return text
+    else:
+        return "".join(
+            t if t not in words else symbol for t in re.findall(pattern, text)
+        )
 
 
-@handle_nans
 def replace_stopwords(
     s: pd.Series, symbol: str, stopwords: Optional[Set[str]] = None
 ) -> pd.Series:
@@ -321,7 +324,6 @@ def remove_stopwords(
     return replace_stopwords(s, symbol="", stopwords=stopwords)
 
 
-@handle_nans
 def stem(s: pd.Series, stem="snowball", language="english") -> pd.Series:
     r"""
     Stem series using either `porter` or `snowball` NLTK stemmers.
@@ -362,7 +364,10 @@ def stem(s: pd.Series, stem="snowball", language="english") -> pd.Series:
         raise ValueError("stem argument must be either 'porter' of 'stemmer'")
 
     def _stem(text):
-        return " ".join([stemmer.stem(word) for word in text])
+        if text is np.nan or text is pd.NA:
+            return text
+        else:
+            return " ".join([stemmer.stem(word) for word in text])
 
     return s.str.split().apply(_stem)
 
@@ -449,7 +454,6 @@ def drop_no_content(s: pd.Series):
     return s[has_content(s)]
 
 
-@handle_nans
 def remove_round_brackets(s: pd.Series):
     """
     Remove content within parentheses () and parentheses.
@@ -473,7 +477,6 @@ def remove_round_brackets(s: pd.Series):
     return s.str.replace(r"\([^()]*\)", "")
 
 
-@handle_nans
 def remove_curly_brackets(s: pd.Series):
     """
     Remove content within curly brackets {} and the curly brackets.
@@ -496,7 +499,6 @@ def remove_curly_brackets(s: pd.Series):
     return s.str.replace(r"\{[^{}]*\}", "")
 
 
-@handle_nans
 def remove_square_brackets(s: pd.Series):
     """
     Remove content within square brackets [] and the square brackets.
@@ -521,7 +523,6 @@ def remove_square_brackets(s: pd.Series):
     return s.str.replace(r"\[[^\[\]]*\]", "")
 
 
-@handle_nans
 def remove_angle_brackets(s: pd.Series):
     """
     Remove content within angle brackets <> and the angle brackets.
@@ -576,7 +577,6 @@ def remove_brackets(s: pd.Series):
     )
 
 
-@handle_nans
 def remove_html_tags(s: pd.Series) -> pd.Series:
     """
     Remove html tags from the given Pandas Series.
@@ -600,7 +600,6 @@ def remove_html_tags(s: pd.Series) -> pd.Series:
     return s.str.replace(pattern, "")
 
 
-@handle_nans
 def tokenize(s: pd.Series) -> pd.Series:
     """
     Tokenize each row of the given Series.
@@ -668,10 +667,10 @@ def tokenize_with_phrases(s: pd.Series, min_count: int = 5, threshold: int = 10)
 
     s = tokenize(s)
     phrases = PhrasesTransformer(min_count=min_count, threshold=threshold)
-    return pd.Series(phrases.fit_transform(s.values), index=s.index)
+    s[:] = phrases.fit_transform(s.values)
+    return s
 
 
-@handle_nans
 def replace_urls(s: pd.Series, symbol: str) -> pd.Series:
     r"""Replace all urls with the given symbol.
 
@@ -720,7 +719,6 @@ def remove_urls(s: pd.Series) -> pd.Series:
     return replace_urls(s, " ")
 
 
-@handle_nans
 def replace_tags(s: pd.Series, symbol: str) -> pd.Series:
     """Replace all tags from a given Pandas Series with symbol.
 
@@ -768,7 +766,6 @@ def remove_tags(s: pd.Series) -> pd.Series:
     return replace_tags(s, " ")
 
 
-@handle_nans
 def replace_hashtags(s: pd.Series, symbol: str) -> pd.Series:
     """Replace all hashtags from a Pandas Series with symbol
 

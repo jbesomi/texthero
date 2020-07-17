@@ -8,7 +8,7 @@ import string
 from parameterized import parameterized
 
 # Define valid inputs for different functions.
-s_nan = pd.Series([np.NaN, "test"])
+s_nan = pd.Series(["test1", np.NaN, "test2", pd.NA])
 s_numeric_and_nan_lists = pd.Series([[5.0, 5.0], [6.0, 6.0], np.nan])
 
 # Define all test cases. Every test case is a list

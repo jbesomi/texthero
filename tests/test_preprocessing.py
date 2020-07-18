@@ -7,6 +7,7 @@ import doctest
 from texthero import preprocessing, stopwords
 from . import PandasTestCase
 
+import warnings
 
 """
 Test doctest
@@ -252,6 +253,25 @@ class TestPreprocessing(PandasTestCase):
 
         s_true = pd.Series(
             [
+                ["New", "York", "is", "a", "beautiful", "city"],
+                ["Look", ":", "New", "York", "!"],
+                ["Very", "beautiful", "city", "New", "York"],
+            ]
+        )
+
+        self.assertEqual(preprocessing.phrases(s), s_true)
+
+    def test_phrases_symbol(self):
+        s = pd.Series(
+            [
+                ["New", "York", "is", "a", "beautiful", "city"],
+                ["Look", ":", "New", "York", "!"],
+                ["Very", "beautiful", "city", "New", "York"],
+            ]
+        )
+
+        s_true = pd.Series(
+            [
                 ["New->York", "is", "a", "beautiful", "city"],
                 ["Look", ":", "New->York", "!"],
                 ["Very", "beautiful", "city", "New->York"],
@@ -261,6 +281,30 @@ class TestPreprocessing(PandasTestCase):
         self.assertEqual(
             preprocessing.phrases(s, min_count=2, threshold=1, symbol="->"), s_true
         )
+
+    def test_phrases_not_tokenized_yet(self):
+        s = pd.Series(
+            [
+                "New York is a beautiful city",
+                "Look: New York!",
+                "Very beautiful city New York",
+            ]
+        )
+
+        s_true = pd.Series(
+            [
+                ["New", "York", "is", "a", "beautiful", "city"],
+                ["Look", ":", "New", "York", "!"],
+                ["Very", "beautiful", "city", "New", "York"],
+            ]
+        )
+
+        with warnings.catch_warnings():  # avoid print warning
+            warnings.simplefilter("ignore")
+            self.assertEqual(preprocessing.phrases(s), s_true)
+
+        with self.assertWarns(DeprecationWarning):  # check raise warning
+            preprocessing.phrases(s)
 
     """
     Test replace and remove tags

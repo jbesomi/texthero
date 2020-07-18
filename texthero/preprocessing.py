@@ -17,6 +17,8 @@ from texthero import stopwords as _stopwords
 
 from typing import List, Callable
 
+import warnings
+
 
 # Ignore gensim annoying warnings
 import warnings
@@ -615,10 +617,18 @@ def tokenize(s: pd.Series) -> pd.Series:
     return s.str.replace(pattern, r"\2 \3 \4 \5").str.split()
 
 
+# Warning message for not-tokenized inputs
+_not_tokenized_warning_message = (
+    "It seems like the given Pandas Series s is not tokenized. This function will"
+    " tokenize it automatically using hero.tokenize(s) first. You should consider"
+    " tokenizing it yourself first with hero.tokenize(s) in the future."
+)
+
+
 def phrases(s: pd.Series, min_count: int = 5, threshold: int = 10, symbol: str = "_"):
     r"""Group up collocations words
 
-    Given a pandas Series of tokenized strings, group together bigrams where each tokens has at least min_count term frequrncy and where the threshold is larger than the underline formula.
+    Given a pandas Series of tokenized strings, group together bigrams where each tokens has at least `min_count` term frequency and where the `threshold` is larger than the underline formula.
 
     :math:`\frac{(bigram\_a\_b\_count - min\_count)* len\_vocab }{ (word\_a\_count * word\_b\_count)}`.
 
@@ -650,8 +660,9 @@ def phrases(s: pd.Series, min_count: int = 5, threshold: int = 10, symbol: str =
 
     """
 
-    if not isinstance(s.iloc[0], list) or not isinstance(s.iloc[0][0], str):
-        raise ValueError("Input series should be a list of string.")
+    if not isinstance(s.iloc[0], list):
+        warnings.warn(_not_tokenized_warning_message, DeprecationWarning)
+        s = tokenize(s)
 
     delimiter = symbol.encode("utf-8")
     phrases = PhrasesTransformer(

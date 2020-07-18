@@ -271,7 +271,7 @@ def pca(s, n_components=2):
     Parameters
     ----------
     s : Pandas Series
-    n_components : Int. Default is 2.
+    n_components : int, optional (the default is 2, which implies projecting data to *two-dimensional principal components*)
         Number of components to keep. If n_components is not set or None, all components are kept.
 
     Examples

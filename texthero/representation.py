@@ -100,7 +100,13 @@ Vectorization
 """
 
 
-def count(s: pd.Series, max_features: Optional[int] = None, return_feature_names=False):
+def count(
+    s: pd.Series,
+    max_features: Optional[int] = None,
+    min_df=1,
+    max_df=1.0,
+    return_feature_names=False,
+):
     """
     Represent a text-based Pandas Series using count.
 
@@ -122,18 +128,18 @@ def count(s: pd.Series, max_features: Optional[int] = None, return_feature_names
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"])
     >>> s = hero.tokenize(s)
-    >>> hero.term_frequency(s)
+    >>> hero.count(s)
     0    [1, 1, 0]
     1    [1, 0, 1]
     dtype: object
     
-    To return the features_names:
+    To return the features_names:s
     
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"])
     >>> s = hero.tokenize(s)
-    >>> hero.term_frequency(s, return_feature_names=True)
+    >>> hero.count(s, return_feature_names=True)
     (0    [1, 1, 0]
     1    [1, 0, 1]
     dtype: object, ['Sentence', 'one', 'two'])
@@ -147,7 +153,11 @@ def count(s: pd.Series, max_features: Optional[int] = None, return_feature_names
         s = preprocessing.tokenize(s)
 
     tf = CountVectorizer(
-        max_features=max_features, tokenizer=lambda x: x, preprocessor=lambda x: x,
+        max_features=max_features,
+        tokenizer=lambda x: x,
+        preprocessor=lambda x: x,
+        min_df=min_df,
+        max_df=max_df,
     )
     s = pd.Series(tf.fit_transform(s).toarray().tolist(), index=s.index)
 
@@ -158,7 +168,11 @@ def count(s: pd.Series, max_features: Optional[int] = None, return_feature_names
 
 
 def term_frequency(
-    s: pd.Series, max_features: Optional[int] = None, return_feature_names=False
+    s: pd.Series,
+    max_features: Optional[int] = None,
+    min_df=1,
+    max_df=1.0,
+    return_feature_names=False,
 ):
 
     """
@@ -181,6 +195,7 @@ def term_frequency(
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"])
+    >>> s = hero.tokenize(s)
     >>> hero.term_frequency(s)
     0    [0.25, 0.25, 0.0]
     1    [0.25, 0.0, 0.25]
@@ -191,15 +206,24 @@ def term_frequency(
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"])
+    >>> s = hero.tokenize(s)
     >>> hero.term_frequency(s, return_feature_names=True)
     (0    [0.25, 0.25, 0.0]
     1    [0.25, 0.0, 0.25]
     dtype: object, ['Sentence', 'one', 'two'])
 
     """
+    # Check if input is tokenized. Else, print warning and tokenize.
+    if not isinstance(s.iloc[0], list):
+        warnings.warn(_not_tokenized_warning_message, DeprecationWarning)
+        s = preprocessing.tokenize(s)
 
     tf = CountVectorizer(
-        max_features=max_features, lowercase=False, token_pattern="\S+"
+        max_features=max_features,
+        tokenizer=lambda x: x,
+        preprocessor=lambda x: x,
+        min_df=min_df,
+        max_df=max_df,
     )
 
     cv_fit_transform = tf.fit_transform(s).toarray()
@@ -212,7 +236,9 @@ def term_frequency(
         return s
 
 
-def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=300, return_feature_names=False):
+def tfidf(
+    s: pd.Series, max_features=None, min_df=1, max_df=1.0, return_feature_names=False
+):
     """
     Represent a text-based Pandas Series using TF-IDF.
 

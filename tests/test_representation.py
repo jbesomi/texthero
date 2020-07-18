@@ -36,7 +36,7 @@ class TestRepresentation(PandasTestCase):
         s = pd.Series(["doc_one", "doc_two"])
         s = preprocessing.tokenize(s)
         s_true = pd.Series([[1, 1, 1, 0], [1, 1, 0, 1]])
-        self.assertEqual(representation.term_frequency(s), s_true)
+        self.assertEqual(representation.count(s), s_true)
 
     def test_count_not_lowercase(self):
         s = pd.Series(["one ONE"])
@@ -59,7 +59,7 @@ class TestRepresentation(PandasTestCase):
             self.assertEqual(representation.count(s), s_true)
 
         with self.assertWarns(DeprecationWarning):  # check raise warning
-            representation.term_frequency(s)
+            representation.count(s)
 
     """
     TF-IDF

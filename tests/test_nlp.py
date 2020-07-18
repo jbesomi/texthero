@@ -68,3 +68,33 @@ class TestNLP(PandasTestCase):
         t_different_index = pd.Series(["", ""], index=[5, 7])
 
         self.assertFalse(counted_sentences_s.index.equals(t_different_index.index))
+
+    """
+    POS tagging.
+    """
+
+    def test_pos(self):
+        s = pd.Series(["Today is such a beautiful day", "São Paulo is a great city"])
+        pos_tagging = nlp.pos_tag(s)
+        s_true = pd.Series(
+            [
+                [
+                    ("Today", "NOUN", "NN"),
+                    ("is", "AUX", "VBZ"),
+                    ("such", "DET", "PDT"),
+                    ("a", "DET", "DT"),
+                    ("beautiful", "ADJ", "JJ"),
+                    ("day", "NOUN", "NN"),
+                ],
+                [
+                    ("São", "PROPN", "NNP"),
+                    ("Paulo", "PROPN", "NNP"),
+                    ("is", "AUX", "VBZ"),
+                    ("a", "DET", "DT"),
+                    ("great", "ADJ", "JJ"),
+                    ("city", "NOUN", "NN"),
+                ],
+            ]
+        )
+
+        self.assertEquals(pos_tagging, s_true)

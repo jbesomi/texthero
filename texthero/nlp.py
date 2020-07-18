@@ -129,3 +129,56 @@ def count_sentences(s: pd.Series) -> pd.Series:
         number_of_sentences.append(sentences)
 
     return pd.Series(number_of_sentences, index=s.index)
+
+
+def pos_tag(s: pd.Series) -> pd.Series:
+    """
+    Return a Pandas Series with part-of-speech tagging
+
+    Return new Pandas Series where each rows contains a list of tuples containing information about part-of-speech tagging
+
+    Tuple (`token name`,`POS tag`,`The detailed POS tag.`)
+
+    This makes use of the SpaCy `processing pipeline. <https://spacy.io/usage/processing-pipelines#pipelines>`.
+
+    List of labels:
+     - `ADJ`: Adjective. Examples: big, old, green.
+     - `ADP`: Adposition. Examples: in, to, during.
+     - `ADV`: Adverb. Examples: very, tomorrow, down.
+     - `AUX` : Auxiliary. Examples: is, has (done), will (do).
+     - `CONJ`: Conjunction. Examples: and, or, but.
+     - `CCONJ`: Coordinating Conjunction. Examples: and, or, but.
+     - `DET`: Determiner. Examples: a, an, the.
+     - `INTJ`: Interjection. Examples: psst, ouch, bravo.
+     - `NOUN`:  Noun. Examples: girl, cat, tree.
+     - `NUM`: Numeral. Examples: 1, 2007, one.
+     - `PART`: Particle. Examples: 's, not.
+     - `PRON`: Pronoun. Examples: I, you, he, she.
+     - `PROPN`: Proper Noun. Examples: Mary, John, London.
+     - `PUNCT`: Punctuation. Examples: ., (, ), ?
+     - `SCONJ`: Subordinating Conjunction. Examples: if, while, that.
+     - `SYM`: Symbol. Examples: $, %, §, ©.
+     - `VERB`: Verb. Examples: run, runs, running.
+     - `X`: Other.
+     - `SPACE`: Space.
+
+    To more details: `POS tagging <https://spacy.io/api/annotation#pos-tagging>`
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("Today is such a beautiful day")
+    >>> print(hero.pos_tag(s)[0])
+    [('Today', 'NOUN', 'NN'), ('is', 'AUX', 'VBZ'), ('such', 'DET', 'PDT'), ('a', 'DET', 'DT'), ('beautiful', 'ADJ', 'JJ'), ('day', 'NOUN', 'NN')]
+    """
+
+    pos_tags = []
+
+    nlp = spacy.load("en_core_web_sm", disable=["parser", "ner"])
+    # nlp.pipe is now "tagger"
+
+    for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
+        pos_tags.append([(token.text, token.pos_, token.tag_) for token in doc])
+
+    return pd.Series(pos_tags, index=s.index)

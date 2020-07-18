@@ -48,14 +48,11 @@ test_cases_preprocessing = [
     ["remove_brackets", preprocessing.remove_brackets, (s_text,)],
     ["remove_html_tags", preprocessing.remove_html_tags, (s_text,)],
     ["tokenize", preprocessing.tokenize, (s_text,)],
+    ["phrases", preprocessing.phrases, (s_tokenized_lists,)],
     ["replace_urls", preprocessing.replace_urls, (s_text, "")],
     ["remove_urls", preprocessing.remove_urls, (s_text,)],
     ["replace_tags", preprocessing.replace_tags, (s_text, "")],
     ["remove_tags", preprocessing.remove_tags, (s_text,)],
-]
-
-test_cases_preprocessing_phrases = [
-    ["phrases", preprocessing.phrases, (s_tokenized_lists,)]
 ]
 
 test_cases_representation = [
@@ -78,7 +75,6 @@ test_cases_visualization = []
 test_cases = (
     test_cases_nlp
     + test_cases_preprocessing
-    + test_cases_preprocessing_phrases
     + test_cases_representation
     + test_cases_visualization
 )

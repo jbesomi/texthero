@@ -238,7 +238,7 @@ def term_frequency(
 
 def tfidf(
     s: pd.Series, max_features=None, min_df=1, max_df=1.0, return_feature_names=False
-):
+) -> pd.Series.sparse:
     """
     Represent a text-based Pandas Series using TF-IDF.
 

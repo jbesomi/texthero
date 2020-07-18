@@ -17,9 +17,6 @@ from texthero import stopwords as _stopwords
 
 from typing import List, Callable
 
-import warnings
-
-
 # Ignore gensim annoying warnings
 import warnings
 

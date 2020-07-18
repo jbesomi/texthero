@@ -56,7 +56,7 @@ def scatterplot(
         df, x=pca0, y=pca1, color=color, hover_data=hover_data, title=title
     )
     # fig.show(config={'displayModeBar': False})
-    fig.show()
+    # fig.show()
 
     if return_figure:
         return fig

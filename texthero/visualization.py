@@ -22,18 +22,33 @@ def scatterplot(
     color: str = None,
     hover_data: [] = None,
     title="",
-    return_figure=False,
+    return_figure=True,
 ):
-    """
+    r"""
     Show scatterplot using python plotly scatter.
 
     Parameters
     ----------
-    df
-    col
+    df : pd.DataFrame
+    col : str
         The name of the column of the DataFrame used for x and y axis.
+    color : str, optional
+        Grouping variable that will produce points with different colors. Can be either numeric or or object or categorical. 
+        If `color` is a pd.Series with numerical values, color mapping is of a continuous color bar.
+        If `color` is an object or a pd.Series with categorical values, color mapping is of a discrete color bar.
+    hover_data : object, optional
+        A single hover label appears for the point directly when the cursor is placed on the point.
+    title : str, optional
+        Title of the scatterplot.
+    return_figure : bool, optional
+        If set to `True` (default), returns the scatterplot. If set to `False`, doesn't return the scatterplot.
+    
+    Returns
+    -------
+    scatterplot
+        If `return_figure` is set to True (default), returns the scatterplot.
+        If `return_figure` is set to False, doesn't return the scatterplot.
     """
-
     pca0 = df[col].apply(lambda x: x[0])
     pca1 = df[col].apply(lambda x: x[1])
 
@@ -159,24 +174,21 @@ def wordcloud(
 
 def top_words(s: pd.Series, normalize=False) -> pd.Series:
     r"""
-    Return a pandas series with index the top words and as value the count.
+    Returns a pandas series with index being the top words and count as the value.
 
     Tokenization: split by space and remove all punctuations that are not between characters.
     
     Parameters
     ----------
     normalize :
-        When set to true, return normalized values.
-
+        When set to `True`, return normalized values.
     """
-
     # Replace all punctuation that are NOT in-between chacarters
     # This means, they have either a non word-bounding \B, are at the start ^, or at the end $
     # As re.sub replace all and not just the matching group, add matching parenthesis to the character
     # to keep during replacement.
 
     # TODO replace it with tokenizer.
-
     pattern = (
         rf"((\w)[{string.punctuation}](?:\B|$)|(?:^|\B)[{string.punctuation}](\w))"
     )

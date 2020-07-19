@@ -14,7 +14,7 @@ def named_entities(s, package="spacy"):
 
     Tuple: (`entity'name`, `entity'label`, `starting character`, `ending character`)
 
-    Under the hood, `named_entities` make use of Spacy name entity recognition.
+    Under the hood, `named_entities` makes use of `Spacy name entity recognition <https://spacy.io/usage/linguistic-features#named-entities>`_
 
     List of labels:
      - `PERSON`: People, including fictional.
@@ -36,6 +36,11 @@ def named_entities(s, package="spacy"):
      - `ORDINAL`: “first”, “second”, etc.
      - `CARDINAL`: Numerals that do not fall under another type.
 
+    Parameters
+    ----------
+        s : Pandas Series
+
+
     Examples
     --------
     >>> import texthero as hero
@@ -51,7 +56,8 @@ def named_entities(s, package="spacy"):
 
     for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
         entities.append(
-            [(ent.text, ent.label_, ent.start_char, ent.end_char) for ent in doc.ents]
+            [(ent.text, ent.label_, ent.start_char, ent.end_char)
+             for ent in doc.ents]
         )
 
     return pd.Series(entities, index=s.index)
@@ -73,7 +79,7 @@ def noun_chunks(s):
 
     Parameters
     ----------
-    input : Pandas Series
+        s : Pandas Series
     
     Examples
     --------
@@ -107,7 +113,12 @@ def count_sentences(s: pd.Series) -> pd.Series:
 
     Return a new Pandas Series with the number of sentences per cell.
 
-    This makes use of the SpaCy `sentencizer <https://spacy.io/api/sentencizer>`.
+    This makes use of the SpaCy `sentencizer <https://spacy.io/api/sentencizer>`_
+
+    Parameters
+    ----------
+        s : Pandas Series
+
 
     Examples
     --------
@@ -117,7 +128,7 @@ def count_sentences(s: pd.Series) -> pd.Series:
     >>> hero.count_sentences(s)
     0    2
     1    3
-    dtype: int64
+    dtype: object
     """
     number_of_sentences = []
 

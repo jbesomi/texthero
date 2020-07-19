@@ -44,20 +44,21 @@
 
 <h2 align="center">From zero to hero</h2>
 
-Texthero is a python toolkit to work with text-based dataset quickly and effortlessly. Texthero is very simple to learn and designed to be used on top of Pandas. Texthero has the same expressiveness and power of Pandas and is extensively documented. Texthero is modern and conceived for programmers of the 2020 decade with little knowledge if any in linguistic. 
+Texthero is a python toolkit to work with text-based dataset quickly and effortlessly. Texthero is very simple to learn and designed to be used on top of Pandas. Texthero has the same expressiveness and power of Pandas and is extensively documented. Texthero is modern and conceived for programmers of the 2020 decade with little knowledge if any in linguistics. 
 
-You can think of Texthero as a tool to help you _understand_ and work with text-based dataset. Given a tabular dataset, it's easy to _grasp the main concept_. Instead, given a text dataset, it's harder to have quick insights into the underline data. With Texthero, preprocessing text data, mapping it into vectors, and visualizing the obtained vector space takes just a couple of lines.
+You can think of Texthero as a tool to help you _understand_ and work with text-based dataset. Given a dataset with structured data, it's easy to have a quick understanding of the underlying data. Oppositely, given a dataset composed of text-only, it's harder to have a quick undertanding of the data. Texthero help you there, providing utility functions to quickly _clean the text data_, _map it into a vector space_ and gather from it _primary insights_.
 
-Texthero include tools for:
-* Preprocess text data: it offers both out-of-the-box solutions but it's also flexible for custom-solutions.
+
+Texthero includes tools for:
+* Preprocessing text data: it offers out-of-the-box solutions but it's also flexible for custom solutions.
 * Natural Language Processing: keyphrases and keywords extraction, and named entity recognition.
 * Text representation: TF-IDF, term frequency, and custom word-embeddings (wip)
-* Vector space analysis: clustering (K-means, Meanshift, DBSCAN and Hierarchical), topic modeling (wip) and interpretation.
+* Vector space analysis: dimensionality reduction (PCA, t-SNE, NMF), clustering (K-means, Meanshift, DBSCAN and Hierarchical), topic modeling (wip) and interpretation.
 * Text visualization: vector space visualization, place localization on maps (wip).
 
 Texthero is free, open-source and [well documented](https://texthero.org/docs) (and that's what we love most by the way!). 
 
-We hope you will find pleasure working with Texthero as we had during his development.
+We hope you will find pleasure working with Texthero as we have during its development.
 
 <h2 align="center">Hablas español? क्या आप हिंदी बोलते हैं? 日本語が話せるのか？</h2>
 
@@ -240,10 +241,10 @@ Full documentation: [nlp](https://texthero.org/docs/api-nlp)
 
 <h3>2. Representation</h3>
 
-**Scope:** map text data into vectors and do dimensionality reduction.
+**Scope:** map text data into vectors and do dimensionality reduction to gather insights and prepare data for visualization.
 
 Supported **representation** algorithms:
-1. Term frequency (`count`)
+1. Term frequency (`term_frequency`)
 1. Term frequency-inverse document frequency (`tfidf`)
 
 Supported **clustering** algorithms:
@@ -260,11 +261,12 @@ Full documentation: [representation](https://texthero.org/docs/api-representatio
 
 <h3>3. Visualization</h3>
 
-**Scope:** summarize the main facts regarding the text data and visualize it. This module is opinionable. It's handy for anyone that needs a quick solution to visualize on screen the text data, for instance during a text exploratory data analysis (EDA).
+**Scope:** summarize the main facts regarding the text data and visualize it. This module is opinionable. It's handy for anyone that needs a quick solution to visualize the text data, for instance during a text exploratory data analysis (EDA).
 
 Supported functions:
    - Text scatterplot (`scatterplot`)
    - Most common words (`top_words`)
+   - Wordcloud (`wordcloud`)
 
 Full documentation: [visualization](https://texthero.org/docs/api-visualization)
 
@@ -272,7 +274,7 @@ Full documentation: [visualization](https://texthero.org/docs/api-visualization)
 
 <h5>Why Texthero</h5>
 
-Sometimes we just want things done, right? Texthero helps with that. It helps make things easier and give the developer more time to focus on his custom requirements. We believe that cleaning text should just take a minute. Same for finding the most important part of a text and the same for representing it.
+Sometimes we just want to get things done, right? Texthero helps with that. It helps make things easier and gives the developer more time to focus on his custom requirements. We believe that cleaning text should just take a minute. Same for finding the most important part of a text and also for representing it.
 
 In a very pragmatic way, texthero has just one goal: make the developer spare time. Working with text data can be a pain and in most cases, a default pipeline can be quite good to start. There is always time to come back and improve previous work.
 

@@ -275,8 +275,7 @@ def tfidf(
 
     # Map word index to word name and keep original index of documents.
     feature_names = tfidf.get_feature_names()
-    s_out.index = s_out.index.map(
-        lambda x: (s.index[x[0]], feature_names[x[1]]))
+    s_out.index = s_out.index.map(lambda x: (s.index[x[0]], feature_names[x[1]]))
 
     s_out.rename_axis(["document", "word"], inplace=True)
 
@@ -695,7 +694,8 @@ def kmeans(
     1    0
     2    1
     3    0
-    dtype: object
+    dtype: category
+    Categories (2, int64): [0, 1]
     >>> # As we can see, the documents are correctly
     >>> # separated into topics / clusters by the algorithm.
 
@@ -815,7 +815,8 @@ def dbscan(
     1    1
     2    0
     3    1
-    dtype: object
+    dtype: category
+    Categories (2, int64): [0, 1]
     >>> # As we can see, the documents are correctly
     >>> # separated into topics / clusters by the algorithm
     >>> # and we didn't even have to say how many topics there are!
@@ -925,7 +926,8 @@ def meanshift(
     3    0
     4    0
     5    0
-    dtype: object
+    dtype: category
+    Categories (2, int64): [0, 1]
 
     See also
     --------

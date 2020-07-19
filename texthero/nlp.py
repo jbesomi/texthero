@@ -56,8 +56,7 @@ def named_entities(s, package="spacy"):
 
     for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
         entities.append(
-            [(ent.text, ent.label_, ent.start_char, ent.end_char)
-             for ent in doc.ents]
+            [(ent.text, ent.label_, ent.start_char, ent.end_char) for ent in doc.ents]
         )
 
     return pd.Series(entities, index=s.index)
@@ -128,7 +127,7 @@ def count_sentences(s: pd.Series) -> pd.Series:
     >>> hero.count_sentences(s)
     0    2
     1    3
-    dtype: object
+    dtype: int64
     """
     number_of_sentences = []
 

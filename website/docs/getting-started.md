@@ -9,13 +9,13 @@ Texthero is a python package to let you work efficiently and quickly with text d
 
 ## Overview
 
-Given a dataset with structured data, it's easy to have a quick understanding of the underline data. Oppositely, given a dataset composed of text-only, it's harder to have a quick undertanding of the data. Texthero help you there, providing utility functions to quickly **clean the text data**, **map it into a vector space** and gather from it **primary insights**.
+Given a dataset with structured data, it's easy to have a quick understanding of the underlying data. Oppositely, given a dataset composed of text-only, it's harder to have a quick undertanding of the data. Texthero help you there, providing utility functions to quickly **clean the text data**, **map it into a vector space** and gather from it **primary insights**.
 
 ##### Pandas integration
 
 One of the main pillar of texthero is that is designed from the ground-up to work with **Pandas Dataframe** and **Series**.
 
-Most of texthero methods, simply apply transformation to Pandas Series. As a rule of thumb, the first argument and the return ouputs of almost all texthero methods are either a Pandas Series or a Pandas DataFrame.
+Most of texthero methods simply apply transformation to Pandas Series. As a rule of thumb, the first argument and the ouput of almost all texthero methods are either a Pandas Series or a Pandas DataFrame.
 
 
 ##### Pipeline
@@ -46,7 +46,7 @@ The five different areas are _athletics_, _cricket_, _football_, _rugby_ and _te
 
 The original dataset comes as a zip files with five different folder containing the article as text data for each topic.
 
-For convenience, we createdThis script simply read all text data and store it into a Pandas Dataframe.
+For convenience, we created this script simply read all text data and store it into a Pandas Dataframe.
 
 Import texthero and pandas.
 
@@ -87,7 +87,7 @@ Recently, Pandas has introduced the pipe function. You can achieve the same resu
 df['clean_text'] = df['text'].pipe(hero.clean)
 ```
 
-> Tips. When we need to define a new column returned from a function, we prepend the name of the function to the column name. Example: df['tsne_col'] = df['col'].pipe(hero.tsne). This keep the code simple to read and permit to construct complex pipeline.
+> Tips. When we need to define a new column returned from a function, we prepend the name of the function to the column name. Example: df['tsne_col'] = df['col'].pipe(hero.tsne). This keep the code simple to read and allows us to construct complex pipelines.
 
 The default pipeline for the `clean` method is the following:
 
@@ -122,23 +122,34 @@ df['clean_text'] = df['clean_text'].pipe(hero.clean, custom_pipeline)
 
 ##### Preprocessing API
 
-The complete preprocessing API can be found at the following address: [api preprocessing](/docs/api-preprocessing).
+The complete preprocessing API can be found here: [api preprocessing](/docs/api-preprocessing).
 
 
 ### Representation
 
-Once cleaned the data, the next natural is to map each document into a vector.
+Once the data is cleaned, the next natural is to map each document to a vector so we can compare
+documents with mathematical methods to derive insights.
 
 ##### TFIDF representation
 
+TFIDF is a formula to calculate the _relative importance_ of the words in a document, taking
+into account the words' occurences in other documents. 
 
 ```python
 df['tfidf_clean_text'] = hero.tfidf(df['clean_text'])
 ```
 
+Now, we have calculated a vector for each document that tells us what words are characteristic for the document.
+Usually, documents about similar topics use similar terms, so their tfidf-vectors will be similar too.
+
 ##### Dimensionality reduction with PCA
 
-To visualize the data, we map each point to a two-dimensional representation with PCA. The principal component analysis algorithms returns the combination of attributes that better account the variance in the data.
+We now want to visualize the data. However, the tfidf-vectors are very high-dimensional (i.e. every
+document might have a tfidf-vector of length 100). Visualizing 100 dimensions is hard!
+
+Thus, we perform dimensionality reduction (generating vectors with fewer entries from vectors with
+many entries). For that, we can use PCA. PCA generates new vectors from the tfidf representation
+that showcase the differences among the documents most strongly in fewer dimensions, often 2 or 3.
 
 ```python
 df['pca_tfidf_clean_text'] = hero.pca(df['tfidf_clean_text'])
@@ -159,7 +170,7 @@ df['pca'] = (
 
 ##### Representation API
 
-The complete representation module API can be found at the following address: [api representation](/docs/api-representation).
+The complete representation module API can be found here: [api representation](/docs/api-representation).
 
 ### Visualization
 
@@ -201,7 +212,7 @@ tennis     6          0.021047
 
 ##### Visualization API
 
-The complete visualization module API can be found at the following address: [api visualization](/docs/api-visualization).
+The complete visualization module API can be found here: [api visualization](/docs/api-visualization).
 
 ## Summary
 
@@ -228,4 +239,4 @@ hero.scatterplot(df, col='pca', color='topic', title="PCA BBC Sport news")
 
 By now, you should have understood the main building blocks of texthero.
 
-In the next sections, we will review each module, see how we can tune the default settings and we will show other application where Texthero might come in handy.
+In the next sections, we will review each module, see how we can tune the default settings and we will show other applications where Texthero might come in handy.

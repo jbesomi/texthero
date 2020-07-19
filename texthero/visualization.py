@@ -20,31 +20,80 @@ def scatterplot(
     df: pd.DataFrame,
     col: str,
     color: str = None,
+    hover_name: str = None,
     hover_data: [] = None,
     title="",
     return_figure=False,
 ):
     """
-    Show scatterplot using python plotly scatter.
+    Show scatterplot of DataFrame column using python plotly scatter.
+
 
     Parameters
     ----------
-    df
-    col
-        The name of the column of the DataFrame used for x and y axis.
+    df: DataFrame with a column to be visualized.
+    col: str
+        The name of the column of the DataFrame to use for x and y (and z) axis.
+    color: str, default to None.
+        Name of the column to use for coloring (rows with same value get same color).
+    title: str, default to "".
+        Title of the plot.
+    return_figure: optional, default to False.
+        Function returns the figure if set to True.
+    hover_data: List[str], default to [].
+        List of column names to supply data when hovering over a point.
+    hover_name: str, default to None
+        Name of the column to supply title of data when hovering over a point.
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> doc1 = "Football, Sports, Soccer"
+    >>> doc2 = "music, violin, orchestra"
+    >>> doc3 = "football, fun, sports"
+    >>> doc4 = "music, fun, guitar"
+    >>> df = pd.DataFrame([doc1, doc2, doc3, doc4], columns=["texts"])
+    >>> df["texts"] = hero.clean(df["texts"])
+    >>> df["texts"] = hero.tokenize(df["texts"])
+    >>> df["tfidf"] = hero.tfidf(df["texts"])
+    >>> df["topics"] = hero.kmeans(df["tfidf"], n_clusters=2)
+    >>> df["pca"] = hero.pca(df["tfidf"], n_components=3)
+    >>> hero.scatterplot(df, col="pca", color="topics", hover_name="texts") # doctest: +SKIP
     """
 
-    pca0 = df[col].apply(lambda x: x[0])
-    pca1 = df[col].apply(lambda x: x[1])
+    x = df[col].apply(lambda x: x[0])
+    y = df[col].apply(lambda x: x[1])
 
-    fig = px.scatter(
-        df, x=pca0, y=pca1, color=color, hover_data=hover_data, title=title
-    )
+    if len(df[col][0]) == 3:
+        z = df[col].apply(lambda x: x[2])
+        fig = px.scatter_3d(
+            df,
+            x=x,
+            y=y,
+            z=z,
+            color=color,
+            hover_data=hover_data,
+            title=title,
+            hover_name=hover_name,
+        )
+    else:
+        fig = px.scatter(
+            df,
+            x=x,
+            y=y,
+            color=color,
+            hover_data=hover_data,
+            title=title,
+            hover_name=hover_name,
+        )
+
     # fig.show(config={'displayModeBar': False})
-    fig.show()
 
     if return_figure:
         return fig
+    else:
+        fig.show()
 
 
 """
@@ -165,8 +214,18 @@ def top_words(s: pd.Series, normalize=False) -> pd.Series:
     
     Parameters
     ----------
-    normalize :
+    normalize : optional, default to False.
         When set to true, return normalized values.
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> s = pd.Series("one two two three three three")
+    >>> hero.top_words(s)
+    three    3
+    two      2
+    one      1
+    dtype: int64
 
     """
 

@@ -6,7 +6,7 @@ import spacy
 import pandas as pd
 
 
-def named_entities(s, package="spacy"):
+def named_entities(s: pd.Series, package="spacy") -> pd.Series:
     """
     Return named-entities.
 
@@ -40,6 +40,9 @@ def named_entities(s, package="spacy"):
     ----------
         s : Pandas Series
 
+    Returns
+    -------
+        Pandas Series, where each rows contains a list of tuples containing information regarding the given named entities.
 
     Examples
     --------
@@ -62,7 +65,7 @@ def named_entities(s, package="spacy"):
     return pd.Series(entities, index=s.index)
 
 
-def noun_chunks(s):
+def noun_chunks(s: pd.Series) -> pd.Series:
     """
     Return noun chunks (noun phrases).
 
@@ -79,7 +82,11 @@ def noun_chunks(s):
     Parameters
     ----------
         s : Pandas Series
-    
+
+    Returns
+    -------
+        Pandas Series, where each row contains a tuple that has information regarding the noun chunk.
+
     Examples
     --------
     >>> import texthero as hero
@@ -118,6 +125,9 @@ def count_sentences(s: pd.Series) -> pd.Series:
     ----------
         s : Pandas Series
 
+    Returns
+    -------
+        Pandas Series, with the number of sentences per document in every cell.
 
     Examples
     --------

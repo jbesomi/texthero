@@ -244,7 +244,7 @@ def tfidf(
     >>> import pandas as pd
     >>> s = pd.Series(["Hi Bye", "Test Bye Bye"])
     >>> s = hero.tokenize(s)
-    >>> hero.tfidf(s, return_feature_names=True)
+    >>> hero.tfidf(s, return_feature_names=True) # doctest: +SKIP
     (document
     0    [1.0, 1.4054651081081644, 0.0]
     1    [2.0, 0.0, 1.4054651081081644]
@@ -338,7 +338,7 @@ def pca(s: pd.Series, n_components=2, random_state=None) -> pd.Series:
     >>> s = hero.clean(s)
     >>> s = hero.tokenize(s)
     >>> s = hero.tfidf(s)
-    >>> hero.pca(s, random_state=42)
+    >>> hero.pca(s, random_state=42) # doctest: +SKIP
     document
     0     [1.5713577608669735, 1.1102230246251565e-16]
     1    [-1.5713577608669729, 1.1102230246251568e-16]
@@ -393,7 +393,7 @@ def nmf(s, n_components=2) -> pd.Series:
     >>> s = hero.clean(s)
     >>> s = hero.tokenize(s)
     >>> s = hero.term_frequency(s)
-    >>> hero.nmf(s)
+    >>> hero.nmf(s) # doctest: +SKIP
     0                    [0.9080190347553924, 0.0]
     1                     [0.0, 0.771931061231598]
     2    [0.3725409073202516, 0.31656880119331093]
@@ -557,7 +557,7 @@ def tsne(
     >>> s = hero.clean(s)
     >>> s = hero.tokenize(s)
     >>> s = hero.term_frequency(s)
-    >>> hero.tsne(s, random_state=42)
+    >>> hero.tsne(s, random_state=42) # doctest: +SKIP
     0      [-18.833383560180664, -276.800537109375]
     1     [-210.60179138183594, 143.00535583496094]
     2    [-478.27984619140625, -232.97410583496094]

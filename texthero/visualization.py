@@ -71,15 +71,23 @@ def wordcloud(
     """
     Plot wordcloud image using WordCloud from word_cloud package.
 
-    Most of the arguments are very similar if not equal to the mother function. In constrast, all words are taken into account when computing the wordcloud, inclusive stopwords. They can be easily removed with preprocessing.remove_stopwords.
+    Most of the arguments are very similar if not equal to the mother
+    function. In constrast, all words are taken into account when computing
+    the wordcloud, inclusive stopwords. They can be easily removed with
+    preprocessing.remove_stopwords.
 
     Word are compute using generate_from_frequencies.
+
+    To reduce blur in the wordcloud image, `width` and `height` should be at
+    least 400.
 
     Parameters
     ----------
     s : pd.Series
     font_path : str
-        Font path to the font that will be used (OTF or TTF). Defaults to DroidSansMono path on a Linux machine. If you are on another OS or don't have this font, you need to adjust this path.
+        Font path to the font that will be used (OTF or TTF). Defaults to
+        DroidSansMono path on a Linux machine. If you are on another OS or
+        don't have this font, you need to adjust this path.
     width : int
         Width of the canvas.
     height : int
@@ -87,17 +95,22 @@ def wordcloud(
     max_words : number (default=200)
         The maximum number of words.
     mask : nd-array or None (default=None)
-        When set, gives a binary mask on where to draw words. When set, width and height will be ignored and the shape of mask will be used instead. All white (#FF or #FFFFFF) entries will be considerd "masked out" while other entries will be free to draw on.
+        When set, gives a binary mask on where to draw words. When set, width
+        and height will be ignored and the shape of mask will be used instead.
+        All white (#FF or #FFFFFF) entries will be considerd "masked out"
+        while other entries will be free to draw on.
     contour_width: float (default=0)
         If mask is not None and contour_width > 0, draw the mask contour.
     contour_color: color value (default="PAPAYAWHIP")
         Mask contour color.
     min_font_size : int (default=4)
-        Smallest font size to use. Will stop when there is no more room in this size.
+        Smallest font size to use. Will stop when there is no more room in
+        this size.
     background_color : color value (default="PAPAYAWHIP")
         Background color for the word cloud image.
     max_font_size : int or None (default=None)
-        Maximum font size for the largest word. If None, height of the image is used.
+        Maximum font size for the largest word. If None, height of the image
+        is used.
     relative_scaling : float (default='auto')
         Importance of relative word frequencies for font-size.  With
         relative_scaling=0, only word-ranks are considered.  With
@@ -177,9 +190,7 @@ def top_words(s: pd.Series, normalize=False) -> pd.Series:
 
     # TODO replace it with tokenizer.
 
-    pattern = (
-        rf"((\w)[{string.punctuation}](?:\B|$)|(?:^|\B)[{string.punctuation}](\w))"
-    )
+    pattern = rf"((\w)[{string.punctuation}](?:\B|$)|(?:^|\B)[{string.punctuation}](\w))"
 
     return (
         s.str.replace(

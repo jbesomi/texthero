@@ -137,7 +137,7 @@ def pos_tag(s: pd.Series) -> pd.Series:
 
     Return new Pandas Series where each rows contains a list of tuples containing information about part-of-speech tagging
 
-    Tuple (`token name`,`POS tag`,`The detailed POS tag.`)
+    Tuple (`token name`,`POS tag`,`The detailed POS tag.`, `starting character`, `ending character`)
 
     This makes use of the SpaCy `processing pipeline. <https://spacy.io/usage/processing-pipelines#pipelines>`.
 
@@ -170,7 +170,7 @@ def pos_tag(s: pd.Series) -> pd.Series:
     >>> import pandas as pd
     >>> s = pd.Series("Today is such a beautiful day")
     >>> print(hero.pos_tag(s)[0])
-    [('Today', 'NOUN', 'NN'), ('is', 'AUX', 'VBZ'), ('such', 'DET', 'PDT'), ('a', 'DET', 'DT'), ('beautiful', 'ADJ', 'JJ'), ('day', 'NOUN', 'NN')]
+    [('Today', 'NOUN', 'NN', 0, 5), ('is', 'AUX', 'VBZ', 6, 8), ('such', 'DET', 'PDT', 9, 13), ('a', 'DET', 'DT', 14, 15), ('beautiful', 'ADJ', 'JJ', 16, 25), ('day', 'NOUN', 'NN', 26, 29)]
     """
 
     pos_tags = []
@@ -179,6 +179,11 @@ def pos_tag(s: pd.Series) -> pd.Series:
     # nlp.pipe is now "tagger"
 
     for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
-        pos_tags.append([(token.text, token.pos_, token.tag_) for token in doc])
+        pos_tags.append(
+            [
+                (token.text, token.pos_, token.tag_, token.idx, token.idx + len(token))
+                for token in doc
+            ]
+        )
 
     return pd.Series(pos_tags, index=s.index)

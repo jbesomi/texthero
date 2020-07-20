@@ -79,20 +79,20 @@ class TestNLP(PandasTestCase):
         s_true = pd.Series(
             [
                 [
-                    ("Today", "NOUN", "NN"),
-                    ("is", "AUX", "VBZ"),
-                    ("such", "DET", "PDT"),
-                    ("a", "DET", "DT"),
-                    ("beautiful", "ADJ", "JJ"),
-                    ("day", "NOUN", "NN"),
+                    ("Today", "NOUN", "NN", 0, 5),
+                    ("is", "AUX", "VBZ", 6, 8),
+                    ("such", "DET", "PDT", 9, 13),
+                    ("a", "DET", "DT", 14, 15),
+                    ("beautiful", "ADJ", "JJ", 16, 25),
+                    ("day", "NOUN", "NN", 26, 29),
                 ],
                 [
-                    ("São", "PROPN", "NNP"),
-                    ("Paulo", "PROPN", "NNP"),
-                    ("is", "AUX", "VBZ"),
-                    ("a", "DET", "DT"),
-                    ("great", "ADJ", "JJ"),
-                    ("city", "NOUN", "NN"),
+                    ("São", "PROPN", "NNP", 0, 3),
+                    ("Paulo", "PROPN", "NNP", 4, 9),
+                    ("is", "AUX", "VBZ", 10, 12),
+                    ("a", "DET", "DT", 13, 14),
+                    ("great", "ADJ", "JJ", 15, 20),
+                    ("city", "NOUN", "NN", 21, 25),
                 ],
             ]
         )

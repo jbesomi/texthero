@@ -127,7 +127,7 @@ The complete preprocessing API can be found here: [api preprocessing](/docs/api-
 
 ### Representation
 
-Once the data is cleaned, the next natural is to map each document to a vector so we can compare
+Once the data is cleaned, the next natural step is, to map each document to a vector so we can compare
 documents with mathematical methods to derive insights.
 
 ##### TFIDF representation
@@ -160,7 +160,7 @@ df['pca_tfidf_clean_text'] = hero.pca(df['tfidf_clean_text'])
 We can achieve all the three steps show above, _cleaning_, _tf-idf representation_ and _dimensionality reduction_ in a single step. Isn't fabulous?
 
 ```python
-df['pca'] = (
+df['pca_tfidf_clean_text'] = (
             df['text']
             .pipe(hero.clean)
             .pipe(hero.tfidf)
@@ -178,7 +178,7 @@ The complete representation module API can be found here: [api representation](/
 
 
 ```python
-hero.scatterplot(df, col='pca', color='topic', title="PCA BBC Sport news")
+hero.scatterplot(df, col='pca_tfidf_clean_text', color='topic', title="PCA BBC Sport news")
 ```
 
 ![](/img/scatterplot_bccsport.svg)
@@ -187,26 +187,37 @@ Also, we can "visualize" the most common words for each `topic` with `top_words`
 
 ```python
 NUM_TOP_WORDS = 5
-df.groupby('topic')['text'].apply(lambda x: hero.top_words(x)[:NUM_TOP_WORDS])
+df.groupby('topic')['clean_text'].apply(lambda x: hero.top_words(x, normalize=True)[:NUM_TOP_WORDS])
 ```
 
 ```
 topic             
-athletics  said       0.010068
-           world      0.008900
-           year       0.008844
-cricket    test       0.008250
-           england    0.008001
-           first      0.007787
-football   said       0.009515
-           chelsea    0.006110
-           game       0.005950
-rugby      england    0.012602
-           said       0.008359
-           wales      0.007880
-tennis     6          0.021047
-           said       0.013012
-           open       0.009834
+athletics  said       0.010330
+           world      0.009132
+           year       0.009075
+           olympic    0.007819
+           race       0.006392
+cricket    test       0.008492
+           england    0.008235
+           first      0.008016
+           cricket    0.007906
+           one        0.007760
+football   said       0.009709
+           chelsea    0.006234
+           game       0.006071
+           would      0.005866
+           club       0.005601
+rugby      england    0.012833
+           said       0.008512
+           wales      0.008025
+           ireland    0.007440
+           rugby      0.007245
+tennis     said       0.013993
+           open       0.010575
+           first      0.009608
+           set        0.009028
+           year       0.008447
+Name: clean_text, dtype: float64
 ```
 
 
@@ -229,11 +240,14 @@ df['pca'] = (
     df['text']
     .pipe(hero.clean)
     .pipe(hero.tfidf)
-    .pipe(hero.pca)
+    .pipe(hero.pca,n_components=2)
 )
 
 hero.scatterplot(df, col='pca', color='topic', title="PCA BBC Sport news")
 ```
+
+![](/img/scatterplot_bccsport_3d.png)
+
 
 ##### Next section
 

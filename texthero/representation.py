@@ -118,6 +118,13 @@ def count(
     s : Pandas Series
     max_features : int, optional
         Maximum number of features to keep.
+    min_df : int, optional, default to 1.
+        When building the vocabulary, ignore terms that have a document 
+        frequency (number of documents a term appears in) strictly lower than the given threshold.
+    max_df : int or double, optional, default to 1.0
+        When building the vocabulary, ignore terms that have a document
+        frequency (number of documents a term appears in) strictly higher than the given threshold. This arguments basically permits to remove corpus-specific stop words. When the argument is a float [0.0, 1.0], the parameter represents a proportion of documents.
+
     return_features_names : Boolean, False by Default
         If True, return a tuple (*count_series*, *features_names*)
 
@@ -186,6 +193,13 @@ def term_frequency(
     s : Pandas Series
     max_features : int, optional
         Maximum number of features to keep.
+    min_df : int, optional, default to 1.
+        When building the vocabulary, ignore terms that have a document 
+        frequency (number of documents a term appears in) strictly lower than the given threshold.
+    max_df : int or double, optional, default to 1.0
+        When building the vocabulary, ignore terms that have a document
+        frequency (number of documents a term appears in) strictly higher than the given threshold. This arguments basically permits to remove corpus-specific stop words. When the argument is a float [0.0, 1.0], the parameter represents a proportion of documents.
+
     return_features_names : Boolean, False by Default
         If True, return a tuple (*count_series*, *features_names*)
 

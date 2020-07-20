@@ -190,7 +190,9 @@ def top_words(s: pd.Series, normalize=False) -> pd.Series:
 
     # TODO replace it with tokenizer.
 
-    pattern = rf"((\w)[{string.punctuation}](?:\B|$)|(?:^|\B)[{string.punctuation}](\w))"
+    pattern = (
+        rf"((\w)[{string.punctuation}](?:\B|$)|(?:^|\B)[{string.punctuation}](\w))"
+    )
 
     return (
         s.str.replace(

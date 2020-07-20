@@ -140,7 +140,7 @@ def count(
     1    [1, 0, 1]
     dtype: object
     
-    To return the features_names:s
+    To return the features_names:
     
     >>> import texthero as hero
     >>> import pandas as pd

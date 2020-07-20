@@ -76,7 +76,7 @@ def wordcloud(
     the wordcloud, inclusive stopwords. They can be easily removed with
     preprocessing.remove_stopwords.
 
-    Word are compute using generate_from_frequencies.
+    Words are computed using generate_from_frequencies.
 
     To reduce blur in the wordcloud image, `width` and `height` should be at
     least 400.

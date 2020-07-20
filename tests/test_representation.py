@@ -35,7 +35,7 @@ class TestRepresentation(PandasTestCase):
     def test_term_frequency_multiple_documents(self):
         s = pd.Series(["doc_one", "doc_two"])
         s = preprocessing.tokenize(s)
-        s_true = pd.Series([[1, 1, 1, 0], [1, 1, 0, 1]])
+        s_true = pd.Series([[1, 0], [0, 1]])
         self.assertEqual(representation.term_frequency(s), s_true)
 
     def test_term_frequency_not_lowercase(self):

@@ -1,5 +1,5 @@
 """
-Common NLP tasks such as named_entities, noun_chunks, etc.
+The texthero.nlp module supports common NLP tasks such as named_entities, noun_chunks, ... on Pandas Series and DataFrame.
 """
 
 import spacy

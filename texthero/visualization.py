@@ -235,7 +235,7 @@ def top_words(s: pd.Series, normalize=False) -> pd.Series:
     Return a pandas series with index the top words and as value the count.
 
     Tokenization: split by space and remove all punctuations that are not between characters.
-    
+
     Parameters
     ----------
     normalize : optional, default to False.
@@ -243,6 +243,7 @@ def top_words(s: pd.Series, normalize=False) -> pd.Series:
 
     Examples
     --------
+    >>> import pandas as pd
     >>> import texthero as hero
     >>> s = pd.Series("one two two three three three")
     >>> hero.top_words(s)

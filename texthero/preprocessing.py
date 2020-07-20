@@ -52,8 +52,8 @@ def fillna(s: pd.Series) -> pd.Series:
 
 def lowercase(s: pd.Series) -> pd.Series:
     """
-    Lowercase all text in a series.
-    
+    Lowercase all texts in a series.
+
     Parameters
     ----------
     s : Pandas Series
@@ -80,7 +80,7 @@ def replace_digits(s: pd.Series, symbols: str = " ", only_blocks=True) -> pd.Ser
 
     By default, only replaces "blocks" of digits, i.e tokens composed of only numbers.
 
-    When `only_blocks` is set to ´False´, replaces any digits.
+    When `only_blocks` is set to ´False´, replaces all digits.
 
     Parameters
     ----------
@@ -90,7 +90,7 @@ def replace_digits(s: pd.Series, symbols: str = " ", only_blocks=True) -> pd.Ser
         Symbols to replace
 
     only_blocks : bool
-        When set to False, remove any digits.
+        When set to False, replace all digits.
 
     Returns
     -------
@@ -241,7 +241,8 @@ def remove_diacritics(s: pd.Series) -> pd.Series:
     """
     Removes all diacritics and accents.
 
-    Removes all diacritics and accents from any word and characters from the given Pandas Series. Returns a cleaned version of the Pandas Series.
+    Removes all diacritics and accents from any word and characters from the given Pandas Series.
+    Returns a cleaned version of the Pandas Series.
 
     Parameters
     ----------
@@ -860,8 +861,8 @@ def tokenize_with_phrases(
 
     Examples
     --------
-    >>> import pandas as pd
     >>> import texthero as hero
+    >>> import pandas as pd
     >>> s = pd.Series(["New York is a beautiful city", "Look: New York!"])
     >>> hero.tokenize_with_phrases(s, min_count=1, threshold=1)
     0    [New_York, is, a, beautiful, city]
@@ -893,7 +894,7 @@ def replace_urls(s: pd.Series, symbol: str) -> pd.Series:
     s: Pandas Series
 
     symbol: String
-        the symbol to which the URL should be changed to
+        The symbol to which the URL should be changed to.
 
     Returns
     -------
@@ -922,7 +923,7 @@ def replace_urls(s: pd.Series, symbol: str) -> pd.Series:
 def remove_urls(s: pd.Series) -> pd.Series:
     r"""Removes all urls from a given Pandas Series.
 
-    `remove_urls` remove any urls and replace it with a single empty space.
+    Removes all urls and replaces them with a single empty space.
 
     Parameters
     ----------

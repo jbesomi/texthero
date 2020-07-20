@@ -249,7 +249,7 @@ def tfidf(
 
     Returns
     -------
-    Panda Series Sparse
+    Panda Series
 
     Examples
     --------

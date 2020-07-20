@@ -85,8 +85,10 @@ def replace_digits(s: pd.Series, symbols: str = " ", only_blocks=True) -> pd.Ser
     Parameters
     ----------
     s : Pandas Series
+
     symbols : str (default single empty space " ")
         Symbols to replace
+
     only_blocks : bool
         When set to False, remove any digits.
 
@@ -127,6 +129,7 @@ def remove_digits(s: pd.Series, only_blocks=True) -> pd.Series:
     Parameters
     ----------
     s : Pandas Series
+
     only_blocks : bool
         Remove only blocks of digits.
            
@@ -159,6 +162,7 @@ def replace_punctuation(s: pd.Series, symbol: str = " ") -> pd.Series:
     Parameters
     ----------
     s : Pandas Series
+
     symbol : str (default single empty space)
         Symbol to use as replacement for all string punctuation. 
 
@@ -295,8 +299,10 @@ def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
     Parameters
     ----------
     text: str
+
     stopwords : Set[str]
         Set of stopwords string to remove.
+
     symbol: str, Optional
         Character(s) to replace words with; defaults to a space.
 
@@ -336,8 +342,10 @@ def replace_stopwords(
     ----------
 
     s : Pandas Series
+
     symbol: str
         Character(s) to replace words with.
+
     stopwords : Set[str], Optional
         Set of stopwords string to remove. If not passed, by default it used NLTK English stopwords. 
 
@@ -373,6 +381,7 @@ def remove_stopwords(
     ----------
 
     s : Pandas Series
+
     stopwords : Set[str], Optional
         Set of stopwords string to remove. If not passed, by default it used NLTK English stopwords.
 
@@ -421,8 +430,10 @@ def stem(s: pd.Series, stem="snowball", language="english") -> pd.Series:
     Parameters
     ----------
     s : Pandas Series
+
     stem : str (snowball by default)
         Stemming algorithm. It can be either 'snowball' or 'porter'
+
     language : str (english by default)
         Supported languages: `danish`, `dutch`, `english`, `finnish`, `french`, `german` , `hungarian`, `italian`, `norwegian`, `portuguese`, `romanian`, `russian`, `spanish` and `swedish`.
 
@@ -502,6 +513,7 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
     Parameters
     ----------
     s : Pandas Series
+
     pipeline :List[Callable[[Pandas Series], Pandas Series]]
        inserting specific pipeline to clean a text
 
@@ -835,8 +847,10 @@ def tokenize_with_phrases(
     Parameters
     ----------
         s : Pandas Series
+
         min_count : Int, optional. Default is 5.
             ignore tokens with frequency less than this
+
         threshold : Int, optional. Default is 10.
             ignore tokens with a score under that threshold
 
@@ -877,6 +891,7 @@ def replace_urls(s: pd.Series, symbol: str) -> pd.Series:
     Parameters
     ----------
     s: Pandas Series
+
     symbol: String
         the symbol to which the URL should be changed to
 
@@ -943,6 +958,7 @@ def replace_tags(s: pd.Series, symbol: str) -> pd.Series:
     Parameters
     ----------
     s : Pandas Series
+
     symbols : str
         Symbols to replace
 
@@ -1002,6 +1018,7 @@ def replace_hashtags(s: pd.Series, symbol: str) -> pd.Series:
     Parameters
     ----------
     s : Pandas Series
+
     symbols : str
         Symbols to replace
     

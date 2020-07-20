@@ -43,8 +43,10 @@ def representation_series_to_flat_series(
     ----------
     s : Sparse Pandas Series or Pandas Series
         The multiindexed Pandas Series to flatten.
+
     index : Pandas Index, optional, default to None
         The index the flattened Series should have.
+
     fill_missing_with : Any, default to np.nan
         Value to fill the NaNs (missing values) with. This _does not_ mean
         that existing values that are np.nan are replaced, but rather that
@@ -122,21 +124,26 @@ def term_frequency(
     Parameters
     ----------
     s : Pandas Series
+
     max_features : int, optional, default to None.
         Maximum number of features to keep. Will keep all features if set to None.
+
     return_features_names : Boolean, default to False.
         If True, return a tuple (*term_frequency_series*, *features_names*)
+
     max_df : float in range [0.0, 1.0] or int, default=1.0
         Ignore terms that have a document frequency (number of documents they appear in)
         frequency strictly higher than the given threshold.
         If float, the parameter represents a proportion of documents, integer
         absolute counts.
+
     min_df : float in range [0.0, 1.0] or int, default=1
         When building the vocabulary ignore terms that have a document
         frequency (number of documents they appear in) strictly 
         lower than the given threshold.
         If float, the parameter represents a proportion of documents, integer
         absolute counts.
+
     binary : bool, default=False
         If True, all non zero counts are set to 1.
 
@@ -223,14 +230,20 @@ def tfidf(
     Parameters
     ----------
     s : Pandas Series (tokenized)
+
     max_features : int, optional, default to None.
         If not None, only the max_features most frequent tokens are used.
+
     min_df : int, optional, default to 1.
-        When building the vocabulary, ignore terms that have a document 
+        When building the vocabulary, ignore terms that have a document
         frequency (number of documents a term appears in) strictly lower than the given threshold.
+
     max_df : int or double, optional, default to 1.0
         When building the vocabulary, ignore terms that have a document
-        frequency (number of documents a term appears in) strictly higher than the given threshold. This arguments basically permits to remove corpus-specific stop words. When the argument is a float [0.0, 1.0], the parameter represents a proportion of documents.
+        frequency (number of documents a term appears in) strictly higher than the given threshold.
+        This arguments basically permits to remove corpus-specific stop words.
+        When the argument is a float [0.0, 1.0], the parameter represents a proportion of documents.
+
     return_feature_names: Boolean, optional, default to False
         Whether to return the feature (i.e. word) names with the output.
 
@@ -249,6 +262,11 @@ def tfidf(
     0    [1.0, 1.4054651081081644, 0.0]
     1    [2.0, 0.0, 1.4054651081081644]
     dtype: object, ['Bye', 'Hi', 'Test'])
+
+    See Also
+    --------
+    `TF-IDF on Wikipedia <https://en.wikipedia.org/wiki/Tf-idf>`_
+
     """
 
     # Check if input is tokenized. Else, print warning and tokenize.
@@ -319,9 +337,11 @@ def pca(s: pd.Series, n_components=2, random_state=None) -> pd.Series:
     Parameters
     ----------
     s : Pandas Series
+
     n_components : Int. Default is 2.
         Number of components to keep (dimensionality of output vectors).
         If n_components is not set or None, all components are kept.
+
     random_state : int, RandomState instance, default=None
         Pass an int for reproducible results across multiple function calls.
 
@@ -347,6 +367,8 @@ def pca(s: pd.Series, n_components=2, random_state=None) -> pd.Series:
     See also
     --------
     `PCA on Wikipedia <https://en.wikipedia.org/wiki/Principal_component_analysis>`_
+
+    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
 
     """
     pca = PCA(n_components=n_components, random_state=random_state)
@@ -374,6 +396,7 @@ def nmf(s, n_components=2) -> pd.Series:
     Parameters
     ----------
     s : Pandas Series
+
     n_components : Int. Default is 2.
         Number of components to keep (dimensionality of output vectors).
         If n_components is not set or None, all components are kept.
@@ -407,6 +430,8 @@ def nmf(s, n_components=2) -> pd.Series:
     See also
     --------
     `NMF on Wikipedia <https://en.wikipedia.org/wiki/Non-negative_matrix_factorization>`_
+
+    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
 
     """
     nmf = NMF(n_components=n_components, init="random", random_state=0)
@@ -567,6 +592,8 @@ def tsne(
     --------
     `t-SNE on Wikipedia <https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding>`_
 
+    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
+
     """
     tsne = TSNE(
         n_components=n_components,
@@ -703,6 +730,8 @@ def kmeans(
     --------
     `kmeans on Wikipedia <https://en.wikipedia.org/wiki/K-means_clustering>`_
 
+    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
+
     """
     vectors = list(s)
     kmeans = KMeans(
@@ -825,6 +854,8 @@ def dbscan(
     --------
     `DBSCAN on Wikipedia <https://en.wikipedia.org/wiki/DBSCAN>`_
 
+    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
+
     """
 
     return pd.Series(
@@ -932,6 +963,8 @@ def meanshift(
     See also
     --------
     `Mean-Shift on Wikipedia <https://en.wikipedia.org/wiki/Mean_shift>`_
+
+    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
 
     """
     return pd.Series(

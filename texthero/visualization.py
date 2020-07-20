@@ -32,16 +32,22 @@ def scatterplot(
     Parameters
     ----------
     df: DataFrame with a column to be visualized.
+
     col: str
         The name of the column of the DataFrame to use for x and y (and z) axis.
+
     color: str, default to None.
         Name of the column to use for coloring (rows with same value get same color).
+
     title: str, default to "".
         Title of the plot.
+
     return_figure: optional, default to False.
         Function returns the figure if set to True.
+
     hover_data: List[str], default to [].
         List of column names to supply data when hovering over a point.
+
     hover_name: str, default to None
         Name of the column to supply title of data when hovering over a point.
 
@@ -127,26 +133,42 @@ def wordcloud(
     Parameters
     ----------
     s : pd.Series
+
     font_path : str
-        Font path to the font that will be used (OTF or TTF). Defaults to DroidSansMono path on a Linux machine. If you are on another OS or don't have this font, you need to adjust this path.
+        Font path to the font that will be used (OTF or TTF).
+        Defaults to DroidSansMono path on a Linux machine.
+        If you are on another OS or don't have this font, you need to adjust this path.
+
     width : int
         Width of the canvas.
+
     height : int
         Height of the canvas.
+
     max_words : number (default=200)
         The maximum number of words.
+
     mask : nd-array or None (default=None)
-        When set, gives a binary mask on where to draw words. When set, width and height will be ignored and the shape of mask will be used instead. All white (#FF or #FFFFFF) entries will be considerd "masked out" while other entries will be free to draw on.
+        When set, gives a binary mask on where to draw words.
+        When set, width and height will be ignored and the shape of mask will be used instead.
+        All white (#FF or #FFFFFF) entries will be considerd "masked out" while other
+        entries will be free to draw on.
+
     contour_width: float (default=0)
         If mask is not None and contour_width > 0, draw the mask contour.
+
     contour_color: color value (default="PAPAYAWHIP")
         Mask contour color.
+
     min_font_size : int (default=4)
         Smallest font size to use. Will stop when there is no more room in this size.
+
     background_color : color value (default="PAPAYAWHIP")
         Background color for the word cloud image.
+
     max_font_size : int or None (default=None)
         Maximum font size for the largest word. If None, height of the image is used.
+
     relative_scaling : float (default='auto')
         Importance of relative word frequencies for font-size.  With
         relative_scaling=0, only word-ranks are considered.  With
@@ -155,8 +177,10 @@ def wordcloud(
         their rank, relative_scaling around .5 often looks good.
         If 'auto' it will be set to 0.5 unless repeat is true, in which
         case it will be set to 0.
+
     colormap : string or matplotlib colormap, default="viridis"
         Matplotlib colormap to randomly draw colors from for each word.
+
     """
     text = s.str.cat(sep=" ")
 

@@ -35,7 +35,7 @@ class TestRepresentation(PandasTestCase):
     def test_count_multiple_documents(self):
         s = pd.Series(["doc_one", "doc_two"])
         s = preprocessing.tokenize(s)
-        s_true = pd.Series([[1, 1, 1, 0], [1, 1, 0, 1]])
+        s_true = pd.Series([[1, 0], [0, 1]])
         self.assertEqual(representation.count(s), s_true)
 
     def test_count_not_lowercase(self):

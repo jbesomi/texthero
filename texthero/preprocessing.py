@@ -608,9 +608,10 @@ def tokenize(s: pd.Series) -> pd.Series:
 
     """
 
-    pattern = (
-        rf"((\w)([{string.punctuation}])(?:\B|$)|(?:^|\B)([{string.punctuation}])(\w))"
-    )
+    punct = string.punctuation.replace("_", "")
+    # In regex, the metacharacter 'w' is "a-z, A-Z, 0-9, including the _ (underscore) character." We therefore remove it from the punctuation string as this is already included in \w
+
+    pattern = rf"((\w)([{punct}])(?:\B|$)|(?:^|\B)([{punct}])(\w))"
 
     return s.str.replace(pattern, r"\2 \3 \4 \5").str.split()
 

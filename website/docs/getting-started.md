@@ -246,7 +246,7 @@ df['pca'] = (
 hero.scatterplot(df, col='pca', color='topic', title="PCA BBC Sport news")
 ```
 
-![](/img/scatterplot_bccsport_3d.png)
+![](/img/scatterplot_bbcsport_3d.png)
 
 
 ##### Next section

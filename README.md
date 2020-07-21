@@ -44,7 +44,7 @@
 
 <h2 align="center">From zero to hero</h2>
 
-Texthero is a python toolkit to work with text-based dataset quickly and effortlessly. Texthero is very simple to learn and designed to be used on top of Pandas. Texthero has the same expressiveness and power of Pandas and is extensively documented. Texthero is modern and conceived for programmers of the 2020 decade with little knowledge if any in linguistic. 
+Texthero is a python toolkit to work with text-based dataset quickly and effortlessly. Texthero is very simple to learn and designed to be used on top of Pandas. Texthero has the same expressiveness and power of Pandas and is extensively documented. Texthero is modern and conceived for programmers of the 2020 decade with little knowledge if any in linguistic.
 
 You can think of Texthero as a tool to help you _understand_ and work with text-based dataset. Given a tabular dataset, it's easy to _grasp the main concept_. Instead, given a text dataset, it's harder to have quick insights into the underline data. With Texthero, preprocessing text data, mapping it into vectors, and visualizing the obtained vector space takes just a couple of lines.
 
@@ -55,7 +55,7 @@ Texthero include tools for:
 * Vector space analysis: clustering (K-means, Meanshift, DBSCAN and Hierarchical), topic modeling (wip) and interpretation.
 * Text visualization: vector space visualization, place localization on maps (wip).
 
-Texthero is free, open-source and [well documented](https://texthero.org/docs) (and that's what we love most by the way!). 
+Texthero is free, open-source and [well documented](https://texthero.org/docs) (and that's what we love most by the way!).
 
 We hope you will find pleasure working with Texthero as we had during his development.
 
@@ -92,7 +92,7 @@ pip install texthero
 
 <h2 align="center">Getting started</h2>
 
-The best way to learn Texthero is through the <a href="https://texthero.org/docs/getting-started">Getting Started</a> docs. 
+The best way to learn Texthero is through the <a href="https://texthero.org/docs/getting-started">Getting Started</a> docs.
 
 In case you are an advanced python user, then `help(texthero)` should do the work.
 
@@ -139,7 +139,7 @@ In case you are an advanced python user, then `help(texthero)` should do the wor
 ...     .pipe(hero.tokenize)
 ...     .pipe(hero.tfidf)
 ... )
->>> 
+>>>
 >>> df['kmeans_labels'] = (
 ...     df['tfidf']
 ...     .pipe(hero.kmeans, n_clusters=5)
@@ -182,7 +182,7 @@ Remove all types of brackets and their content.
 
 ```python
 >>> s = hero.remove_brackets(s)
->>> s 
+>>> s
 0    This sèntencé    needs to  be cleaned!
 dtype: object
 ```
@@ -191,7 +191,7 @@ Remove diacritics.
 
 ```python
 >>> s = hero.remove_diacritics(s)
->>> s 
+>>> s
 0    This sentence    needs to  be cleaned!
 dtype: object
 ```
@@ -200,7 +200,7 @@ Remove punctuation.
 
 ```python
 >>> s = hero.remove_punctuation(s)
->>> s 
+>>> s
 0    This sentence    needs to  be cleaned
 dtype: object
 ```
@@ -209,7 +209,7 @@ Remove extra white-spaces.
 
 ```python
 >>> s = hero.remove_whitespace(s)
->>> s 
+>>> s
 0    This sentence needs to be cleaned
 dtype: object
 ```
@@ -257,7 +257,7 @@ Supported **representation** algorithms:
 1. Term frequency (`term_frequency`)
 1. Term frequency-inverse document frequency (`tfidf`)
 
-For the "representation" functions it is strongly recomended to tokenize the input series with the `hero.tokenize(s)` function from the texthero library or to use a custom tokenizer.
+For the "representation" functions it is strongly recommended to tokenize the input series first with the `hero.tokenize(s)` function from the texthero library.
 
 Supported **clustering** algorithms:
 1. K-means (`kmeans`)
@@ -308,7 +308,7 @@ The website will be soon moved from Docusaurus to Sphinx: read the [open issue t
 
 **Are you good at writing?**
 
-Probably this is the most important piece missing now on Texthero: more tutorials and more "Getting Started" guide. 
+Probably this is the most important piece missing now on Texthero: more tutorials and more "Getting Started" guide.
 
 If you are good at writing you can help us! Why don't you start by [Adding a FAQ page to the website](https://github.com/jbesomi/texthero/issues/41) or explain how to [create a custom pipeline](https://github.com/jbesomi/texthero/issues/38)? Need help? We are there for you.
 

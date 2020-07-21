@@ -63,7 +63,7 @@ We hope you will find pleasure working with Texthero as we had during his develo
 
 Texthero has been developed for the whole NLP community. We know how hard it is to deal with different NLP tools (NLTK, SpaCy, Gensim, TextBlob, Sklearn): that's why we developed Texthero, to simplify things.
 
-Now, the next main milestone is to provide *multilingual support* and for this big step, we need the help of all of you. ¿Hablas español? Sie sprechen Deutsch? 你会说中文？ 日本語が話せるのか？ Fala português? Parli Italiano? Вы говорите по-русски? If yes or you speak another language not mentioned here, then you might help us develop multilingual support! Even if you haven't contributed before or you just started with NLP, contact us or open a Github issue, there is always a first time :) We promise you will learn a lot, and, ... who knows? It might help you find your new job as an NLP-developer!
+Now, the next main milestone is to provide *multilingual support* and for this big step, we need the help of all of you. ¿Hablas español? Sprechen Sie Deutsch? 你会说中文 日本語が話せるのか？Fala português? Parli Italiano? Вы говорите по-русски? If yes or you speak another language not mentioned here, then you might help us develop multilingual support! Even if you haven't contributed before or you just started with NLP, contact us or open a Github issue, there is always a first time :) We promise you will learn a lot, and, ... who knows? It might help you find your new job as an NLP-developer!
 
 For improving the python toolkit and provide an even better experience, your aid and feedback are crucial. If you have any problem or suggestion please open a Github [issue](https://github.com/jbesomi/texthero/issues), we will be glad to support you and help you.
 
@@ -112,6 +112,7 @@ In case you are an advanced python user, then `help(texthero)` should do the wor
 >>> df['pca'] = (
 ...    df['text']
 ...    .pipe(hero.clean)
+...    .pipe(hero.tokenize)
 ...    .pipe(hero.tfidf)
 ...    .pipe(hero.pca)
 ... )
@@ -135,6 +136,7 @@ In case you are an advanced python user, then `help(texthero)` should do the wor
 >>> df['tfidf'] = (
 ...     df['text']
 ...     .pipe(hero.clean)
+...     .pipe(hero.tokenize)
 ...     .pipe(hero.tfidf)
 ... )
 >>> 
@@ -252,8 +254,10 @@ Full documentation: [nlp](https://texthero.org/docs/api-nlp)
 **Scope:** map text data into vectors and do dimensionality reduction.
 
 Supported **representation** algorithms:
-1. Term frequency (`count`)
+1. Term frequency (`term_frequency`)
 1. Term frequency-inverse document frequency (`tfidf`)
+
+For the "representation" functions it is strongly recomended to tokenize the input series with the `hero.tokenize(s)` function from the texthero library or to use a custom tokenizer.
 
 Supported **clustering** algorithms:
 1. K-means (`kmeans`)

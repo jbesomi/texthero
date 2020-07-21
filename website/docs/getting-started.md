@@ -9,13 +9,13 @@ Texthero is a python package to let you work efficiently and quickly with text d
 
 ## Overview
 
-Given a dataset with structured data, it's easy to have a quick understanding of the underlying data. Oppositely, given a dataset composed of text-only, it's harder to have a quick undertanding of the data. Texthero help you there, providing utility functions to quickly **clean the text data**, **map it into a vector space** and gather from it **primary insights**.
+Given a dataset with structured data, it's easy to have a quick understanding of the underlying data. Oppositely, given a dataset composed of text-only, it's harder to have a quick undertanding of the data. Texthero help you there, providing utility functions to quickly **clean the text data**, **tokenize it**, **map it into a vector space** and gather from it **primary insights**.
 
 ##### Pandas integration
 
 One of the main pillar of texthero is that is designed from the ground-up to work with **Pandas Dataframe** and **Series**.
 
-Most of texthero methods simply apply transformation to Pandas Series. As a rule of thumb, the first argument and the ouput of almost all texthero methods are either a Pandas Series or a Pandas DataFrame.
+Most of texthero's methods simply apply a transformation to a Pandas Series. As a rule of thumb, the first argument and the ouput of almost all texthero methods are either a Pandas Series or a Pandas DataFrame.
 
 
 ##### Pipeline
@@ -120,6 +120,15 @@ or alternatively
 df['clean_text'] = df['clean_text'].pipe(hero.clean, custom_pipeline)
 ```
 
+##### Tokenize
+
+Next, we usually want to tokenize the text (_tokenizing_ means splitting sentences/documents into separate words, the _tokens_). Of course, texthero provides an easy function for that!
+
+```python
+df['tokenized_text'] = hero.tokenize(df['clean_text'])
+```
+
+
 ##### Preprocessing API
 
 The complete preprocessing API can be found here: [api preprocessing](/docs/api-preprocessing).
@@ -127,16 +136,15 @@ The complete preprocessing API can be found here: [api preprocessing](/docs/api-
 
 ### Representation
 
-Once the data is cleaned, the next natural step is, to map each document to a vector so we can compare
-documents with mathematical methods to derive insights.
+Once the data is cleaned and tokenized, the next natural step is to map each document to a vector so we can compare documents with mathematical methods to derive insights.
 
 ##### TFIDF representation
 
 TFIDF is a formula to calculate the _relative importance_ of the words in a document, taking
-into account the words' occurences in other documents. 
+into account the words' occurrences in other documents.
 
 ```python
-df['tfidf_clean_text'] = hero.tfidf(df['clean_text'])
+df['tfidf'] = hero.tfidf(df['tokenized_text'])
 ```
 
 Now, we have calculated a vector for each document that tells us what words are characteristic for the document.
@@ -152,20 +160,21 @@ many entries). For that, we can use PCA. PCA generates new vectors from the tfid
 that showcase the differences among the documents most strongly in fewer dimensions, often 2 or 3.
 
 ```python
-df['pca_tfidf_clean_text'] = hero.pca(df['tfidf_clean_text'])
+df['pca'] = hero.pca(df['tfidf'])
 ```
 
 ##### All in one step
 
-We can achieve all the three steps show above, _cleaning_, _tf-idf representation_ and _dimensionality reduction_ in a single step. Isn't fabulous?
+We can achieve all the steps shown above, _cleaning_, _tokenizing_, _tf-idf representation_ and _dimensionality reduction_ in a single step. Isn't that fabulous?
 
 ```python
-df['pca_tfidf_clean_text'] = (
-            df['text']
-            .pipe(hero.clean)
-            .pipe(hero.tfidf)
-            .pipe(hero.pca)
-   )
+df['pca'] = (
+      df['text']
+      .pipe(hero.clean)
+      .pipe(hero.tokenize)
+      .pipe(hero.tfidf)
+      .pipe(hero.pca)
+)
 ```
 
 ##### Representation API
@@ -178,7 +187,7 @@ The complete representation module API can be found here: [api representation](/
 
 
 ```python
-hero.scatterplot(df, col='pca_tfidf_clean_text', color='topic', title="PCA BBC Sport news")
+hero.scatterplot(df, col='pca', color='topic', title="PCA BBC Sport news")
 ```
 
 ![](/img/scatterplot_bccsport.svg)
@@ -239,8 +248,9 @@ df = pd.read_csv(
 df['pca'] = (
     df['text']
     .pipe(hero.clean)
+    .pipe(hero.tokenize)
     .pipe(hero.tfidf)
-    .pipe(hero.pca,n_components=2)
+    .pipe(hero.pca, n_components=3)
 )
 
 hero.scatterplot(df, col='pca', color='topic', title="PCA BBC Sport news")

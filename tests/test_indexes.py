@@ -55,6 +55,7 @@ test_cases_preprocessing = [
 ]
 
 test_cases_representation = [
+    ["count", representation.count, (preprocessing.tokenize(s_text),),],
     [
         "term_frequency",
         representation.term_frequency,

@@ -100,22 +100,33 @@ Vectorization
 """
 
 
-def term_frequency(
-    s: pd.Series, max_features: Optional[int] = None, return_feature_names=False
+def count(
+    s: pd.Series,
+    max_features: Optional[int] = None,
+    min_df=1,
+    max_df=1.0,
+    return_feature_names=False,
 ):
     """
-    Represent a text-based Pandas Series using term_frequency.
+    Represent a text-based Pandas Series using count.
 
     The input Series should already be tokenized. If not, it will
-    be tokenized before term_frequency is calculated.
+    be tokenized before count is calculated.
 
     Parameters
     ----------
     s : Pandas Series
     max_features : int, optional
         Maximum number of features to keep.
+    min_df : int, optional, default to 1.
+        When building the vocabulary, ignore terms that have a document 
+        frequency (number of documents a term appears in) strictly lower than the given threshold.
+    max_df : int or double, optional, default to 1.0
+        When building the vocabulary, ignore terms that have a document
+        frequency (number of documents a term appears in) strictly higher than the given threshold. This arguments basically permits to remove corpus-specific stop words. When the argument is a float [0.0, 1.0], the parameter represents a proportion of documents.
+
     return_features_names : Boolean, False by Default
-        If True, return a tuple (*term_frequency_series*, *features_names*)
+        If True, return a tuple (*count_series*, *features_names*)
 
 
     Examples
@@ -124,7 +135,7 @@ def term_frequency(
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"])
     >>> s = hero.tokenize(s)
-    >>> hero.term_frequency(s)
+    >>> hero.count(s)
     0    [1, 1, 0]
     1    [1, 0, 1]
     dtype: object
@@ -135,7 +146,7 @@ def term_frequency(
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"])
     >>> s = hero.tokenize(s)
-    >>> hero.term_frequency(s, return_feature_names=True)
+    >>> hero.count(s, return_feature_names=True)
     (0    [1, 1, 0]
     1    [1, 0, 1]
     dtype: object, ['Sentence', 'one', 'two'])
@@ -149,9 +160,89 @@ def term_frequency(
         s = preprocessing.tokenize(s)
 
     tf = CountVectorizer(
-        max_features=max_features, tokenizer=lambda x: x, preprocessor=lambda x: x,
+        max_features=max_features,
+        tokenizer=lambda x: x,
+        preprocessor=lambda x: x,
+        min_df=min_df,
+        max_df=max_df,
     )
     s = pd.Series(tf.fit_transform(s).toarray().tolist(), index=s.index)
+
+    if return_feature_names:
+        return (s, tf.get_feature_names())
+    else:
+        return s
+
+
+def term_frequency(
+    s: pd.Series,
+    max_features: Optional[int] = None,
+    min_df=1,
+    max_df=1.0,
+    return_feature_names=False,
+):
+
+    """
+    Represent a text-based Pandas Series using term frequency.
+
+    The input Series should already be tokenized. If not, it will
+    be tokenized before term_frequency is calculated.
+
+    Parameters
+    ----------
+    s : Pandas Series
+    max_features : int, optional
+        Maximum number of features to keep.
+    min_df : int, optional, default to 1.
+        When building the vocabulary, ignore terms that have a document 
+        frequency (number of documents a term appears in) strictly lower than the given threshold.
+    max_df : int or double, optional, default to 1.0
+        When building the vocabulary, ignore terms that have a document
+        frequency (number of documents a term appears in) strictly higher than the given threshold. This arguments basically permits to remove corpus-specific stop words. When the argument is a float [0.0, 1.0], the parameter represents a proportion of documents.
+
+    return_features_names : Boolean, False by Default
+        If True, return a tuple (*count_series*, *features_names*)
+
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["Sentence one", "Sentence two"])
+    >>> s = hero.tokenize(s)
+    >>> hero.term_frequency(s)
+    0    [0.25, 0.25, 0.0]
+    1    [0.25, 0.0, 0.25]
+    dtype: object
+    
+    To return the features_names:
+    
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["Sentence one", "Sentence two"])
+    >>> s = hero.tokenize(s)
+    >>> hero.term_frequency(s, return_feature_names=True)
+    (0    [0.25, 0.25, 0.0]
+    1    [0.25, 0.0, 0.25]
+    dtype: object, ['Sentence', 'one', 'two'])
+
+    """
+    # Check if input is tokenized. Else, print warning and tokenize.
+    if not isinstance(s.iloc[0], list):
+        warnings.warn(_not_tokenized_warning_message, DeprecationWarning)
+        s = preprocessing.tokenize(s)
+
+    tf = CountVectorizer(
+        max_features=max_features,
+        tokenizer=lambda x: x,
+        preprocessor=lambda x: x,
+        min_df=min_df,
+        max_df=max_df,
+    )
+
+    cv_fit_transform = tf.fit_transform(s).toarray()
+    total_count = np.sum(cv_fit_transform)
+    s = pd.Series(np.divide(cv_fit_transform, total_count).tolist(), index=s.index)
 
     if return_feature_names:
         return (s, tf.get_feature_names())

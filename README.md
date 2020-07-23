@@ -314,6 +314,7 @@ If you have just other questions or inquiry drop me a line at jonathanbesomi__AT
 - [bobfang1992](https://github.com/bobfang1992)
 - [Ishan Arora](https://github.com/ishanarora04)
 - [Vidya P](https://github.com/vidyap-xgboost)
+- [Cedric Conol](https://github.com/cedricconol)
 
 
 <h2 align="center"><a href="./LICENSE">License</a></h2>

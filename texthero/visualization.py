@@ -54,17 +54,11 @@ def scatterplot(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> doc1 = "Football, Sports, Soccer"
-    >>> doc2 = "music, violin, orchestra"
-    >>> doc3 = "football, fun, sports"
-    >>> doc4 = "music, fun, guitar"
-    >>> df = pd.DataFrame([doc1, doc2, doc3, doc4], columns=["texts"])
-    >>> df["texts"] = hero.clean(df["texts"])
-    >>> df["texts"] = hero.tokenize(df["texts"])
-    >>> df["tfidf"] = hero.tfidf(df["texts"])
-    >>> df["topics"] = hero.kmeans(df["tfidf"], n_clusters=2)
-    >>> df["pca"] = hero.pca(df["tfidf"], n_components=3)
-    >>> hero.scatterplot(df, col="pca", color="topics", hover_name="texts") # doctest: +SKIP
+    >>> df = pd.DataFrame(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports"], columns=["texts"])
+    >>> df["texts"] = hero.clean(df["texts"]).pipe(hero.tokenize)
+    >>> df["pca"] = hero.tfidf(df["texts"]).pipe(hero.pca)
+    >>> df["topics"] = hero.tfidf(df["texts"]).pipe(hero.kmeans, n_clusters=2)
+    >>> hero.scatterplot(df, col="pca", color="topics", hover_data=["texts"]) # doctest: +SKIP
     """
 
     pca0 = df[col].apply(lambda x: x[0])

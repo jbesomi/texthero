@@ -143,8 +143,7 @@ def count(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Sentence one", "Sentence two"])
-    >>> s = hero.tokenize(s)
+    >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
     >>> hero.count(s)
     0    [1, 1, 0]
     1    [1, 0, 1]
@@ -154,8 +153,7 @@ def count(
     
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Sentence one", "Sentence two"])
-    >>> s = hero.tokenize(s)
+    >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
     >>> hero.count(s, return_feature_names=True)
     (0    [1, 1, 0]
     1    [1, 0, 1]
@@ -226,8 +224,7 @@ def term_frequency(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Sentence one", "Sentence two"])
-    >>> s = hero.tokenize(s)
+    >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
     >>> hero.term_frequency(s)
     0    [0.25, 0.25, 0.0]
     1    [0.25, 0.0, 0.25]
@@ -237,8 +234,7 @@ def term_frequency(
     
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Sentence one", "Sentence two"])
-    >>> s = hero.tokenize(s)
+    >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
     >>> hero.term_frequency(s, return_feature_names=True)
     (0    [0.25, 0.25, 0.0]
     1    [0.25, 0.0, 0.25]
@@ -327,8 +323,7 @@ def tfidf(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Hi Bye", "Test Bye Bye"])
-    >>> s = hero.tokenize(s)
+    >>> s = pd.Series(["Hi Bye", "Test Bye Bye"]).pipe(hero.tokenize)
     >>> hero.tfidf(s, return_feature_names=True)
     (document
     0    [1.0, 1.4054651081081644, 0.0]
@@ -427,9 +422,7 @@ def pca(s, n_components=2) -> pd.Series:
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Football is great", "Hi, I'm Texthero, who are you? Tell me!"])
-    >>> s = hero.clean(s)
-    >>> s = hero.tokenize(s)
-    >>> s = hero.tfidf(s)
+    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
     >>> # Attention, your results might differ due to
     >>> # the randomness in PCA!
     >>> hero.pca(s) # doctest: +SKIP
@@ -483,13 +476,8 @@ def nmf(s, n_components=2) -> pd.Series:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> doc1 = "Football, Sports, Soccer"
-    >>> doc2 = "Music, Violin, Orchestra"
-    >>> doc3 = "Football, Music"
-    >>> s = pd.Series([doc1, doc2, doc3])
-    >>> s = hero.clean(s)
-    >>> s = hero.tokenize(s)
-    >>> s = hero.term_frequency(s)
+    >>> s = pd.Series(["Football, Sports, Soccer", "Music, Violin, Orchestra", "Football, Music"])
+    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency)
     >>> hero.nmf(s) # doctest: +SKIP
     0                    [0.9080190347553924, 0.0]
     1                     [0.0, 0.771931061231598]
@@ -649,13 +637,8 @@ def tsne(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> doc1 = "Football, Sports, Soccer"
-    >>> doc2 = "Music, Violin, Orchestra"
-    >>> doc3 = "Football, Music"
-    >>> s = pd.Series([doc1, doc2, doc3])
-    >>> s = hero.clean(s)
-    >>> s = hero.tokenize(s)
-    >>> s = hero.term_frequency(s)
+    >>> s = pd.Series(["Football, Sports, Soccer", "Music, Violin, Orchestra", "Football, Music"])
+    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency)
     >>> hero.tsne(s, random_state=42) # doctest: +SKIP
     0      [-18.833383560180664, -276.800537109375]
     1     [-210.60179138183594, 143.00535583496094]
@@ -783,14 +766,8 @@ def kmeans(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> doc1 = "Football, Sports, Soccer"
-    >>> doc2 = "music, violin, orchestra"
-    >>> doc3 = "football, fun, sports"
-    >>> doc4 = "music, fun, guitar"
-    >>> s = pd.Series([doc1, doc2, doc3, doc4])
-    >>> s = hero.clean(s)
-    >>> s = hero.tokenize(s)
-    >>> s = hero.term_frequency(s)
+    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, fun, guitar"])
+    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency)
     >>> hero.kmeans(s, n_clusters=2, random_state=42)
     0    1
     1    0
@@ -905,14 +882,8 @@ def dbscan(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> doc1 = "Football, Sports, Soccer"
-    >>> doc2 = "music, violin, orchestra"
-    >>> doc3 = "football, fun, sports"
-    >>> doc4 = "music, enjoy, guitar"
-    >>> s = pd.Series([doc1, doc2, doc3, doc4])
-    >>> s = hero.clean(s)
-    >>> s = hero.tokenize(s)
-    >>> s = hero.tfidf(s)
+    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, enjoy, guitar"])
+    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
     >>> hero.dbscan(s, min_samples=1, eps=4)
     document
     0    0

@@ -68,7 +68,7 @@ Texthero is there for the NLP-community. If you have an idea on how we can impro
 1. Name your PR title accordingly to your changes and add a good and exhaustive description
 1. Give to the branch a meaningful name. Avoid using the master branch. 
 1. Respect [numpydoc docstring guide](https://numpydoc.readthedocs.io/en/latest/format.html). Look at the code for similarity.
-
+1. Respect [PEP 257 -- Docstring Conventions](https://www.python.org/dev/peps/pep-0257/)
 
 ## Good first issue
 

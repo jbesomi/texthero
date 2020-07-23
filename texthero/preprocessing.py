@@ -100,11 +100,11 @@ def replace_digits(s: pd.Series, symbols: str = " ", only_blocks=True) -> pd.Ser
 
 def remove_digits(s: pd.Series, only_blocks=True) -> pd.Series:
     """
-    Removes all digits and replaces them with a single space.
+    Remove all digits and replaces them with a single space.
 
-    By default, only removes "blocks" of digits. For instance, `1234 falcon9` becomes ` falcon9`.
+    By default, only remove "blocks" of digits. For instance, `1234 falcon9` becomes ` falcon9`.
 
-    When the arguments `only_blocks` is set to ´False´, removes any digits.
+    When the arguments `only_blocks` is set to ´False´, remove any digits.
 
     See also :meth:`replace_digits` to replace digits with another string.
 
@@ -133,10 +133,10 @@ def remove_digits(s: pd.Series, only_blocks=True) -> pd.Series:
 
 def replace_punctuation(s: pd.Series, symbol: str = " ") -> pd.Series:
     """
-    Replaces all punctuation with a given symbol.
+    Replace all punctuation with a given symbol.
 
-    `replace_punctuation` replace all punctuation from the given
-    Pandas Series and replace it with a custom symbol. 
+    Replace all punctuation from the given
+    Pandas Series with a custom symbol. 
     It considers as punctuation characters all :data:`string.punctuation` 
     symbols `!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~).`
 
@@ -165,7 +165,8 @@ def remove_punctuation(s: pd.Series) -> pd.Series:
     """
     Replace all punctuation with a single space (" ").
 
-    `remove_punctuation` removes all punctuation from the given Pandas Series and replaces it with a single space. It considers as punctuation characters all :data:`string.punctuation` symbols `!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~).`
+    Remove all punctuation from the given Pandas Series and replace it
+    with a single space. It considers as punctuation characters all :data:`string.punctuation` symbols `!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~).`
 
     See also :meth:`replace_punctuation` to replace punctuation with a custom symbol.
 
@@ -183,7 +184,7 @@ def remove_punctuation(s: pd.Series) -> pd.Series:
 
 def _remove_diacritics(text: str) -> str:
     """
-    Removes diacritics and accents from one string.
+    Remove diacritics and accents from one string.
 
     Examples
     --------
@@ -201,10 +202,10 @@ def _remove_diacritics(text: str) -> str:
 
 def remove_diacritics(s: pd.Series) -> pd.Series:
     """
-    Removes all diacritics and accents.
+    Remove all diacritics and accents.
 
-    Removes all diacritics and accents from any word and characters from the given Pandas Series.
-    Returns a cleaned version of the Pandas Series.
+    Remove all diacritics and accents from any word and characters from the given Pandas Series.
+    Return a cleaned version of the Pandas Series.
 
     Examples
     --------
@@ -220,10 +221,10 @@ def remove_diacritics(s: pd.Series) -> pd.Series:
 
 def remove_whitespace(s: pd.Series) -> pd.Series:
     r"""
-    Removes any extra white spaces.
+    Remove any extra white spaces.
 
-    Removes any extra whitespace in the given Pandas Series.
-    Removes also newline, tabs and any form of space.
+    Remove any extra whitespace in the given Pandas Series.
+    Remove also newline, tabs and any form of space.
 
     Useful when there is a need to visualize a Pandas Series and
     most cells have many newlines or other kind of space characters.
@@ -243,7 +244,7 @@ def remove_whitespace(s: pd.Series) -> pd.Series:
 
 def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
     """
-    Removes words in a set from a string, replacing them with a symbol.
+    Remove words in a set from a string, replacing them with a symbol.
 
     Parameters
     ----------
@@ -279,7 +280,7 @@ def replace_stopwords(
     s: pd.Series, symbol: str, stopwords: Optional[Set[str]] = None
 ) -> pd.Series:
     """
-    Replaces all instances of `words` with symbol.
+    Replace all instances of `words` with symbol.
 
     By default uses NLTK's english stopwords of 179 words.
 
@@ -313,9 +314,9 @@ def remove_stopwords(
     s: pd.Series, stopwords: Optional[Set[str]] = None, remove_str_numbers=False
 ) -> pd.Series:
     """
-    Removes all instances of `words`.
+    Remove all instances of `words`.
 
-    By default uses NLTK's english stopwords of 179 words:
+    By default use NLTK's english stopwords of 179 words:
 
     Parameters
     ----------
@@ -357,9 +358,10 @@ def stem(s: pd.Series, stem="snowball", language="english") -> pd.Series:
     r"""
     Stem series using either `porter` or `snowball` NLTK stemmers.
 
-    The act of stemming means removing the end of a words with an heuristic process. It's useful in context where the meaning of the word is important rather than his derivation. Stemming is very efficient and adapt in case the given dataset is large.
+    The act of stemming means removing the end of a words with an heuristic process.
+    It's useful in context where the meaning of the word is important rather than his derivation. Stemming is very efficient and adapt in case the given dataset is large.
 
-    `texthero.preprocessing.stem` make use of two NLTK stemming algorithms known as :class:`nltk.stem.SnowballStemmer` and :class:`nltk.stem.PorterStemmer`. SnowballStemmer should be used when the Pandas Series contains non-English text has it has multilanguage support.
+    Make use of two NLTK stemming algorithms known as :class:`nltk.stem.SnowballStemmer` and :class:`nltk.stem.PorterStemmer`. SnowballStemmer should be used when the Pandas Series contains non-English text has it has multilanguage support.
 
 
     Parameters
@@ -401,7 +403,7 @@ def stem(s: pd.Series, stem="snowball", language="english") -> pd.Series:
 
 def get_default_pipeline() -> List[Callable[[pd.Series], pd.Series]]:
     """
-    Returns a list contaning all the methods used in the default cleaning pipeline.
+    Return a list contaning all the methods used in the default cleaning pipeline.
 
     Return a list with the following functions:
      1. :meth:`texthero.preprocessing.fillna`
@@ -465,7 +467,7 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
 
 def has_content(s: pd.Series) -> pd.Series:
     r"""
-    Returns a Boolean Pandas Series indicating if the rows have content.
+    Return a Boolean Pandas Series indicating if the rows have content.
 
     Examples
     --------
@@ -485,7 +487,7 @@ def has_content(s: pd.Series) -> pd.Series:
 
 def drop_no_content(s: pd.Series) -> pd.Series:
     r"""
-    Drops all rows without content.
+    Drop all rows without content.
 
     Every row from a given Pandas Series, where :meth:`has_content` is False, will be dropped.
 
@@ -504,7 +506,7 @@ def drop_no_content(s: pd.Series) -> pd.Series:
 
 def remove_round_brackets(s: pd.Series) -> pd.Series:
     """
-    Removes content within parentheses '()' and the parentheses by themself.
+    Remove content within parentheses '()' and the parentheses by themself.
 
     Examples
     --------
@@ -529,7 +531,7 @@ def remove_round_brackets(s: pd.Series) -> pd.Series:
 
 def remove_curly_brackets(s: pd.Series) -> pd.Series:
     """
-    Removes content within curly brackets '{}' and the curly brackets by themself.
+    Remove content within curly brackets '{}' and the curly brackets by themself.
 
     Examples
     --------
@@ -553,7 +555,7 @@ def remove_curly_brackets(s: pd.Series) -> pd.Series:
 
 def remove_square_brackets(s: pd.Series) -> pd.Series:
     """
-    Removes content within square brackets '[]' and the square brackets by themself.
+    Remove content within square brackets '[]' and the square brackets by themself.
 
     Examples
     --------
@@ -578,7 +580,7 @@ def remove_square_brackets(s: pd.Series) -> pd.Series:
 
 def remove_angle_brackets(s: pd.Series) -> pd.Series:
     """
-    Removes content within angle brackets '<>' and the angle brackets by themself.
+    Remove content within angle brackets '<>' and the angle brackets by themself.
 
     Examples
     --------
@@ -602,9 +604,9 @@ def remove_angle_brackets(s: pd.Series) -> pd.Series:
 
 def remove_brackets(s: pd.Series) -> pd.Series:
     """
-    Removes content within brackets and the brackets itself.
+    Remove content within brackets and the brackets itself.
 
-    Removes content from any kind of brackets, (), [], {}, <>.
+    Remove content from any kind of brackets, (), [], {}, <>.
 
     Examples
     --------
@@ -634,10 +636,10 @@ def remove_brackets(s: pd.Series) -> pd.Series:
 
 def remove_html_tags(s: pd.Series) -> pd.Series:
     """
-    Removes html tags from the given Pandas Series.
+    Remove html tags from the given Pandas Series.
 
-    Removes all html tags of the type `<.*?>` such as <html>, <p>, <div class="hello"> and
-    removes all html tags of type &nbsp and returns a cleaned Pandas Series.
+    Remove all html tags of the type `<.*?>` such as <html>, <p>, <div class="hello"> and
+    remove all html tags of type &nbsp and return a cleaned Pandas Series.
 
     Examples
     --------
@@ -660,9 +662,9 @@ def remove_html_tags(s: pd.Series) -> pd.Series:
 
 def tokenize(s: pd.Series) -> pd.Series:
     """
-    Tokenizes each row of the given Series.
+    Tokenize each row of the given Series.
 
-    Tokenizes each row of the given Pandas Series and returns a Pandas Series where
+    Tokenize each row of the given Pandas Series and return a Pandas Series where
     each row contains a list of tokens.
 
     Algorithm: add a space between any punctuation symbol at
@@ -692,8 +694,8 @@ def tokenize_with_phrases(
 ) -> pd.Series:
     r"""Tokenize and group up collocations words
 
-    Tokenizes the given pandas Series and group up bigrams where each
-    tokens has at least min_count term frequrncy and where the threshold
+    Tokenize the given pandas Series and group up bigrams where each
+    token has at least min_count term frequrncy and where the threshold
     is larger than the underline formula.
 
     :math:`\frac{(bigram\_a\_b\_count - min\_count)* len\_vocab }{ (word\_a\_count * word\_b\_count)}`.
@@ -736,7 +738,7 @@ def tokenize_with_phrases(
 def replace_urls(s: pd.Series, symbol: str) -> pd.Series:
     r"""Replace all urls with the given symbol.
 
-    `replace_urls` replace any urls from the given Pandas Series with the given symbol.
+    Replace any urls from the given Pandas Series with the given symbol.
 
     Parameters
     ----------
@@ -766,9 +768,9 @@ def replace_urls(s: pd.Series, symbol: str) -> pd.Series:
 
 
 def remove_urls(s: pd.Series) -> pd.Series:
-    r"""Removes all urls from a given Pandas Series.
+    r"""Remove all urls from a given Pandas Series.
 
-    Removes all urls and replaces them with a single empty space.
+    Remove all urls and replaces them with a single empty space.
 
     Examples
     --------

@@ -270,7 +270,7 @@ def replace_stopwords(
 
 
 def remove_stopwords(
-    input: pd.Series, stopwords: Optional[Set[str]] = None, remove_str_numbers=False,
+    input: pd.Series, stopwords: Optional[Set[str]] = None, remove_str_numbers=False
 ) -> pd.Series:
     """
     Remove all instances of `words`.

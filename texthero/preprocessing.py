@@ -270,7 +270,7 @@ def replace_stopwords(
 
 
 def remove_stopwords(
-    input: pd.Series, stopwords: Optional[Set[str]] = None, remove_str_numbers=False
+    input: pd.Series, stopwords: Optional[Set[str]] = None, remove_str_numbers=False,
 ) -> pd.Series:
     """
     Remove all instances of `words`.
@@ -625,9 +625,12 @@ _not_tokenized_warning_message = (
 def phrases(s: pd.Series, min_count: int = 5, threshold: int = 10, symbol: str = "_"):
     r"""Group up collocations words
 
-    Given a pandas Series of tokenized strings, group together bigrams where each tokens has at least `min_count` term frequency and where the `threshold` is larger than the underline formula.
+    Given a pandas Series of tokenized strings, group together bigrams where
+    each tokens has at least `min_count` term frequency and where the
+    `threshold` is larger than the underline formula.
 
-    :math:`\frac{(bigram\_a\_b\_count - min\_count)* len\_vocab }{ (word\_a\_count * word\_b\_count)}`.
+    :math:`\frac{(bigram\_a\_b\_count - min\_count)* len\_vocab }
+    { (word\_a\_count * word\_b\_count)}`.
 
 
     Parameters
@@ -644,7 +647,8 @@ def phrases(s: pd.Series, min_count: int = 5, threshold: int = 10, symbol: str =
     --------
     >>> import pandas as pd
     >>> import texthero as hero
-    >>> s = pd.Series([['New', 'York', 'is', 'a', 'beautiful', 'city'], ['Look', ':', 'New', 'York', '!']])
+    >>> s = pd.Series([['New', 'York', 'is', 'a', 'beautiful', 'city'],
+    ...               ['Look', ':', 'New', 'York', '!']])
     >>> hero.phrases(s, min_count=1, threshold=1)
     0    [New_York, is, a, beautiful, city]
     1                [Look, :, New_York, !]
@@ -652,7 +656,8 @@ def phrases(s: pd.Series, min_count: int = 5, threshold: int = 10, symbol: str =
 
     Reference
     --------
-    `Mikolov, et. al: "Distributed Representations of Words and Phrases and their Compositionality"
+    `Mikolov, et. al: "Distributed Representations of Words and Phrases and
+    their Compositionality"
         <https://arxiv.org/abs/1310.4546>`_
 
     """

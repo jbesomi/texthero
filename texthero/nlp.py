@@ -137,11 +137,18 @@ def pos_tag(s: pd.Series) -> pd.Series:
 
     Return new Pandas Series where each rows contains a list of tuples containing information about part-of-speech tagging
 
-    Tuple (`token name`,`POS tag`,`The detailed POS tag.`, `starting character`, `ending character`)
+    Tuple (`token name`,`Coarse-grained POS`,`Fine-grained POS`, `starting character`, `ending character`)
+    
+    A difference between the coarse-grained POS and the Fine-grained POS is that the last one is more specific about marking,
+    for example if the coarse-grained POS has a NOUN value, then the refined POS will give more details about the type of 
+    the noun, whether it is singular, plural and/or proper.
+    You can use the spacy `explain` function to find out which fine-grained POS it is.
+    
+    You can see more details about Fine-grained POS at: <https://spacy.io/api/annotation#pos-en>
 
     This makes use of the SpaCy `processing pipeline. <https://spacy.io/usage/processing-pipelines#pipelines>`.
 
-    List of labels:
+    List of POS/Tag:
      - `ADJ`: Adjective. Examples: big, old, green.
      - `ADP`: Adposition. Examples: in, to, during.
      - `ADV`: Adverb. Examples: very, tomorrow, down.
@@ -162,7 +169,7 @@ def pos_tag(s: pd.Series) -> pd.Series:
      - `X`: Other.
      - `SPACE`: Space.
 
-    To more details: `POS tagging <https://spacy.io/api/annotation#pos-tagging>`
+    Internally pos_tag makes use of Spacy's dependency tagging: <https://spacy.io/api/annotation#pos-tagging>`
 
     Examples
     --------

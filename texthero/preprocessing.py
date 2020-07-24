@@ -24,35 +24,59 @@ import warnings
 warnings.filterwarnings(action="ignore", category=UserWarning, module="gensim")
 
 
-def fillna(input: pd.Series) -> pd.Series:
-    """Replace not assigned values with empty spaces."""
-    return input.fillna("").astype("str")
+def fillna(s: pd.Series) -> pd.Series:
+    """
+    Replaces not assigned values with empty spaces.
 
 
-def lowercase(input: pd.Series) -> pd.Series:
-    """Lowercase all text."""
-    return input.str.lower()
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series([np.NaN, "I'm", "You're"])
+    >>> hero.fillna(s)
+    0          
+    1       I'm
+    2    You're
+    dtype: object
+    """
+    return s.fillna("").astype("str")
 
 
-def replace_digits(input: pd.Series, symbols: str = " ", only_blocks=True) -> pd.Series:
+def lowercase(s: pd.Series) -> pd.Series:
+    """
+    Lowercase all texts in a series.
+
+    
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("This is NeW YoRk wIth upPer letters")
+    >>> hero.lowercase(s)
+    0    this is new york with upper letters
+    dtype: object
+    """
+    return s.str.lower()
+
+
+def replace_digits(s: pd.Series, symbols: str = " ", only_blocks=True) -> pd.Series:
     """
     Replace all digits with symbols.
 
-    By default, only replace "blocks" of digits, i.e tokens composed of only numbers.
+    By default, only replaces "blocks" of digits, i.e tokens composed of only numbers.
 
-    When `only_blocks` is set to ´False´, replace any digits.
+    When `only_blocks` is set to ´False´, replaces all digits.
 
     Parameters
     ----------
-    input : Pandas Series
+    s : Pandas Series
+
     symbols : str (default single empty space " ")
         Symbols to replace
-    only_blocks : bool
-        When set to False, remove any digits.
 
-    Returns
-    -------
-    Pandas Series
+    only_blocks : bool
+        When set to False, replace all digits.
 
     Examples
     --------
@@ -69,16 +93,16 @@ def replace_digits(input: pd.Series, symbols: str = " ", only_blocks=True) -> pd
 
     if only_blocks:
         pattern = r"\b\d+\b"
-        return input.str.replace(pattern, symbols)
+        return s.str.replace(pattern, symbols)
     else:
-        return input.str.replace(r"\d+", symbols)
+        return s.str.replace(r"\d+", symbols)
 
 
-def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
+def remove_digits(s: pd.Series, only_blocks=True) -> pd.Series:
     """
-    Remove all digits and replace it with a single space.
+    Remove all digits and replaces them with a single space.
 
-    By default, only removes "blocks" of digits. For instance, `1234 falcon9` becomes ` falcon9`.
+    By default, only remove "blocks" of digits. For instance, `1234 falcon9` becomes ` falcon9`.
 
     When the arguments `only_blocks` is set to ´False´, remove any digits.
 
@@ -86,7 +110,8 @@ def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
 
     Parameters
     ----------
-    input : Pandas Series
+    s : Pandas Series
+
     only_blocks : bool
         Remove only blocks of digits.
 
@@ -103,18 +128,23 @@ def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
     dtype: object
     """
 
-    return replace_digits(input, " ", only_blocks)
+    return replace_digits(s, " ", only_blocks)
 
 
-def replace_punctuation(input: pd.Series, symbol: str = " ") -> pd.Series:
+def replace_punctuation(s: pd.Series, symbol: str = " ") -> pd.Series:
     """
     Replace all punctuation with a given symbol.
 
-    `replace_punctuation` replace all punctuation from the given Pandas Series and replace it with a custom symbol. It consider as punctuation characters all :data:`string.punctuation` symbols `!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~).`
+    Replace all punctuation from the given
+    Pandas Series with a custom symbol. 
+    It considers as punctuation characters all :data:`string.punctuation` 
+    symbols `!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~).`
+
 
     Parameters
     ----------
-    input : Pandas Series
+    s : Pandas Series
+
     symbol : str (default single empty space)
         Symbol to use as replacement for all string punctuation. 
 
@@ -128,14 +158,15 @@ def replace_punctuation(input: pd.Series, symbol: str = " ") -> pd.Series:
     dtype: object
     """
 
-    return input.str.replace(rf"([{string.punctuation}])+", symbol)
+    return s.str.replace(rf"([{string.punctuation}])+", symbol)
 
 
-def remove_punctuation(input: pd.Series) -> pd.Series:
+def remove_punctuation(s: pd.Series) -> pd.Series:
     """
     Replace all punctuation with a single space (" ").
 
-    `remove_punctuation` removes all punctuation from the given Pandas Series and replace it with a single space. It consider as punctuation characters all :data:`string.punctuation` symbols `!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~).`
+    Remove all punctuation from the given Pandas Series and replace it
+    with a single space. It considers as punctuation characters all :data:`string.punctuation` symbols `!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~).`
 
     See also :meth:`replace_punctuation` to replace punctuation with a custom symbol.
 
@@ -148,7 +179,7 @@ def remove_punctuation(input: pd.Series) -> pd.Series:
     0    Finnaly 
     dtype: object
     """
-    return replace_punctuation(input, " ")
+    return replace_punctuation(s, " ")
 
 
 def _remove_diacritics(text: str) -> str:
@@ -157,23 +188,24 @@ def _remove_diacritics(text: str) -> str:
 
     Examples
     --------
-    >>> import texthero as hero
+    >>> from texthero.preprocessing import _remove_diacritics
     >>> import pandas as pd
     >>> text = "Montréal, über, 12.89, Mère, Françoise, noël, 889, اِس, اُس"
     >>> _remove_diacritics(text)
     'Montreal, uber, 12.89, Mere, Francoise, noel, 889, اس, اس'
     """
     nfkd_form = unicodedata.normalize("NFKD", text)
-    # unicodedata.combinding(char) checks if the character is in
+    # unicodedata.combining(char) checks if the character is in
     # composed form (consisting of several unicode chars combined), i.e. a diacritic
     return "".join([char for char in nfkd_form if not unicodedata.combining(char)])
 
 
-def remove_diacritics(input: pd.Series) -> pd.Series:
+def remove_diacritics(s: pd.Series) -> pd.Series:
     """
     Remove all diacritics and accents.
 
-    Remove all diacritics and accents from any word and characters from the given Pandas Series. Return a cleaned version of the Pandas Series.
+    Remove all diacritics and accents from any word and characters from the given Pandas Series.
+    Return a cleaned version of the Pandas Series.
 
     Examples
     --------
@@ -182,17 +214,20 @@ def remove_diacritics(input: pd.Series) -> pd.Series:
     >>> s = pd.Series("Montréal, über, 12.89, Mère, Françoise, noël, 889, اِس, اُس")
     >>> hero.remove_diacritics(s)[0]
     'Montreal, uber, 12.89, Mere, Francoise, noel, 889, اس, اس'
+
     """
-    return input.astype("unicode").apply(_remove_diacritics)
+    return s.astype("unicode").apply(_remove_diacritics)
 
 
-def remove_whitespace(input: pd.Series) -> pd.Series:
+def remove_whitespace(s: pd.Series) -> pd.Series:
     r"""
     Remove any extra white spaces.
 
-    Remove any extra whitespace in the given Pandas Series. Removes also newline, tabs and any form of space.
+    Remove any extra whitespace in the given Pandas Series.
+    Remove also newline, tabs and any form of space.
 
-    Useful when there is a need to visualize a Pandas Series and most cells have many newlines or other kind of space characters.
+    Useful when there is a need to visualize a Pandas Series and
+    most cells have many newlines or other kind of space characters.
 
     Examples
     --------
@@ -204,7 +239,7 @@ def remove_whitespace(input: pd.Series) -> pd.Series:
     dtype: object
     """
 
-    return input.str.replace("\xa0", " ").str.split().str.join(" ")
+    return s.str.replace("\xa0", " ").str.split().str.join(" ")
 
 
 def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
@@ -214,13 +249,16 @@ def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
     Parameters
     ----------
     text: str
+
     stopwords : Set[str]
         Set of stopwords string to remove.
+
     symbol: str, Optional
         Character(s) to replace words with; defaults to a space.
 
     Examples
     --------
+    >>> from texthero.preprocessing import _replace_stopwords
     >>> s = "the book of the jungle"
     >>> symbol = "$"
     >>> stopwords = ["the", "of"]
@@ -239,7 +277,7 @@ def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
 
 
 def replace_stopwords(
-    input: pd.Series, symbol: str, stopwords: Optional[Set[str]] = None
+    s: pd.Series, symbol: str, stopwords: Optional[Set[str]] = None
 ) -> pd.Series:
     """
     Replace all instances of `words` with symbol.
@@ -248,18 +286,20 @@ def replace_stopwords(
 
     Parameters
     ----------
+    s : Pandas Series
 
-    input : Pandas Series
     symbol: str
         Character(s) to replace words with.
+
     stopwords : Set[str], Optional
         Set of stopwords string to remove. If not passed, by default it used NLTK English stopwords. 
 
-
     Examples
     --------
+    >>> import texthero as hero
+    >>> import pandas as pd
     >>> s = pd.Series("the book of the jungle")
-    >>> replace_stopwords(s, "X")
+    >>> hero.replace_stopwords(s, "X")
     0    X book X X jungle
     dtype: object
 
@@ -267,21 +307,21 @@ def replace_stopwords(
 
     if stopwords is None:
         stopwords = _stopwords.DEFAULT
-    return input.apply(_replace_stopwords, args=(stopwords, symbol))
+    return s.apply(_replace_stopwords, args=(stopwords, symbol))
 
 
 def remove_stopwords(
-    input: pd.Series, stopwords: Optional[Set[str]] = None, remove_str_numbers=False
+    s: pd.Series, stopwords: Optional[Set[str]] = None, remove_str_numbers=False
 ) -> pd.Series:
     """
     Remove all instances of `words`.
 
-    By default uses NLTK's english stopwords of 179 words:
+    By default use NLTK's english stopwords of 179 words:
 
     Parameters
     ----------
+    s : Pandas Series
 
-    input : Pandas Series
     stopwords : Set[str], Optional
         Set of stopwords string to remove. If not passed, by default it used NLTK English stopwords.
 
@@ -311,23 +351,26 @@ def remove_stopwords(
 
 
     """
-    return replace_stopwords(input, symbol="", stopwords=stopwords)
+    return replace_stopwords(s, symbol="", stopwords=stopwords)
 
 
-def stem(input: pd.Series, stem="snowball", language="english") -> pd.Series:
+def stem(s: pd.Series, stem="snowball", language="english") -> pd.Series:
     r"""
     Stem series using either `porter` or `snowball` NLTK stemmers.
 
-    The act of stemming means removing the end of a words with an heuristic process. It's useful in context where the meaning of the word is important rather than his derivation. Stemming is very efficient and adapt in case the given dataset is large.
+    The act of stemming means removing the end of a words with an heuristic process.
+    It's useful in context where the meaning of the word is important rather than his derivation. Stemming is very efficient and adapt in case the given dataset is large.
 
-    `texthero.preprocessing.stem` make use of two NLTK stemming algorithms known as :class:`nltk.stem.SnowballStemmer` and :class:`nltk.stem.PorterStemmer`. SnowballStemmer should be used when the Pandas Series contains non-English text has it has multilanguage support.
+    Make use of two NLTK stemming algorithms known as :class:`nltk.stem.SnowballStemmer` and :class:`nltk.stem.PorterStemmer`. SnowballStemmer should be used when the Pandas Series contains non-English text has it has multilanguage support.
 
 
     Parameters
     ----------
-    input : Pandas Series
+    s : Pandas Series
+
     stem : str (snowball by default)
         Stemming algorithm. It can be either 'snowball' or 'porter'
+
     language : str (english by default)
         Supported languages: `danish`, `dutch`, `english`, `finnish`, `french`, `german` , `hungarian`, `italian`, `norwegian`, `portuguese`, `romanian`, `russian`, `spanish` and `swedish`.
 
@@ -335,13 +378,12 @@ def stem(input: pd.Series, stem="snowball", language="english") -> pd.Series:
     -----
     By default NLTK stemming algorithms lowercase all text.
 
-
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series("I used to go \t\n running.")
-    >>> hero.preprocessing.stem(s)
+    >>> hero.stem(s)
     0    i use to go running.
     dtype: object
     """
@@ -356,7 +398,7 @@ def stem(input: pd.Series, stem="snowball", language="english") -> pd.Series:
     def _stem(text):
         return " ".join([stemmer.stem(word) for word in text])
 
-    return input.str.split().apply(_stem)
+    return s.str.split().apply(_stem)
 
 
 def get_default_pipeline() -> List[Callable[[pd.Series], pd.Series]]:
@@ -385,10 +427,9 @@ def get_default_pipeline() -> List[Callable[[pd.Series], pd.Series]]:
 
 def clean(s: pd.Series, pipeline=None) -> pd.Series:
     """
-    Pre-process a text-based Pandas Series.
+    Pre-process a text-based Pandas Series, by using the following default pipline.
 
-
-    Default pipeline:
+     Default pipeline:
      1. :meth:`texthero.preprocessing.fillna`
      2. :meth:`texthero.preprocessing.lowercase`
      3. :meth:`texthero.preprocessing.remove_digits`
@@ -396,6 +437,24 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
      5. :meth:`texthero.preprocessing.remove_diacritics`
      6. :meth:`texthero.preprocessing.remove_stopwords`
      7. :meth:`texthero.preprocessing.remove_whitespace`
+
+    Parameters
+    ----------
+    s : Pandas Series
+
+    pipeline :List[Callable[[Pandas Series], Pandas Series]]
+       inserting specific pipeline to clean a text
+   
+    Examples
+    --------
+    For the default pipeline:
+
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("Uper 9dig.        he her ÄÖÜ")
+    >>> hero.clean(s)
+    0    uper 9dig aou
+    dtype: object
     """
 
     if not pipeline:
@@ -406,14 +465,16 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
     return s
 
 
-def has_content(s: pd.Series):
+def has_content(s: pd.Series) -> pd.Series:
     r"""
-    Return a Boolean Pandas Series indicating if the rows has content.
+    Return a Boolean Pandas Series indicating if the rows have content.
 
     Examples
     --------
+    >>> import texthero as hero
+    >>> import pandas as pd
     >>> s = pd.Series(["content", np.nan, "\t\n", " "])
-    >>> has_content(s)
+    >>> hero.has_content(s)
     0     True
     1    False
     2    False
@@ -424,16 +485,18 @@ def has_content(s: pd.Series):
     return (s.pipe(remove_whitespace) != "") & (~s.isna())
 
 
-def drop_no_content(s: pd.Series):
+def drop_no_content(s: pd.Series) -> pd.Series:
     r"""
     Drop all rows without content.
 
-    Drop all rows from the given Pandas Series where :meth:`has_content` is False.
+    Every row from a given Pandas Series, where :meth:`has_content` is False, will be dropped.
 
     Examples
     --------
+    >>> import texthero as hero
+    >>> import pandas as pd
     >>> s = pd.Series(["content", np.nan, "\t\n", " "])
-    >>> drop_no_content(s)
+    >>> hero.drop_no_content(s)
     0    content
     dtype: object
 
@@ -441,15 +504,17 @@ def drop_no_content(s: pd.Series):
     return s[has_content(s)]
 
 
-def remove_round_brackets(s: pd.Series):
+def remove_round_brackets(s: pd.Series) -> pd.Series:
     """
-    Remove content within parentheses () and parentheses.
+    Remove content within parentheses '()' and the parentheses by themself.
 
     Examples
     --------
 
+    >>> import texthero as hero
+    >>> import pandas as pd
     >>> s = pd.Series("Texthero (is not a superhero!)")
-    >>> remove_round_brackets(s)
+    >>> hero.remove_round_brackets(s)
     0    Texthero 
     dtype: object
 
@@ -464,14 +529,16 @@ def remove_round_brackets(s: pd.Series):
     return s.str.replace(r"\([^()]*\)", "")
 
 
-def remove_curly_brackets(s: pd.Series):
+def remove_curly_brackets(s: pd.Series) -> pd.Series:
     """
-    Remove content within curly brackets {} and the curly brackets.
+    Remove content within curly brackets '{}' and the curly brackets by themself.
 
     Examples
     --------
+    >>> import texthero as hero
+    >>> import pandas as pd
     >>> s = pd.Series("Texthero {is not a superhero!}")
-    >>> remove_curly_brackets(s)
+    >>> hero.remove_curly_brackets(s)
     0    Texthero 
     dtype: object
 
@@ -486,15 +553,16 @@ def remove_curly_brackets(s: pd.Series):
     return s.str.replace(r"\{[^{}]*\}", "")
 
 
-def remove_square_brackets(s: pd.Series):
+def remove_square_brackets(s: pd.Series) -> pd.Series:
     """
-    Remove content within square brackets [] and the square brackets.
+    Remove content within square brackets '[]' and the square brackets by themself.
 
     Examples
     --------
-
+    >>> import texthero as hero
+    >>> import pandas as pd
     >>> s = pd.Series("Texthero [is not a superhero!]")
-    >>> remove_square_brackets(s)
+    >>> hero.remove_square_brackets(s)
     0    Texthero 
     dtype: object
 
@@ -510,15 +578,16 @@ def remove_square_brackets(s: pd.Series):
     return s.str.replace(r"\[[^\[\]]*\]", "")
 
 
-def remove_angle_brackets(s: pd.Series):
+def remove_angle_brackets(s: pd.Series) -> pd.Series:
     """
-    Remove content within angle brackets <> and the angle brackets.
+    Remove content within angle brackets '<>' and the angle brackets by themself.
 
     Examples
     --------
-
+    >>> import texthero as hero
+    >>> import pandas as pd
     >>> s = pd.Series("Texthero <is not a superhero!>")
-    >>> remove_angle_brackets(s)
+    >>> hero.remove_angle_brackets(s)
     0    Texthero 
     dtype: object
 
@@ -533,7 +602,7 @@ def remove_angle_brackets(s: pd.Series):
     return s.str.replace(r"<[^<>]*>", "")
 
 
-def remove_brackets(s: pd.Series):
+def remove_brackets(s: pd.Series) -> pd.Series:
     """
     Remove content within brackets and the brackets itself.
 
@@ -541,9 +610,10 @@ def remove_brackets(s: pd.Series):
 
     Examples
     --------
-
+    >>> import texthero as hero
+    >>> import pandas as pd
     >>> s = pd.Series("Texthero (round) [square] [curly] [angle]")
-    >>> remove_brackets(s)
+    >>> hero.remove_brackets(s)
     0    Texthero    
     dtype: object
 
@@ -568,12 +638,15 @@ def remove_html_tags(s: pd.Series) -> pd.Series:
     """
     Remove html tags from the given Pandas Series.
 
-    Remove all html tags of the type `<.*?>` such as <html>, <p>, <div class="hello"> and remove all html tags of type &nbsp and return a cleaned Pandas Series.
+    Remove all html tags of the type `<.*?>` such as <html>, <p>, <div class="hello"> and
+    remove all html tags of type &nbsp and return a cleaned Pandas Series.
 
     Examples
     --------
+    >>> import texthero as hero
+    >>> import pandas as pd
     >>> s = pd.Series("<html><h1>Title</h1></html>")
-    >>> remove_html_tags(s)
+    >>> hero.remove_html_tags(s)
     0    Title
     dtype: object
 
@@ -591,8 +664,8 @@ def tokenize(s: pd.Series) -> pd.Series:
     """
     Tokenize each row of the given Series.
 
-    Tokenize each row of the given Pandas Series and return a Pandas Series where each row contains a list of tokens.
-
+    Tokenize each row of the given Pandas Series and return a Pandas Series where
+    each row contains a list of tokens.
 
     Algorithm: add a space between any punctuation symbol at
     exception if the symbol is between two alphanumeric character and split.
@@ -616,26 +689,31 @@ def tokenize(s: pd.Series) -> pd.Series:
     return s.str.replace(pattern, r"\2 \3 \4 \5").str.split()
 
 
-def tokenize_with_phrases(s: pd.Series, min_count: int = 5, threshold: int = 10):
+def tokenize_with_phrases(
+    s: pd.Series, min_count: int = 5, threshold: int = 10
+) -> pd.Series:
     r"""Tokenize and group up collocations words
 
-    Tokenize the given pandas Series and group up bigrams where each tokens has at least min_count term frequrncy and where the threshold is larger than the underline formula.
+    Tokenize the given pandas Series and group up bigrams where each
+    token has at least min_count term frequrncy and where the threshold
+    is larger than the underline formula.
 
     :math:`\frac{(bigram\_a\_b\_count - min\_count)* len\_vocab }{ (word\_a\_count * word\_b\_count)}`.
 
-
     Parameters
     ----------
-        s : Pandas Series
-        min_count : Int, optional. Default is 5.
-            ignore tokens with frequency less than this
-        threshold : Int, optional. Default is 10.
-            ignore tokens with a score under that threshold
+    s : Pandas Series
+
+    min_count : Int, optional. Default is 5.
+        ignore tokens with frequency less than this
+
+    threshold : Int, optional. Default is 10.
+        ignore tokens with a score under that threshold
 
     Examples
     --------
-    >>> import pandas as pd
     >>> import texthero as hero
+    >>> import pandas as pd
     >>> s = pd.Series(["New York is a beautiful city", "Look: New York!"])
     >>> hero.tokenize_with_phrases(s, min_count=1, threshold=1)
     0    [New_York, is, a, beautiful, city]
@@ -660,7 +738,14 @@ def tokenize_with_phrases(s: pd.Series, min_count: int = 5, threshold: int = 10)
 def replace_urls(s: pd.Series, symbol: str) -> pd.Series:
     r"""Replace all urls with the given symbol.
 
-    `replace_urls` replace any urls from the given Pandas Series with the given symbol.
+    Replace any urls from the given Pandas Series with the given symbol.
+
+    Parameters
+    ----------
+    s: Pandas Series
+
+    symbol: String
+        The symbol to which the URL should be changed to.
 
     Examples
     --------
@@ -685,7 +770,7 @@ def replace_urls(s: pd.Series, symbol: str) -> pd.Series:
 def remove_urls(s: pd.Series) -> pd.Series:
     r"""Remove all urls from a given Pandas Series.
 
-    `remove_urls` remove any urls and replace it with a single empty space.
+    Remove all urls and replaces them with a single empty space.
 
     Examples
     --------
@@ -713,6 +798,7 @@ def replace_tags(s: pd.Series, symbol: str) -> pd.Series:
     Parameters
     ----------
     s : Pandas Series
+
     symbols : str
         Symbols to replace
 
@@ -760,9 +846,10 @@ def replace_hashtags(s: pd.Series, symbol: str) -> pd.Series:
     Parameters
     ----------
     s : Pandas Series
+
     symbols : str
         Symbols to replace
-
+    
     Examples
     --------
     >>> import texthero as hero

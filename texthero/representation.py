@@ -177,6 +177,7 @@ def count(
         preprocessor=lambda x: x,
         min_df=min_df,
         max_df=max_df,
+        binary=binary,
     )
     s = pd.Series(tf.fit_transform(s).toarray().tolist(), index=s.index)
 
@@ -506,7 +507,12 @@ def nmf(s, n_components=2, verbose=False, random_state=None) -> pd.Series:
     :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
 
     """
-    nmf = NMF(n_components=n_components, init="random", random_state=random_state)
+    nmf = NMF(
+        n_components=n_components,
+        verbose=verbose,
+        init="random",
+        random_state=random_state,
+    )
     return pd.Series(nmf.fit_transform(list(s)).tolist(), index=s.index)
 
 
@@ -603,6 +609,7 @@ def tsne(
         learning_rate=learning_rate,
         n_iter=n_iter,
         random_state=random_state,
+        verbose=verbose,
         n_jobs=n_jobs,
     )
     return pd.Series(tsne.fit_transform(list(s)).tolist(), index=s.index)

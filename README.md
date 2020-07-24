@@ -329,6 +329,7 @@ If you have just other questions or inquiry drop me a line at jonathanbesomi__AT
 - [Vidya P](https://github.com/vidyap-xgboost)
 - [Henri Froese](https://github.com/henrifroese)
 - [Maximilian Krahn](https://github.com/mk2510)
+- [Cedric Conol](https://github.com/cedricconol)
 
 
 <h2 align="center"><a href="./LICENSE">License</a></h2>

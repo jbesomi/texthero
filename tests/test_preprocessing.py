@@ -175,8 +175,8 @@ class TestPreprocessing(PandasTestCase):
         self.assertEqual(preprocessing.tokenize(s), s_true)
 
     def test_tokenize_not_split_in_between_punctuation(self):
-        s = pd.Series(["don't say hello-world"])
-        s_true = pd.Series([["don't", "say", "hello-world"]])
+        s = pd.Series(["don't say hello-world hello_world"])
+        s_true = pd.Series([["don't", "say", "hello-world", "hello_world"]])
         self.assertEqual(preprocessing.tokenize(s), s_true)
 
     """

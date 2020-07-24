@@ -64,8 +64,12 @@ Texthero is there for the NLP-community. If you have an idea on how we can impro
 
 ## Best practices
 
-1. Read and respect the [numpydoc docstring guide](https://numpydoc.readthedocs.io/en/latest/format.html). Look at the code for similarity.
-1. Give to your branch a meaningful name. Avoid using the master branch. 
+1. Make sure Pull Request only changes one thing and one thing only. PR should be independent and self-contained. Read this article: [A Plea For Small Pull Requests](https://opensource.zalando.com/blog/2017/10/small-pull-requests/)
+1. Name your PR title accordingly to your changes and add a good and exhaustive description
+1. Give to the branch a meaningful name. Avoid using the master branch. 
+1. Respect [numpydoc docstring guide](https://numpydoc.readthedocs.io/en/latest/format.html). Look at the code for similarity.
+1. Respect [PEP 257 -- Docstring Conventions](https://www.python.org/dev/peps/pep-0257/)
+1. Maximum character length should be 88 (default settings of `black`). 
 
 ## Good first issue
 

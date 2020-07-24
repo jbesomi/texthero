@@ -253,13 +253,51 @@ class TestPreprocessing(PandasTestCase):
 
         s_true = pd.Series(
             [
+                ["New_York", "is", "a", "beautiful", "city"],
+                ["Look", ":", "New_York", "!"],
+                ["Very", "beautiful", "city", "New_York"],
+            ]
+        )
+
+        self.assertEqual(preprocessing.phrases(s, min_count=2, threshold=1), s_true)
+
+    def test_phrases_min_count(self):
+        s = pd.Series(
+            [
                 ["New", "York", "is", "a", "beautiful", "city"],
                 ["Look", ":", "New", "York", "!"],
                 ["Very", "beautiful", "city", "New", "York"],
             ]
         )
 
-        self.assertEqual(preprocessing.phrases(s), s_true)
+        s_true = pd.Series(
+            [
+                ["New_York", "is", "a", "beautiful_city"],
+                ["Look", ":", "New_York", "!"],
+                ["Very", "beautiful_city", "New_York"],
+            ]
+        )
+
+        self.assertEqual(preprocessing.phrases(s, min_count=1, threshold=1), s_true)
+
+    def test_phrases_threshold(self):
+        s = pd.Series(
+            [
+                ["New", "York", "is", "a", "beautiful", "city"],
+                ["Look", ":", "New", "York", "!"],
+                ["Very", "beautiful", "city", "New", "York"],
+            ]
+        )
+
+        s_true = pd.Series(
+            [
+                ["New_York", "is", "a", "beautiful", "city"],
+                ["Look", ":", "New_York", "!"],
+                ["Very", "beautiful", "city", "New_York"],
+            ]
+        )
+
+        self.assertEqual(preprocessing.phrases(s, min_count=2, threshold=2), s_true)
 
     def test_phrases_symbol(self):
         s = pd.Series(

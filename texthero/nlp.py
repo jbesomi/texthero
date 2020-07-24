@@ -1,20 +1,22 @@
 """
-Common NLP tasks such as named_entities, noun_chunks, etc.
+The texthero.nlp module supports common NLP tasks such as named_entities, noun_chunks, ... on Pandas Series and DataFrame.
 """
 
 import spacy
 import pandas as pd
 
 
-def named_entities(s, package="spacy"):
+def named_entities(s: pd.Series, package="spacy") -> pd.Series:
     """
     Return named-entities.
 
-    Return a Pandas Series where each rows contains a list of tuples containing information regarding the given named entities.
+    Return a Pandas Series where each row contains a list of tuples
+    with information about the named entities in the row's document.
 
     Tuple: (`entity'name`, `entity'label`, `starting character`, `ending character`)
 
-    Under the hood, `named_entities` make use of Spacy name entity recognition.
+    Under the hood, `named_entities` makes use of 
+    `Spacy name entity recognition <https://spacy.io/usage/linguistic-features#named-entities>`_
 
     List of labels:
      - `PERSON`: People, including fictional.
@@ -57,12 +59,13 @@ def named_entities(s, package="spacy"):
     return pd.Series(entities, index=s.index)
 
 
-def noun_chunks(s):
+def noun_chunks(s: pd.Series) -> pd.Series:
     """
     Return noun chunks (noun phrases).
 
-    Return a Pandas Series where each row contains a tuple that has information regarding the noun chunk.
-    
+    Return a Pandas Series where each row contains a tuple that has information
+    regarding the noun chunk.
+
     Tuple: (`chunk'text`, `chunk'label`, `starting index`, `ending index`)
 
     Noun chunks or noun phrases are phrases that have noun at their head or nucleus 
@@ -71,10 +74,6 @@ def noun_chunks(s):
     Internally `noun_chunks` makes use of Spacy's dependency parsing:
     https://spacy.io/usage/linguistic-features#dependency-parse
 
-    Parameters
-    ----------
-    input : Pandas Series
-    
     Examples
     --------
     >>> import texthero as hero
@@ -107,7 +106,7 @@ def count_sentences(s: pd.Series) -> pd.Series:
 
     Return a new Pandas Series with the number of sentences per cell.
 
-    This makes use of the SpaCy `sentencizer <https://spacy.io/api/sentencizer>`.
+    This makes use of the SpaCy `sentencizer <https://spacy.io/api/sentencizer>`_
 
     Examples
     --------

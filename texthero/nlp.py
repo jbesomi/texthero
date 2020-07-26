@@ -4,6 +4,9 @@ The texthero.nlp module supports common NLP tasks such as named_entities, noun_c
 
 import spacy
 import pandas as pd
+from langdetect import detect_langs
+from langdetect.lang_detect_exception import LangDetectException
+from langdetect.language import Language
 
 
 def named_entities(s: pd.Series, package="spacy") -> pd.Series:
@@ -128,3 +131,71 @@ def count_sentences(s: pd.Series) -> pd.Series:
         number_of_sentences.append(sentences)
 
     return pd.Series(number_of_sentences, index=s.index)
+
+
+def _Language_to_tuple(lang: Language):
+    return (str(lang.lang), "%.5f" % float(lang.prob))
+
+
+def _detect_language_probability(s):
+    """
+    gured out appling detect_langs function on sentence
+    :param s
+    """
+    try:
+        detected_language = list(map(_Language_to_tuple, detect_langs(s)))
+        return detected_language
+    except LangDetectException:
+        return ("UNKNOWN", 0.0)
+
+
+def _detect_language(s):
+    """
+    gured out appling detect_langs function on sentence
+    :param s
+    """
+    try:
+        detected_language = str(detect_langs(s)[0].lang)
+        return detected_language
+    except LangDetectException:
+        return "UNKNOWN"
+
+
+def infer_lang(s, probability=False):
+    """
+    Return languages and their probabilities.
+
+    Return a Pandas Series where each row contains a ISO nomenclature of the "average" infer language.
+
+    If probability = True then each row contains a list of tuples
+
+    Tuple : (language, probability)
+
+    Note: infer_lang is nondeterministic function
+
+    Parameters
+    ----------
+    s : Pandas Series
+    probability (optional) : boolean
+
+    supports 55 languages out of the box (ISO 639-1 codes)
+    ------------------------------------------------------
+    af, ar, bg, bn, ca, cs, cy, da, de, el, en, es, et, fa, fi, fr, gu, he,
+    hi, hr, hu, id, it, ja, kn, ko, lt, lv, mk, ml, mr, ne, nl, no, pa, pl,
+    pt, ro, ru, sk, sl, so, sq, sv, sw, ta, te, th, tl, tr, uk, ur, vi, zh-cn, zh-tw
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("This is an English text!.")
+    >>> hero.infer_lang(s)
+    0    en
+    dtype: object
+
+    """
+
+    if probability:
+        return s.apply(_detect_language_probability)
+    else:
+        return s.apply(_detect_language)

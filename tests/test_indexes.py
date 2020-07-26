@@ -1,10 +1,11 @@
 import pandas as pd
+from parameterized import parameterized
+
 from texthero import nlp, visualization, preprocessing, representation
 
 from . import PandasTestCase
 import unittest
 import string
-from parameterized import parameterized
 
 
 # Define valid inputs for different functions.
@@ -25,6 +26,7 @@ s_numeric_lists = pd.Series([[5.0, 5.0], [6.0, 6.0]], index=[5, 6])
 test_cases_nlp = [
     ["named_entities", nlp.named_entities, (s_text,)],
     ["noun_chunks", nlp.noun_chunks, (s_text,)],
+    ["infer_lang", nlp.infer_lang, (s_text,)],
 ]
 
 test_cases_preprocessing = [

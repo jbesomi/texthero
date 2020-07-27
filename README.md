@@ -102,21 +102,21 @@ In case you are an advanced python user, then `help(texthero)` should do the wor
 
 
 ```python
->>> import texthero as hero
->>> import pandas as pd
->>>
->>> df = pd.read_csv(
-...   "https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv"
-... )
->>>
->>> df['pca'] = (
-...    df['text']
-...    .pipe(hero.clean)
-...    .pipe(hero.tokenize)
-...    .pipe(hero.tfidf)
-...    .pipe(hero.pca)
-... )
->>> hero.scatterplot(df, 'pca', color='topic', title="PCA BBC Sport news")
+import texthero as hero
+import pandas as pd
+
+df = pd.read_csv(
+  "https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv"
+)
+
+df['pca'] = (
+   df['text']
+   .pipe(hero.clean)
+   .pipe(hero.tokenize)
+   .pipe(hero.tfidf)
+   .pipe(hero.pca)
+)
+hero.scatterplot(df, 'pca', color='topic', title="PCA BBC Sport news")
 ```
 
 <p align="center">
@@ -126,29 +126,29 @@ In case you are an advanced python user, then `help(texthero)` should do the wor
 <h3>2. Text preprocessing, TF-IDF, K-means and Visualization</h3>
 
 ```python
->>> import texthero as hero
->>> import pandas as pd
->>>
->>> df = pd.read_csv(
-...     "https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv"
-... )
+import texthero as hero
+import pandas as pd
 
->>> df['tfidf'] = (
-...     df['text']
-...     .pipe(hero.clean)
-...     .pipe(hero.tokenize)
-...     .pipe(hero.tfidf)
-... )
->>>
->>> df['kmeans_labels'] = (
-...     df['tfidf']
-...     .pipe(hero.kmeans, n_clusters=5)
-...     .astype(str)
-... )
->>>
->>> df['pca'] = df['tfidf'].pipe(hero.pca)
->>>
->>> hero.scatterplot(df, 'pca', color='kmeans_labels', title="K-means BBC Sport news")
+df = pd.read_csv(
+    "https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv"
+)
+
+df['tfidf'] = (
+    df['text']
+    .pipe(hero.clean)
+    .pipe(hero.tokenize)
+    .pipe(hero.tfidf)
+)
+
+df['kmeans_labels'] = (
+    df['tfidf']
+    .pipe(hero.kmeans, n_clusters=5)
+    .astype(str)
+)
+
+df['pca'] = df['tfidf'].pipe(hero.pca)
+
+hero.scatterplot(df, 'pca', color='kmeans_labels', title="K-means BBC Sport news")
 ```
 
 <p align="center">

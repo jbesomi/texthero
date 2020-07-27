@@ -440,8 +440,6 @@ def pca(s, n_components=2, random_state=None) -> pd.Series:
     --------
     `PCA on Wikipedia <https://en.wikipedia.org/wiki/Principal_component_analysis>`_
 
-    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
-
     """
     pca = PCA(n_components=n_components, random_state=random_state, copy=False)
     return pd.Series(pca.fit_transform(list(s)).tolist(), index=s.index)
@@ -500,8 +498,6 @@ def nmf(s, n_components=2, random_state=None) -> pd.Series:
     See also
     --------
     `NMF on Wikipedia <https://en.wikipedia.org/wiki/Non-negative_matrix_factorization>`_
-
-    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
 
     """
     nmf = NMF(n_components=n_components, init="random", random_state=random_state,)
@@ -587,8 +583,6 @@ def tsne(
     See also
     --------
     `t-SNE on Wikipedia <https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding>`_
-
-    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
 
     """
     tsne = TSNE(
@@ -680,8 +674,6 @@ def kmeans(
     See also
     --------
     `kmeans on Wikipedia <https://en.wikipedia.org/wiki/K-means_clustering>`_
-
-    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
 
     """
     vectors = list(s)
@@ -782,8 +774,6 @@ def dbscan(
     --------
     `DBSCAN on Wikipedia <https://en.wikipedia.org/wiki/DBSCAN>`_
 
-    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
-
     """
 
     return pd.Series(
@@ -883,8 +873,6 @@ def meanshift(
     See also
     --------
     `Mean-Shift on Wikipedia <https://en.wikipedia.org/wiki/Mean_shift>`_
-
-    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
 
     """
 

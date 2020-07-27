@@ -447,7 +447,7 @@ def pca(s, n_components=2, random_state=None) -> pd.Series:
     return pd.Series(pca.fit_transform(list(s)).tolist(), index=s.index)
 
 
-def nmf(s, n_components=2, verbose=False, random_state=None) -> pd.Series:
+def nmf(s, n_components=2, random_state=None) -> pd.Series:
     """
     Performs non-negative matrix factorization.
 
@@ -472,9 +472,6 @@ def nmf(s, n_components=2, verbose=False, random_state=None) -> pd.Series:
     n_components : Int. Default is 2.
         Number of components to keep (dimensionality of output vectors).
         If n_components is not set or None, all components are kept.
-
-    verbose : bool, default=False
-        Whether to be verbose.
 
     random_state : int, default=None
         Pass an int for reproducible results across multiple function calls.
@@ -507,12 +504,7 @@ def nmf(s, n_components=2, verbose=False, random_state=None) -> pd.Series:
     :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
 
     """
-    nmf = NMF(
-        n_components=n_components,
-        verbose=verbose,
-        init="random",
-        random_state=random_state,
-    )
+    nmf = NMF(n_components=n_components, init="random", random_state=random_state,)
     return pd.Series(nmf.fit_transform(list(s)).tolist(), index=s.index)
 
 
@@ -523,7 +515,6 @@ def tsne(
     learning_rate=200.0,
     n_iter=1000,
     random_state=None,
-    verbose=False,
     n_jobs=-1,
 ) -> pd.Series:
     """
@@ -573,9 +564,6 @@ def tsne(
         Determines the random number generator. Pass an int for reproducible
         results across multiple function calls.
 
-    verbose : bool, default=False
-        Whether to be verbose.
-
     n_jobs : int, optional, default=-1
         The number of parallel jobs to run for neighbors search.
         ``-1`` means using all processors.
@@ -609,7 +597,6 @@ def tsne(
         learning_rate=learning_rate,
         n_iter=n_iter,
         random_state=random_state,
-        verbose=verbose,
         n_jobs=n_jobs,
     )
     return pd.Series(tsne.fit_transform(list(s)).tolist(), index=s.index)
@@ -625,7 +612,6 @@ def kmeans(
     n_clusters=5,
     n_init=10,
     max_iter=300,
-    verbose=False,
     random_state=None,
     algorithm="auto",
 ):
@@ -660,9 +646,6 @@ def kmeans(
     max_iter : int, default=300
         Maximum number of iterations of the k-means algorithm for a
         single run.
-
-    verbose : bool, default=False
-        Whether to be verbose.
 
     random_state : int, default=None
         Determines random number generation for centroid initialization. Use
@@ -706,7 +689,6 @@ def kmeans(
         n_clusters=n_clusters,
         n_init=n_init,
         max_iter=max_iter,
-        verbose=verbose,
         random_state=random_state,
         copy_x=True,
         algorithm=algorithm,

@@ -3,7 +3,6 @@ Useful helper functions for the texthero library.
 """
 
 import functools
-import numpy as np
 import warnings
 
 

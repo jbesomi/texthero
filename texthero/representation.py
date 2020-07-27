@@ -89,12 +89,18 @@ def representation_series_to_flat_series(
     return s
 
 
-# Warning message for not-tokenized inputs
-_not_tokenized_warning_message = (
-    "It seems like the given Pandas Series s is not tokenized. This function will"
-    " tokenize it automatically using hero.tokenize(s) first. You should consider"
-    " tokenizing it yourself first with hero.tokenize(s) in the future."
-)
+def _check_tokenized(s: pd.Series) -> pd.Series:
+    # Warning message for not-tokenized inputs
+    _not_tokenized_warning_message = (
+        "It seems like the given Pandas Series s is not tokenized. This function will"
+        " tokenize it automatically using hero.tokenize(s) first. You should consider"
+        " tokenizing it yourself first with hero.tokenize(s) in the future."
+    )
+    # Check if input is tokenized. Else, print warning and tokenize.
+    if not isinstance(s.iloc[0], list):
+        warnings.warn(_not_tokenized_warning_message, DeprecationWarning)
+        s = preprocessing.tokenize(s)
+    return s
 
 
 """
@@ -162,10 +168,7 @@ def count(
     """
     # TODO. Can be rewritten without sklearn.
 
-    # Check if input is tokenized. Else, print warning and tokenize.
-    if not isinstance(s.iloc[0], list):
-        warnings.warn(_not_tokenized_warning_message, DeprecationWarning)
-        s = preprocessing.tokenize(s)
+    s = _check_tokenized(s)
 
     tf = CountVectorizer(
         max_features=max_features,
@@ -241,10 +244,8 @@ def term_frequency(
     dtype: object, ['Sentence', 'one', 'two'])
 
     """
-    # Check if input is tokenized. Else, print warning and tokenize.
-    if not isinstance(s.iloc[0], list):
-        warnings.warn(_not_tokenized_warning_message, DeprecationWarning)
-        s = preprocessing.tokenize(s)
+
+    s = _check_tokenized(s)
 
     tf = CountVectorizer(
         max_features=max_features,
@@ -336,10 +337,7 @@ def tfidf(
 
     """
 
-    # Check if input is tokenized. Else, print warning and tokenize.
-    if not isinstance(s.iloc[0], list):
-        warnings.warn(_not_tokenized_warning_message, DeprecationWarning)
-        s = preprocessing.tokenize(s)
+    s = _check_tokenized(s)
 
     tfidf = TfidfVectorizer(
         use_idf=True,

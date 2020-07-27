@@ -184,3 +184,6 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 docs/source/api
+
+# Visual Studio Code
+.vscode/

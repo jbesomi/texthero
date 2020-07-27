@@ -1,3 +1,7 @@
+"""
+Unit-tests for the helper module.
+"""
+
 import pandas as pd
 import numpy as np
 
@@ -23,7 +27,7 @@ Test Decorators.
 """
 
 
-class TestNLP(PandasTestCase):
+class TestHelpers(PandasTestCase):
     """
     handle_nans.
     """

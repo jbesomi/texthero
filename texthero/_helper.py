@@ -6,8 +6,6 @@ import functools
 import numpy as np
 import warnings
 
-from texthero.preprocessing import fillna
-
 
 """
 Warnings.
@@ -57,8 +55,8 @@ def handle_nans(replace_nans_with):
 
             # Get first input argument (the series) and replace the NaNs.
             s = args[0]
-            if s.isnull().values.any():
-                warnings.warn(_warning_nans_in_input, Warning)
+            if s.isna().values.any():
+                warnings.warn(_warning_nans_in_input, UserWarning)
                 s = s.fillna(value=replace_nans_with)
 
             # Put the series back into the input.

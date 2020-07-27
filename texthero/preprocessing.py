@@ -17,6 +17,34 @@ from texthero import stopwords as _stopwords
 
 from typing import List, Callable
 
+# REGEX pattern constants
+PATTERN_REMOVE_DIGITS_BLOCK = r"\b\d+\b"
+PATTERN_REMOVE_PUNCTUATION = rf"([{string.punctuation}])+"
+PATTERN_STOPWORD_TOKENIZER = r"""(?x)                          # Set flag to allow verbose regexps
+                                \w+(?:-\w+)*                              # Words with optional internal hyphens 
+                                | \s*                                     # Any space
+                                | [][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]    # Any symbol 
+                                """
+PATTERN_REMOVE_ROUND_BRACKETS = r"\([^()]*\)"
+PATERN_REMOVE_CURLY_BRACKETS = r"\{[^{}]*\}"
+PATTERN_REMOVE_SQUARE_BRACKETS = r"\[[^\[\]]*\]"
+PATTERN_REMOVE_ANGLE_BRACKETS = r"<[^<>]*>"
+PATTERN_REMOVE_HTML_TAG = r"""(?x)                    # Turn on free-spacing
+                            <[^>]+>                             # Remove <html> tags
+                            | &([a-z0-9]+|\#[0-9]{1,6}|\#x[0-9a-f]{1,6}); # Remove &nbsp;
+                            """
+
+
+def GET_PATTERN_TOKENIZATION(punct: str) -> str:
+    """
+    Returns the standart tokenisation pattern
+    """
+    return rf"((\w)([{punct}])(?:\B|$)|(?:^|\B)([{punct}])(\w))"
+
+
+PATTERN_REPLACE_URLS = r"http\S+"
+PATTERN_REPLACE_TAGS = r"@[a-zA-Z0-9]+"
+PATTERN_REPLACE_HASHTAGS = r"#[a-zA-Z0-9_]+"
 
 # Ignore gensim annoying warnings
 import warnings
@@ -92,8 +120,7 @@ def replace_digits(s: pd.Series, symbols: str = " ", only_blocks=True) -> pd.Ser
     """
 
     if only_blocks:
-        pattern = r"\b\d+\b"
-        return s.str.replace(pattern, symbols)
+        return s.str.replace(PATTERN_REMOVE_DIGITS_BLOCK, symbols)
     else:
         return s.str.replace(r"\d+", symbols)
 
@@ -158,7 +185,7 @@ def replace_punctuation(s: pd.Series, symbol: str = " ") -> pd.Series:
     dtype: object
     """
 
-    return s.str.replace(rf"([{string.punctuation}])+", symbol)
+    return s.str.replace(PATTERN_REMOVE_PUNCTUATION, symbol)
 
 
 def remove_punctuation(s: pd.Series) -> pd.Series:
@@ -267,13 +294,10 @@ def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
 
     """
 
-    pattern = r"""(?x)                          # Set flag to allow verbose regexps
-      \w+(?:-\w+)*                              # Words with optional internal hyphens 
-      | \s*                                     # Any space
-      | [][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]    # Any symbol 
-    """
-
-    return "".join(t if t not in words else symbol for t in re.findall(pattern, text))
+    return "".join(
+        t if t not in words else symbol
+        for t in re.findall(PATTERN_STOPWORD_TOKENIZER, text)
+    )
 
 
 def replace_stopwords(
@@ -504,9 +528,9 @@ def _optimised_default_clean_single_cell(text: str) -> str:
     text = text.lower()
 
     # remove digits and punctuation
-    pattern_digits_remove = r"\b\d+\b"
-    pattern_punctuation_remove = rf"([{string.punctuation}])+"
-    pattern_mixed_remove = pattern_digits_remove + "|" + pattern_punctuation_remove
+    pattern_mixed_remove = (
+        PATTERN_REMOVE_DIGITS_BLOCK + "|" + PATTERN_REMOVE_PUNCTUATION
+    )
     text = re.sub(pattern_mixed_remove, "", text)
 
     # remove diacritics
@@ -582,7 +606,7 @@ def remove_round_brackets(s: pd.Series) -> pd.Series:
     :meth:`remove_square_brackets`
 
     """
-    return s.str.replace(r"\([^()]*\)", "")
+    return s.str.replace(PATTERN_REMOVE_ROUND_BRACKETS, "")
 
 
 def remove_curly_brackets(s: pd.Series) -> pd.Series:
@@ -606,7 +630,7 @@ def remove_curly_brackets(s: pd.Series) -> pd.Series:
     :meth:`remove_square_brackets`
 
     """
-    return s.str.replace(r"\{[^{}]*\}", "")
+    return s.str.replace(PATERN_REMOVE_CURLY_BRACKETS, "")
 
 
 def remove_square_brackets(s: pd.Series) -> pd.Series:
@@ -631,7 +655,7 @@ def remove_square_brackets(s: pd.Series) -> pd.Series:
 
 
     """
-    return s.str.replace(r"\[[^\[\]]*\]", "")
+    return s.str.replace(PATTERN_REMOVE_SQUARE_BRACKETS, "")
 
 
 def remove_angle_brackets(s: pd.Series) -> pd.Series:
@@ -655,7 +679,7 @@ def remove_angle_brackets(s: pd.Series) -> pd.Series:
     :meth:`remove_square_brackets`
 
     """
-    return s.str.replace(r"<[^<>]*>", "")
+    return s.str.replace(PATTERN_REMOVE_ANGLE_BRACKETS, "")
 
 
 def remove_brackets(s: pd.Series) -> pd.Series:
@@ -708,12 +732,7 @@ def remove_html_tags(s: pd.Series) -> pd.Series:
 
     """
 
-    pattern = r"""(?x)                    # Turn on free-spacing
-      <[^>]+>                             # Remove <html> tags
-      | &([a-z0-9]+|\#[0-9]{1,6}|\#x[0-9a-f]{1,6}); # Remove &nbsp;
-      """
-
-    return s.str.replace(pattern, "")
+    return s.str.replace(PATTERN_REMOVE_HTML_TAG, "")
 
 
 def tokenize(s: pd.Series) -> pd.Series:
@@ -737,12 +756,10 @@ def tokenize(s: pd.Series) -> pd.Series:
 
     """
 
-    punct = string.punctuation.replace("_", "")
     # In regex, the metacharacter 'w' is "a-z, A-Z, 0-9, including the _ (underscore) character." We therefore remove it from the punctuation string as this is already included in \w
+    punct = string.punctuation.replace("_", "")
 
-    pattern = rf"((\w)([{punct}])(?:\B|$)|(?:^|\B)([{punct}])(\w))"
-
-    return s.str.replace(pattern, r"\2 \3 \4 \5").str.split()
+    return s.str.replace(GET_PATTERN_TOKENIZATION(punct), r"\2 \3 \4 \5").str.split()
 
 
 def tokenize_with_phrases(
@@ -818,9 +835,7 @@ def replace_urls(s: pd.Series, symbol: str) -> pd.Series:
 
     """
 
-    pattern = r"http\S+"
-
-    return s.str.replace(pattern, symbol)
+    return s.str.replace(PATTERN_REPLACE_URLS, symbol)
 
 
 def remove_urls(s: pd.Series) -> pd.Series:
@@ -869,8 +884,7 @@ def replace_tags(s: pd.Series, symbol: str) -> pd.Series:
 
     """
 
-    pattern = r"@[a-zA-Z0-9]+"
-    return s.str.replace(pattern, symbol)
+    return s.str.replace(PATTERN_REPLACE_TAGS, symbol)
 
 
 def remove_tags(s: pd.Series) -> pd.Series:
@@ -916,8 +930,7 @@ def replace_hashtags(s: pd.Series, symbol: str) -> pd.Series:
     dtype: object
 
     """
-    pattern = r"#[a-zA-Z0-9_]+"
-    return s.str.replace(pattern, symbol)
+    return s.str.replace(PATTERN_REPLACE_HASHTAGS, symbol)
 
 
 def remove_hashtags(s: pd.Series) -> pd.Series:

@@ -451,7 +451,12 @@ def get_default_pipeline() -> List[Callable[[pd.Series], pd.Series]]:
 
 def clean(s: pd.Series, pipeline=None) -> pd.Series:
     """
-    Pre-process a text-based Pandas Series, by using the following default pipline.
+    Pre-process a text-based Pandas Series.
+    
+    There are two options to use this function. You can either use this function, buy not specifiying an pipeline.
+    In this case the clean function will use a default pipeline, which was hardcoded, to gain 30% performance improvements,
+    over the "pipe" method.
+    If you specify your own cleaning pipeline, the clean function will use this one instead.
 
      Default pipeline:
      1. :meth:`texthero.preprocessing.fillna`
@@ -461,6 +466,7 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
      5. :meth:`texthero.preprocessing.remove_diacritics`
      6. :meth:`texthero.preprocessing.remove_stopwords`
      7. :meth:`texthero.preprocessing.remove_whitespace`
+
 
     Parameters
     ----------

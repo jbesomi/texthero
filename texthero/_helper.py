@@ -36,7 +36,7 @@ def handle_nans(replace_nans_with):
 
     Examples
     --------
-    >>> from texthero._helper import *
+    >>> from texthero._helper import handle_nans
     >>> import pandas as pd
     >>> import numpy as np
     >>> @handle_nans(replace_nans_with="I was missing!")

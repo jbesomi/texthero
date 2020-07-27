@@ -425,29 +425,6 @@ def stem(s: pd.Series, stem="snowball", language="english") -> pd.Series:
     return s.str.split().apply(_stem)
 
 
-def get_default_pipeline() -> List[Callable[[pd.Series], pd.Series]]:
-    """
-    Return a list contaning all the methods used in the default cleaning pipeline.
-
-    Return a list with the following functions:
-     1. :meth:`texthero.preprocessing.fillna`
-     2. :meth:`texthero.preprocessing.lowercase`
-     3. :meth:`texthero.preprocessing.remove_digits`
-     4. :meth:`texthero.preprocessing.remove_punctuation`
-     5. :meth:`texthero.preprocessing.remove_diacritics`
-     6. :meth:`texthero.preprocessing.remove_stopwords`
-     7. :meth:`texthero.preprocessing.remove_whitespace`
-    """
-    return [
-        fillna,
-        lowercase,
-        remove_digits,
-        remove_punctuation,
-        remove_diacritics,
-        remove_stopwords,
-        remove_whitespace,
-    ]
-
 
 def clean(s: pd.Series, pipeline=None) -> pd.Series:
     """

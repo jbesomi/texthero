@@ -425,7 +425,6 @@ def stem(s: pd.Series, stem="snowball", language="english") -> pd.Series:
     return s.str.split().apply(_stem)
 
 
-
 def clean(s: pd.Series, pipeline=None) -> pd.Series:
     """
     Pre-process a text-based Pandas Series.

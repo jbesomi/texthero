@@ -12,6 +12,7 @@ import pandas as pd
 
 from spacy.lang.zh import Chinese
 import texthero as hero
+from texthero._helper import root_caller
 
 from typing import List, Callable
 
@@ -20,20 +21,6 @@ from typing import List, Callable
 import warnings
 
 warnings.filterwarnings(action="ignore", category=UserWarning, module="gensim")
-
-
-def root_caller(root_module):
-    """
-    A decorator to call functions with the same name from `texthero.root_module`, when the original implementation
-    can be applied on Chinese.
-
-    # TODO: May put this in _helper.py
-    """
-    @wrapt.decorator
-    def wrapper(wrapped, instance, args, kwargs):
-        root_func = getattr(root_module, wrapped.__name__)
-        return root_func(*args, **kwargs)
-    return wrapper
 
 
 def get_default_pipeline() -> List[Callable[[pd.Series], pd.Series]]:
@@ -82,7 +69,7 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
     """
     if not pipeline:
         pipeline = get_default_pipeline()
-    
+
     return hero.preprocessing.clean(s, pipeline)
 
 

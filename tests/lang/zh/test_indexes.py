@@ -37,65 +37,63 @@ test_cases_preprocessing = [
     ["remove_hashtags", preprocessing.remove_hashtags, (s_text,)],
 ]
 
-test_cases = (
-    test_cases_preprocessing
-)
+test_cases = test_cases_preprocessing
 
 # test_cases_nlp = [
-    # ["named_entities", nlp.named_entities, (s_text,)],
-    # ["noun_chunks", nlp.noun_chunks, (s_text,)],
+# ["named_entities", nlp.named_entities, (s_text,)],
+# ["noun_chunks", nlp.noun_chunks, (s_text,)],
 # ]
-# 
+#
 # test_cases_preprocessing = [
-    # ["fillna", preprocessing.fillna, (s_text,)],
-    # ["lowercase", preprocessing.lowercase, (s_text,)],
-    # ["replace_digits", preprocessing.replace_digits, (s_text, "")],
-    # ["remove_digits", preprocessing.remove_digits, (s_text,)],
-    # ["replace_punctuation", preprocessing.replace_punctuation, (s_text, "")],
-    # ["remove_punctuation", preprocessing.remove_punctuation, (s_text,)],
-    # ["remove_diacritics", preprocessing.remove_diacritics, (s_text,)],
-    # ["remove_whitespace", preprocessing.remove_whitespace, (s_text,)],
-    # ["replace_stopwords", preprocessing.replace_stopwords, (s_text, "")],
-    # ["remove_stopwords", preprocessing.remove_stopwords, (s_text,)],
-    # ["stem", preprocessing.stem, (s_text,)],
-    # ["clean", preprocessing.clean, (s_text,)],
-    # ["remove_round_brackets", preprocessing.remove_round_brackets, (s_text,)],
-    # ["remove_curly_brackets", preprocessing.remove_curly_brackets, (s_text,)],
-    # ["remove_square_brackets", preprocessing.remove_square_brackets, (s_text,)],
-    # ["remove_angle_brackets", preprocessing.remove_angle_brackets, (s_text,)],
-    # ["remove_brackets", preprocessing.remove_brackets, (s_text,)],
-    # ["remove_html_tags", preprocessing.remove_html_tags, (s_text,)],
-    # ["tokenize", preprocessing.tokenize, (s_text,)],
-    # ["tokenize_with_phrases", preprocessing.tokenize_with_phrases, (s_text,)],
-    # ["replace_urls", preprocessing.replace_urls, (s_text, "")],
-    # ["remove_urls", preprocessing.remove_urls, (s_text,)],
-    # ["replace_tags", preprocessing.replace_tags, (s_text, "")],
-    # ["remove_tags", preprocessing.remove_tags, (s_text,)],
+# ["fillna", preprocessing.fillna, (s_text,)],
+# ["lowercase", preprocessing.lowercase, (s_text,)],
+# ["replace_digits", preprocessing.replace_digits, (s_text, "")],
+# ["remove_digits", preprocessing.remove_digits, (s_text,)],
+# ["replace_punctuation", preprocessing.replace_punctuation, (s_text, "")],
+# ["remove_punctuation", preprocessing.remove_punctuation, (s_text,)],
+# ["remove_diacritics", preprocessing.remove_diacritics, (s_text,)],
+# ["remove_whitespace", preprocessing.remove_whitespace, (s_text,)],
+# ["replace_stopwords", preprocessing.replace_stopwords, (s_text, "")],
+# ["remove_stopwords", preprocessing.remove_stopwords, (s_text,)],
+# ["stem", preprocessing.stem, (s_text,)],
+# ["clean", preprocessing.clean, (s_text,)],
+# ["remove_round_brackets", preprocessing.remove_round_brackets, (s_text,)],
+# ["remove_curly_brackets", preprocessing.remove_curly_brackets, (s_text,)],
+# ["remove_square_brackets", preprocessing.remove_square_brackets, (s_text,)],
+# ["remove_angle_brackets", preprocessing.remove_angle_brackets, (s_text,)],
+# ["remove_brackets", preprocessing.remove_brackets, (s_text,)],
+# ["remove_html_tags", preprocessing.remove_html_tags, (s_text,)],
+# ["tokenize", preprocessing.tokenize, (s_text,)],
+# ["tokenize_with_phrases", preprocessing.tokenize_with_phrases, (s_text,)],
+# ["replace_urls", preprocessing.replace_urls, (s_text, "")],
+# ["remove_urls", preprocessing.remove_urls, (s_text,)],
+# ["replace_tags", preprocessing.replace_tags, (s_text, "")],
+# ["remove_tags", preprocessing.remove_tags, (s_text,)],
 # ]
-# 
+#
 # test_cases_representation = [
-    # ["count", representation.count, (preprocessing.tokenize(s_text),),],
-    # [
-        # "term_frequency",
-        # representation.term_frequency,
-        # (preprocessing.tokenize(s_text),),
-    # ],
-    # ["tfidf", representation.tfidf, (preprocessing.tokenize(s_text),)],
-    # ["pca", representation.pca, (s_numeric_lists, 0)],
-    # ["nmf", representation.nmf, (s_numeric_lists,)],
-    # ["tsne", representation.tsne, (s_numeric_lists,)],
-    # ["kmeans", representation.kmeans, (s_numeric_lists, 1)],
-    # ["dbscan", representation.dbscan, (s_numeric_lists,)],
-    # ["meanshift", representation.meanshift, (s_numeric_lists,)],
+# ["count", representation.count, (preprocessing.tokenize(s_text),),],
+# [
+# "term_frequency",
+# representation.term_frequency,
+# (preprocessing.tokenize(s_text),),
+# ],
+# ["tfidf", representation.tfidf, (preprocessing.tokenize(s_text),)],
+# ["pca", representation.pca, (s_numeric_lists, 0)],
+# ["nmf", representation.nmf, (s_numeric_lists,)],
+# ["tsne", representation.tsne, (s_numeric_lists,)],
+# ["kmeans", representation.kmeans, (s_numeric_lists, 1)],
+# ["dbscan", representation.dbscan, (s_numeric_lists,)],
+# ["meanshift", representation.meanshift, (s_numeric_lists,)],
 # ]
-# 
+#
 # test_cases_visualization = []
-# 
+#
 # test_cases = (
-    # test_cases_nlp
-    # + test_cases_preprocessing
-    # + test_cases_representation
-    # + test_cases_visualization
+# test_cases_nlp
+# + test_cases_preprocessing
+# + test_cases_representation
+# + test_cases_visualization
 # )
 
 

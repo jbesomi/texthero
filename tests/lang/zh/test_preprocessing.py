@@ -35,9 +35,11 @@ class TestPreprocessing(PandasTestCase):
     def test_pipeline_stopwords(self):
         s = pd.Series("语言是人类区别其他动物的本质特性。\t@中国NLP第一大师\n#如何定义NLP 为什么呢？")
         s_true = pd.Series("语言是人类区别其他动物的本质特性。     为什么呢？")
-        pipeline = [preprocessing.remove_whitespace, 
-            preprocessing.remove_hashtags, 
-            preprocessing.remove_tags]
+        pipeline = [
+            preprocessing.remove_whitespace,
+            preprocessing.remove_hashtags,
+            preprocessing.remove_tags,
+        ]
         self.assertEqual(preprocessing.clean(s, pipeline=pipeline), s_true)
 
     """
@@ -62,7 +64,6 @@ class TestPreprocessing(PandasTestCase):
         s = pd.Series(["今天天气真好", "明天会怎样呢"])
         s_true = pd.Series([["今天天气", "真", "好"], ["明天", "会", "怎样", "呢"]])
         self.assertEqual(preprocessing.tokenize(s), s_true)
-
 
     """
     Has content

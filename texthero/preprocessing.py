@@ -34,17 +34,26 @@ HTML_TAG = r"""(?x)                    # Turn on free-spacing
             | &([a-z0-9]+|\#[0-9]{1,6}|\#x[0-9a-f]{1,6}); # Remove &nbsp;
             """
 
+URLS = r"http\S+"
+TAGS = r"@[a-zA-Z0-9]+"
+HASHTAGS = r"#[a-zA-Z0-9_]+"
+
 
 def _get_pattern_for_tokenisation(punct: str) -> str:
     """
     Returns the standart tokenisation pattern
+
+    The standart tokenisation will seperate all "regex words" '\w' from each other and also 
+    puts the punctuation in its own tokens
+
+    Parameters
+    ----------
+    punct : String
+            the text, which should get tokenized by this pattern, but all '_' characters should have been removed,
+            as '\w' in regex already includes this one
     """
     return rf"((\w)([{punct}])(?:\B|$)|(?:^|\B)([{punct}])(\w))"
 
-
-URLS = r"http\S+"
-TAGS = r"@[a-zA-Z0-9]+"
-HASHTAGS = r"#[a-zA-Z0-9_]+"
 
 # Ignore gensim annoying warnings
 import warnings
@@ -295,8 +304,7 @@ def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
     """
 
     return "".join(
-        t if t not in words else symbol
-        for t in re.findall(STOPWORD_TOKENIZER, text)
+        t if t not in words else symbol for t in re.findall(STOPWORD_TOKENIZER, text)
     )
 
 
@@ -510,9 +518,7 @@ def _optimised_default_clean_single_cell(text: str) -> str:
     text = text.lower()
 
     # remove digits and punctuation
-    pattern_mixed_remove = (
-        DIGITS_BLOCK + "|" + PUNCTUATION
-    )
+    pattern_mixed_remove = DIGITS_BLOCK + "|" + PUNCTUATION
     text = re.sub(pattern_mixed_remove, "", text)
 
     # remove diacritics
@@ -741,7 +747,9 @@ def tokenize(s: pd.Series) -> pd.Series:
     # In regex, the metacharacter 'w' is "a-z, A-Z, 0-9, including the _ (underscore) character." We therefore remove it from the punctuation string as this is already included in \w
     punct = string.punctuation.replace("_", "")
 
-    return s.str.replace(_get_pattern_for_tokenisation(punct), r"\2 \3 \4 \5").str.split()
+    return s.str.replace(
+        _get_pattern_for_tokenisation(punct), r"\2 \3 \4 \5"
+    ).str.split()
 
 
 def tokenize_with_phrases(

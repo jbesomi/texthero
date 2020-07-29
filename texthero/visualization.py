@@ -3,6 +3,7 @@ Visualize insights and statistics of a text-based Pandas DataFrame.
 """
 
 import pandas as pd
+import numpy as np
 import plotly.express as px
 
 from wordcloud import WordCloud
@@ -43,17 +44,17 @@ def scatterplot(
     color: str, default to None.
         Name of the column to use for coloring (rows with same value get same color).
 
+    hover_name: str, default to None
+        Name of the column to supply title of hover data when hovering over a point.
+
+    hover_data: List[str], default to [].
+        List of column names to supply data when hovering over a point.
+
     title: str, default to "".
         Title of the plot.
 
     return_figure: optional, default to False.
         Function returns the figure instead of showing it if set to True.
-
-    hover_data: List[str], default to [].
-        List of column names to supply data when hovering over a point.
-
-    hover_name: str, default to None
-        Name of the column to supply title of hover data when hovering over a point.
 
     Examples
     --------
@@ -66,26 +67,36 @@ def scatterplot(
     >>> hero.scatterplot(df, col="pca", color="topics", hover_data=["texts"]) # doctest: +SKIP
     """
 
-    x = df[col].apply(lambda x: x[0])
-    y = df[col].apply(lambda x: x[1])
+    plot_values = np.stack(df[col], axis=1)
+    dimension = len(plot_values)
 
-    if len(df[col][0]) == 3:
-        z = df[col].apply(lambda x: x[2])
-        fig = px.scatter_3d(
+    if dimension < 2 or dimension > 3:
+        raise ValueError(
+            "The column you want to visualize has dimension < 2 or dimension > 3."
+            " The function can only visualize 2- and 3-dimensional data."
+        )
+
+    if dimension == 2:
+        x, y = plot_values[0], plot_values[1]
+
+        fig = px.scatter(
             df,
             x=x,
             y=y,
-            z=z,
             color=color,
             hover_data=hover_data,
             title=title,
             hover_name=hover_name,
         )
+
     else:
-        fig = px.scatter(
+        x, y, z = plot_values[0], plot_values[1], plot_values[2]
+
+        fig = px.scatter_3d(
             df,
             x=x,
             y=y,
+            z=z,
             color=color,
             hover_data=hover_data,
             title=title,

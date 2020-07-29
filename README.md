@@ -315,6 +315,7 @@ If you have just other questions or inquiry drop me a line at jonathanbesomi__AT
 - [Ishan Arora](https://github.com/ishanarora04)
 - [Vidya P](https://github.com/vidyap-xgboost)
 - [Cedric Conol](https://github.com/cedricconol)
+- [Rich Ramalho](https://github.com/richecr)
 
 
 <h2 align="center"><a href="./LICENSE">License</a></h2>

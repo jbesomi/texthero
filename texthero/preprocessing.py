@@ -757,44 +757,56 @@ def tokenize_with_phrases(
 ) -> pd.Series:
     r"""Tokenize and group up collocations words
 
-    Tokenize the given pandas Series and group up bigrams where each
-    token has at least min_count term frequrncy and where the threshold
-    is larger than the underline formula.
 
-    :math:`\frac{(bigram\_a\_b\_count - min\_count)* len\_vocab }{ (word\_a\_count * word\_b\_count)}`.
+def phrases(s: pd.Series, min_count: int = 5, threshold: int = 10, symbol: str = "_"):
+    r"""Group up collocations words
+
+    Given a pandas Series of tokenized strings, group together bigrams where
+    each tokens has at least `min_count` term frequency and where the
+    `threshold` is larger than the underline formula.
+
+    :math:`\frac{(bigram\_a\_b\_count - min\_count)* len\_vocab }
+    { (word\_a\_count * word\_b\_count)}`.
 
     Parameters
     ----------
     s : Pandas Series
-
+    
     min_count : Int, optional. Default is 5.
         ignore tokens with frequency less than this
-
+        
     threshold : Int, optional. Default is 10.
         ignore tokens with a score under that threshold
+        
+    symbol : Str, optional. Default is '_'.
+        character used to join collocation words
 
     Examples
     --------
     >>> import texthero as hero
-    >>> import pandas as pd
-    >>> s = pd.Series(["New York is a beautiful city", "Look: New York!"])
-    >>> hero.tokenize_with_phrases(s, min_count=1, threshold=1)
+    >>> s = pd.Series([['New', 'York', 'is', 'a', 'beautiful', 'city'],
+    ...               ['Look', ':', 'New', 'York', '!']])
+    >>> hero.phrases(s, min_count=1, threshold=1)
     0    [New_York, is, a, beautiful, city]
     1                [Look, :, New_York, !]
     dtype: object
 
     Reference
     --------
-    `Mikolov, et. al: "Distributed Representations of Words and Phrases and their Compositionality"
+    `Mikolov, et. al: "Distributed Representations of Words and Phrases and
+    their Compositionality"
         <https://arxiv.org/abs/1310.4546>`_
 
     """
 
-    if type(s.iloc[0]) != str:
-        raise ValueError("Input series should be a list of string.")
+    if not isinstance(s.iloc[0], list):
+        warnings.warn(_not_tokenized_warning_message, DeprecationWarning)
+        s = tokenize(s)
 
-    s = tokenize(s)
-    phrases = PhrasesTransformer(min_count=min_count, threshold=threshold)
+    delimiter = symbol.encode("utf-8")
+    phrases = PhrasesTransformer(
+        min_count=min_count, threshold=threshold, delimiter=delimiter
+    )
     return pd.Series(phrases.fit_transform(s.values), index=s.index)
 
 

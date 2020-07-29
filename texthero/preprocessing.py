@@ -752,10 +752,12 @@ def tokenize(s: pd.Series) -> pd.Series:
     ).str.split()
 
 
-def tokenize_with_phrases(
-    s: pd.Series, min_count: int = 5, threshold: int = 10
-) -> pd.Series:
-    r"""Tokenize and group up collocations words
+# Warning message for not-tokenized inputs
+_not_tokenized_warning_message = (
+    "It seems like the given Pandas Series s is not tokenized. This function will"
+    " tokenize it automatically using hero.tokenize(s) first. You should consider"
+    " tokenizing it yourself first with hero.tokenize(s) in the future."
+)
 
 
 def phrases(s: pd.Series, min_count: int = 5, threshold: int = 10, symbol: str = "_"):

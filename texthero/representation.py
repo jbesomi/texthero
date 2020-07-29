@@ -107,6 +107,7 @@ def count(
     max_features: Optional[int] = None,
     min_df=1,
     max_df=1.0,
+    binary=False,
     return_feature_names=False,
 ) -> pd.Series:
     """
@@ -134,6 +135,9 @@ def count(
         frequency strictly higher than the given threshold.
         If float, the parameter represents a proportion of documents, integer
         absolute counts.
+
+    binary : bool, default=False
+        If True, all non zero counts are set to 1.
 
     return_features_names : Boolean, False by Default
         If True, return a tuple (*count_series*, *features_names*)
@@ -173,6 +177,7 @@ def count(
         preprocessor=lambda x: x,
         min_df=min_df,
         max_df=max_df,
+        binary=binary,
     )
     s = pd.Series(tf.fit_transform(s).toarray().tolist(), index=s.index)
 
@@ -381,7 +386,7 @@ Dimensionality reduction
 """
 
 
-def pca(s, n_components=2) -> pd.Series:
+def pca(s, n_components=2, random_state=None) -> pd.Series:
     """
     Perform principal component analysis on the given Pandas Series.
 
@@ -409,7 +414,7 @@ def pca(s, n_components=2) -> pd.Series:
         Number of components to keep (dimensionality of output vectors).
         If n_components is not set or None, all components are kept.
 
-    random_state : int, RandomState instance, default=None
+    random_state : int, default=None
         Pass an int for reproducible results across multiple function calls.
 
 
@@ -435,14 +440,12 @@ def pca(s, n_components=2) -> pd.Series:
     --------
     `PCA on Wikipedia <https://en.wikipedia.org/wiki/Principal_component_analysis>`_
 
-    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
- 
     """
-    pca = PCA(n_components=n_components)
+    pca = PCA(n_components=n_components, random_state=random_state, copy=False)
     return pd.Series(pca.fit_transform(list(s)).tolist(), index=s.index)
 
 
-def nmf(s, n_components=2) -> pd.Series:
+def nmf(s, n_components=2, random_state=None) -> pd.Series:
     """
     Performs non-negative matrix factorization.
 
@@ -467,6 +470,9 @@ def nmf(s, n_components=2) -> pd.Series:
     n_components : Int. Default is 2.
         Number of components to keep (dimensionality of output vectors).
         If n_components is not set or None, all components are kept.
+
+    random_state : int, default=None
+        Pass an int for reproducible results across multiple function calls.
 
     Returns
     -------
@@ -493,10 +499,8 @@ def nmf(s, n_components=2) -> pd.Series:
     --------
     `NMF on Wikipedia <https://en.wikipedia.org/wiki/Non-negative_matrix_factorization>`_
 
-    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
-
     """
-    nmf = NMF(n_components=n_components, init="random", random_state=0)
+    nmf = NMF(n_components=n_components, init="random", random_state=random_state,)
     return pd.Series(nmf.fit_transform(list(s)).tolist(), index=s.index)
 
 
@@ -504,17 +508,9 @@ def tsne(
     s: pd.Series,
     n_components=2,
     perplexity=30.0,
-    early_exaggeration=12.0,
     learning_rate=200.0,
     n_iter=1000,
-    n_iter_without_progress=300,
-    min_grad_norm=1e-07,
-    metric="euclidean",
-    init="random",
-    verbose=0,
     random_state=None,
-    method="barnes_hut",
-    angle=0.5,
     n_jobs=-1,
 ) -> pd.Series:
     """
@@ -548,15 +544,6 @@ def tsne(
         between 5 and 50. Different values can result in significanlty
         different results.
 
-    early_exaggeration : float, optional (default: 12.0)
-        Controls how tight natural clusters in the original space are in
-        the embedded space and how much space will be between them. For
-        larger values, the space between natural clusters will be larger
-        in the embedded space. Again, the choice of this parameter is not
-        very critical. If the cost function increases during initial
-        optimization, the early exaggeration factor or the learning rate
-        might be too high.
-
     learning_rate : float, optional (default: 200.0)
         The learning rate for t-SNE is usually in the range [10.0, 1000.0]. If
         the learning rate is too high, the data may look like a 'ball' with any
@@ -569,64 +556,12 @@ def tsne(
         Maximum number of iterations for the optimization. Should be at
         least 250.
 
-    n_iter_without_progress : int, optional (default: 300)
-        Maximum number of iterations without progress before we abort the
-        optimization, used after 250 initial iterations with early
-        exaggeration. Note that progress is only checked every 50 iterations so
-        this value is rounded to the next multiple of 50.
-
-    min_grad_norm : float, optional (default: 1e-7)
-        If the gradient norm is below this threshold, the optimization will
-        be stopped.
-
-    metric : string or callable, optional
-        The metric to use when calculating distance between instances in a
-        feature array. If metric is a string, it must be one of the options
-        allowed by scipy.spatial.distance.pdist for its metric parameter.
-
-        Alternatively, if metric is a callable function, it is called on each
-        pair of instances (rows) and the resulting value recorded. The callable
-        should take two arrays from X as input and return a value indicating
-        the distance between them. The default is "euclidean" which is
-        interpreted as squared euclidean distance.
-
-    init : string or numpy array, optional (default: "random")
-        Initialization of embedding. Possible options are 'random', 'pca',
-        and a numpy array of shape (n_samples, n_components).
-        PCA initialization cannot be used with precomputed distances and is
-        usually more globally stable than random initialization.
-
-    verbose : int, optional (default: 0)
-        Verbosity level.
-
-    random_state : int, RandomState instance, default=None
+    random_state : int, default=None
         Determines the random number generator. Pass an int for reproducible
-        results across multiple function calls. Note that different
-        initializations might result in different local minima of the cost
-        function.
+        results across multiple function calls.
 
-    method : string (default: 'barnes_hut')
-        By default the gradient calculation algorithm uses Barnes-Hut
-        approximation running in O(NlogN) time. method='exact'
-        will run on the slower, but exact, algorithm in O(N^2) time. The
-        exact algorithm should be used when nearest-neighbor errors need
-        to be better than 3%. However, the exact method cannot scale to
-        millions of examples.
-
-    angle : float (default: 0.5)
-        Only used if method='barnes_hut'
-        This is the trade-off between speed and accuracy for Barnes-Hut T-SNE.
-        'angle' is the angular size of a distant
-        node as measured from a point. If this size is below 'angle' then it is
-        used as a summary node of all points contained within it.
-        This method is not very sensitive to changes in this parameter
-        in the range of 0.2 - 0.8. Angle less than 0.2 has quickly increasing
-        computation time and angle greater 0.8 has quickly increasing error.
-
-    n_jobs : int or None, optional (default=None)
-        The number of parallel jobs to run for neighbors search. This parameter
-        has no impact when ``metric="precomputed"`` or
-        (``metric="euclidean"`` and ``method="exact"``).
+    n_jobs : int, optional, default=-1
+        The number of parallel jobs to run for neighbors search.
         ``-1`` means using all processors.
 
     Returns
@@ -649,23 +584,13 @@ def tsne(
     --------
     `t-SNE on Wikipedia <https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding>`_
 
-    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
-
     """
     tsne = TSNE(
         n_components=n_components,
         perplexity=perplexity,
-        early_exaggeration=early_exaggeration,
         learning_rate=learning_rate,
         n_iter=n_iter,
-        n_iter_without_progress=n_iter_without_progress,
-        min_grad_norm=min_grad_norm,
-        metric=metric,
-        init=init,
-        verbose=verbose,
         random_state=random_state,
-        method=method,
-        angle=angle,
         n_jobs=n_jobs,
     )
     return pd.Series(tsne.fit_transform(list(s)).tolist(), index=s.index)
@@ -679,15 +604,9 @@ Clustering
 def kmeans(
     s: pd.Series,
     n_clusters=5,
-    init="k-means++",
     n_init=10,
     max_iter=300,
-    tol=0.0001,
-    precompute_distances="auto",
-    verbose=0,
     random_state=None,
-    copy_x=True,
-    n_jobs=-1,
     algorithm="auto",
 ):
     """
@@ -713,22 +632,6 @@ def kmeans(
     n_clusters: Int, default to 5.
         The number of clusters to separate the data into.
 
-    init : {'k-means++', 'random', ndarray, callable}, default='k-means++'
-        Method for initialization:
-
-        'k-means++' : selects initial cluster centers for k-mean
-        clustering in a smart way to speed up convergence. See section
-        Notes in k_init for more details.
-
-        'random': choose `n_clusters` observations (rows) at random from data
-        for the initial centroids.
-
-        If an ndarray is passed, it should be of shape (n_clusters, n_features)
-        and gives the initial centers.
-
-        If a callable is passed, it should take arguments X, n_clusters and a
-        random state and return an initialization.
-
     n_init : int, default=10
         Number of time the k-means algorithm will be run with different
         centroid seeds. The final results will be the best output of
@@ -738,17 +641,7 @@ def kmeans(
         Maximum number of iterations of the k-means algorithm for a
         single run.
 
-    tol : float, default=1e-4
-        Relative tolerance with regards to Frobenius norm of the difference
-        in the cluster centers of two consecutive iterations to declare
-        convergence.
-        It's not advised to set `tol=0` since convergence might never be
-        declared due to rounding errors. Use a very small number instead.
-
-    verbose : int, default=0
-        Verbosity mode.
-
-    random_state : int, RandomState instance, default=None
+    random_state : int, default=None
         Determines random number generation for centroid initialization. Use
         an int to make the randomness deterministic.
 
@@ -782,21 +675,14 @@ def kmeans(
     --------
     `kmeans on Wikipedia <https://en.wikipedia.org/wiki/K-means_clustering>`_
 
-    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
-
     """
     vectors = list(s)
     kmeans = KMeans(
         n_clusters=n_clusters,
-        init=init,
         n_init=n_init,
         max_iter=max_iter,
-        tol=tol,
-        precompute_distances=precompute_distances,
-        verbose=verbose,
         random_state=random_state,
-        copy_x=copy_x,
-        n_jobs=n_jobs,
+        copy_x=True,
         algorithm=algorithm,
     ).fit(vectors)
     return pd.Series(kmeans.predict(vectors), index=s.index).astype("category")
@@ -808,10 +694,8 @@ def dbscan(
     min_samples=5,
     metric="euclidean",
     metric_params=None,
-    algorithm="auto",
     leaf_size=30,
-    p=None,
-    n_jobs=None,
+    n_jobs=-1,
 ):
     """
     Perform DBSCAN clustering.
@@ -848,17 +732,11 @@ def dbscan(
 
     metric : string, or callable, default='euclidean'
         The metric to use when calculating distance between instances in a
-        feature array. If metric is a string or callable, it must be one of
-        the options allowed by :func:`sklearn.metrics.pairwise_distances` for
-        its metric parameter.
+        feature array. Use `sorted(sklearn.neighbors.VALID_METRICS['brute'])`
+        to see valid options.
 
     metric_params : dict, default=None
         Additional keyword arguments for the metric function.
-
-    algorithm : {'auto', 'ball_tree', 'kd_tree', 'brute'}, default='auto'
-        The algorithm to be used by the NearestNeighbors module
-        to compute pointwise distances and find nearest neighbors.
-        See NearestNeighbors module documentation for details.
 
     leaf_size : int, default=30
         Leaf size passed to BallTree or cKDTree. This can affect the speed
@@ -866,11 +744,7 @@ def dbscan(
         to store the tree. The optimal value depends
         on the nature of the problem.
 
-    p : float, default=None
-        The power of the Minkowski metric to be used to calculate distance
-        between points.
-
-    n_jobs : int, default=None
+    n_jobs : int, default=-1
         The number of parallel jobs to run.
         ``-1`` means using all processors.
 
@@ -900,8 +774,6 @@ def dbscan(
     --------
     `DBSCAN on Wikipedia <https://en.wikipedia.org/wiki/DBSCAN>`_
 
-    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
-
     """
 
     return pd.Series(
@@ -910,9 +782,7 @@ def dbscan(
             min_samples=min_samples,
             metric=metric,
             metric_params=metric_params,
-            algorithm=algorithm,
             leaf_size=leaf_size,
-            p=p,
             n_jobs=n_jobs,
         ).fit_predict(list(s)),
         index=s.index,
@@ -922,11 +792,10 @@ def dbscan(
 def meanshift(
     s,
     bandwidth=None,
-    seeds=None,
     bin_seeding=False,
     min_bin_freq=1,
     cluster_all=True,
-    n_jobs=None,
+    n_jobs=-1,
     max_iter=300,
 ):
     """
@@ -954,12 +823,9 @@ def meanshift(
     bandwidth : float, default=None
         Bandwidth used in the RBF kernel.
 
-        If not given, the bandwidth is estimated using
-        sklearn.cluster.estimate_bandwidth; see the documentation for that
-        function for hints on scalability.
-
-    seeds : array-like of shape (n_samples, n_features), default=None
-        Seeds used to initialize kernels.
+        If not given, the bandwidth is estimated.
+        Estimating takes time at least quadratic in the number of samples (i.e. documents).
+        For large datasets, it’s wise to set the bandwidth to a small value.
 
     bin_seeding : bool, default=False
         If true, initial kernel locations are not locations of all
@@ -967,8 +833,6 @@ def meanshift(
         points, where points are binned onto a grid whose coarseness
         corresponds to the bandwidth. Setting this option to True will speed
         up the algorithm because fewer seeds will be initialized.
-        The default value is False.
-        Ignored if seeds argument is not None.
 
     min_bin_freq : int, default=1
        To speed up the algorithm, accept only those bins with at least
@@ -979,7 +843,7 @@ def meanshift(
         not within any kernel. Orphans are assigned to the nearest kernel.
         If false, then orphans are given cluster label -1.
 
-    n_jobs : int, default=None
+    n_jobs : int, default=-1
         The number of jobs to use for the computation.
         ``-1`` means using all processors
 
@@ -1010,14 +874,11 @@ def meanshift(
     --------
     `Mean-Shift on Wikipedia <https://en.wikipedia.org/wiki/Mean_shift>`_
 
-    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
-
     """
 
     return pd.Series(
         MeanShift(
             bandwidth=bandwidth,
-            seeds=seeds,
             bin_seeding=bin_seeding,
             min_bin_freq=min_bin_freq,
             cluster_all=cluster_all,

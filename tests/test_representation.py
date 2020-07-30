@@ -192,8 +192,8 @@ class TestRepresentation(PandasTestCase):
             [(0, "a"), (0, "b"), (0, "c")], names=("document", "word")
         )
 
-        s_true = pd.Series([1, 2, 2], index=idx, dtype="float").astype(
-            pd.SparseDtype("int", 0)
+        s_true = pd.Series([1, 2, 2], index=idx, dtype=np.int64).astype(
+            pd.SparseDtype(np.int64, 0)
         )
         pd.testing.assert_series_equal(
             representation.count(s), s_true, check_dtype=False
@@ -207,8 +207,8 @@ class TestRepresentation(PandasTestCase):
             [(0, "doc_one"), (1, "doc_two")], names=("document", "word")
         )
 
-        s_true = pd.Series([1, 1], index=idx, dtype="float").astype(
-            pd.SparseDtype("int", 0)
+        s_true = pd.Series([1, 1], index=idx, dtype=np.int64).astype(
+            pd.SparseDtype(np.int64, 0)
         )
         pd.testing.assert_series_equal(
             representation.count(s), s_true, check_dtype=False
@@ -222,8 +222,8 @@ class TestRepresentation(PandasTestCase):
             [(0, "A"), (1, "a")], names=("document", "word")
         )
 
-        s_true = pd.Series([1, 1], index=idx, dtype="float").astype(
-            pd.SparseDtype("int", 0)
+        s_true = pd.Series([1, 1], index=idx, dtype=np.int64).astype(
+            pd.SparseDtype(np.int64, 0)
         )
         pd.testing.assert_series_equal(
             representation.count(s), s_true, check_dtype=False
@@ -237,11 +237,11 @@ class TestRepresentation(PandasTestCase):
             [(0, "!"), (0, "?"), (0, "number"), (0, "one")], names=("document", "word")
         )
 
-        s_true = pd.Series([1, 1, 1, 1], index=idx, dtype="float").astype(
-            pd.SparseDtype("int", 0)
+        s_true = pd.Series([1, 1, 1, 1], index=idx, dtype=np.int64).astype(
+            pd.SparseDtype(np.int64, 0)
         )
         pd.testing.assert_series_equal(
-            representation.count(s), s_true, check_dtype=False
+            representation.count(s), s_true,
         )
 
     """

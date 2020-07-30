@@ -196,7 +196,7 @@ def count(
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
-    >>> hero.count(s, return_flat_series=True)
+    >>> hero.count(s, return_flat_series=True) # doctest: +SKIP
     document
     0    [1, 1.0, 0.0]
     1    [1, 0.0, 1.0]
@@ -207,7 +207,7 @@ def count(
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
-    >>> hero.count(s, return_flat_series=True, return_feature_names=True)
+    >>> hero.count(s, return_flat_series=True, return_feature_names=True) # doctest: +SKIP
     (document
     0    [1, 1.0, 0.0]
     1    [1, 0.0, 1.0]

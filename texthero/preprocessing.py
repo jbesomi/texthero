@@ -896,3 +896,4 @@ def remove_hashtags(s: pd.Series) -> pd.Series:
     :meth:`texthero.preprocessing.replace_hashtags` for replacing a hashtag with a custom symbol.
     """
     return replace_hashtags(s, " ")
+

@@ -195,7 +195,9 @@ class TestRepresentation(PandasTestCase):
         s_true = pd.Series([1, 2, 2], index=idx, dtype="float").astype(
             pd.SparseDtype("int", 0)
         )
-        pd.testing.assert_series_equal(representation.count(s), s_true, check_dtype=False)
+        pd.testing.assert_series_equal(
+            representation.count(s), s_true, check_dtype=False
+        )
 
     def test_count_multiple_documents_representation_series(self):
 
@@ -208,7 +210,9 @@ class TestRepresentation(PandasTestCase):
         s_true = pd.Series([1, 1], index=idx, dtype="float").astype(
             pd.SparseDtype("int", 0)
         )
-        pd.testing.assert_series_equal(representation.count(s), s_true, check_dtype=False)
+        pd.testing.assert_series_equal(
+            representation.count(s), s_true, check_dtype=False
+        )
 
     def test_count_not_lowercase_representation_series(self):
 
@@ -221,7 +225,9 @@ class TestRepresentation(PandasTestCase):
         s_true = pd.Series([1, 1], index=idx, dtype="float").astype(
             pd.SparseDtype("int", 0)
         )
-        pd.testing.assert_series_equal(representation.count(s), s_true, check_dtype=False)
+        pd.testing.assert_series_equal(
+            representation.count(s), s_true, check_dtype=False
+        )
 
     def test_count_punctuation_are_kept_representation_series(self):
 
@@ -234,7 +240,9 @@ class TestRepresentation(PandasTestCase):
         s_true = pd.Series([1, 1, 1, 1], index=idx, dtype="float").astype(
             pd.SparseDtype("int", 0)
         )
-        pd.testing.assert_series_equal(representation.count(s), s_true, check_dtype=False)
+        pd.testing.assert_series_equal(
+            representation.count(s), s_true, check_dtype=False
+        )
 
     """
     Term Frequency.

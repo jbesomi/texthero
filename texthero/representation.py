@@ -89,6 +89,31 @@ def representation_series_to_flat_series(
     return s
 
 
+def _check_is_valid_representation(s: pd.Series) -> bool:
+    """
+    Check if the given Pandas Series is a Document Representation Series.
+
+    Returns true if Series is Document Representation Series, else False.
+
+    """
+
+    # TODO: in Version 2 when only representation is accepted as input -> change "return False" to "raise ValueError"
+
+    if not isinstance(s.index, pd.MultiIndex):
+        return False
+        # raise ValueError(
+        #     f"The input Pandas Series should be a Representation Pandas Series and should have a MultiIndex. The given Pandas Series does not appears to have MultiIndex"
+        # )
+
+    if s.index.nlevels != 2:
+        return False
+        # raise ValueError(
+        #     f"The input Pandas Series should be a Representation Pandas Series and should have a MultiIndex, where the first level represent the document and the second one the words/token. The given Pandas Series has {s.index.nlevels} number of levels instead of 2."
+        # )
+
+    return True
+
+
 # Warning message for not-tokenized inputs
 _not_tokenized_warning_message = (
     "It seems like the given Pandas Series s is not tokenized. This function will"
@@ -109,9 +134,16 @@ def count(
     max_df=1.0,
     binary=False,
     return_feature_names=False,
+    return_flat_series=False,
 ) -> pd.Series:
     """
     Represent a text-based Pandas Series using count.
+
+    Return a Document Representation Series with the
+    number of occurences of a document's words for every
+    document. If return_flat_series is set to True,
+    return a Series with document vectors in every cell.
+    TODO add tutorial link
 
     The input Series should already be tokenized. If not, it will
     be tokenized before count is calculated.
@@ -142,6 +174,9 @@ def count(
     return_features_names : Boolean, False by Default
         If True, return a tuple (*count_series*, *features_names*)
 
+    return_flat_series : bool, default=False
+        Whether to return a flat Series (document vectors in every cell) instead
+        of a Document Representation Series. Will be less memory-efficient.
 
     Examples
     --------
@@ -149,20 +184,38 @@ def count(
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
     >>> hero.count(s)
-    0    [1, 1, 0]
-    1    [1, 0, 1]
-    dtype: object
-    
-    To return the features_names:
-    
+    document  word    
+    0         Sentence    1
+              one         1
+    1         Sentence    1
+              two         1
+    dtype: Sparse[int64, 0]
+
+    With flat output:
+
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
-    >>> hero.count(s, return_feature_names=True)
-    (0    [1, 1, 0]
-    1    [1, 0, 1]
+    >>> hero.count(s, return_flat_series=True)
+    document
+    0    [1, 1.0, 0.0]
+    1    [1, 0.0, 1.0]
+    dtype: object
+
+    To return the features_names:
+
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
+    >>> hero.count(s, return_flat_series=True, return_feature_names=True)
+    (document
+    0    [1, 1.0, 0.0]
+    1    [1, 0.0, 1.0]
     dtype: object, ['Sentence', 'one', 'two'])
 
+    See Also
+    --------
+    Document Representation Series: TODO add tutorial link
     """
     # TODO. Can be rewritten without sklearn.
 
@@ -179,12 +232,29 @@ def count(
         max_df=max_df,
         binary=binary,
     )
-    s = pd.Series(tf.fit_transform(s).toarray().tolist(), index=s.index)
 
-    if return_feature_names:
-        return (s, tf.get_feature_names())
-    else:
-        return s
+    tf_vectors_csr = tf.fit_transform(s)
+    tf_vectors_coo = coo_matrix(tf_vectors_csr)
+
+    s_out = pd.Series.sparse.from_coo(tf_vectors_coo)
+
+    features_names = tf.get_feature_names()
+
+    # Map word index to word name
+    s_out.index = s_out.index.map(lambda x: (s.index[x[0]], features_names[x[1]]))
+
+    s_out.rename_axis(["document", "word"], inplace=True)
+
+    if return_flat_series:
+
+        s_out = representation_series_to_flat_series(
+            s_out, fill_missing_with=0.0, index=s.index
+        )
+
+        if return_feature_names:
+            return (s_out, tf.get_feature_names())
+
+    return s_out
 
 
 def term_frequency(
@@ -193,10 +263,16 @@ def term_frequency(
     min_df=1,
     max_df=1.0,
     return_feature_names=False,
+    return_flat_series=False,
 ) -> pd.Series:
-
     """
     Represent a text-based Pandas Series using term frequency.
+
+    Return a Document Representation Series with the
+    term frequencies of the terms for every
+    document. If return_flat_series is set to True,
+    return a Series with document vectors in every cell.
+    TODO add tutorial link
 
     The input Series should already be tokenized. If not, it will
     be tokenized before term_frequency is calculated.
@@ -223,28 +299,51 @@ def term_frequency(
 
     return_features_names : Boolean, False by Default
         If True, return a tuple (*count_series*, *features_names*)
+        Only applicable if return_flat_series is set to True.
 
+    return_flat_series : bool, default=False
+        Whether to return a flat Series (document vectors in every cell) instead
+        of a Document Representation Series. Will be less memory-efficient.
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
+    >>> s = pd.Series(["Sentence one hey", "Sentence two"]).pipe(hero.tokenize)
     >>> hero.term_frequency(s)
-    0    [0.25, 0.25, 0.0]
-    1    [0.25, 0.0, 0.25]
-    dtype: object
-    
-    To return the features_names:
-    
+    document  word    
+    0         Sentence    0.2
+              hey         0.2
+              one         0.2
+    1         Sentence    0.2
+              two         0.2
+    dtype: Sparse[float64, nan]
+
+    With flat output:
+
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
-    >>> hero.term_frequency(s, return_feature_names=True)
-    (0    [0.25, 0.25, 0.0]
-    1    [0.25, 0.0, 0.25]
-    dtype: object, ['Sentence', 'one', 'two'])
+    >>> s = pd.Series(["Sentence one hey", "Sentence two"]).pipe(hero.tokenize)
+    >>> hero.term_frequency(s, return_flat_series=True)
+    document
+    0    [0.2, 0.2, 0.2, 0.0]
+    1    [0.2, 0.0, 0.0, 0.2]
+    dtype: object
 
+    To return the features_names with the flat output:
+
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["Sentence one hey", "Sentence two"]).pipe(hero.tokenize)
+    >>> hero.term_frequency(s, return_feature_names=True, return_flat_series=True)
+    (document
+    0    [0.2, 0.2, 0.2, 0.0]
+    1    [0.2, 0.0, 0.0, 0.2]
+    dtype: object, ['Sentence', 'hey', 'one', 'two'])
+
+    See Also
+    --------
+    Document Representation Series: TODO add tutorial link
     """
     # Check if input is tokenized. Else, print warning and tokenize.
     if not isinstance(s.iloc[0], list):
@@ -259,19 +358,41 @@ def term_frequency(
         max_df=max_df,
     )
 
-    cv_fit_transform = tf.fit_transform(s).toarray()
-    total_count = np.sum(cv_fit_transform)
-    s = pd.Series(np.divide(cv_fit_transform, total_count).tolist(), index=s.index)
+    tf_vectors_csr = tf.fit_transform(s)
+    tf_vectors_coo = coo_matrix(tf_vectors_csr)
 
-    if return_feature_names:
-        return (s, tf.get_feature_names())
-    else:
-        return s
+    total_count_coo = np.sum(tf_vectors_coo)
+    frequency_coo = np.divide(tf_vectors_coo, total_count_coo)
+
+    s_out = pd.Series.sparse.from_coo(frequency_coo)
+
+    features_names = tf.get_feature_names()
+
+    # Map word index to word name
+    s_out.index = s_out.index.map(lambda x: (s.index[x[0]], features_names[x[1]]))
+
+    s_out.rename_axis(["document", "word"], inplace=True)
+
+    if return_flat_series:
+
+        s_out = representation_series_to_flat_series(
+            s_out, fill_missing_with=0.0, index=s.index
+        )
+
+        if return_feature_names:
+            return (s_out, tf.get_feature_names())
+
+    return s_out
 
 
 def tfidf(
-    s: pd.Series, max_features=None, min_df=1, max_df=1.0, return_feature_names=False
-) -> pd.Series.sparse:
+    s: pd.Series,
+    max_features=None,
+    min_df=1,
+    max_df=1.0,
+    return_feature_names=False,
+    return_flat_series=False,
+) -> pd.Series:
     """
     Represent a text-based Pandas Series using TF-IDF.
 
@@ -288,10 +409,16 @@ def tfidf(
 
     Finally, tf-idf(document d, term t) = tf(d, t) * idf(t).
 
-    Different from the `sklearn-implementation of tfidf <https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html>`,
+    Different from the `sklearn-implementation of 
+    tfidf <https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html>`,
     this function does *not* normalize the output in any way,
     so the result is exactly what you
     get applying the formula described above.
+
+    Return a Document Representation Series with the
+    tfidf of every word in the document. If return_flat_series is set to True,
+    return a Series with document vectors in every cell.
+    TODO add tutorial link
 
     The input Series should already be tokenized. If not, it will
     be tokenized before tfidf is calculated.
@@ -304,7 +431,7 @@ def tfidf(
     s : Pandas Series (tokenized)
 
     max_features : int, optional, default to None.
-        Maximum number of features to keep. Will keep all features if set to None.
+        If not None, only the max_features most frequent tokens are used.
 
     min_df : float in range [0.0, 1.0] or int, default=1
         When building the vocabulary ignore terms that have a document
@@ -320,16 +447,32 @@ def tfidf(
         If float, the parameter represents a proportion of documents, integer
         absolute counts.
 
-    return_features_names : Boolean, False by Default
-        If True, return a tuple (*count_series*, *features_names*)
+    return_feature_names: Boolean, optional, default to False
+        Whether to return the feature (i.e. word) names with the output.
 
+    return_flat_series : bool, default=False
+        Whether to return a flat Series (document vectors in every cell) instead
+        of a Document Representation Series. Will be less memory-efficient.
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Hi Bye", "Test Bye Bye"]).pipe(hero.tokenize)
-    >>> hero.tfidf(s, return_feature_names=True)
+    >>> hero.tfidf(s) # doctest: +SKIP
+    document  word
+    0         Bye     1.000000
+              Hi      1.405465
+    1         Bye     2.000000
+              Test    1.405465
+    dtype: Sparse[float64, nan]
+
+    With flat output:
+
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["Hi Bye", "Test Bye Bye"]).pipe(hero.tokenize)
+    >>> hero.tfidf(s, return_feature_names=True, return_flat_series=True) # doctest: +SKIP
     (document
     0    [1.0, 1.4054651081081644, 0.0]
     1    [2.0, 0.0, 1.4054651081081644]
@@ -339,6 +482,7 @@ def tfidf(
     --------
     `TF-IDF on Wikipedia <https://en.wikipedia.org/wiki/Tf-idf>`_
 
+    Document Representation Series: TODO add tutorial link
     """
 
     # Check if input is tokenized. Else, print warning and tokenize.
@@ -369,16 +513,15 @@ def tfidf(
 
     s_out.rename_axis(["document", "word"], inplace=True)
 
-    # NOTE: Currently: still convert to flat series instead of representation series.
-    # Will change to return representation series directly in Version 2.
-    s_out = representation_series_to_flat_series(
-        s_out, fill_missing_with=0.0, index=s.index
-    )
+    if return_flat_series:
+        s_out = representation_series_to_flat_series(
+            s_out, fill_missing_with=0.0, index=s.index
+        )
 
-    if return_feature_names:
-        return s_out, feature_names
-    else:
-        return s_out
+        if return_feature_names:
+            return (s_out, feature_names)
+
+    return s_out
 
 
 """
@@ -660,8 +803,9 @@ def kmeans(
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, fun, guitar"])
-    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency)
+    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency, return_flat_series=True) # TODO: when others get Representation Support: remove argument
     >>> hero.kmeans(s, n_clusters=2, random_state=42)
+    document
     0    1
     1    0
     2    1
@@ -757,7 +901,7 @@ def dbscan(
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, enjoy, guitar"])
-    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
+    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf, return_flat_series=True) # TODO: when others get Representation Support: remove argument
     >>> hero.dbscan(s, min_samples=1, eps=4)
     document
     0    0

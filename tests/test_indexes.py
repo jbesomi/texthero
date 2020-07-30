@@ -56,13 +56,17 @@ test_cases_preprocessing = [
 ]
 
 test_cases_representation = [
-    ["count", representation.count, (preprocessing.tokenize(s_text),),],
+    [
+        "count",
+        representation.count,
+        (preprocessing.tokenize(s_text), None, 1, 1.0, False, False, True),
+    ],
     [
         "term_frequency",
         representation.term_frequency,
-        (preprocessing.tokenize(s_text),),
+        (preprocessing.tokenize(s_text), None, 1, 1.0, False, True),
     ],
-    ["tfidf", representation.tfidf, (preprocessing.tokenize(s_text),)],
+    ["tfidf", representation.tfidf, (s_text, None, 1, 1.0, False, True)],
     ["pca", representation.pca, (s_numeric_lists, 0)],
     ["nmf", representation.nmf, (s_numeric_lists,)],
     ["tsne", representation.tsne, (s_numeric_lists,)],

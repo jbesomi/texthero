@@ -14,6 +14,7 @@ import unidecode
 from nltk.stem import PorterStemmer, SnowballStemmer
 
 from texthero import stopwords as _stopwords
+from texthero._helper import handle_nans
 
 from typing import List, Callable
 
@@ -199,6 +200,7 @@ def _remove_diacritics(text: str) -> str:
     return "".join([char for char in nfkd_form if not unicodedata.combining(char)])
 
 
+@handle_nans("")
 def remove_diacritics(s: pd.Series) -> pd.Series:
     """
     Remove all diacritics and accents.
@@ -275,6 +277,7 @@ def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
     return "".join(t if t not in words else symbol for t in re.findall(pattern, text))
 
 
+@handle_nans("")
 def replace_stopwords(
     s: pd.Series, symbol: str, stopwords: Optional[Set[str]] = None
 ) -> pd.Series:
@@ -353,6 +356,7 @@ def remove_stopwords(
     return replace_stopwords(s, symbol="", stopwords=stopwords)
 
 
+@handle_nans("")
 def stem(s: pd.Series, stem="snowball", language="english") -> pd.Series:
     r"""
     Stem series using either `porter` or `snowball` NLTK stemmers.
@@ -696,6 +700,7 @@ _not_tokenized_warning_message = (
 )
 
 
+@handle_nans("")
 def phrases(s: pd.Series, min_count: int = 5, threshold: int = 10, symbol: str = "_"):
     r"""Group up collocations words
 

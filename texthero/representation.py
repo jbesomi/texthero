@@ -960,7 +960,7 @@ def normalize(s: pd.Series, norm="l2") -> pd.Series:
             s = s.astype("Sparse")
             s_coo_matrix = s.sparse.to_coo()[0]
 
-        s_for_vectorization = s_coo_matrix.todense()
+        s_for_vectorization = s_coo_matrix
 
     else:
         s_for_vectorization = list(s)

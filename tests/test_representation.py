@@ -10,6 +10,8 @@ import unittest
 import string
 import math
 import warnings
+from parameterized import parameterized
+
 
 """
 Test doctest
@@ -21,315 +23,79 @@ def load_tests(loader, tests, ignore):
     return tests
 
 
-class TestRepresentation(PandasTestCase):
+"""
+Test functions in representation module in a
+parameterized way.
+"""
+
+
+# Define valid inputs / outputs / indexes for different functions.
+s_not_tokenized = pd.Series(["This is not tokenized!"])
+s_tokenized = pd.Series([["Test", "Test", "TEST", "!"], ["Test", "?", ".", "."]])
+s_tokenized_output_index = pd.MultiIndex.from_tuples(
+    [(0, "!"), (0, "TEST"), (0, "Test"), (1, "."), (1, "?"), (1, "Test")],
+    names=["document", "word"],
+)
+
+test_cases_vectorization = [
+    # format: [function_name, function, correct output for tokenized input above, dtype of output]
+    ["count", representation.count, [1, 1, 2, 2, 1, 1], "int"],
+    [
+        "term_frequency",
+        representation.term_frequency,
+        [0.125, 0.125, 0.250, 0.250, 0.125, 0.125],
+        "float",
+    ],
+    [
+        "tfidf",
+        representation.tfidf,
+        [1.405465, 1.405465, 2.000000, 2.810930, 1.405465, 1.000000],
+        "float",
+    ],
+]
+
+
+class AbstractRepresentationTest(PandasTestCase):
     """
-    Count.
+    Class for representation test cases. Most tests are
+    parameterized, some are implemented individually
+    (e.g. to test a formula manually).
     """
 
-    def test_count_single_document(self):
-        s = pd.Series("a b c c")
-        s = preprocessing.tokenize(s)
-        s_true = pd.Series([[1, 1, 2]])
-        s_true.rename_axis("document", inplace=True)
+    """
+    Vectorization.
+    """
 
-        self.assertEqual(representation.flatten(representation.count(s)), s_true)
+    @parameterized.expand(test_cases_vectorization)
+    def test_vectorization_simple(
+        self, name, test_function, correct_output_values, int_or_float
+    ):
+        if int_or_float == "int":
+            s_true = pd.Series(
+                correct_output_values, index=s_tokenized_output_index, dtype="int"
+            ).astype(pd.SparseDtype(np.int64, 0))
+        else:
+            s_true = pd.Series(
+                correct_output_values, index=s_tokenized_output_index, dtype="float"
+            ).astype(pd.SparseDtype("float", np.nan))
+        result_s = test_function(s_tokenized)
 
-    def test_count_multiple_documents(self):
-        s = pd.Series(["doc_one", "doc_two"])
-        s = preprocessing.tokenize(s)
-        s_true = pd.Series([[1, 0], [0, 1]])
-        s_true.rename_axis("document", inplace=True)
+        pd.testing.assert_series_equal(s_true, result_s)
 
-        self.assertEqual(representation.flatten(representation.count(s)), s_true)
-
-    def test_count_not_lowercase(self):
-        s = pd.Series(["one ONE"])
-        s = preprocessing.tokenize(s)
-        s_true = pd.Series([[1, 1]])
-        s_true.rename_axis("document", inplace=True)
-
-        self.assertEqual(representation.flatten(representation.count(s)), s_true)
-
-    def test_count_punctuation_are_kept(self):
-        s = pd.Series(["one !"])
-        s = preprocessing.tokenize(s)
-        s_true = pd.Series([[1, 1]])
-        s_true.rename_axis("document", inplace=True)
-
-        self.assertEqual(representation.flatten(representation.count(s)), s_true)
-
-    def test_count_not_tokenized_yet(self):
-        s = pd.Series("a b c c")
-        s_true = pd.Series([[1, 1, 2]])
-        s_true.rename_axis("document", inplace=True)
-
-        with warnings.catch_warnings():  # avoid print warning
-            warnings.simplefilter("ignore")
-            self.assertEqual(representation.flatten(representation.count(s)), s_true)
-
+    @parameterized.expand(test_cases_vectorization)
+    def test_vectorization_not_tokenized_yet_warning(self, name, test_function, *args):
         with self.assertWarns(DeprecationWarning):  # check raise warning
-            representation.flatten(representation.count(s))
+            test_function(s_not_tokenized)
 
     """
-    TF-IDF
+    Individual / special tests.
     """
 
     def test_tfidf_formula(self):
         s = pd.Series(["Hi Bye", "Test Bye Bye"])
         s = preprocessing.tokenize(s)
-        s_true = pd.Series(
-            [
-                [
-                    1.0 * (math.log(3 / 3) + 1),
-                    1.0 * (math.log(3 / 2) + 1),
-                    0.0 * (math.log(3 / 2) + 1),
-                ],
-                [
-                    2.0 * (math.log(3 / 3) + 1),
-                    0.0 * (math.log(3 / 2) + 1),
-                    1.0 * (math.log(3 / 2) + 1),
-                ],
-            ]
-        )
-        s_true.rename_axis("document", inplace=True)
-        self.assertEqual(representation.flatten(representation.tfidf(s)), s_true)
-
-    def test_tfidf_single_document(self):
-        s = pd.Series("a", index=["yo"])
-        s = preprocessing.tokenize(s)
-        s_true = pd.Series([[1]], index=["yo"])
-        s_true.rename_axis("document", inplace=True)
-        self.assertEqual(representation.flatten(representation.tfidf(s)), s_true)
-
-    def test_tfidf_not_tokenized_yet(self):
-        s = pd.Series("a")
-        s_true = pd.Series([[1]])
-        s_true.rename_axis("document", inplace=True)
-
-        with warnings.catch_warnings():  # avoid print warning
-            warnings.simplefilter("ignore")
-            self.assertEqual(representation.flatten(representation.tfidf(s)), s_true)
-
-        with self.assertWarns(DeprecationWarning):  # check raise warning
-            representation.flatten(representation.tfidf(s))
-
-    def test_tfidf_single_not_lowercase(self):
-        s = pd.Series("ONE one")
-        s = preprocessing.tokenize(s)
-        s_true = pd.Series([[1.0, 1.0]])
-        s_true.rename_axis("document", inplace=True)
-        self.assertEqual(representation.flatten(representation.tfidf(s)), s_true)
-
-    """
-    Term Frequency
-    """
-
-    def test_term_frequency_single_document(self):
-        s = pd.Series("a b c c")
-        s = preprocessing.tokenize(s)
-        s_true = pd.Series([[0.25, 0.25, 0.5]])
-        s_true.rename_axis("document", inplace=True)
-        self.assertEqual(
-            representation.flatten(representation.term_frequency(s)), s_true,
-        )
-
-    def test_term_frequency_multiple_documents(self):
-        s = pd.Series(["doc_one", "doc_two"])
-        s = preprocessing.tokenize(s)
-        s_true = pd.Series([[0.5, 0.0], [0.0, 0.5]])
-        s_true.rename_axis("document", inplace=True)
-
-        self.assertEqual(
-            representation.flatten(representation.term_frequency(s)), s_true,
-        )
-
-    def test_term_frequency_not_lowercase(self):
-        s = pd.Series(["one ONE"])
-        s = preprocessing.tokenize(s)
-        s_true = pd.Series([[0.5, 0.5]])
-        s_true.rename_axis("document", inplace=True)
-
-        self.assertEqual(
-            representation.flatten(representation.term_frequency(s)), s_true,
-        )
-
-    def test_term_frequency_punctuation_are_kept(self):
-        s = pd.Series(["one !"])
-        s = preprocessing.tokenize(s)
-        s_true = pd.Series([[0.5, 0.5]])
-        s_true.rename_axis("document", inplace=True)
-
-        self.assertEqual(
-            representation.flatten(representation.term_frequency(s)), s_true,
-        )
-
-    def test_term_frequency_not_tokenized_yet(self):
-        s = pd.Series("a b c c")
-        s_true = pd.Series([[0.25, 0.25, 0.5]])
-        s_true.rename_axis("document", inplace=True)
-
-        with warnings.catch_warnings():  # avoid print warning
-            warnings.simplefilter("ignore")
-            self.assertEqual(
-                representation.flatten(representation.term_frequency(s)), s_true,
-            )
-
-        with self.assertWarns(DeprecationWarning):  # check raise warning
-            representation.flatten(representation.term_frequency(s)), s_true,
-
-    """
-    Representation series testing
-    """
-
-    """
-    Count.
-    """
-
-    def test_count_single_document_representation_series(self):
-        s = pd.Series([list("abbcc")])
-
-        idx = pd.MultiIndex.from_tuples(
-            [(0, "a"), (0, "b"), (0, "c")], names=("document", "word")
-        )
-
-        s_true = pd.Series([1, 2, 2], index=idx, dtype=np.int64).astype(
-            pd.SparseDtype(np.int64, 0)
-        )
-        pd.testing.assert_series_equal(
-            representation.count(s), s_true, check_dtype=False
-        )
-
-    def test_count_multiple_documents_representation_series(self):
-
-        s = pd.Series([["doc_one"], ["doc_two"]])
-
-        idx = pd.MultiIndex.from_tuples(
-            [(0, "doc_one"), (1, "doc_two")], names=("document", "word")
-        )
-
-        s_true = pd.Series([1, 1], index=idx, dtype=np.int64).astype(
-            pd.SparseDtype(np.int64, 0)
-        )
-        pd.testing.assert_series_equal(
-            representation.count(s), s_true, check_dtype=False
-        )
-
-    def test_count_not_lowercase_representation_series(self):
-
-        s = pd.Series([["A"], ["a"]])
-
-        idx = pd.MultiIndex.from_tuples(
-            [(0, "A"), (1, "a")], names=("document", "word")
-        )
-
-        s_true = pd.Series([1, 1], index=idx, dtype=np.int64).astype(
-            pd.SparseDtype(np.int64, 0)
-        )
-        pd.testing.assert_series_equal(
-            representation.count(s), s_true, check_dtype=False
-        )
-
-    def test_count_punctuation_are_kept_representation_series(self):
-
-        s = pd.Series([["number", "one", "!", "?"]])
-
-        idx = pd.MultiIndex.from_tuples(
-            [(0, "!"), (0, "?"), (0, "number"), (0, "one")], names=("document", "word")
-        )
-
-        s_true = pd.Series([1, 1, 1, 1], index=idx, dtype=np.int64).astype(
-            pd.SparseDtype(np.int64, 0)
-        )
-        pd.testing.assert_series_equal(
-            representation.count(s), s_true,
-        )
-
-    """
-    Term Frequency.
-    """
-
-    def test_term_frequency_single_document_representation_series(self):
-        s = pd.Series([list("abbcc")])
-
-        idx = pd.MultiIndex.from_tuples(
-            [(0, "a"), (0, "b"), (0, "c")], names=("document", "word")
-        )
-
-        s_true = pd.Series([0.2, 0.4, 0.4], index=idx, dtype="float").astype(
-            pd.SparseDtype("float", np.nan)
-        )
-        self.assertEqual(representation.term_frequency(s), s_true)
-
-    def test_term_frequency_multiple_documents_representation_series(self):
-
-        s = pd.Series([["doc_one"], ["doc_two"]])
-
-        idx = pd.MultiIndex.from_tuples(
-            [(0, "doc_one"), (1, "doc_two")], names=("document", "word")
-        )
-
-        s_true = pd.Series([0.5, 0.5], index=idx, dtype="float").astype(
-            pd.SparseDtype("float", np.nan)
-        )
-        self.assertEqual(representation.term_frequency(s), s_true)
-
-    def test_term_frequency_not_lowercase_representation_series(self):
-
-        s = pd.Series([["A"], ["a"]])
-
-        idx = pd.MultiIndex.from_tuples(
-            [(0, "A"), (1, "a")], names=("document", "word")
-        )
-
-        s_true = pd.Series([0.5, 0.5], index=idx, dtype="float").astype(
-            pd.SparseDtype("float", np.nan)
-        )
-        self.assertEqual(representation.term_frequency(s), s_true)
-
-    def test_term_frequency_punctuation_are_kept_representation_series(self):
-
-        s = pd.Series([["number", "one", "!", "?"]])
-
-        idx = pd.MultiIndex.from_tuples(
-            [(0, "!"), (0, "?"), (0, "number"), (0, "one")], names=("document", "word")
-        )
-
-        s_true = pd.Series([0.25, 0.25, 0.25, 0.25], index=idx, dtype="float").astype(
-            pd.SparseDtype("float", np.nan)
-        )
-        self.assertEqual(representation.term_frequency(s), s_true)
-
-    """
-    TF-IDF
-    """
-
-    def test_tfidf_simple_representation_series(self):
-        s = pd.Series([["a"]])
-
-        idx = pd.MultiIndex.from_tuples([(0, "a")], names=("document", "word"))
-        s_true = pd.Series([1.0], index=idx).astype("Sparse")
-        self.assertEqual(representation.tfidf(s), s_true)
-
-    def test_tfidf_single_not_lowercase_representation_series(self):
-        tfidf_single_smooth = 1.0
-
-        s = pd.Series([list("Aa")])
-
-        idx = pd.MultiIndex.from_tuples(
-            [(0, "A"), (0, "a")], names=("document", "word")
-        )
-
-        s_true = pd.Series(
-            [tfidf_single_smooth, tfidf_single_smooth], index=idx
-        ).astype("Sparse")
-
-        self.assertEqual(representation.tfidf(s), s_true)
-
-    def test_tfidf_single_different_index_representation_series(self):
-
-        idx = pd.MultiIndex.from_tuples(
-            [(10, "Bye"), (10, "Hi"), (11, "Bye"), (11, "Test")],
-            names=("document", "word"),
+        s_true_index = pd.MultiIndex.from_tuples(
+            [(0, "Bye"), (0, "Hi"), (1, "Bye"), (1, "Test")], names=["document", "word"]
         )
         s_true = pd.Series(
             [
@@ -338,9 +104,7 @@ class TestRepresentation(PandasTestCase):
                 2.0 * (math.log(3 / 3) + 1),
                 1.0 * (math.log(3 / 2) + 1),
             ],
-            index=idx,
+            index=s_true_index,
         ).astype("Sparse")
 
-        s = pd.Series(["Hi Bye", "Test Bye Bye"], index=[10, 11])
-        s = preprocessing.tokenize(s)
         self.assertEqual(representation.tfidf(s), s_true)

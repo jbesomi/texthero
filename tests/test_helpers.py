@@ -11,6 +11,7 @@ import unittest
 import warnings
 
 from texthero import _helper
+from texthero.representation import flatten
 
 """
 Doctests.
@@ -74,3 +75,56 @@ class TestHelpers(PandasTestCase):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             self.assertTrue(f(s).index.equals(s_true.index))
+
+    """
+    flatten.
+    """
+
+    def test_flatten(self):
+        index = pd.MultiIndex.from_tuples(
+            [("doc0", "Word1"), ("doc0", "Word3"), ("doc1", "Word2")],
+            names=["document", "word"],
+        )
+        s = pd.Series([3, np.nan, 4], index=index)
+
+        s_true = pd.Series(
+            [[3.0, 0.0, np.nan], [0.0, 4.0, 0.0]], index=["doc0", "doc1"],
+        )
+
+        pd.testing.assert_series_equal(flatten(s), s_true, check_names=False)
+
+    def test_flatten_fill_missing_with(self):
+        index = pd.MultiIndex.from_tuples(
+            [("doc0", "Word1"), ("doc0", "Word3"), ("doc1", "Word2")],
+            names=["document", "word"],
+        )
+        s = pd.Series([3, np.nan, 4], index=index)
+
+        s_true = pd.Series(
+            [[3.0, "FILLED", np.nan], ["FILLED", 4.0, "FILLED"]],
+            index=["doc0", "doc1"],
+            name="document",
+        )
+
+        pd.testing.assert_series_equal(
+            flatten(s, fill_missing_with="FILLED"), s_true, check_names=False
+        )
+
+    def test_flatten_missing_row(self):
+        # Simulating a row with no features, so it's completely missing from
+        # the representation series.
+        index = pd.MultiIndex.from_tuples(
+            [("doc0", "Word1"), ("doc0", "Word3"), ("doc1", "Word2")],
+            names=["document", "word"],
+        )
+        s = pd.Series([3, np.nan, 4], index=index)
+
+        s_true = pd.Series(
+            [[3.0, 0.0, np.nan], [0.0, 4.0, 0.0], [0.0, 0.0, 0.0]],
+            index=["doc0", "doc1", "doc2"],
+            name="document",
+        )
+
+        pd.testing.assert_series_equal(
+            flatten(s, index=s_true.index), s_true, check_names=False
+        )

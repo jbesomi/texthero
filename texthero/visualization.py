@@ -8,7 +8,7 @@ import plotly.express as px
 
 from wordcloud import WordCloud
 
-from texthero import preprocessing
+from texthero import preprocessing, nlp
 import string
 
 from matplotlib.colors import LinearSegmentedColormap as lsg
@@ -288,3 +288,45 @@ def top_words(s: pd.Series, normalize=False) -> pd.Series:
         .explode()  # one word for each line
         .value_counts(normalize=normalize)
     )
+
+
+def automated_readability_index(s: pd.Series) -> pd.Series:
+    """
+    Calculate the automated readability index (ARI).
+
+    Calculate ARI for each item in the given Pandas Series. Return a Pandas Series with the ARI scores.
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["New York is a beautiful city.", "Look: New York!", "Wow"])
+    >>> hero.automated_readability_index(s)
+    0    3.0
+    1    6.0
+    2    0.0
+    dtype: float64
+
+    Reference
+    --------
+    `Automated Readability Index <https://en.wikipedia.org/wiki/Automated_readability_index>`_
+
+    """
+    # Check if type is strings only.
+    if not s.map(type).eq(str).all():
+        raise TypeError(
+            "Non-string values in series. Use hero.drop_no_content(s) to drop those values."
+        )
+
+    words_s = s.str.split().str.len() - 1
+    characters_s = s.str.count(r"[a-zA-Z0-9]")  # Regex for alphanumeric.
+    sentences_s = nlp.count_sentences(s)
+
+    score_s = 4.71 * (characters_s / words_s) + 0.5 * (words_s / sentences_s) - 21.43
+    score_s = np.ceil(score_s)
+
+    # Pandas does not raise an Error when dividing by zero -> remove
+    # wrong values by ourselves.
+    score_s.loc[~np.isfinite(score_s)] = 0
+
+    return score_s

@@ -74,3 +74,70 @@ class TestHelpers(PandasTestCase):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             self.assertTrue(f(s).index.equals(s_true.index))
+
+    """
+    InputSeries.
+    """
+
+    def test_inputseries_function_executes_correctly(self):
+        @_helper.InputSeries(_helper.TextSeries)
+        def f(s, t):
+            return t
+
+        s = pd.Series("I'm a TextSeries")
+        t = "test"
+        self.assertEqual(f(s, t), t)
+
+    def test_inputseries_wrong_type(self):
+        @_helper.InputSeries(_helper.TextSeries)
+        def f(s):
+            pass
+
+        self.assertRaises(TypeError, f, pd.Series([["token", "ized"]]))
+
+    def test_inputseries_correct_type_textseries(self):
+        @_helper.InputSeries(_helper.TextSeries)
+        def f(s):
+            pass
+
+        try:
+            f(pd.Series("I'm a TextSeries"))
+        except TypeError:
+            self.fail("Failed although input type is correct.")
+
+    def test_inputseries_correct_type_tokenseries(self):
+        @_helper.InputSeries(_helper.TokenSeries)
+        def f(s):
+            pass
+
+        try:
+            f(pd.Series([["token", "ized"]]))
+        except TypeError:
+            self.fail("Failed although input type is correct.")
+
+    def test_inputseries_correct_type_vectorseries(self):
+        @_helper.InputSeries(_helper.VectorSeries)
+        def f(s):
+            pass
+
+        try:
+            f(pd.Series([[0.0, 1.0]]))
+        except TypeError:
+            self.fail("Failed although input type is correct.")
+
+    def test_inputseries_correct_type_documentrepresentationseries(self):
+        @_helper.InputSeries(_helper.DocumentRepresentationSeries)
+        def f(s):
+            pass
+
+        try:
+            f(
+                pd.Series(
+                    [1, 2, 3],
+                    index=pd.MultiIndex.from_tuples(
+                        [("doc1", "word1"), ("doc1", "word2"), ("doc2", "word1")]
+                    ),
+                )
+            )
+        except TypeError:
+            self.fail("Failed although input type is correct.")

@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import doctest
 
-from texthero.lang.hero_zh import preprocessing, stopwords
+from texthero.lang.zh import preprocessing, stopwords
 from ... import PandasTestCase
 
 

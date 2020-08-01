@@ -22,7 +22,7 @@ from texthero.preprocessing import (
     remove_html_tags,
     replace_urls,
     remove_urls,
-    phrases
+    phrases,
 )
 
 from typing import List, Callable
@@ -90,7 +90,7 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
     --------
     For the default pipeline:
 
-    >>> import texthero.lang.hero_zh as hero
+    >>> import texthero.lang.zh as hero
     >>> import pandas as pd
     >>> s = pd.Series("我昨天吃烤鸭去了。     挺好吃的。")
     >>> hero.clean(s)
@@ -118,7 +118,7 @@ def replace_tags(s: pd.Series, symbol: str) -> pd.Series:
 
     Examples
     --------
-    >>> import texthero.lang.hero_zh as hero
+    >>> import texthero.lang.zh as hero
     >>> import pandas as pd
     >>> s = pd.Series("你好啊@我爱texthero123。")
     >>> hero.replace_tags(s, symbol='TAG')
@@ -139,7 +139,7 @@ def remove_tags(s: pd.Series) -> pd.Series:
 
     Examples
     --------
-    >>> import texthero.lang.hero_zh as hero
+    >>> import texthero.lang.zh as hero
     >>> import pandas as pd
     >>> s = pd.Series("你好啊@我爱texthero123。")
     >>> hero.remove_tags(s)
@@ -168,7 +168,7 @@ def replace_hashtags(s: pd.Series, symbol: str) -> pd.Series:
     
     Examples
     --------
-    >>> import texthero.lang.hero_zh as hero
+    >>> import texthero.lang.zh as hero
     >>> import pandas as pd
     >>> s = pd.Series("今天天气真不错#杰克_texthero_123。")
     >>> hero.replace_hashtags(s, symbol='HASHTAG')
@@ -188,7 +188,7 @@ def remove_hashtags(s: pd.Series) -> pd.Series:
 
     Examples
     --------
-    >>> import texthero.lang.hero_zh as hero
+    >>> import texthero.lang.zh as hero
     >>> import pandas as pd
     >>> s = pd.Series("今天天气真不错#杰克_texthero_123。")
     >>> hero.remove_hashtags(s)
@@ -214,7 +214,7 @@ def tokenize(s: pd.Series) -> pd.Series:
 
     Examples
     --------
-    >>> import texthero.lang.hero_zh as hero
+    >>> import texthero.lang.zh as hero
     >>> import pandas as pd
     >>> s = pd.Series(["我昨天吃烤鸭去了。"])
     >>> hero.tokenize(s)

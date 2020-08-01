@@ -1,5 +1,5 @@
 import pandas as pd
-from texthero.lang.hero_zh import preprocessing
+from texthero.lang.zh import preprocessing
 
 from ... import PandasTestCase
 import unittest

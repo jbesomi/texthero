@@ -2,7 +2,6 @@
 Useful helper functions for the texthero library.
 """
 
-import wrapt
 import pandas as pd
 import functools
 import warnings

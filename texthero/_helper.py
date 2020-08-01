@@ -71,18 +71,3 @@ def handle_nans(replace_nans_with):
         return wrapper
 
     return decorator
-
-
-def root_caller(target_module):
-    """
-    A decorator to call functions with the same name from `texthero.target_module`. It can 
-    be used for multilingual support when a function can be reused by many languages.
-
-    """
-
-    @wrapt.decorator
-    def wrapper(wrapped, instance, args, kwargs):
-        root_func = getattr(target_module, wrapped.__name__)
-        return root_func(*args, **kwargs)
-
-    return wrapper

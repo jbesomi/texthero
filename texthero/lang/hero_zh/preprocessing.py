@@ -12,7 +12,18 @@ import pandas as pd
 
 from spacy.lang.zh import Chinese
 import texthero as hero
-from texthero._helper import root_caller
+
+# Standard functions supported Chinese
+from texthero.preprocessing import (
+    fillna,
+    has_content,
+    drop_no_content,
+    remove_whitespace,
+    remove_html_tags,
+    replace_urls,
+    remove_urls,
+    phrases
+)
 
 from typing import List, Callable
 
@@ -21,6 +32,25 @@ from typing import List, Callable
 import warnings
 
 warnings.filterwarnings(action="ignore", category=UserWarning, module="gensim")
+
+
+__all__ = [
+    "fillna",
+    "has_content",
+    "drop_no_content",
+    "remove_whitespace",
+    "remove_html_tags",
+    "replace_urls",
+    "remove_urls",
+    "phrases",
+    "clean",
+    "get_default_pipeline",
+    "remove_hashtags",
+    "remove_tags",
+    "replace_hashtags",
+    "replace_tags",
+    "tokenize",
+]
 
 
 def get_default_pipeline() -> List[Callable[[pd.Series], pd.Series]]:
@@ -60,52 +90,17 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
     --------
     For the default pipeline:
 
-    >>> import texthero as hero
+    >>> import texthero.lang.hero_zh as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Uper 9dig.        he her ÄÖÜ")
+    >>> s = pd.Series("我昨天吃烤鸭去了。     挺好吃的。")
     >>> hero.clean(s)
-    0    uper 9dig aou
+    0    [我, 昨天, 吃, 烤鸭, 去, 了, 。, 挺好吃, 的, 。]
     dtype: object
     """
     if not pipeline:
         pipeline = get_default_pipeline()
 
     return hero.preprocessing.clean(s, pipeline)
-
-
-@root_caller(hero.preprocessing)
-def fillna(s: pd.Series) -> pd.Series:
-    pass
-
-
-@root_caller(hero.preprocessing)
-def has_content(s: pd.Series):
-    pass
-
-
-@root_caller(hero.preprocessing)
-def drop_no_content(s: pd.Series):
-    pass
-
-
-@root_caller(hero.preprocessing)
-def remove_html_tags(s: pd.Series) -> pd.Series:
-    pass
-
-
-@root_caller(hero.preprocessing)
-def remove_whitespace(s: pd.Series) -> pd.Series:
-    pass
-
-
-@root_caller(hero.preprocessing)
-def replace_urls(s: pd.Series, symbol: str) -> pd.Series:
-    pass
-
-
-@root_caller(hero.preprocessing)
-def remove_urls(s: pd.Series) -> pd.Series:
-    pass
 
 
 def replace_tags(s: pd.Series, symbol: str) -> pd.Series:

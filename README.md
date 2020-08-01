@@ -46,13 +46,13 @@
 
 Texthero is a python toolkit to work with text-based dataset quickly and effortlessly. Texthero is very simple to learn and designed to be used on top of Pandas. Texthero has the same expressiveness and power of Pandas and is extensively documented. Texthero is modern and conceived for programmers of the 2020 decade with little knowledge if any in linguistic. 
 
-You can think of Texthero as a tool to help you _understand_ and work with text-based dataset. Given a tabular dataset, it's easy to _grasp the main concept_. Instead, given a text dataset, it's harder to have quick insights into the underline data. With Texthero, preprocessing text data, map it into vectors, and visualize the obtained vector space takes just a couple of lines.
+You can think of Texthero as a tool to help you _understand_ and work with text-based dataset. Given a tabular dataset, it's easy to _grasp the main concept_. Instead, given a text dataset, it's harder to have quick insights into the underline data. With Texthero, preprocessing text data, mapping it into vectors, and visualizing the obtained vector space takes just a couple of lines.
 
 Texthero include tools for:
 * Preprocess text data: it offers both out-of-the-box solutions but it's also flexible for custom-solutions.
 * Natural Language Processing: keyphrases and keywords extraction, and named entity recognition.
 * Text representation: TF-IDF, term frequency, and custom word-embeddings (wip)
-* Vector space analysis: clustering (K-means, Meanshift, DBSAN and Hierarchical), topic modeling (wip) and interpretation.
+* Vector space analysis: clustering (K-means, Meanshift, DBSCAN and Hierarchical), topic modeling (wip) and interpretation.
 * Text visualization: vector space visualization, place localization on maps (wip).
 
 Texthero is free, open-source and [well documented](https://texthero.org/docs) (and that's what we love most by the way!). 
@@ -61,9 +61,9 @@ We hope you will find pleasure working with Texthero as we had during his develo
 
 <h2 align="center">Hablas español? क्या आप हिंदी बोलते हैं? 日本語が話せるのか？</h2>
 
-Texthero has been developed for the whole NLP community. We know how hard is to deal with different NLP tools (NLTK, SpaCy, Gensim, TextBlob, Sklearn): that's why we developed Texthero, to simplify things.
+Texthero has been developed for the whole NLP community. We know how hard it is to deal with different NLP tools (NLTK, SpaCy, Gensim, TextBlob, Sklearn): that's why we developed Texthero, to simplify things.
 
-Now, the next main milestone is to provide *multilingual support* and for this big step, we need the help of all of you. ¿Hablas español? Sie sprechen Deutsch? 你会说中文？ 日本語が話せるのか？ Fala português? Parli Italiano? Вы говорите по-русски? If yes or you speak another language not mentioned, then you might help us develop multilingual support! Even if you haven't contributed before or you just started with NLP contact us or open a Github issue, there is always a first time :) We promise you will learn a lot, and, ... who knows? It might help you find your new job as an NLP-developer!
+Now, the next main milestone is to provide *multilingual support* and for this big step, we need the help of all of you. ¿Hablas español? Sie sprechen Deutsch? 你会说中文？ 日本語が話せるのか？ Fala português? Parli Italiano? Вы говорите по-русски? If yes or you speak another language not mentioned here, then you might help us develop multilingual support! Even if you haven't contributed before or you just started with NLP, contact us or open a Github issue, there is always a first time :) We promise you will learn a lot, and, ... who knows? It might help you find your new job as an NLP-developer!
 
 For improving the python toolkit and provide an even better experience, your aid and feedback are crucial. If you have any problem or suggestion please open a Github [issue](https://github.com/jbesomi/texthero/issues), we will be glad to support you and help you.
 
@@ -72,11 +72,11 @@ For improving the python toolkit and provide an even better experience, your aid
 
 Texthero's community is growing fast. Texthero though is still in a beta version; soon, a faster and better version will be released and it will bring some major changes.
 
-For instance, to give a more granular control over the pipeline, starting from the next version on, all `preprocessing` functions will require as argument an already tokenized text. This will be a major changes.
+For instance, to give a more granular control over the pipeline, starting from the next version on, all `preprocessing` functions will require as argument an already tokenized text. This will be a major change.
 
 Once released the stable version (Texthero 2.0), backward compatibility will be respected. Until this point, backward compatibility will be present but it will be weaker.
 
-If you want to be part of this fast-growing movements, do not hesitate to contribute: [CONTRIBUTING](blob/master/CONTRIBUTING.md)!
+If you want to be part of this fast-growing movements, do not hesitate to contribute: [CONTRIBUTING](./CONTRIBUTING.md)!
 
 <h2 align="center">Installation</h2>
 
@@ -88,7 +88,7 @@ pip install texthero
 
 > ☝️Under the hoods, Texthero makes use of multiple NLP and machine learning toolkits such as Gensim, NLTK, SpaCy and scikit-learn. You don't need to install them all separately, pip will take care of that.
 
-> For fast performance, make sure you have installed Spacy version >= 2.2. Also, make sure you have a recent version of python, the higher, the best.
+> For faster performance, make sure you have installed Spacy version >= 2.2. Also, make sure you have a recent version of python, the higher, the best.
 
 <h2 align="center">Getting started</h2>
 
@@ -98,7 +98,7 @@ In case you are an advanced python user, then `help(texthero)` should do the wor
 
 <h2 align="center">Examples</h2>
 
-<h3>1. Text cleaning, TF-IDF representation and visualization</h3>
+<h3>1. Text cleaning, TF-IDF representation and Visualization</h3>
 
 
 ```python
@@ -122,7 +122,7 @@ hero.scatterplot(df, 'pca', color='topic', title="PCA BBC Sport news")
    <img src="https://github.com/jbesomi/texthero/raw/master/github/scatterplot_bbcsport.svg">
 </p>
 
-<h3>2. Text preprocessing, TF-IDF, K-means and visualization</h3>
+<h3>2. Text preprocessing, TF-IDF, K-means and Visualization</h3>
 
 ```python
 import texthero as hero
@@ -174,7 +174,7 @@ Remove all digits:
 dtype: object
 ```
 
-> Remove digits replace only blocks of digits. The digits in the string "hello123" will not be removed. If we want to remove all digits, you need to set only_blocks to false.
+> Remove digits replaces only blocks of digits. The digits in the string "hello123" will not be removed. If we want to remove all digits, you need to set only_blocks to false.
 
 Remove all types of brackets and their content.
 
@@ -272,7 +272,7 @@ Full documentation: [visualization](https://texthero.org/docs/api-visualization)
 
 <h5>Why Texthero</h5>
 
-Sometimes we just want things done, right? Texthero help with that. It helps make things easier and give the developer more time to focus on his custom requirements. We believe that start cleaning text should just take a minute. Same for finding the most important part of a text and the same for representing it.
+Sometimes we just want things done, right? Texthero helps with that. It helps make things easier and give the developer more time to focus on his custom requirements. We believe that cleaning text should just take a minute. Same for finding the most important part of a text and the same for representing it.
 
 In a very pragmatic way, texthero has just one goal: make the developer spare time. Working with text data can be a pain and in most cases, a default pipeline can be quite good to start. There is always time to come back and improve previous work.
 
@@ -283,7 +283,7 @@ In a very pragmatic way, texthero has just one goal: make the developer spare ti
 
 Texthero is for all of us NLP-developers and it can continue to exist with the precious contribution of the community.
 
-Your level of expertise of python and NLP does not matter, anyone can help and anyone is more than welcomed to contribute!
+Your level of expertise of python and NLP does not matter, anyone can help and anyone is more than welcome to contribute!
 
 **Are you an NLP expert?**
 
@@ -313,6 +313,9 @@ If you have just other questions or inquiry drop me a line at jonathanbesomi__AT
 - [Christian Claus](https://github.com/cclauss)
 - [bobfang1992](https://github.com/bobfang1992)
 - [Ishan Arora](https://github.com/ishanarora04)
+- [Vidya P](https://github.com/vidyap-xgboost)
+- [Cedric Conol](https://github.com/cedricconol)
+- [Rich Ramalho](https://github.com/richecr)
 
 
 <h2 align="center"><a href="./LICENSE">License</a></h2>

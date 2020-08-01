@@ -111,7 +111,7 @@ from texthero import preprocessing
 custom_pipeline = [preprocessing.fillna,
                    preprocessing.lowercase,
                    preprocessing.remove_whitespace]
-df['clean_text'] = hero.clean(df['text'])
+df['clean_text'] = hero.clean(df['text'], custom_pipeline)
 ```
 
 or alternatively
@@ -163,7 +163,7 @@ The complete representation module API can be found at the following address: [a
 
 ### Visualization
 
-`texthero.visualization` provide some helpers functions to visualize the tarnsformed Dataframe. All visualization utilize under the hoods the [Plotly Python Open Source Graphing Library](https://plotly.com/python/).
+`texthero.visualization` provide some helpers functions to visualize the transformed Dataframe. All visualization utilize under the hoods the [Plotly Python Open Source Graphing Library](https://plotly.com/python/).
 
 
 ```python

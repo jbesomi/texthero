@@ -13,10 +13,10 @@ In case you are interested in the Texthero's vision as well as the core-principl
 ## Quality
 
 Texthero's main goal is to make the NLP-developer life _easier_. It does so by
-1. Provide a simple-yet-complete tool for NLP and text analytics
-2. Empower the NLP developer with great documentation, simple getting started docs as well as (work in progress) clear and concise tutorials (blog).
+1. Providing a simple-yet-complete tool for NLP and text analytics
+2. Empowering the NLP developer with great documentation, simple getting started docs as well as (work in progress) clear and concise tutorials (blog).
 
-To achieve all of this, Texthero's code and documentation must be of high quality. Having a clean, readable, and **tested** code drastically reduces the likelihood of introducing bugs, and having great documentation will facilitate the work of many NLP developers as well as the work of Texther's maintainers.
+To achieve all of this, Texthero's code and documentation must be of high quality. Having a clean, readable, and **tested** code drastically reduces the likelihood of introducing bugs, and having great documentation will facilitate the work of many NLP developers as well as the work of Texthero's maintainers.
 
 
 ## Shift-left testing
@@ -25,7 +25,7 @@ Texthero follows an approach known as shift-left testing. According to [Wikipedi
 
 > Shift-left testing is an approach to software testing and system testing in which testing is performed earlier in the lifecycle.
 
-Shift-left testing reduces the number of bugs by attempting to solve the problem at the origin. Often many programming defects are not uncovered and fixed until after significant effort has been wasted on their implementation. Texthero's attempt to avoid this kind of issue.
+Shift-left testing reduces the number of bugs by attempting to solve the problem at the origin. Often many programming defects are not uncovered and fixed until after significant effort has been wasted on their implementation. Texthero attempts to avoid these kind of issues.
 
 
 ## Improve documentation!
@@ -43,12 +43,12 @@ Making sure your pull requests do not break the code and bring something valuabl
 
 The following link gives some advice on how to submit a successful pull request.
 
-1. Submit a successful PR is not hard. Have a look at all [previous PR](https://github.com/jbesomi/texthero/pulls?q=is%3Apr+is%3Aclosed) already approved.
+1. Submitting a successful PR is not hard. Have a look at all [previous PR](https://github.com/jbesomi/texthero/pulls?q=is%3Apr+is%3Aclosed) already approved.
 1. **Extensively test your code**. Think at all possible edge cases. Look at similar tests for ideas.
-1. In most cases, there exist an example of function or docstring very similar to your specific use-case. Before writing your own-code, look at what the other functions look like.
+1. In most cases, there exists an example of function or docstring very similar to your specific use-case. Before writing your own-code, look at what the other functions look like.
 1. Before submitting, **test locally** that you pass all tests (see below under `testing`).
-1. Respect the best practice (see below `best practice`)
-1. Make sure your code is black-formatted (`./format.sh`, see `formatting`)
+1. Respect the best practices (see below `best practices`).
+1. Make sure your code is black-formatted (`./format.sh`, see `formatting`).
 
 <!--
 1. Make use of the PR template (see `PR template` ) -->
@@ -56,7 +56,7 @@ The following link gives some advice on how to submit a successful pull request.
 
 ## Ask questions!
 
-We are there for you! If everything is unclear, just ask. We will do our best to answer you quickly.
+We are there for you! If anything is unclear, just ask. We will do our best to answer you quickly.
 
 ## Propose new ideas!
 
@@ -64,8 +64,12 @@ Texthero is there for the NLP-community. If you have an idea on how we can impro
 
 ## Best practices
 
-1. Read and respect the [numpydoc docstring guide](https://numpydoc.readthedocs.io/en/latest/format.html). Look at the code for similarity.
-1. Give to your branch a meaningful name. Avoid using the master branch. 
+1. Make sure Pull Request only changes one thing and one thing only. PR should be independent and self-contained. Read this article: [A Plea For Small Pull Requests](https://opensource.zalando.com/blog/2017/10/small-pull-requests/)
+1. Name your PR title accordingly to your changes and add a good and exhaustive description
+1. Give to the branch a meaningful name. Avoid using the master branch. 
+1. Respect [numpydoc docstring guide](https://numpydoc.readthedocs.io/en/latest/format.html). Look at the code for similarity.
+1. Respect [PEP 257 -- Docstring Conventions](https://www.python.org/dev/peps/pep-0257/)
+1. Maximum character length should be 88 (default settings of `black`). 
 
 ## Good first issue
 
@@ -84,7 +88,7 @@ $ cd scripts
 $ ./tests.sh
 ```
 
-Calling `./test.sh` is equivalent to execute form the _root_ `python3 -m unittest discover -s tests -t .`
+Calling `./tests.sh` is equivalent to executing it from the _root_ `python3 -m unittest discover -s tests -t .`
 
 
 **Important.** If you worked on a bug, you should add a test that checks the bug is not present anymore. This is extremely useful as it avoids to re-introduce the same bug again in the future.
@@ -92,7 +96,7 @@ Calling `./test.sh` is equivalent to execute form the _root_ `python3 -m unittes
 
 ### Passing doctests
 
-When executing `./test.sh` it will also check that the Examples in the docstrings are correct (doctests).
+When executing `./tests.sh` it will also check that the Examples in the docstrings are correct (doctests).
 
 Passing doctests might be a bit annoying sometimes. Let's look at this example for instance:
 
@@ -114,7 +118,7 @@ The docstring failed? Why? The reason is that somewhere in the `Example` section
 
 When you submit your code, all code will be tested on different operating systems using Travis CI: [TRAVIS CI texthero](https://travis-ci.com/github/jbesomi/texthero).
 
-Make sure you pass all your test locally before opening a pull request!
+Make sure you pass all your tests locally before opening a pull request!
 
 ## Formatting
 
@@ -147,29 +151,38 @@ $ git remote add upstream git@github.com:jbesomi/texthero.git
 
 > This first step needs to be done only once. But, in the future when you will want to make new changes, make sure your repository is synchronized with respect to the upstream: [Syncing a fork](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/syncing-a-fork).
 
-1. Install texthero locally and his dev-dependencies
+1. Install texthero locally **and** his dev-dependencies
 
 Install texthero locally directly from the source code. This makes sure you are working on the latest version and that you will install all the required dependencies.
 
 ```
 $ pip install -e .
 ```
-
 > The `-e` will install the python package in 'development' mode. That way your changes will take effect immediately without the need to reinstall the package again.
-
-1. Install development dependencies (only required if you want to change the website doc)
-
-Development dependencies need to be installed to update the website documentation, i.e the content in texthero.org. 
-
-In most cases, you **do not need** to update this. Changes from pull requests will be available to everyone only after a new release.
 
 ```
 pip install -e '.[dev]'
 ```
 
+- All contributors are expected to install the development dependencies as well.
+
+- Some of the [dev-dependencies](https://github.com/jbesomi/texthero/blob/6e6b8f70432979a81a09d48826fc907adc67cba7/setup.cfg#L43) will be used by any contributor of TextHero to execute the [tests.sh](./scripts/tests.sh) locally.
+
+## **IMPORTANT NOTE**
+
+- Some of the [dev-dependencies](https://github.com/jbesomi/texthero/blob/6e6b8f70432979a81a09d48826fc907adc67cba7/setup.cfg#L43) are necessary **IF** the contributor wants to update the website or run the website locally but please remember that one **shouldn't be sending these kind of changes as a Pull Request**.
+
+**Why?**
+
+- Because it would instantaneously change the website.
+- Changes from pull requests will be available to everyone only after a new release. Imagine you add a new function as a PR, if your PR also updates the documentation then the function will appear under the APIs which is not yet present in the installable pip version. That would be really confusing, isn't it?
+
+
 1. Create a new working branch
 
 You can name it as you wish. A good practice is to give the branch a meaningful name so others know what you are working on.
+
+**Example branch name**: `33-fixing-wordcloud-issue`. Here `33` indicates this [issue tracker ID](https://github.com/jbesomi/texthero/issues/33), `fixing-wordcloud-issue` is a short and actionable description of what your PR is about. Use hyphens as separators. 
 
 ```
 $ git checkout -b new-branch
@@ -177,15 +190,16 @@ $ git checkout -b new-branch
 
 1. Add your changes
 
-Try to commit regularly. In addition, whenever possible, group changes into distinct commits. It will be easier for the rest of us to understand what you worked just by reading the description of your commit.
+Try to commit regularly. In addition, whenever possible, group changes into distinct commits. It will be easier for the rest of us to understand what you worked on just by reading the description of your commit.
 
 ```
-$ ...
+$ git add README.md
+$ git commit -m "added README.md"
 ```
 
 1. Test your changes
 
-Before opening a new pull-request, you should make sure that all tests still pass with the new changes. Also, if you implement a new function or enhance an existing one, please **add all the necessary** unittests. PR without a properly unit-tested code will not be accepted as we want to avoid at all costs bugs in the project. This is also known as [Shift-left testing](https://en.wikipedia.org/wiki/Shift-left_testing).
+Before opening a new pull-request, you should make sure that all tests still pass with the new changes. Also, if you implement a new function or enhance an existing one, please **add all the necessary** unittests. PR without a properly unit-tested code will not be accepted as we want to avoid bugs at all costs in the project. This is also known as [Shift-left testing](https://en.wikipedia.org/wiki/Shift-left_testing).
 
 **Important.** If you worked on a bug, you should add a test that checks the bug is not present anymore. This is extremely useful as it avoids to re-introduce the same bug again in the future.
 
@@ -198,7 +212,7 @@ The time to submit the PR has come. Head to your forked repository on Github. Th
 
 - `./test.sh`
    - Execute unittests as well as test all doctests
-- `./formath.sh`
+- `./format.sh`
    - format all code with [black](https://github.com/psf/black)
 - `./check.sh`
    - Format the code with black (`format.sh`)

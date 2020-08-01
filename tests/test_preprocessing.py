@@ -7,6 +7,7 @@ import doctest
 from texthero import preprocessing, stopwords
 from . import PandasTestCase
 
+import warnings
 
 """
 Test doctest
@@ -90,8 +91,8 @@ class TestPreprocessing(PandasTestCase):
     """
 
     def test_remove_diactitics(self):
-        s = pd.Series("hèllo")
-        s_true = pd.Series("hello")
+        s = pd.Series("Montréal, über, 12.89, Mère, Françoise, noël, 889, اِس, اُس")
+        s_true = pd.Series("Montreal, uber, 12.89, Mere, Francoise, noel, 889, اس, اس")
         self.assertEqual(preprocessing.remove_diacritics(s), s_true)
 
     """
@@ -174,8 +175,8 @@ class TestPreprocessing(PandasTestCase):
         self.assertEqual(preprocessing.tokenize(s), s_true)
 
     def test_tokenize_not_split_in_between_punctuation(self):
-        s = pd.Series(["don't say hello-world"])
-        s_true = pd.Series([["don't", "say", "hello-world"]])
+        s = pd.Series(["don't say hello-world hello_world"])
+        s_true = pd.Series([["don't", "say", "hello-world", "hello_world"]])
         self.assertEqual(preprocessing.tokenize(s), s_true)
 
     """
@@ -238,10 +239,88 @@ class TestPreprocessing(PandasTestCase):
         self.assertEqual(preprocessing.remove_brackets(s), s_true)
 
     """
-    Test tokenize_with_phrases
+    Test phrases
     """
 
-    def test_tokenize_with_phrases(self):
+    def test_phrases(self):
+        s = pd.Series(
+            [
+                ["New", "York", "is", "a", "beautiful", "city"],
+                ["Look", ":", "New", "York", "!"],
+                ["Very", "beautiful", "city", "New", "York"],
+            ]
+        )
+
+        s_true = pd.Series(
+            [
+                ["New_York", "is", "a", "beautiful", "city"],
+                ["Look", ":", "New_York", "!"],
+                ["Very", "beautiful", "city", "New_York"],
+            ]
+        )
+
+        self.assertEqual(preprocessing.phrases(s, min_count=2, threshold=1), s_true)
+
+    def test_phrases_min_count(self):
+        s = pd.Series(
+            [
+                ["New", "York", "is", "a", "beautiful", "city"],
+                ["Look", ":", "New", "York", "!"],
+                ["Very", "beautiful", "city", "New", "York"],
+            ]
+        )
+
+        s_true = pd.Series(
+            [
+                ["New_York", "is", "a", "beautiful_city"],
+                ["Look", ":", "New_York", "!"],
+                ["Very", "beautiful_city", "New_York"],
+            ]
+        )
+
+        self.assertEqual(preprocessing.phrases(s, min_count=1, threshold=1), s_true)
+
+    def test_phrases_threshold(self):
+        s = pd.Series(
+            [
+                ["New", "York", "is", "a", "beautiful", "city"],
+                ["Look", ":", "New", "York", "!"],
+                ["Very", "beautiful", "city", "New", "York"],
+            ]
+        )
+
+        s_true = pd.Series(
+            [
+                ["New_York", "is", "a", "beautiful", "city"],
+                ["Look", ":", "New_York", "!"],
+                ["Very", "beautiful", "city", "New_York"],
+            ]
+        )
+
+        self.assertEqual(preprocessing.phrases(s, min_count=2, threshold=2), s_true)
+
+    def test_phrases_symbol(self):
+        s = pd.Series(
+            [
+                ["New", "York", "is", "a", "beautiful", "city"],
+                ["Look", ":", "New", "York", "!"],
+                ["Very", "beautiful", "city", "New", "York"],
+            ]
+        )
+
+        s_true = pd.Series(
+            [
+                ["New->York", "is", "a", "beautiful", "city"],
+                ["Look", ":", "New->York", "!"],
+                ["Very", "beautiful", "city", "New->York"],
+            ]
+        )
+
+        self.assertEqual(
+            preprocessing.phrases(s, min_count=2, threshold=1, symbol="->"), s_true
+        )
+
+    def test_phrases_not_tokenized_yet(self):
         s = pd.Series(
             [
                 "New York is a beautiful city",
@@ -249,6 +328,7 @@ class TestPreprocessing(PandasTestCase):
                 "Very beautiful city New York",
             ]
         )
+
         s_true = pd.Series(
             [
                 ["New", "York", "is", "a", "beautiful", "city"],
@@ -256,9 +336,13 @@ class TestPreprocessing(PandasTestCase):
                 ["Very", "beautiful", "city", "New", "York"],
             ]
         )
-        self.assertEqual(
-            preprocessing.tokenize_with_phrases(s, min_count=3, threshold=1), s_true
-        )
+
+        with warnings.catch_warnings():  # avoid print warning
+            warnings.simplefilter("ignore")
+            self.assertEqual(preprocessing.phrases(s), s_true)
+
+        with self.assertWarns(DeprecationWarning):  # check raise warning
+            preprocessing.phrases(s)
 
     """
     Test replace and remove tags
@@ -281,3 +365,19 @@ class TestPreprocessing(PandasTestCase):
         s_true = pd.Series("Hi  , we will remove you")
 
         self.assertEqual(preprocessing.remove_tags(s), s_true)
+
+    """
+    Test replace and remove hashtags
+    """
+
+    def test_replace_hashtags(self):
+        s = pd.Series("Hi #hashtag, we will replace you")
+        s_true = pd.Series("Hi HASHTAG, we will replace you")
+
+        self.assertEqual(preprocessing.replace_hashtags(s, symbol="HASHTAG"), s_true)
+
+    def test_remove_hashtags(self):
+        s = pd.Series("Hi #hashtag_trending123, we will remove you")
+        s_true = pd.Series("Hi  , we will remove you")
+
+        self.assertEqual(preprocessing.remove_hashtags(s), s_true)

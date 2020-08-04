@@ -905,8 +905,7 @@ def normalize(s: pd.Series, norm="l2") -> pd.Series:
     """
     Normalize every cell in a Pandas Series.
 
-    Input can be either a "normal" / flat Series or a Document Representation Series.
-    Output will be same type as input.
+    Input has to be a Representation Series.
 
     Parameters
     ----------
@@ -919,13 +918,6 @@ def normalize(s: pd.Series, norm="l2") -> pd.Series:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series([[1, 1, 1, 3, 2], [2, 2, 2, 0, 2]])
-    >>> hero.normalize(s, norm="l2")
-    0    [0.25, 0.25, 0.25, 0.75, 0.5]
-    1        [0.5, 0.5, 0.5, 0.0, 0.5]
-    dtype: object
-
-    With a Document Representation Series:
     >>> idx = pd.MultiIndex.from_tuples(
     ...             [(0, "a"), (0, "b"), (1, "c"), (1, "d")], names=("document", "word")
     ...         )
@@ -950,32 +942,27 @@ def normalize(s: pd.Series, norm="l2") -> pd.Series:
     is_valid_representation = (
         isinstance(s.index, pd.MultiIndex) and s.index.nlevels == 2
     )
+
+    if not is_valid_representation:
+        raise TypeError(
+            "The input Pandas Series should be a Representation Pandas Series and should have a MultiIndex. The given Pandas Series does not appears to have MultiIndex"
+        )
     # TODO after merging representation: use _check_is_valid_representation instead
 
-    if is_valid_representation:
-
-        if pd.api.types.is_sparse(s):
-            s_coo_matrix = s.sparse.to_coo()[0]
-        else:
-            s = s.astype("Sparse")
-            s_coo_matrix = s.sparse.to_coo()[0]
-
-        s_for_vectorization = s_coo_matrix
-
+    if pd.api.types.is_sparse(s):
+        s_coo_matrix = s.sparse.to_coo()[0]
     else:
-        s_for_vectorization = list(s)
+        s = s.astype("Sparse")
+        s_coo_matrix = s.sparse.to_coo()[0]
+
+    s_for_vectorization = s_coo_matrix
 
     result = sklearn_normalize(
         s_for_vectorization, norm=norm
     )  # Can handle sparse input.
 
-    if is_valid_representation:
-        # If we're here, result is already sparse, but in CSR format -> to COO for pandas.
-        result_coo = coo_matrix(result)
-        s_result = pd.Series.sparse.from_coo(result_coo)
-        s_result.index = s.index
-
-    else:
-        s_result = pd.Series(result.tolist(), index=s.index)
+    result_coo = coo_matrix(result)
+    s_result = pd.Series.sparse.from_coo(result_coo)
+    s_result.index = s.index
 
     return s_result

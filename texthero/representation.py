@@ -84,8 +84,6 @@ def flatten(
 
     s = pd.Series(s.values.tolist(), index=s.index)
 
-    s.rename_axis("document", inplace=True)
-
     return s
 
 
@@ -178,13 +176,11 @@ def count(
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
     >>> hero.count(s)
-    document  word    
-    0         Sentence    1
-              one         1
-    1         Sentence    1
-              two         1
+    0  Sentence    1
+       one         1
+    1  Sentence    1
+       two         1
     dtype: Sparse[int64, 0]
-
 
     See Also
     --------
@@ -215,8 +211,6 @@ def count(
 
     # Map word index to word name
     s_out.index = s_out.index.map(lambda x: (s.index[x[0]], features_names[x[1]]))
-
-    s_out.rename_axis(["document", "word"], inplace=True)
 
     return s_out
 
@@ -266,12 +260,11 @@ def term_frequency(
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one hey", "Sentence two"]).pipe(hero.tokenize)
     >>> hero.term_frequency(s)
-    document  word    
-    0         Sentence    0.2
-              hey         0.2
-              one         0.2
-    1         Sentence    0.2
-              two         0.2
+    0  Sentence    0.2
+       hey         0.2
+       one         0.2
+    1  Sentence    0.2
+       two         0.2
     dtype: Sparse[float64, nan]
 
     See Also
@@ -303,8 +296,6 @@ def term_frequency(
 
     # Map word index to word name
     s_out.index = s_out.index.map(lambda x: (s.index[x[0]], features_names[x[1]]))
-
-    s_out.rename_axis(["document", "word"], inplace=True)
 
     return s_out
 
@@ -373,7 +364,6 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.Series:
     >>> import pandas as pd
     >>> s = pd.Series(["Hi Bye", "Test Bye Bye"]).pipe(hero.tokenize)
     >>> hero.tfidf(s) # doctest: +SKIP
-    document  word
     0         Bye     1.000000
               Hi      1.405465
     1         Bye     2.000000
@@ -412,8 +402,6 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.Series:
     # Map word index to word name and keep original index of documents.
     feature_names = tfidf.get_feature_names()
     s_out.index = s_out.index.map(lambda x: (s.index[x[0]], feature_names[x[1]]))
-
-    s_out.rename_axis(["document", "word"], inplace=True)
 
     return s_out
 
@@ -699,7 +687,6 @@ def kmeans(
     >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, fun, guitar"])
     >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency).pipe(hero.flatten) # TODO: when others get Representation Support: remove flatten
     >>> hero.kmeans(s, n_clusters=2, random_state=42)
-    document
     0    1
     1    0
     2    1
@@ -797,7 +784,6 @@ def dbscan(
     >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, enjoy, guitar"])
     >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf).pipe(hero.flatten) # TODO: when others get Representation Support: remove flatten
     >>> hero.dbscan(s, min_samples=1, eps=4)
-    document
     0    0
     1    1
     2    0

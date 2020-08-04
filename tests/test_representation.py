@@ -24,6 +24,20 @@ def load_tests(loader, tests, ignore):
 
 
 """
+Helper functions for the tests.
+"""
+
+
+def _tfidf(term, corpus, document_index):
+    idf = (
+        math.log((1 + len(corpus)) / (1 + len([doc for doc in corpus if term in doc])))
+        + 1
+    )
+    tfidf_value = idf * corpus[document_index].count(term)
+    return tfidf_value
+
+
+"""
 Test functions in representation module in a
 parameterized way.
 """
@@ -38,17 +52,13 @@ s_tokenized_with_noncontinuous_index = pd.Series(
 
 s_tokenized_output_index = pd.MultiIndex.from_tuples(
     [(0, "!"), (0, "TEST"), (0, "Test"), (1, "."), (1, "?"), (1, "Test")],
-    names=["document", "word"],
 )
 
 s_tokenized_output_noncontinuous_index = pd.MultiIndex.from_tuples(
     [(5, "!"), (5, "TEST"), (5, "Test"), (7, "."), (7, "?"), (7, "Test")],
-    names=["document", "word"],
 )
 
-s_tokenized_output_min_df_index = pd.MultiIndex.from_tuples(
-    [(0, "Test"), (1, "Test")], names=["document", "word"],
-)
+s_tokenized_output_min_df_index = pd.MultiIndex.from_tuples([(0, "Test"), (1, "Test")],)
 
 
 test_cases_vectorization = [
@@ -63,7 +73,7 @@ test_cases_vectorization = [
     [
         "tfidf",
         representation.tfidf,
-        [1.405465, 1.405465, 2.000000, 2.810930, 1.405465, 1.000000],
+        [_tfidf(x[1], s_tokenized, x[0]) for x in s_tokenized_output_index],
         "float",
     ],
 ]
@@ -165,16 +175,10 @@ class AbstractRepresentationTest(PandasTestCase):
         s = pd.Series(["Hi Bye", "Test Bye Bye"])
         s = preprocessing.tokenize(s)
         s_true_index = pd.MultiIndex.from_tuples(
-            [(0, "Bye"), (0, "Hi"), (1, "Bye"), (1, "Test")], names=["document", "word"]
+            [(0, "Bye"), (0, "Hi"), (1, "Bye"), (1, "Test")],
         )
         s_true = pd.Series(
-            [
-                1.0 * (math.log(3 / 3) + 1),
-                1.0 * (math.log(3 / 2) + 1),
-                2.0 * (math.log(3 / 3) + 1),
-                1.0 * (math.log(3 / 2) + 1),
-            ],
-            index=s_true_index,
+            [_tfidf(x[1], s, x[0]) for x in s_true_index], index=s_true_index
         ).astype("Sparse")
 
         self.assertEqual(representation.tfidf(s), s_true)
@@ -186,7 +190,6 @@ class AbstractRepresentationTest(PandasTestCase):
     def test_flatten(self):
         index = pd.MultiIndex.from_tuples(
             [("doc0", "Word1"), ("doc0", "Word3"), ("doc1", "Word2")],
-            names=["document", "word"],
         )
         s = pd.Series([3, np.nan, 4], index=index)
 
@@ -201,14 +204,12 @@ class AbstractRepresentationTest(PandasTestCase):
     def test_flatten_fill_missing_with(self):
         index = pd.MultiIndex.from_tuples(
             [("doc0", "Word1"), ("doc0", "Word3"), ("doc1", "Word2")],
-            names=["document", "word"],
         )
         s = pd.Series([3, np.nan, 4], index=index)
 
         s_true = pd.Series(
             [[3.0, "FILLED", np.nan], ["FILLED", 4.0, "FILLED"]],
             index=["doc0", "doc1"],
-            name="document",
         )
 
         pd.testing.assert_series_equal(
@@ -222,14 +223,12 @@ class AbstractRepresentationTest(PandasTestCase):
         # the representation series.
         index = pd.MultiIndex.from_tuples(
             [("doc0", "Word1"), ("doc0", "Word3"), ("doc1", "Word2")],
-            names=["document", "word"],
         )
         s = pd.Series([3, np.nan, 4], index=index)
 
         s_true = pd.Series(
             [[3.0, 0.0, np.nan], [0.0, 4.0, 0.0], [0.0, 0.0, 0.0]],
             index=["doc0", "doc1", "doc2"],
-            name="document",
         )
 
         pd.testing.assert_series_equal(

@@ -126,7 +126,7 @@ class TestHelpers(PandasTestCase):
             self.fail("Failed although input type is correct.")
 
     def test_inputseries_correct_type_documentrepresentationseries(self):
-        @_helper.InputSeries(_helper.DocumentRepresentationSeries)
+        @_helper.InputSeries(_helper.RepresentationSeries)
         def f(s):
             pass
 

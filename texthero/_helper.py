@@ -86,9 +86,9 @@ Series and defines functions to check the types.
 
 The goal is to be able to do something like this:
 
-@OutputSeries(DocumentRepresentationSeries)
+@OutputSeries(RepresentationSeries)
 @InputSeries(TokenSeries)
-def tfidf(s: TokenSeries) -> DocumentRepresentationSeries:
+def tfidf(s: TokenSeries) -> RepresentationSeries:
     ...
 
 The decorator (@...) makes python check whether the input is
@@ -118,7 +118,7 @@ These are the implemented types:
 - TextSeries: cells are text (i.e. strings), e.g. "Test"
 - TokenSeries: cells are lists of tokens (i.e. lists of strings), e.g. ["word1", "word2"]
 - VectorSeries: cells are vector representations of text, e.g. [0.25, 0.75]
-- DocumentRepresentationSeries: Series is multiindexed with level one
+- RepresentationSeries: Series is multiindexed with level one
 being the document, level two being the individual features and their values
 
 The classes are lightweight subclasses of pd.Series and serve 2 purposes:
@@ -153,17 +153,17 @@ class HeroSeries(pd.Series):
     3. VectorSeries: Every cell is a vector representing text, i.e.
     a list of floats. For example, `pd.Series([[1.0, 2.0], [3.0]])` is a valid VectorSeries.
 
-    4. DocumentRepresentationSeries: Series is multiindexed with level one
+    4. RepresentationSeries: Series is multiindexed with level one
     being the document, level two being the individual features and their values.
     For example,
     `pd.Series([1, 2, 3], index=pd.MultiIndex.from_tuples([("doc1", "word1"), ("doc1", "word2"), ("doc2", "word1")]))`
-    is a valid DocumentRepresentationSeries.
+    is a valid RepresentationSeries.
 
     These types of Series are supposed to make using the library
     easier and more intuitive. For example, if you see a
     function head
     ```
-    def tfidf(s: TokenSeries) -> DocumentRepresentationSeries
+    def tfidf(s: TokenSeries) -> RepresentationSeries
     ```
     then you know that the function takes a Pandas Series
     whose cells are lists of strings (tokens) and will
@@ -255,19 +255,19 @@ class VectorSeries(HeroSeries):
             raise TypeError(error_string)
 
 
-class DocumentRepresentationSeries(HeroSeries):
+class RepresentationSeries(HeroSeries):
     """
-    A DocumentRepresentationSeries is multiindexed with level one
+    A RepresentationSeries is multiindexed with level one
     being the document, and level two being the individual features and their values.
     For example,
     `pd.Series([1, 2, 3], index=pd.MultiIndex.from_tuples([("doc1", "word1"), ("doc1", "word2"), ("doc2", "word1")]))`
-    is a valid DocumentRepresentationSeries.
+    is a valid RepresentationSeries.
     """
 
     @staticmethod
     def check_series(s: pd.Series, input_output="") -> bool:
         """
-        Check if a given Pandas Series has the properties of a DocumentRepresentationSeries.
+        Check if a given Pandas Series has the properties of a RepresentationSeries.
         """
 
         error_string = (

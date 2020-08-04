@@ -3,6 +3,7 @@ Visualize insights and statistics of a text-based Pandas DataFrame.
 """
 
 import pandas as pd
+import numpy as np
 import plotly.express as px
 
 from wordcloud import WordCloud
@@ -20,6 +21,7 @@ def scatterplot(
     df: pd.DataFrame,
     col: str,
     color: str = None,
+    hover_name: str = None,
     hover_data: [] = None,
     title="",
     return_figure=False,
@@ -27,51 +29,84 @@ def scatterplot(
     """
     Show scatterplot of DataFrame column using python plotly scatter.
 
+    Plot the values in column col. For example, if every cell in df[col]
+    is a list of three values (e.g. from doing PCA with 3 components),
+    a 3D-Plot is created and every cell entry [x, y, z] is visualized
+    as the point (x, y, z).
 
     Parameters
     ----------
     df: DataFrame with a column to be visualized.
 
     col: str
-        The name of the column of the DataFrame to use for x and y axis.
+        The name of the column of the DataFrame to use for x and y (and z) axis.
 
     color: str, default to None.
         Name of the column to use for coloring (rows with same value get same color).
+
+    hover_name: str, default to None
+        Name of the column to supply title of hover data when hovering over a point.
+
+    hover_data: List[str], default to [].
+        List of column names to supply data when hovering over a point.
 
     title: str, default to "".
         Title of the plot.
 
     return_figure: optional, default to False.
-        Function returns the figure if set to True.
-
-    hover_data: List[str], default to [].
-        List of column names to supply data when hovering over a point.
-
-    hover_name: str, default to None
-        Name of the column to supply title of hover data when hovering over a point.
+        Function returns the figure instead of showing it if set to True.
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> df = pd.DataFrame(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports"], columns=["texts"])
+    >>> df = pd.DataFrame(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, fun, guitar"], columns=["texts"])
     >>> df["texts"] = hero.clean(df["texts"]).pipe(hero.tokenize)
-    >>> df["pca"] = hero.tfidf(df["texts"]).pipe(hero.pca)
+    >>> df["pca"] = hero.tfidf(df["texts"]).pipe(hero.pca, n_components=3)
     >>> df["topics"] = hero.tfidf(df["texts"]).pipe(hero.kmeans, n_clusters=2)
     >>> hero.scatterplot(df, col="pca", color="topics", hover_data=["texts"]) # doctest: +SKIP
     """
 
-    pca0 = df[col].apply(lambda x: x[0])
-    pca1 = df[col].apply(lambda x: x[1])
+    plot_values = np.stack(df[col], axis=1)
+    dimension = len(plot_values)
 
-    fig = px.scatter(
-        df, x=pca0, y=pca1, color=color, hover_data=hover_data, title=title
-    )
-    # fig.show(config={'displayModeBar': False})
-    fig.show()
+    if dimension < 2 or dimension > 3:
+        raise ValueError(
+            "The column you want to visualize has dimension < 2 or dimension > 3."
+            " The function can only visualize 2- and 3-dimensional data."
+        )
+
+    if dimension == 2:
+        x, y = plot_values[0], plot_values[1]
+
+        fig = px.scatter(
+            df,
+            x=x,
+            y=y,
+            color=color,
+            hover_data=hover_data,
+            title=title,
+            hover_name=hover_name,
+        )
+
+    else:
+        x, y, z = plot_values[0], plot_values[1], plot_values[2]
+
+        fig = px.scatter_3d(
+            df,
+            x=x,
+            y=y,
+            z=z,
+            color=color,
+            hover_data=hover_data,
+            title=title,
+            hover_name=hover_name,
+        )
 
     if return_figure:
         return fig
+    else:
+        fig.show()
 
 
 """

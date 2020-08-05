@@ -5,8 +5,11 @@ The texthero.nlp module supports common NLP tasks such as named_entities, noun_c
 import spacy
 import pandas as pd
 
+from texthero._helper import TextSeries, InputSeries
 
-def named_entities(s: pd.Series, package="spacy") -> pd.Series:
+
+@InputSeries(TextSeries)
+def named_entities(s: TextSeries, package="spacy") -> pd.Series:
     """
     Return named-entities.
 
@@ -59,7 +62,8 @@ def named_entities(s: pd.Series, package="spacy") -> pd.Series:
     return pd.Series(entities, index=s.index)
 
 
-def noun_chunks(s: pd.Series) -> pd.Series:
+@InputSeries(TextSeries)
+def noun_chunks(s: TextSeries) -> pd.Series:
     """
     Return noun chunks (noun phrases).
 
@@ -100,7 +104,8 @@ def noun_chunks(s: pd.Series) -> pd.Series:
     return pd.Series(noun_chunks, index=s.index)
 
 
-def count_sentences(s: pd.Series) -> pd.Series:
+@InputSeries(TextSeries)
+def count_sentences(s: TextSeries) -> pd.Series:
     """
     Count the number of sentences per cell in a Pandas Series.
 
@@ -130,7 +135,8 @@ def count_sentences(s: pd.Series) -> pd.Series:
     return pd.Series(number_of_sentences, index=s.index)
 
 
-def pos_tag(s: pd.Series) -> pd.Series:
+@InputSeries(TextSeries)
+def pos_tag(s: TextSeries) -> pd.Series:
     """
     Return a Pandas Series with part-of-speech tagging
 

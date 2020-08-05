@@ -25,7 +25,7 @@ warnings.filterwarnings(action="ignore", category=UserWarning, module="gensim")
 
 def fillna(s: pd.Series) -> pd.Series:
     """
-    Replaces not assigned values with empty spaces.
+    Replaces not assigned values with empty string.
 
 
     Examples
@@ -63,7 +63,8 @@ def replace_digits(s: pd.Series, symbols: str = " ", only_blocks=True) -> pd.Ser
     """
     Replace all digits with symbols.
 
-    By default, only replaces "blocks" of digits, i.e tokens composed of only numbers.
+    By default, only replaces "blocks" of digits, i.e tokens composed of only
+    numbers.
 
     When `only_blocks` is set to ´False´, replaces all digits.
 
@@ -101,7 +102,8 @@ def remove_digits(s: pd.Series, only_blocks=True) -> pd.Series:
     """
     Remove all digits and replaces them with a single space.
 
-    By default, only remove "blocks" of digits. For instance, `1234 falcon9` becomes ` falcon9`.
+    By default, only remove "blocks" of digits. For instance, `1234 falcon9`
+    becomes ` falcon9`.
 
     When the arguments `only_blocks` is set to ´False´, remove any digits.
 
@@ -165,9 +167,11 @@ def remove_punctuation(s: pd.Series) -> pd.Series:
     Replace all punctuation with a single space (" ").
 
     Remove all punctuation from the given Pandas Series and replace it
-    with a single space. It considers as punctuation characters all :data:`string.punctuation` symbols `!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~).`
+    with a single space. It considers as punctuation characters all
+    :data:`string.punctuation` symbols `!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~).`
 
-    See also :meth:`replace_punctuation` to replace punctuation with a custom symbol.
+    See also :meth:`replace_punctuation` to replace punctuation with a custom
+    symbol.
 
     Examples
     --------
@@ -203,14 +207,16 @@ def remove_diacritics(s: pd.Series) -> pd.Series:
     """
     Remove all diacritics and accents.
 
-    Remove all diacritics and accents from any word and characters from the given Pandas Series.
+    Remove all diacritics and accents from any word and characters from the
+    given Pandas Series.
     Return a cleaned version of the Pandas Series.
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Montréal, über, 12.89, Mère, Françoise, noël, 889, اِس, اُس")
+    >>> s = pd.Series(
+    ...     "Montréal, über, 12.89, Mère, Françoise, noël, 889, اِس, اُس")
     >>> hero.remove_diacritics(s)[0]
     'Montreal, uber, 12.89, Mere, Francoise, noel, 889, اس, اس'
 
@@ -291,7 +297,8 @@ def replace_stopwords(
         Character(s) to replace words with.
 
     stopwords : Set[str], Optional
-        Set of stopwords string to remove. If not passed, by default it used NLTK English stopwords. 
+        Set of stopwords string to remove. If not passed, by default it used
+        NLTK English stopwords. 
 
     Examples
     --------
@@ -322,7 +329,8 @@ def remove_stopwords(
     s : Pandas Series
 
     stopwords : Set[str], Optional
-        Set of stopwords string to remove. If not passed, by default it used NLTK English stopwords.
+        Set of stopwords string to remove. If not passed, by default it used
+        NLTK English stopwords.
 
     Examples
     --------
@@ -357,10 +365,16 @@ def stem(s: pd.Series, stem="snowball", language="english") -> pd.Series:
     r"""
     Stem series using either `porter` or `snowball` NLTK stemmers.
 
-    The act of stemming means removing the end of a words with an heuristic process.
-    It's useful in context where the meaning of the word is important rather than his derivation. Stemming is very efficient and adapt in case the given dataset is large.
+    The act of stemming means removing the end of a words with an heuristic
+    process.
+    It's useful in context where the meaning of the word is important rather
+    than his derivation. Stemming is very efficient and adapt in case the given
+    dataset is large.
 
-    Make use of two NLTK stemming algorithms known as :class:`nltk.stem.SnowballStemmer` and :class:`nltk.stem.PorterStemmer`. SnowballStemmer should be used when the Pandas Series contains non-English text has it has multilanguage support.
+    Make use of two NLTK stemming algorithms known as
+    :class:`nltk.stem.SnowballStemmer` and :class:`nltk.stem.PorterStemmer`.
+    SnowballStemmer should be used when the Pandas Series contains non-English
+    text has it has multilanguage support.
 
 
     Parameters
@@ -371,7 +385,9 @@ def stem(s: pd.Series, stem="snowball", language="english") -> pd.Series:
         Stemming algorithm. It can be either 'snowball' or 'porter'
 
     language : str (english by default)
-        Supported languages: `danish`, `dutch`, `english`, `finnish`, `french`, `german` , `hungarian`, `italian`, `norwegian`, `portuguese`, `romanian`, `russian`, `spanish` and `swedish`.
+        Supported languages: `danish`, `dutch`, `english`, `finnish`, `french`,
+        `german` , `hungarian`, `italian`, `norwegian`, `portuguese`,
+        `romanian`, `russian`, `spanish` and `swedish`.
 
     Notes
     -----
@@ -402,7 +418,8 @@ def stem(s: pd.Series, stem="snowball", language="english") -> pd.Series:
 
 def get_default_pipeline() -> List[Callable[[pd.Series], pd.Series]]:
     """
-    Return a list contaning all the methods used in the default cleaning pipeline.
+    Return a list contaning all the methods used in the default cleaning
+    pipeline.
 
     Return a list with the following functions:
      1. :meth:`texthero.preprocessing.fillna`
@@ -426,7 +443,8 @@ def get_default_pipeline() -> List[Callable[[pd.Series], pd.Series]]:
 
 def clean(s: pd.Series, pipeline=None) -> pd.Series:
     """
-    Pre-process a text-based Pandas Series, by using the following default pipline.
+    Pre-process a text-based Pandas Series, by using the following default
+    pipeline.
 
      Default pipeline:
      1. :meth:`texthero.preprocessing.fillna`
@@ -488,7 +506,8 @@ def drop_no_content(s: pd.Series) -> pd.Series:
     r"""
     Drop all rows without content.
 
-    Every row from a given Pandas Series, where :meth:`has_content` is False, will be dropped.
+    Every row from a given Pandas Series, where :meth:`has_content` is False,
+    will be dropped.
 
     Examples
     --------
@@ -530,7 +549,8 @@ def remove_round_brackets(s: pd.Series) -> pd.Series:
 
 def remove_curly_brackets(s: pd.Series) -> pd.Series:
     """
-    Remove content within curly brackets '{}' and the curly brackets by themself.
+    Remove content within curly brackets '{}' and the curly brackets by
+    themselves.
 
     Examples
     --------
@@ -554,7 +574,8 @@ def remove_curly_brackets(s: pd.Series) -> pd.Series:
 
 def remove_square_brackets(s: pd.Series) -> pd.Series:
     """
-    Remove content within square brackets '[]' and the square brackets by themself.
+    Remove content within square brackets '[]' and the square brackets by
+    themselves.
 
     Examples
     --------
@@ -579,7 +600,8 @@ def remove_square_brackets(s: pd.Series) -> pd.Series:
 
 def remove_angle_brackets(s: pd.Series) -> pd.Series:
     """
-    Remove content within angle brackets '<>' and the angle brackets by themself.
+    Remove content within angle brackets '<>' and the angle brackets by
+    themselves.
 
     Examples
     --------
@@ -637,8 +659,9 @@ def remove_html_tags(s: pd.Series) -> pd.Series:
     """
     Remove html tags from the given Pandas Series.
 
-    Remove all html tags of the type `<.*?>` such as <html>, <p>, <div class="hello"> and
-    remove all html tags of type &nbsp and return a cleaned Pandas Series.
+    Remove all html tags of the type `<.*?>` such as <html>, <p>,
+    <div class="hello"> and remove all html tags of type &nbsp and return a
+    cleaned Pandas Series.
 
     Examples
     --------
@@ -651,8 +674,8 @@ def remove_html_tags(s: pd.Series) -> pd.Series:
 
     """
 
-    pattern = r"""(?x)                    # Turn on free-spacing
-      <[^>]+>                             # Remove <html> tags
+    pattern = r"""(?x)                              # Turn on free-spacing
+      <[^>]+>                                       # Remove <html> tags
       | &([a-z0-9]+|\#[0-9]{1,6}|\#x[0-9a-f]{1,6}); # Remove &nbsp;
       """
 
@@ -663,8 +686,8 @@ def tokenize(s: pd.Series) -> pd.Series:
     """
     Tokenize each row of the given Series.
 
-    Tokenize each row of the given Pandas Series and return a Pandas Series where
-    each row contains a list of tokens.
+    Tokenize each row of the given Pandas Series and return a Pandas Series
+    where each row contains a list of tokens.
 
     Algorithm: add a space between any punctuation symbol at
     exception if the symbol is between two alphanumeric character and split.
@@ -681,7 +704,9 @@ def tokenize(s: pd.Series) -> pd.Series:
     """
 
     punct = string.punctuation.replace("_", "")
-    # In regex, the metacharacter 'w' is "a-z, A-Z, 0-9, including the _ (underscore) character." We therefore remove it from the punctuation string as this is already included in \w
+    # In regex, the metacharacter 'w' is "a-z, A-Z, 0-9, including the _ (underscore)
+    # character." We therefore remove it from the punctuation string as this is already
+    # included in \w.
 
     pattern = rf"((\w)([{punct}])(?:\B|$)|(?:^|\B)([{punct}])(\w))"
 
@@ -806,7 +831,8 @@ def remove_urls(s: pd.Series) -> pd.Series:
 def replace_tags(s: pd.Series, symbol: str) -> pd.Series:
     """Replace all tags from a given Pandas Series with symbol.
 
-    A tag is a string formed by @ concatenated with a sequence of characters and digits. Example: @texthero123.
+    A tag is a string formed by @ concatenated with a sequence of characters
+    and digits. Example: @texthero123.
 
     Parameters
     ----------
@@ -833,7 +859,8 @@ def replace_tags(s: pd.Series, symbol: str) -> pd.Series:
 def remove_tags(s: pd.Series) -> pd.Series:
     """Remove all tags from a given Pandas Series.
 
-    A tag is a string formed by @ concatenated with a sequence of characters and digits. Example: @texthero123. Tags are replaceb by an empty space ` `.
+    A tag is a string formed by @ concatenated with a sequence of characters
+    and digits. Example: @texthero123. Tags are replaceb by an empty space ` `.
 
     Examples
     --------
@@ -846,7 +873,8 @@ def remove_tags(s: pd.Series) -> pd.Series:
 
     See also
     --------
-    :meth:`texthero.preprocessing.replace_tags` for replacing a tag with a custom symbol.
+    :meth:`texthero.preprocessing.replace_tags` for replacing a tag with a
+        custom symbol.
     """
     return replace_tags(s, " ")
 
@@ -854,7 +882,8 @@ def remove_tags(s: pd.Series) -> pd.Series:
 def replace_hashtags(s: pd.Series, symbol: str) -> pd.Series:
     """Replace all hashtags from a Pandas Series with symbol
 
-    A hashtag is a string formed by # concatenated with a sequence of characters, digits and underscores. Example: #texthero_123. 
+    A hashtag is a string formed by # concatenated with a sequence of
+    characters, digits and underscores. Example: #texthero_123. 
 
     Parameters
     ----------
@@ -880,7 +909,8 @@ def replace_hashtags(s: pd.Series, symbol: str) -> pd.Series:
 def remove_hashtags(s: pd.Series) -> pd.Series:
     """Remove all hashtags from a given Pandas Series
 
-    A hashtag is a string formed by # concatenated with a sequence of characters, digits and underscores. Example: #texthero_123. 
+    A hashtag is a string formed by # concatenated with a sequence of
+    characters, digits and underscores. Example: #texthero_123. 
 
     Examples
     --------
@@ -893,6 +923,7 @@ def remove_hashtags(s: pd.Series) -> pd.Series:
 
     See also
     --------
-    :meth:`texthero.preprocessing.replace_hashtags` for replacing a hashtag with a custom symbol.
+    :meth:`texthero.preprocessing.replace_hashtags` for replacing a hashtag
+        with a custom symbol.
     """
     return replace_hashtags(s, " ")

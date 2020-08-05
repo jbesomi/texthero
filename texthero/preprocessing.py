@@ -72,7 +72,7 @@ def replace_digits(s: TextSeries, symbols: str = " ", only_blocks=True) -> TextS
 
     Parameters
     ----------
-    s : Pandas Series
+    s : :class:`texthero._helper.TextSeries`
 
     symbols : str (default single empty space " ")
         Symbols to replace
@@ -113,7 +113,7 @@ def remove_digits(s: TextSeries, only_blocks=True) -> TextSeries:
 
     Parameters
     ----------
-    s : Pandas Series
+    s : :class:`texthero._helper.TextSeries`
 
     only_blocks : bool
         Remove only blocks of digits.
@@ -147,7 +147,7 @@ def replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
 
     Parameters
     ----------
-    s : Pandas Series
+    s : :class:`texthero._helper.TextSeries`
 
     symbol : str (default single empty space)
         Symbol to use as replacement for all string punctuation. 
@@ -329,7 +329,7 @@ def remove_stopwords(
 
     Parameters
     ----------
-    s : Pandas Series
+    s : :class:`texthero._helper.TextSeries`
 
     stopwords : Set[str], Optional
         Set of stopwords string to remove. If not passed, by default it used NLTK English stopwords.
@@ -779,7 +779,7 @@ def replace_urls(s: TextSeries, symbol: str) -> TextSeries:
 
     Parameters
     ----------
-    s: Pandas Series
+    s : :class:`texthero._helper.TextSeries`
 
     symbol: String
         The symbol to which the URL should be changed to.
@@ -836,7 +836,7 @@ def replace_tags(s: TextSeries, symbol: str) -> TextSeries:
 
     Parameters
     ----------
-    s : Pandas Series
+    s : :class:`texthero._helper.TextSeries`
 
     symbols : str
         Symbols to replace
@@ -887,7 +887,7 @@ def replace_hashtags(s: TextSeries, symbol: str) -> TextSeries:
 
     Parameters
     ----------
-    s : Pandas Series
+    s : :class:`texthero._helper.TextSeries`
 
     symbols : str
         Symbols to replace

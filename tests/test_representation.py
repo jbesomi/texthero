@@ -60,6 +60,20 @@ s_tokenized_output_noncontinuous_index = pd.MultiIndex.from_tuples(
 
 s_tokenized_output_min_df_index = pd.MultiIndex.from_tuples([(0, "Test"), (1, "Test")],)
 
+s_representation_vectors_index = pd.MultiIndex.from_tuples(
+    [(5, "A"), (5, "B"), (7, "A"), (7, "C")]
+)
+
+s_representation_vectors = pd.Series(
+    [1.0, 0.0, 0.0, 1.0], index=s_representation_vectors_index
+)
+
+s_flat_vectors_index = pd.Index([5, 7])
+
+s_flat_vectors = pd.Series(
+    [[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]], index=s_flat_vectors_index
+)
+
 
 test_cases_vectorization = [
     # format: [function_name, function, correct output for tokenized input above, dtype of output]
@@ -83,6 +97,16 @@ test_cases_vectorization_min_df = [
     ["count", representation.count, [2, 1], "int"],
     ["term_frequency", representation.term_frequency, [0.666667, 0.333333], "float",],
     ["tfidf", representation.tfidf, [2.0, 1.0], "float",],
+]
+
+test_cases_dim_reduction = [
+    # format: [function_name, function, correct output for numeric input above, dtype of output]
+    [
+        "pca",
+        representation.pca,
+        [[0.7071067811865475, 0.0], [-0.7071067811865475, 0.0]],
+    ],
+    ["nmf", representation.nmf, [[0.0, 1.0], [1.0, 0.0]]],
 ]
 
 
@@ -163,7 +187,40 @@ class AbstractRepresentationTest(PandasTestCase):
     @parameterized.expand(test_cases_vectorization)
     def test_vectorization_arguments_to_sklearn(self, name, test_function, *args):
         try:
-            test_function(s_not_tokenized, max_features=1, min_df=1, max_df=1.0)
+            test_function(s_tokenized, max_features=1, min_df=1, max_df=1.0)
+        except TypeError:
+            self.fail("Sklearn arguments not handled correctly.")
+
+    """
+    Dimensionality Reduction
+    """
+
+    @parameterized.expand(test_cases_dim_reduction)
+    def test_dim_reduction_simple_with_index(
+        self, name, test_function, correct_output_values
+    ):
+        s_true = pd.Series(correct_output_values, index=s_flat_vectors_index)
+
+        result_s = test_function(s_representation_vectors, random_state=42)
+
+        # check_less_precise True to prevent rounding errors from giving a Failure.
+        pd.testing.assert_series_equal(s_true, result_s, check_less_precise=True)
+
+    @parameterized.expand(test_cases_dim_reduction)
+    def test_dim_reduction_flat_with_index(
+        self, name, test_function, correct_output_values
+    ):
+        s_true = pd.Series(correct_output_values, index=s_flat_vectors_index)
+
+        result_s = test_function(s_flat_vectors, random_state=42)
+
+        # check_less_precise True to prevent rounding errors from giving a Failure.
+        pd.testing.assert_series_equal(s_true, result_s, check_less_precise=True)
+
+    @parameterized.expand(test_cases_dim_reduction)
+    def test_dim_reduction_arguments_to_sklearn(self, name, test_function, *args):
+        try:
+            test_function(s_representation_vectors, n_components=2, random_state=42)
         except TypeError:
             self.fail("Sklearn arguments not handled correctly.")
 

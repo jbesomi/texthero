@@ -432,6 +432,9 @@ def pca(s, n_components=2, random_state=None) -> pd.Series:
 
     In general, *pca* should be called after the text has already been represented to a matrix form.
 
+    The input can either be a Document Representation Series or a flat Series.
+    TODO add tutorial link
+
     Parameters
     ----------
     s : Pandas Series
@@ -466,9 +469,38 @@ def pca(s, n_components=2, random_state=None) -> pd.Series:
     --------
     `PCA on Wikipedia <https://en.wikipedia.org/wiki/Principal_component_analysis>`_
 
+    Document Representation Series: TODO add tutorial link
+
     """
     pca = PCA(n_components=n_components, random_state=random_state, copy=False)
-    return pd.Series(pca.fit_transform(list(s)).tolist(), index=s.index)
+
+    if _check_is_valid_representation(s):
+
+        if pd.api.types.is_sparse(s):
+            s_coo_matrix = s.sparse.to_coo()[0]
+            if s_coo_matrix.shape[1] > 1000:
+                warnings.warn(
+                    "Be careful. You are trying to compute PCA from a Sparse Pandas Series with a very large vocabulary."
+                    " Principal Component Analysis normalize the data and this act requires to expand the input Sparse Matrix."
+                    " This operation might take long. Consider using `svd_truncated` instead as it can deals with Sparse Matrix efficiently."
+                )
+        else:
+            # Treat it as a Sparse matrix anyway for efficiency.
+            s = s.astype("Sparse")
+            s_coo_matrix = s.sparse.to_coo()[0]
+
+        s_for_vectorization = s_coo_matrix.todense()  # PCA cannot handle sparse input.
+
+    # Else: no Document Representation Series -> like before
+    else:
+        s_for_vectorization = list(s)
+
+    s_out = pd.Series(
+        pca.fit_transform(s_for_vectorization).tolist(), index=s.index.unique(level=0),
+    )
+    s_out = s_out.rename_axis(None)
+
+    return s_out
 
 
 def nmf(s, n_components=2, random_state=None) -> pd.Series:
@@ -488,6 +520,8 @@ def nmf(s, n_components=2, random_state=None) -> pd.Series:
     and calculate a vector for each document that places it
     correctly among the topics.
 
+    The input can either be a Document Representation Series or a flat Series.
+    TODO add tutorial link
 
     Parameters
     ----------
@@ -525,9 +559,33 @@ def nmf(s, n_components=2, random_state=None) -> pd.Series:
     --------
     `NMF on Wikipedia <https://en.wikipedia.org/wiki/Non-negative_matrix_factorization>`_
 
+    The input can either be a Document Representation Series or a flat Series.
+    TODO add tutorial link
     """
-    nmf = NMF(n_components=n_components, init="random", random_state=random_state,)
-    return pd.Series(nmf.fit_transform(list(s)).tolist(), index=s.index)
+    nmf = NMF(n_components=n_components, init=None, random_state=random_state)
+
+    if _check_is_valid_representation(s):
+
+        if pd.api.types.is_sparse(s):
+            s_coo_matrix = s.sparse.to_coo()[0]
+        else:
+            # Treat it as a Sparse matrix anyway for efficiency.
+            s = s.astype("Sparse")
+            s_coo_matrix = s.sparse.to_coo()[0]
+
+        s_for_vectorization = s_coo_matrix  # NMF can work with sparse input.
+
+    # Else: no Document Representation Series -> like before
+    else:
+        s_for_vectorization = list(s)
+
+    s_out = pd.Series(
+        nmf.fit_transform(s_for_vectorization).tolist(), index=s.index.unique(level=0),
+    )
+
+    s_out = s_out.rename_axis(None)
+
+    return s_out
 
 
 def tsne(
@@ -554,6 +612,8 @@ def tsne(
     vector in such a way that the differences / similarities between
     documents are preserved.
 
+    The input can either be a Document Representation Series or a flat Series.
+    TODO add tutorial link
 
     Parameters
     ----------
@@ -610,6 +670,8 @@ def tsne(
     --------
     `t-SNE on Wikipedia <https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding>`_
 
+    Document Representation Series: TODO add tutorial link
+
     """
     tsne = TSNE(
         n_components=n_components,
@@ -619,7 +681,29 @@ def tsne(
         random_state=random_state,
         n_jobs=n_jobs,
     )
-    return pd.Series(tsne.fit_transform(list(s)).tolist(), index=s.index)
+
+    if _check_is_valid_representation(s):
+
+        if pd.api.types.is_sparse(s):
+            s_coo_matrix = s.sparse.to_coo()[0]
+        else:
+            # Treat it as a Sparse matrix anyway for efficiency.
+            s = s.astype("Sparse")
+            s_coo_matrix = s.sparse.to_coo()[0]
+
+        s_for_vectorization = s_coo_matrix  # TSNE can work with sparse input.
+
+    # Else: no Document Representation Series -> like before
+    else:
+        s_for_vectorization = list(s)
+
+    s_out = pd.Series(
+        tsne.fit_transform(s_for_vectorization).tolist(), index=s.index.unique(level=0)
+    )
+
+    s_out = s_out.rename_axis(None)
+
+    return s_out
 
 
 """

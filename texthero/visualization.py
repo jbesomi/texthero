@@ -62,7 +62,7 @@ def scatterplot(
     >>> import pandas as pd
     >>> df = pd.DataFrame(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, fun, guitar"], columns=["texts"])
     >>> df["texts"] = hero.clean(df["texts"]).pipe(hero.tokenize)
-    >>> df["pca"] = hero.tfidf(df["texts"]).pipe(hero.flatten).pipe(hero.pca, n_components=3) # TODO: when others get Representation Support: remove flatten
+    >>> df["pca"] = hero.tfidf(df["texts"]).pipe(hero.pca, n_components=3)
     >>> df["topics"] = hero.tfidf(df["texts"]).pipe(hero.flatten).pipe(hero.kmeans, n_clusters=2) # TODO: when others get Representation Support: remove flatten
     >>> hero.scatterplot(df, col="pca", color="topics", hover_data=["texts"]) # doctest: +SKIP
     """

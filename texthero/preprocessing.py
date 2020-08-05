@@ -14,7 +14,7 @@ import unidecode
 from nltk.stem import PorterStemmer, SnowballStemmer
 
 from texthero import stopwords as _stopwords
-from texthero._helper import TokenSeries, TextSeries, InputSeries, VectorSeries
+from texthero._helper import TokenSeries, TextSeries, InputSeries
 
 from typing import List, Callable, Union
 

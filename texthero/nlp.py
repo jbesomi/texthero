@@ -13,12 +13,11 @@ def named_entities(s: pd.Series, package="spacy") -> pd.Series:
     Return a Pandas Series where each row contains a list of tuples
     with information about the named entities in the row's document.
 
-    Tuple: (`entity'name`, `entity'label`, `starting character`, `ending
-    character`)
+    Tuple: (`entity'name`, `entity'label`, `starting character`,
+            `ending character`)
 
-    Under the hood, `named_entities` makes use of
-    `Spacy name entity recognition
-    <https://spacy.io/usage/linguistic-features#named-entities>`_
+    Under the hood, `named_entities` makes use of `Spacy name entity
+    recognition <https://spacy.io/usage/linguistic-features#named-entities>`_
 
     List of labels:
      - `PERSON`: People, including fictional.
@@ -109,8 +108,8 @@ def count_sentences(s: pd.Series) -> pd.Series:
 
     Return a new Pandas Series with the number of sentences per cell.
 
-    This makes use of the SpaCy
-    `sentencizer <https://spacy.io/api/sentencizer>`_
+    This makes use of the SpaCy `sentencizer
+    <https://spacy.io/api/sentencizer>`_
 
     Examples
     --------
@@ -143,8 +142,8 @@ def pos_tag(s: pd.Series) -> pd.Series:
     Return new Pandas Series where each rows contains a list of tuples
     containing information about part-of-speech tagging.
 
-    Tuple (`token name`,`Coarse-grained POS`,`Fine-grained POS`, `starting
-    character`, `ending character`)
+    Tuple: (`token name`,`Coarse-grained POS`,`Fine-grained POS`,
+            `starting character`, `ending character`)
 
     A difference between the coarse-grained POS and the Fine-grained POS is
     that the last one is more specific about marking, for example if the
@@ -158,7 +157,7 @@ def pos_tag(s: pd.Series) -> pd.Series:
     You can see more details about Fine-grained POS at:
     <https://spacy.io/api/annotation#pos-en>
 
-    This makes use of the SpaCy `processing pipeline.
+    This makes use of the SpaCy `processing pipeline
     <https://spacy.io/usage/processing-pipelines#pipelines>`.
 
     List of POS/Tag:

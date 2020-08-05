@@ -10,6 +10,7 @@ from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA, NMF
 from sklearn.cluster import KMeans, DBSCAN, MeanShift
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.preprocessing import normalize as sklearn_normalize
 from scipy.sparse import coo_matrix
 
 from typing import Optional, Union, Any
@@ -894,3 +895,74 @@ Topic modelling
 """
 
 # TODO.
+
+"""
+Normalization.
+"""
+
+
+def normalize(s: pd.Series, norm="l2") -> pd.Series:
+    """
+    Normalize every cell in a Pandas Series.
+
+    Input has to be a Representation Series.
+
+    Parameters
+    ----------
+    s: Pandas Series
+
+    norm: str, default to "l2"
+        One of "l1", "l2", or "max". The norm that is used.
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> idx = pd.MultiIndex.from_tuples(
+    ...             [(0, "a"), (0, "b"), (1, "c"), (1, "d")], names=("document", "word")
+    ...         )
+    >>> s = pd.Series([1, 2, 3, 4], index=idx)
+    >>> hero.normalize(s, norm="max")
+    document  word
+    0         a       0.50
+              b       1.00
+    1         c       0.75
+              d       1.00
+    dtype: Sparse[float64, nan]
+
+
+    See Also
+    --------
+    Representation Series link TODO add link to tutorial
+
+    `Norm on Wikipedia <https://en.wikipedia.org/wiki/Norm_(mathematics)>`_
+
+    """
+
+    is_valid_representation = (
+        isinstance(s.index, pd.MultiIndex) and s.index.nlevels == 2
+    )
+
+    if not is_valid_representation:
+        raise TypeError(
+            "The input Pandas Series should be a Representation Pandas Series and should have a MultiIndex. The given Pandas Series does not appears to have MultiIndex"
+        )
+    # TODO after merging representation: use _check_is_valid_representation instead
+
+    if pd.api.types.is_sparse(s):
+        s_coo_matrix = s.sparse.to_coo()[0]
+    else:
+        s = s.astype("Sparse")
+        s_coo_matrix = s.sparse.to_coo()[0]
+
+    s_for_vectorization = s_coo_matrix
+
+    result = sklearn_normalize(
+        s_for_vectorization, norm=norm
+    )  # Can handle sparse input.
+
+    result_coo = coo_matrix(result)
+    s_result = pd.Series.sparse.from_coo(result_coo)
+    s_result.index = s.index
+
+    return s_result

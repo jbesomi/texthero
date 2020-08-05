@@ -363,11 +363,11 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.Series:
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Hi Bye", "Test Bye Bye"]).pipe(hero.tokenize)
-    >>> hero.tfidf(s) # doctest: +SKIP
-    0         Bye     1.000000
-              Hi      1.405465
-    1         Bye     2.000000
-              Test    1.405465
+    >>> hero.tfidf(s)
+    0  Bye     1.000000
+       Hi      1.405465
+    1  Bye     2.000000
+       Test    1.405465
     dtype: Sparse[float64, nan]
 
     See Also

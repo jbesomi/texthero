@@ -41,10 +41,10 @@ HASHTAGS = r"#[a-zA-Z0-9_]+"
 
 def _get_pattern_for_tokenisation(punct: str) -> str:
     """
-    Return the standart tokenisation pattern
+    Return a tokenisation pattern, on basis of the regex '\w' definition
 
     The standart tokenisation will seperate all "regex words" '\w' from each other and also 
-    puts the punctuation in its own tokens
+    puts the punctuation in its own tokens. It will fit most needs for tokenisation
 
     Parameters
     ----------

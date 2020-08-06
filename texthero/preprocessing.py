@@ -519,7 +519,7 @@ def _optimised_default_clean_single_cell(text: str) -> str:
 
     # remove digits and punctuation
     pattern_mixed_remove = DIGITS_BLOCK + "|" + PUNCTUATION
-    text = text.lower().replace(pattern_mixed_remove,"")
+    text = re.sub(pattern_mixed_remove,"", text.lower())
 
     # remove diacritics
     text = _remove_diacritics(text)
@@ -528,7 +528,7 @@ def _optimised_default_clean_single_cell(text: str) -> str:
     text = _replace_stopwords(text, _stopwords.DEFAULT, "")
 
     # remove whitespace
-    text = ' '.join(text.replace("\xa0", " ").split())
+    text = ' '.join(re.sub("\xa0", " ", text).split())
 
     return text
 

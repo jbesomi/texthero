@@ -19,6 +19,26 @@ def load_tests(loader, tests, ignore):
 
 class TestVisualization(PandasTestCase):
     """
+    Test scatterplot.
+    """
+
+    def test_scatterplot_dimension_too_high(self):
+        s = pd.Series([[1, 2, 3, 4], [1, 2, 3, 4]])
+        df = pd.DataFrame(s)
+        self.assertRaises(ValueError, visualization.scatterplot, df, col=0)
+
+    def test_scatterplot_dimension_too_low(self):
+        s = pd.Series([[1], [1]])
+        df = pd.DataFrame(s)
+        self.assertRaises(ValueError, visualization.scatterplot, df, col=0)
+
+    def test_scatterplot_return_figure(self):
+        s = pd.Series([[1, 2, 3], [1, 2, 3]])
+        df = pd.DataFrame(s)
+        ret = visualization.scatterplot(df, col=0, return_figure=True)
+        self.assertIsNotNone(ret)
+
+    """
     Test top_words.
     """
 

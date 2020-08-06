@@ -478,61 +478,6 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
         s = s.pipe(f)
     return s
 
-
-def _optimised_default_clean(s: pd.Series) -> pd.Series:
-    """
-    Applies the default clean pipeline in an optimised way to a series,
-    that is about 30% faster.
-
-    Default pipeline:
-     1. :meth:`texthero.preprocessing.fillna`
-     2. :meth:`texthero.preprocessing.lowercase`
-     3. :meth:`texthero.preprocessing.remove_digits`
-     4. :meth:`texthero.preprocessing.remove_punctuation`
-     5. :meth:`texthero.preprocessing.remove_diacritics`
-     6. :meth:`texthero.preprocessing.remove_stopwords`
-     7. :meth:`texthero.preprocessing.remove_whitespace`
-    """
-    return s.apply(_optimised_default_clean_single_cell)
-
-
-def _optimised_default_clean_single_cell(text: str) -> str:
-    """
-    Applies the default clean pipeline to one cell.
-
-    Default pipeline:
-     1. :meth:`texthero.preprocessing.fillna`
-     2. :meth:`texthero.preprocessing.lowercase`
-     3. :meth:`texthero.preprocessing.remove_digits`
-     4. :meth:`texthero.preprocessing.remove_punctuation`
-     5. :meth:`texthero.preprocessing.remove_diacritics`
-     6. :meth:`texthero.preprocessing.remove_stopwords`
-     7. :meth:`texthero.preprocessing.remove_whitespace`
-    """
-
-    # fillna
-    if pd.isna(text):
-        return ""
-
-    # lowercase
-    text = text.lower()
-
-    # remove digits and punctuation
-    pattern_mixed_remove = DIGITS_BLOCK + "|" + PUNCTUATION
-    text = re.sub(pattern_mixed_remove, "", text)
-
-    # remove diacritics
-    text = _remove_diacritics(text)
-
-    # remove stopwords
-    text = _replace_stopwords(text, _stopwords.DEFAULT, "")
-
-    # remove whitespace
-    text = " ".join(re.sub("\xa0", " ", text).split())
-
-    return text
-
-
 def has_content(s: pd.Series) -> pd.Series:
     r"""
     Return a Boolean Pandas Series indicating if the rows have content.

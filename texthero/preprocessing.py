@@ -433,14 +433,33 @@ def stem(s: pd.Series, stem="snowball", language="english") -> pd.Series:
     return s.str.split().apply(_stem)
 
 
+def get_default_pipeline() -> List[Callable[[pd.Series], pd.Series]]:
+    """
+    Return a list contaning all the methods used in the default cleaning pipeline.
+
+    Return a list with the following functions:
+     1. :meth:`texthero.preprocessing.fillna`
+     2. :meth:`texthero.preprocessing.lowercase`
+     3. :meth:`texthero.preprocessing.remove_digits`
+     4. :meth:`texthero.preprocessing.remove_punctuation`
+     5. :meth:`texthero.preprocessing.remove_diacritics`
+     6. :meth:`texthero.preprocessing.remove_stopwords`
+     7. :meth:`texthero.preprocessing.remove_whitespace`
+    """
+    return [
+        fillna,
+        lowercase,
+        remove_digits,
+        remove_punctuation,
+        remove_diacritics,
+        remove_stopwords,
+        remove_whitespace,
+    ]
+
+
 def clean(s: pd.Series, pipeline=None) -> pd.Series:
     """
-    Pre-process a text-based Pandas Series.
-    
-    There are two options to use this function. You can either use this function, buy not specifiying an pipeline.
-    In this case the clean function will use a default pipeline, which was hardcoded, to gain 30% performance improvements,
-    over the "pipe" method.
-    If you specify your own cleaning pipeline, the clean function will use this one instead.
+    Pre-process a text-based Pandas Series, by using the following default pipline.
 
      Default pipeline:
      1. :meth:`texthero.preprocessing.fillna`
@@ -450,7 +469,6 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
      5. :meth:`texthero.preprocessing.remove_diacritics`
      6. :meth:`texthero.preprocessing.remove_stopwords`
      7. :meth:`texthero.preprocessing.remove_whitespace`
-
 
     Parameters
     ----------
@@ -472,7 +490,7 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
     """
 
     if not pipeline:
-        return _optimised_default_clean(s)
+        pipeline = get_default_pipeline()
 
     for f in pipeline:
         s = s.pipe(f)

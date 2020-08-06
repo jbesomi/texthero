@@ -154,64 +154,6 @@ class TestPreprocessing(PandasTestCase):
             preprocessing.clean(s_true, self._get_default_clean_pipeline()),
         )
 
-    def test_clean_fillna(self):
-        s = pd.Series(np.NaN)
-        s_true = pd.Series(np.NaN)
-        self.assertEqual(
-            preprocessing.clean(s),
-            preprocessing.clean(s_true, self._get_default_clean_pipeline()),
-        )
-
-    def test_clean_lowercase(self):
-        s = pd.Series("this text Is MiXed CasE")
-        s_true = pd.Series("this text Is MiXed CasE")
-        self.assertEqual(
-            preprocessing.clean(s),
-            preprocessing.clean(s_true, self._get_default_clean_pipeline()),
-        )
-
-    def test_clean_digits(self):
-        s = pd.Series("Here are 42 digits blocks 89")
-        s_true = pd.Series("Here are 42 digits blocks 89")
-        self.assertEqual(
-            preprocessing.clean(s),
-            preprocessing.clean(s_true, self._get_default_clean_pipeline()),
-        )
-
-    def test_clean_punctuation(self):
-        s = pd.Series("Some. wired, punctiation;.:!!!!")
-        s_true = pd.Series("Some. wired, punctiation;.:!!!")
-        self.assertEqual(
-            preprocessing.clean(s),
-            preprocessing.clean(s_true, self._get_default_clean_pipeline()),
-        )
-
-    def test_clean_diacritics(self):
-        s = pd.Series("Montréal, über, 12.89, Mère, Françoise, noël, 889, اِس, اُس")
-        s_true = pd.Series(
-            "Montréal, über, 12.89, Mère, Françoise, noël, 889, اِس, اُس"
-        )
-        self.assertEqual(
-            preprocessing.clean(s),
-            preprocessing.clean(s_true, self._get_default_clean_pipeline()),
-        )
-
-    def test_clean_stopwords(self):
-        s = pd.Series("some stopwords are here\nAnd on")
-        s_true = pd.Series("some stopwords are here\nAnd on")
-        self.assertEqual(
-            preprocessing.clean(s),
-            preprocessing.clean(s_true, self._get_default_clean_pipeline()),
-        )
-
-    def test_clean_whitespaces(self):
-        s = pd.Series("hello   world  hello        world \n there ")
-        s_true = pd.Series("hello   world  hello        world \n there ")
-        self.assertEqual(
-            preprocessing.clean(s),
-            preprocessing.clean(s_true, self._get_default_clean_pipeline()),
-        )
-
     """
     Test stopwords.
     """

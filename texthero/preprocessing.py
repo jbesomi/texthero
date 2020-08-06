@@ -496,6 +496,7 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
         s = s.pipe(f)
     return s
 
+
 def has_content(s: pd.Series) -> pd.Series:
     r"""
     Return a Boolean Pandas Series indicating if the rows have content.

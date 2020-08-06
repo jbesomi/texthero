@@ -53,6 +53,7 @@ The classes are lightweight subclasses of pd.Series and serve 2 purposes:
 """
 
 import functools
+import pandas as pd
 
 
 """
@@ -213,7 +214,7 @@ def InputSeries(allowed_hero_series_type):
 
     Examples
     --------
-    >>> from texthero.types import *
+    >>> from texthero._types import *
     >>> import pandas as pd
     >>> @InputSeries(TokenSeries)
     ... def f(s):

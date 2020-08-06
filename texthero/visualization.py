@@ -9,7 +9,7 @@ import plotly.express as px
 from wordcloud import WordCloud
 
 from texthero import preprocessing
-from texthero._helper import TextSeries, InputSeries
+from texthero._types import TextSeries, InputSeries
 import string
 
 from matplotlib.colors import LinearSegmentedColormap as lsg
@@ -147,7 +147,7 @@ def wordcloud(
 
     Parameters
     ----------
-    s : :class:`texthero._helper.TextSeries`
+    s : :class:`texthero._types.TextSeries`
 
     font_path : str
         Font path to the font that will be used (OTF or TTF). Defaults to

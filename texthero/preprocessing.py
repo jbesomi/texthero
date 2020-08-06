@@ -14,7 +14,7 @@ import unidecode
 from nltk.stem import PorterStemmer, SnowballStemmer
 
 from texthero import stopwords as _stopwords
-from texthero._helper import TokenSeries, TextSeries, InputSeries
+from texthero._types import TokenSeries, TextSeries, InputSeries
 
 from typing import List, Callable, Union
 
@@ -24,6 +24,7 @@ import warnings
 warnings.filterwarnings(action="ignore", category=UserWarning, module="gensim")
 
 
+@InputSeries(TextSeries)
 def fillna(s: TextSeries) -> TextSeries:
     """
     Replaces not assigned values with empty spaces.
@@ -33,11 +34,12 @@ def fillna(s: TextSeries) -> TextSeries:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series([np.NaN, "I'm", "You're"])
+    >>> s = pd.Series(["I'm", np.NaN, pd.NA, "You're"])
     >>> hero.fillna(s)
-    0          
-    1       I'm
-    2    You're
+    0       I'm
+    1          
+    2          
+    3    You're
     dtype: object
     """
     return s.fillna("").astype("str")
@@ -72,7 +74,7 @@ def replace_digits(s: TextSeries, symbols: str = " ", only_blocks=True) -> TextS
 
     Parameters
     ----------
-    s : :class:`texthero._helper.TextSeries`
+    s : :class:`texthero._types.TextSeries`
 
     symbols : str (default single empty space " ")
         Symbols to replace
@@ -113,7 +115,7 @@ def remove_digits(s: TextSeries, only_blocks=True) -> TextSeries:
 
     Parameters
     ----------
-    s : :class:`texthero._helper.TextSeries`
+    s : :class:`texthero._types.TextSeries`
 
     only_blocks : bool
         Remove only blocks of digits.
@@ -147,7 +149,7 @@ def replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
 
     Parameters
     ----------
-    s : :class:`texthero._helper.TextSeries`
+    s : :class:`texthero._types.TextSeries`
 
     symbol : str (default single empty space)
         Symbol to use as replacement for all string punctuation. 
@@ -294,7 +296,7 @@ def replace_stopwords(
 
     Parameters
     ----------
-    s : :class:`texthero._helper.TextSeries`
+    s : :class:`texthero._types.TextSeries`
 
     symbol: str
         Character(s) to replace words with.
@@ -329,7 +331,7 @@ def remove_stopwords(
 
     Parameters
     ----------
-    s : :class:`texthero._helper.TextSeries`
+    s : :class:`texthero._types.TextSeries`
 
     stopwords : Set[str], Optional
         Set of stopwords string to remove. If not passed, by default it used NLTK English stopwords.
@@ -376,7 +378,7 @@ def stem(s: TextSeries, stem="snowball", language="english") -> TextSeries:
 
     Parameters
     ----------
-    s : :class:`texthero._helper.TextSeries`
+    s : :class:`texthero._types.TextSeries`
 
     stem : str (snowball by default)
         Stemming algorithm. It can be either 'snowball' or 'porter'
@@ -451,7 +453,7 @@ def clean(s: TextSeries, pipeline=None) -> TextSeries:
 
     Parameters
     ----------
-    s : :class:`texthero._helper.TextSeries`
+    s : :class:`texthero._types.TextSeries`
 
     pipeline :List[Callable[[Pandas Series], Pandas Series]]
        inserting specific pipeline to clean a text
@@ -731,7 +733,7 @@ def phrases(
 
     Parameters
     ----------
-    s : :class:`texthero._helper.TokenSeries`
+    s : :class:`texthero._types.TokenSeries`
     
     min_count : Int, optional. Default is 5.
         ignore tokens with frequency less than this
@@ -779,7 +781,7 @@ def replace_urls(s: TextSeries, symbol: str) -> TextSeries:
 
     Parameters
     ----------
-    s : :class:`texthero._helper.TextSeries`
+    s : :class:`texthero._types.TextSeries`
 
     symbol: String
         The symbol to which the URL should be changed to.
@@ -836,7 +838,7 @@ def replace_tags(s: TextSeries, symbol: str) -> TextSeries:
 
     Parameters
     ----------
-    s : :class:`texthero._helper.TextSeries`
+    s : :class:`texthero._types.TextSeries`
 
     symbols : str
         Symbols to replace
@@ -887,7 +889,7 @@ def replace_hashtags(s: TextSeries, symbol: str) -> TextSeries:
 
     Parameters
     ----------
-    s : :class:`texthero._helper.TextSeries`
+    s : :class:`texthero._types.TextSeries`
 
     symbols : str
         Symbols to replace

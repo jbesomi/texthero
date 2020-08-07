@@ -207,17 +207,6 @@ class AbstractRepresentationTest(PandasTestCase):
         pd.testing.assert_series_equal(s_true, result_s, check_less_precise=True)
 
     @parameterized.expand(test_cases_dim_reduction)
-    def test_dim_reduction_flat_with_index(
-        self, name, test_function, correct_output_values
-    ):
-        s_true = pd.Series(correct_output_values, index=s_flat_vectors_index)
-
-        result_s = test_function(s_flat_vectors, random_state=42)
-
-        # check_less_precise True to prevent rounding errors from giving a Failure.
-        pd.testing.assert_series_equal(s_true, result_s, check_less_precise=True)
-
-    @parameterized.expand(test_cases_dim_reduction)
     def test_dim_reduction_arguments_to_sklearn(self, name, test_function, *args):
         try:
             test_function(s_representation_vectors, n_components=2, random_state=42)

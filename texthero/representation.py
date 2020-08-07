@@ -430,10 +430,16 @@ def pca(s, n_components=2, random_state=None) -> pd.Series:
     are easily visible. The corpus can now be visualized in 3D and we can
     get a good first view of the data!
 
+    Be careful: PCA can *not* handle sparse input, so even when calling PCA with
+    a very sparse Representation Series, internally texthero will compute
+    the whole dense representation, so if you're working with big datasets,
+    you should probably use :meth:`texthero.representation.nmf` or
+    :meth:`texthero.representation.tsne` as they can handle sparse input.
+
     In general, *pca* should be called after the text has already been represented to a matrix form.
 
-    The input can either be a Document Representation Series or a flat Series.
-    TODO add tutorial link
+    The input has to be a Representation Series.
+    TODO add typing module link
 
     Parameters
     ----------
@@ -469,7 +475,7 @@ def pca(s, n_components=2, random_state=None) -> pd.Series:
     --------
     `PCA on Wikipedia <https://en.wikipedia.org/wiki/Principal_component_analysis>`_
 
-    Document Representation Series: TODO add tutorial link
+    Representation Series: TODO add tutorial link and typing module link
 
     """
     pca = PCA(n_components=n_components, random_state=random_state, copy=False)
@@ -491,9 +497,11 @@ def pca(s, n_components=2, random_state=None) -> pd.Series:
 
         s_for_vectorization = s_coo_matrix.todense()  # PCA cannot handle sparse input.
 
-    # Else: no Document Representation Series -> like before
+    # Else: no Representation Series -> fail
     else:
-        s_for_vectorization = list(s)
+        raise ValueError(
+            f"The input Pandas Series should be a Representation Pandas Series and should have a MultiIndex, where the first level represent the document and the second one the words/token. The given Pandas Series has {s.index.nlevels} number of levels instead of 2."
+        )
 
     s_out = pd.Series(
         pca.fit_transform(s_for_vectorization).tolist(), index=s.index.unique(level=0),
@@ -520,7 +528,7 @@ def nmf(s, n_components=2, random_state=None) -> pd.Series:
     and calculate a vector for each document that places it
     correctly among the topics.
 
-    The input can either be a Document Representation Series or a flat Series.
+    The input has to be a Representation Series.
     TODO add tutorial link
 
     Parameters
@@ -559,9 +567,9 @@ def nmf(s, n_components=2, random_state=None) -> pd.Series:
     --------
     `NMF on Wikipedia <https://en.wikipedia.org/wiki/Non-negative_matrix_factorization>`_
 
-    The input can either be a Document Representation Series or a flat Series.
-    TODO add tutorial link
+    Representation Series: TODO add tutorial link and typing module link
     """
+
     nmf = NMF(n_components=n_components, init=None, random_state=random_state)
 
     if _check_is_valid_representation(s):
@@ -575,9 +583,11 @@ def nmf(s, n_components=2, random_state=None) -> pd.Series:
 
         s_for_vectorization = s_coo_matrix  # NMF can work with sparse input.
 
-    # Else: no Document Representation Series -> like before
+    # Else: no Representation Series -> fail
     else:
-        s_for_vectorization = list(s)
+        raise ValueError(
+            f"The input Pandas Series should be a Representation Pandas Series and should have a MultiIndex, where the first level represent the document and the second one the words/token. The given Pandas Series has {s.index.nlevels} number of levels instead of 2."
+        )
 
     s_out = pd.Series(
         nmf.fit_transform(s_for_vectorization).tolist(), index=s.index.unique(level=0),
@@ -612,8 +622,8 @@ def tsne(
     vector in such a way that the differences / similarities between
     documents are preserved.
 
-    The input can either be a Document Representation Series or a flat Series.
-    TODO add tutorial link
+    The input has to be a Representation Series.
+    TODO add typing module link
 
     Parameters
     ----------
@@ -670,7 +680,7 @@ def tsne(
     --------
     `t-SNE on Wikipedia <https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding>`_
 
-    Document Representation Series: TODO add tutorial link
+    Representation Series: TODO add tutorial link and typing module link
 
     """
     tsne = TSNE(
@@ -693,9 +703,11 @@ def tsne(
 
         s_for_vectorization = s_coo_matrix  # TSNE can work with sparse input.
 
-    # Else: no Document Representation Series -> like before
+    # Else: no Representation Series -> fail
     else:
-        s_for_vectorization = list(s)
+        raise ValueError(
+            f"The input Pandas Series should be a Representation Pandas Series and should have a MultiIndex, where the first level represent the document and the second one the words/token. The given Pandas Series has {s.index.nlevels} number of levels instead of 2."
+        )
 
     s_out = pd.Series(
         tsne.fit_transform(s_for_vectorization).tolist(), index=s.index.unique(level=0)

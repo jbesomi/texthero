@@ -12,6 +12,11 @@ s_text = pd.Series(["Test"], index=[5])
 s_tokenized_lists = pd.Series([["Test", "Test2"], ["Test3"]], index=[5, 6])
 s_numeric = pd.Series([5.0], index=[5])
 s_numeric_lists = pd.Series([[5.0, 5.0], [6.0, 6.0]], index=[5, 6])
+s_representation_vectors = pd.Series(
+    [1.0, 0.0, 0.0, 1.0],
+    index=pd.MultiIndex.from_tuples([(5, "A"), (5, "B"), (7, "A"), (7, "C")]),
+)
+
 
 # Define all test cases. Every test case is a list
 # of [name of test case, function to test, tuple of valid input for the function].
@@ -71,9 +76,9 @@ test_cases_representation = [
         lambda x: representation.flatten(representation.tfidf(x)),
         (s_tokenized_lists,),
     ],
-    ["pca", representation.pca, (s_numeric_lists, 0)],
-    ["nmf", representation.nmf, (s_numeric_lists,)],
-    ["tsne", representation.tsne, (s_numeric_lists,)],
+    ["pca", representation.pca, (s_representation_vectors,),],
+    ["nmf", representation.nmf, (s_representation_vectors,),],
+    ["tsne", representation.tsne, (s_representation_vectors,),],
     ["kmeans", representation.kmeans, (s_numeric_lists, 1)],
     ["dbscan", representation.dbscan, (s_numeric_lists,)],
     ["meanshift", representation.meanshift, (s_numeric_lists,)],
@@ -107,7 +112,10 @@ class AbstractIndexTest(PandasTestCase):
         s = valid_input[0]
         result_s = test_function(*valid_input)
         t_same_index = pd.Series(s.values, s.index)
-        self.assertTrue(result_s.index.equals(t_same_index.index))
+        if isinstance(s.index, pd.MultiIndex):  # if Representation Series
+            self.assertTrue(result_s.index.equals(t_same_index.index.levels[0]))
+        else:
+            self.assertTrue(result_s.index.equals(t_same_index.index))
 
     @parameterized.expand(test_cases)
     def test_incorrect_index(self, name, test_function, valid_input):

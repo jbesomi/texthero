@@ -1,20 +1,22 @@
 """
-Common NLP tasks such as named_entities, noun_chunks, etc.
+The texthero.nlp module supports common NLP tasks such as named_entities, noun_chunks, ... on Pandas Series and DataFrame.
 """
 
 import spacy
 import pandas as pd
 
 
-def named_entities(s, package="spacy"):
+def named_entities(s: pd.Series, package="spacy") -> pd.Series:
     """
     Return named-entities.
 
-    Return a Pandas Series where each rows contains a list of tuples containing information regarding the given named entities.
+    Return a Pandas Series where each row contains a list of tuples
+    with information about the named entities in the row's document.
 
     Tuple: (`entity'name`, `entity'label`, `starting character`, `ending character`)
 
-    Under the hood, `named_entities` make use of Spacy name entity recognition.
+    Under the hood, `named_entities` makes use of 
+    `Spacy name entity recognition <https://spacy.io/usage/linguistic-features#named-entities>`_
 
     List of labels:
      - `PERSON`: People, including fictional.
@@ -57,12 +59,13 @@ def named_entities(s, package="spacy"):
     return pd.Series(entities, index=s.index)
 
 
-def noun_chunks(s):
+def noun_chunks(s: pd.Series) -> pd.Series:
     """
     Return noun chunks (noun phrases).
 
-    Return a Pandas Series where each row contains a tuple that has information regarding the noun chunk.
-    
+    Return a Pandas Series where each row contains a tuple that has information
+    regarding the noun chunk.
+
     Tuple: (`chunk'text`, `chunk'label`, `starting index`, `ending index`)
 
     Noun chunks or noun phrases are phrases that have noun at their head or nucleus 
@@ -71,10 +74,6 @@ def noun_chunks(s):
     Internally `noun_chunks` makes use of Spacy's dependency parsing:
     https://spacy.io/usage/linguistic-features#dependency-parse
 
-    Parameters
-    ----------
-    input : Pandas Series
-    
     Examples
     --------
     >>> import texthero as hero
@@ -107,7 +106,7 @@ def count_sentences(s: pd.Series) -> pd.Series:
 
     Return a new Pandas Series with the number of sentences per cell.
 
-    This makes use of the SpaCy `sentencizer <https://spacy.io/api/sentencizer>`.
+    This makes use of the SpaCy `sentencizer <https://spacy.io/api/sentencizer>`_
 
     Examples
     --------
@@ -129,3 +128,68 @@ def count_sentences(s: pd.Series) -> pd.Series:
         number_of_sentences.append(sentences)
 
     return pd.Series(number_of_sentences, index=s.index)
+
+
+def pos_tag(s: pd.Series) -> pd.Series:
+    """
+    Return a Pandas Series with part-of-speech tagging
+
+    Return new Pandas Series where each rows contains a list of tuples containing information about part-of-speech tagging
+
+    Tuple (`token name`,`Coarse-grained POS`,`Fine-grained POS`, `starting character`, `ending character`)
+    
+    A difference between the coarse-grained POS and the Fine-grained POS is that the last one is more specific about marking,
+    for example if the coarse-grained POS has a NOUN value, then the refined POS will give more details about the type of 
+    the noun, whether it is singular, plural and/or proper.
+    You can use the spacy `explain` function to find out which fine-grained POS it is.
+    
+    You can see more details about Fine-grained POS at: <https://spacy.io/api/annotation#pos-en>
+
+    This makes use of the SpaCy `processing pipeline. <https://spacy.io/usage/processing-pipelines#pipelines>`.
+
+    List of POS/Tag:
+     - `ADJ`: Adjective. Examples: big, old, green.
+     - `ADP`: Adposition. Examples: in, to, during.
+     - `ADV`: Adverb. Examples: very, tomorrow, down.
+     - `AUX` : Auxiliary. Examples: is, has (done), will (do).
+     - `CONJ`: Conjunction. Examples: and, or, but.
+     - `CCONJ`: Coordinating Conjunction. Examples: and, or, but.
+     - `DET`: Determiner. Examples: a, an, the.
+     - `INTJ`: Interjection. Examples: psst, ouch, bravo.
+     - `NOUN`:  Noun. Examples: girl, cat, tree.
+     - `NUM`: Numeral. Examples: 1, 2007, one.
+     - `PART`: Particle. Examples: 's, not.
+     - `PRON`: Pronoun. Examples: I, you, he, she.
+     - `PROPN`: Proper Noun. Examples: Mary, John, London.
+     - `PUNCT`: Punctuation. Examples: ., (, ), ?
+     - `SCONJ`: Subordinating Conjunction. Examples: if, while, that.
+     - `SYM`: Symbol. Examples: $, %, §, ©.
+     - `VERB`: Verb. Examples: run, runs, running.
+     - `X`: Other.
+     - `SPACE`: Space.
+
+    Internally pos_tag makes use of Spacy's dependency tagging: <https://spacy.io/api/annotation#pos-tagging>`
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("Today is such a beautiful day")
+    >>> print(hero.pos_tag(s)[0])
+    [('Today', 'NOUN', 'NN', 0, 5), ('is', 'AUX', 'VBZ', 6, 8), ('such', 'DET', 'PDT', 9, 13), ('a', 'DET', 'DT', 14, 15), ('beautiful', 'ADJ', 'JJ', 16, 25), ('day', 'NOUN', 'NN', 26, 29)]
+    """
+
+    pos_tags = []
+
+    nlp = spacy.load("en_core_web_sm", disable=["parser", "ner"])
+    # nlp.pipe is now "tagger"
+
+    for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
+        pos_tags.append(
+            [
+                (token.text, token.pos_, token.tag_, token.idx, token.idx + len(token))
+                for token in doc
+            ]
+        )
+
+    return pd.Series(pos_tags, index=s.index)

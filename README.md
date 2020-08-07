@@ -254,6 +254,7 @@ Full documentation: [nlp](https://texthero.org/docs/api-nlp)
 **Scope:** map text data into vectors and do dimensionality reduction.
 
 Supported **representation** algorithms:
+1. counting terms (`count`)
 1. Term frequency (`term_frequency`)
 1. Term frequency-inverse document frequency (`tfidf`)
 
@@ -280,6 +281,18 @@ Supported functions:
    - Most common words (`top_words`)
 
 Full documentation: [visualization](https://texthero.org/docs/api-visualization)
+
+<h2 align="center">Series Typing</h2>
+
+What is series typing? Each category of functions, which are defined above, accepts a different type of pandas series. Those are explained here. Those types will in general improve the efficiency of the different algorithms as they are especially designed for those.
+
+For the first step you don't need to worry too much about them, because, if you use a typical texthero pipeline, the functions will have the right input and output types. The *typical* hero pipeline will:
+- first "clean" the text with any preprocessing function, e. g. `clean`,
+- then perform a NLP function to categorise the text, e. g. `tokenize` and `tfidf`
+- analyse or display the series with the representation function or the clustering functions, e. g. `kmeans`
+- do a dimensionality reduction to display them better in 2D or 3D, e. g.  `pca`
+
+If your pipeline will differ, you might want to check out the tutorial on series types to understand which type of series you will get returned and which types will be accepted by the functions.
 
 <h2 align="center">FAQ</h2>
 

@@ -10,6 +10,7 @@ from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA, NMF
 from sklearn.cluster import KMeans, DBSCAN, MeanShift
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.preprocessing import normalize as sklearn_normalize
 from scipy.sparse import coo_matrix
 
 from typing import Optional, Union, Any
@@ -26,10 +27,10 @@ Helper
 """
 
 
-def representation_series_to_flat_series(
+def flatten(
     s: Union[pd.Series, pd.Series.sparse],
     index: pd.Index = None,
-    fill_missing_with: Any = np.nan,
+    fill_missing_with: Any = 0.0,
 ) -> pd.Series:
     """
     Transform a Pandas Representation Series to a "normal" (flattened) Pandas Series.
@@ -47,7 +48,7 @@ def representation_series_to_flat_series(
     index : Pandas Index, optional, default to None
         The index the flattened Series should have.
 
-    fill_missing_with : Any, default to np.nan
+    fill_missing_with : Any, default to 0.0
         Value to fill the NaNs (missing values) with. This _does not_ mean
         that existing values that are np.nan are replaced, but rather that
         features that are not present in one document but present in others
@@ -67,7 +68,7 @@ def representation_series_to_flat_series(
               Word3    NaN
     doc1      Word2    4.0
     dtype: float64
-    >>> hero.representation_series_to_flat_series(s, fill_missing_with=0.0)
+    >>> hero.flatten(s, fill_missing_with=0.0)
     document
     doc0    [3.0, 0.0, nan]
     doc1    [0.0, 4.0, 0.0]
@@ -84,9 +85,32 @@ def representation_series_to_flat_series(
 
     s = pd.Series(s.values.tolist(), index=s.index)
 
-    s.rename_axis("document", inplace=True)
-
     return s
+
+
+def _check_is_valid_representation(s: pd.Series) -> bool:
+    """
+    Check if the given Pandas Series is a Document Representation Series.
+
+    Returns true if Series is Document Representation Series, else False.
+
+    """
+
+    # TODO: in Version 2 when only representation is accepted as input -> change "return False" to "raise ValueError"
+
+    if not isinstance(s.index, pd.MultiIndex):
+        return False
+        # raise ValueError(
+        #     f"The input Pandas Series should be a Representation Pandas Series and should have a MultiIndex. The given Pandas Series does not appears to have MultiIndex"
+        # )
+
+    if s.index.nlevels != 2:
+        return False
+        # raise ValueError(
+        #     f"The input Pandas Series should be a Representation Pandas Series and should have a MultiIndex, where the first level represent the document and the second one the words/token. The given Pandas Series has {s.index.nlevels} number of levels instead of 2."
+        # )
+
+    return True
 
 
 # Warning message for not-tokenized inputs
@@ -107,13 +131,22 @@ def count(
     max_features: Optional[int] = None,
     min_df=1,
     max_df=1.0,
-    return_feature_names=False,
+    binary=False,
 ) -> pd.Series:
     """
     Represent a text-based Pandas Series using count.
 
+    Return a Document Representation Series with the
+    number of occurences of a document's words for every
+    document.
+    TODO add tutorial link
+
     The input Series should already be tokenized. If not, it will
     be tokenized before count is calculated.
+
+    Use :meth:`hero.representation.flatten` on the output to get
+    a standard Pandas Series with the document vectors
+    in every cell.
 
     Parameters
     ----------
@@ -135,9 +168,8 @@ def count(
         If float, the parameter represents a proportion of documents, integer
         absolute counts.
 
-    return_features_names : Boolean, False by Default
-        If True, return a tuple (*count_series*, *features_names*)
-
+    binary : bool, default=False
+        If True, all non zero counts are set to 1.
 
     Examples
     --------
@@ -145,20 +177,15 @@ def count(
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
     >>> hero.count(s)
-    0    [1, 1, 0]
-    1    [1, 0, 1]
-    dtype: object
-    
-    To return the features_names:
-    
-    >>> import texthero as hero
-    >>> import pandas as pd
-    >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
-    >>> hero.count(s, return_feature_names=True)
-    (0    [1, 1, 0]
-    1    [1, 0, 1]
-    dtype: object, ['Sentence', 'one', 'two'])
+    0  Sentence    1
+       one         1
+    1  Sentence    1
+       two         1
+    dtype: Sparse[int64, 0]
 
+    See Also
+    --------
+    Document Representation Series: TODO add tutorial link
     """
     # TODO. Can be rewritten without sklearn.
 
@@ -173,28 +200,40 @@ def count(
         preprocessor=lambda x: x,
         min_df=min_df,
         max_df=max_df,
+        binary=binary,
     )
-    s = pd.Series(tf.fit_transform(s).toarray().tolist(), index=s.index)
 
-    if return_feature_names:
-        return (s, tf.get_feature_names())
-    else:
-        return s
+    tf_vectors_csr = tf.fit_transform(s)
+    tf_vectors_coo = coo_matrix(tf_vectors_csr)
+
+    s_out = pd.Series.sparse.from_coo(tf_vectors_coo)
+
+    features_names = tf.get_feature_names()
+
+    # Map word index to word name
+    s_out.index = s_out.index.map(lambda x: (s.index[x[0]], features_names[x[1]]))
+
+    return s_out
 
 
 def term_frequency(
-    s: pd.Series,
-    max_features: Optional[int] = None,
-    min_df=1,
-    max_df=1.0,
-    return_feature_names=False,
+    s: pd.Series, max_features: Optional[int] = None, min_df=1, max_df=1.0,
 ) -> pd.Series:
-
     """
     Represent a text-based Pandas Series using term frequency.
 
+    Return a Document Representation Series with the
+    term frequencies of the terms for every
+    document.
+    TODO add tutorial link
+
     The input Series should already be tokenized. If not, it will
     be tokenized before term_frequency is calculated.
+
+    Use :meth:`hero.representation.flatten` on the output to get
+    a standard Pandas Series with the document vectors
+    in every cell.
+
 
     Parameters
     ----------
@@ -216,30 +255,22 @@ def term_frequency(
         If float, the parameter represents a proportion of documents, integer
         absolute counts.
 
-    return_features_names : Boolean, False by Default
-        If True, return a tuple (*count_series*, *features_names*)
-
-
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
+    >>> s = pd.Series(["Sentence one hey", "Sentence two"]).pipe(hero.tokenize)
     >>> hero.term_frequency(s)
-    0    [0.25, 0.25, 0.0]
-    1    [0.25, 0.0, 0.25]
-    dtype: object
-    
-    To return the features_names:
-    
-    >>> import texthero as hero
-    >>> import pandas as pd
-    >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
-    >>> hero.term_frequency(s, return_feature_names=True)
-    (0    [0.25, 0.25, 0.0]
-    1    [0.25, 0.0, 0.25]
-    dtype: object, ['Sentence', 'one', 'two'])
+    0  Sentence    0.2
+       hey         0.2
+       one         0.2
+    1  Sentence    0.2
+       two         0.2
+    dtype: Sparse[float64, nan]
 
+    See Also
+    --------
+    Document Representation Series: TODO add tutorial link
     """
     # Check if input is tokenized. Else, print warning and tokenize.
     if not isinstance(s.iloc[0], list):
@@ -254,19 +285,23 @@ def term_frequency(
         max_df=max_df,
     )
 
-    cv_fit_transform = tf.fit_transform(s).toarray()
-    total_count = np.sum(cv_fit_transform)
-    s = pd.Series(np.divide(cv_fit_transform, total_count).tolist(), index=s.index)
+    tf_vectors_csr = tf.fit_transform(s)
+    tf_vectors_coo = coo_matrix(tf_vectors_csr)
 
-    if return_feature_names:
-        return (s, tf.get_feature_names())
-    else:
-        return s
+    total_count_coo = np.sum(tf_vectors_coo)
+    frequency_coo = np.divide(tf_vectors_coo, total_count_coo)
+
+    s_out = pd.Series.sparse.from_coo(frequency_coo)
+
+    features_names = tf.get_feature_names()
+
+    # Map word index to word name
+    s_out.index = s_out.index.map(lambda x: (s.index[x[0]], features_names[x[1]]))
+
+    return s_out
 
 
-def tfidf(
-    s: pd.Series, max_features=None, min_df=1, max_df=1.0, return_feature_names=False
-) -> pd.Series.sparse:
+def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.Series:
     """
     Represent a text-based Pandas Series using TF-IDF.
 
@@ -283,10 +318,15 @@ def tfidf(
 
     Finally, tf-idf(document d, term t) = tf(d, t) * idf(t).
 
-    Different from the `sklearn-implementation of tfidf <https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html>`,
+    Different from the `sklearn-implementation of 
+    tfidf <https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html>`,
     this function does *not* normalize the output in any way,
     so the result is exactly what you
     get applying the formula described above.
+
+    Return a Document Representation Series with the
+    tfidf of every word in the document.
+    TODO add tutorial link
 
     The input Series should already be tokenized. If not, it will
     be tokenized before tfidf is calculated.
@@ -294,12 +334,16 @@ def tfidf(
     If working with big pandas Series, you might want to limit
     the number of features through the max_features parameter.
 
+    Use :meth:`hero.representation.flatten` on the output to get
+    a standard Pandas Series with the document vectors
+    in every cell.
+
     Parameters
     ----------
     s : Pandas Series (tokenized)
 
     max_features : int, optional, default to None.
-        Maximum number of features to keep. Will keep all features if set to None.
+        If not None, only the max_features most frequent tokens are used.
 
     min_df : float in range [0.0, 1.0] or int, default=1
         When building the vocabulary ignore terms that have a document
@@ -315,25 +359,23 @@ def tfidf(
         If float, the parameter represents a proportion of documents, integer
         absolute counts.
 
-    return_features_names : Boolean, False by Default
-        If True, return a tuple (*count_series*, *features_names*)
-
-
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Hi Bye", "Test Bye Bye"]).pipe(hero.tokenize)
-    >>> hero.tfidf(s, return_feature_names=True)
-    (document
-    0    [1.0, 1.4054651081081644, 0.0]
-    1    [2.0, 0.0, 1.4054651081081644]
-    dtype: object, ['Bye', 'Hi', 'Test'])
+    >>> hero.tfidf(s)
+    0  Bye     1.000000
+       Hi      1.405465
+    1  Bye     2.000000
+       Test    1.405465
+    dtype: Sparse[float64, nan]
 
     See Also
     --------
     `TF-IDF on Wikipedia <https://en.wikipedia.org/wiki/Tf-idf>`_
 
+    Document Representation Series: TODO add tutorial link
     """
 
     # Check if input is tokenized. Else, print warning and tokenize.
@@ -362,18 +404,7 @@ def tfidf(
     feature_names = tfidf.get_feature_names()
     s_out.index = s_out.index.map(lambda x: (s.index[x[0]], feature_names[x[1]]))
 
-    s_out.rename_axis(["document", "word"], inplace=True)
-
-    # NOTE: Currently: still convert to flat series instead of representation series.
-    # Will change to return representation series directly in Version 2.
-    s_out = representation_series_to_flat_series(
-        s_out, fill_missing_with=0.0, index=s.index
-    )
-
-    if return_feature_names:
-        return s_out, feature_names
-    else:
-        return s_out
+    return s_out
 
 
 """
@@ -381,7 +412,7 @@ Dimensionality reduction
 """
 
 
-def pca(s, n_components=2) -> pd.Series:
+def pca(s, n_components=2, random_state=None) -> pd.Series:
     """
     Perform principal component analysis on the given Pandas Series.
 
@@ -409,7 +440,7 @@ def pca(s, n_components=2) -> pd.Series:
         Number of components to keep (dimensionality of output vectors).
         If n_components is not set or None, all components are kept.
 
-    random_state : int, RandomState instance, default=None
+    random_state : int, default=None
         Pass an int for reproducible results across multiple function calls.
 
 
@@ -435,14 +466,12 @@ def pca(s, n_components=2) -> pd.Series:
     --------
     `PCA on Wikipedia <https://en.wikipedia.org/wiki/Principal_component_analysis>`_
 
-    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
- 
     """
-    pca = PCA(n_components=n_components)
+    pca = PCA(n_components=n_components, random_state=random_state, copy=False)
     return pd.Series(pca.fit_transform(list(s)).tolist(), index=s.index)
 
 
-def nmf(s, n_components=2) -> pd.Series:
+def nmf(s, n_components=2, random_state=None) -> pd.Series:
     """
     Performs non-negative matrix factorization.
 
@@ -467,6 +496,9 @@ def nmf(s, n_components=2) -> pd.Series:
     n_components : Int. Default is 2.
         Number of components to keep (dimensionality of output vectors).
         If n_components is not set or None, all components are kept.
+
+    random_state : int, default=None
+        Pass an int for reproducible results across multiple function calls.
 
     Returns
     -------
@@ -493,10 +525,8 @@ def nmf(s, n_components=2) -> pd.Series:
     --------
     `NMF on Wikipedia <https://en.wikipedia.org/wiki/Non-negative_matrix_factorization>`_
 
-    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
-
     """
-    nmf = NMF(n_components=n_components, init="random", random_state=0)
+    nmf = NMF(n_components=n_components, init="random", random_state=random_state,)
     return pd.Series(nmf.fit_transform(list(s)).tolist(), index=s.index)
 
 
@@ -504,17 +534,9 @@ def tsne(
     s: pd.Series,
     n_components=2,
     perplexity=30.0,
-    early_exaggeration=12.0,
     learning_rate=200.0,
     n_iter=1000,
-    n_iter_without_progress=300,
-    min_grad_norm=1e-07,
-    metric="euclidean",
-    init="random",
-    verbose=0,
     random_state=None,
-    method="barnes_hut",
-    angle=0.5,
     n_jobs=-1,
 ) -> pd.Series:
     """
@@ -548,15 +570,6 @@ def tsne(
         between 5 and 50. Different values can result in significanlty
         different results.
 
-    early_exaggeration : float, optional (default: 12.0)
-        Controls how tight natural clusters in the original space are in
-        the embedded space and how much space will be between them. For
-        larger values, the space between natural clusters will be larger
-        in the embedded space. Again, the choice of this parameter is not
-        very critical. If the cost function increases during initial
-        optimization, the early exaggeration factor or the learning rate
-        might be too high.
-
     learning_rate : float, optional (default: 200.0)
         The learning rate for t-SNE is usually in the range [10.0, 1000.0]. If
         the learning rate is too high, the data may look like a 'ball' with any
@@ -569,64 +582,12 @@ def tsne(
         Maximum number of iterations for the optimization. Should be at
         least 250.
 
-    n_iter_without_progress : int, optional (default: 300)
-        Maximum number of iterations without progress before we abort the
-        optimization, used after 250 initial iterations with early
-        exaggeration. Note that progress is only checked every 50 iterations so
-        this value is rounded to the next multiple of 50.
-
-    min_grad_norm : float, optional (default: 1e-7)
-        If the gradient norm is below this threshold, the optimization will
-        be stopped.
-
-    metric : string or callable, optional
-        The metric to use when calculating distance between instances in a
-        feature array. If metric is a string, it must be one of the options
-        allowed by scipy.spatial.distance.pdist for its metric parameter.
-
-        Alternatively, if metric is a callable function, it is called on each
-        pair of instances (rows) and the resulting value recorded. The callable
-        should take two arrays from X as input and return a value indicating
-        the distance between them. The default is "euclidean" which is
-        interpreted as squared euclidean distance.
-
-    init : string or numpy array, optional (default: "random")
-        Initialization of embedding. Possible options are 'random', 'pca',
-        and a numpy array of shape (n_samples, n_components).
-        PCA initialization cannot be used with precomputed distances and is
-        usually more globally stable than random initialization.
-
-    verbose : int, optional (default: 0)
-        Verbosity level.
-
-    random_state : int, RandomState instance, default=None
+    random_state : int, default=None
         Determines the random number generator. Pass an int for reproducible
-        results across multiple function calls. Note that different
-        initializations might result in different local minima of the cost
-        function.
+        results across multiple function calls.
 
-    method : string (default: 'barnes_hut')
-        By default the gradient calculation algorithm uses Barnes-Hut
-        approximation running in O(NlogN) time. method='exact'
-        will run on the slower, but exact, algorithm in O(N^2) time. The
-        exact algorithm should be used when nearest-neighbor errors need
-        to be better than 3%. However, the exact method cannot scale to
-        millions of examples.
-
-    angle : float (default: 0.5)
-        Only used if method='barnes_hut'
-        This is the trade-off between speed and accuracy for Barnes-Hut T-SNE.
-        'angle' is the angular size of a distant
-        node as measured from a point. If this size is below 'angle' then it is
-        used as a summary node of all points contained within it.
-        This method is not very sensitive to changes in this parameter
-        in the range of 0.2 - 0.8. Angle less than 0.2 has quickly increasing
-        computation time and angle greater 0.8 has quickly increasing error.
-
-    n_jobs : int or None, optional (default=None)
-        The number of parallel jobs to run for neighbors search. This parameter
-        has no impact when ``metric="precomputed"`` or
-        (``metric="euclidean"`` and ``method="exact"``).
+    n_jobs : int, optional, default=-1
+        The number of parallel jobs to run for neighbors search.
         ``-1`` means using all processors.
 
     Returns
@@ -649,23 +610,13 @@ def tsne(
     --------
     `t-SNE on Wikipedia <https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding>`_
 
-    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
-
     """
     tsne = TSNE(
         n_components=n_components,
         perplexity=perplexity,
-        early_exaggeration=early_exaggeration,
         learning_rate=learning_rate,
         n_iter=n_iter,
-        n_iter_without_progress=n_iter_without_progress,
-        min_grad_norm=min_grad_norm,
-        metric=metric,
-        init=init,
-        verbose=verbose,
         random_state=random_state,
-        method=method,
-        angle=angle,
         n_jobs=n_jobs,
     )
     return pd.Series(tsne.fit_transform(list(s)).tolist(), index=s.index)
@@ -679,15 +630,9 @@ Clustering
 def kmeans(
     s: pd.Series,
     n_clusters=5,
-    init="k-means++",
     n_init=10,
     max_iter=300,
-    tol=0.0001,
-    precompute_distances="auto",
-    verbose=0,
     random_state=None,
-    copy_x=True,
-    n_jobs=-1,
     algorithm="auto",
 ):
     """
@@ -713,22 +658,6 @@ def kmeans(
     n_clusters: Int, default to 5.
         The number of clusters to separate the data into.
 
-    init : {'k-means++', 'random', ndarray, callable}, default='k-means++'
-        Method for initialization:
-
-        'k-means++' : selects initial cluster centers for k-mean
-        clustering in a smart way to speed up convergence. See section
-        Notes in k_init for more details.
-
-        'random': choose `n_clusters` observations (rows) at random from data
-        for the initial centroids.
-
-        If an ndarray is passed, it should be of shape (n_clusters, n_features)
-        and gives the initial centers.
-
-        If a callable is passed, it should take arguments X, n_clusters and a
-        random state and return an initialization.
-
     n_init : int, default=10
         Number of time the k-means algorithm will be run with different
         centroid seeds. The final results will be the best output of
@@ -738,17 +667,7 @@ def kmeans(
         Maximum number of iterations of the k-means algorithm for a
         single run.
 
-    tol : float, default=1e-4
-        Relative tolerance with regards to Frobenius norm of the difference
-        in the cluster centers of two consecutive iterations to declare
-        convergence.
-        It's not advised to set `tol=0` since convergence might never be
-        declared due to rounding errors. Use a very small number instead.
-
-    verbose : int, default=0
-        Verbosity mode.
-
-    random_state : int, RandomState instance, default=None
+    random_state : int, default=None
         Determines random number generation for centroid initialization. Use
         an int to make the randomness deterministic.
 
@@ -767,7 +686,7 @@ def kmeans(
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, fun, guitar"])
-    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency)
+    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency).pipe(hero.flatten) # TODO: when others get Representation Support: remove flatten
     >>> hero.kmeans(s, n_clusters=2, random_state=42)
     0    1
     1    0
@@ -782,21 +701,14 @@ def kmeans(
     --------
     `kmeans on Wikipedia <https://en.wikipedia.org/wiki/K-means_clustering>`_
 
-    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
-
     """
     vectors = list(s)
     kmeans = KMeans(
         n_clusters=n_clusters,
-        init=init,
         n_init=n_init,
         max_iter=max_iter,
-        tol=tol,
-        precompute_distances=precompute_distances,
-        verbose=verbose,
         random_state=random_state,
-        copy_x=copy_x,
-        n_jobs=n_jobs,
+        copy_x=True,
         algorithm=algorithm,
     ).fit(vectors)
     return pd.Series(kmeans.predict(vectors), index=s.index).astype("category")
@@ -808,10 +720,8 @@ def dbscan(
     min_samples=5,
     metric="euclidean",
     metric_params=None,
-    algorithm="auto",
     leaf_size=30,
-    p=None,
-    n_jobs=None,
+    n_jobs=-1,
 ):
     """
     Perform DBSCAN clustering.
@@ -848,17 +758,11 @@ def dbscan(
 
     metric : string, or callable, default='euclidean'
         The metric to use when calculating distance between instances in a
-        feature array. If metric is a string or callable, it must be one of
-        the options allowed by :func:`sklearn.metrics.pairwise_distances` for
-        its metric parameter.
+        feature array. Use `sorted(sklearn.neighbors.VALID_METRICS['brute'])`
+        to see valid options.
 
     metric_params : dict, default=None
         Additional keyword arguments for the metric function.
-
-    algorithm : {'auto', 'ball_tree', 'kd_tree', 'brute'}, default='auto'
-        The algorithm to be used by the NearestNeighbors module
-        to compute pointwise distances and find nearest neighbors.
-        See NearestNeighbors module documentation for details.
 
     leaf_size : int, default=30
         Leaf size passed to BallTree or cKDTree. This can affect the speed
@@ -866,11 +770,7 @@ def dbscan(
         to store the tree. The optimal value depends
         on the nature of the problem.
 
-    p : float, default=None
-        The power of the Minkowski metric to be used to calculate distance
-        between points.
-
-    n_jobs : int, default=None
+    n_jobs : int, default=-1
         The number of parallel jobs to run.
         ``-1`` means using all processors.
 
@@ -883,9 +783,8 @@ def dbscan(
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, enjoy, guitar"])
-    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
+    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf).pipe(hero.flatten) # TODO: when others get Representation Support: remove flatten
     >>> hero.dbscan(s, min_samples=1, eps=4)
-    document
     0    0
     1    1
     2    0
@@ -900,8 +799,6 @@ def dbscan(
     --------
     `DBSCAN on Wikipedia <https://en.wikipedia.org/wiki/DBSCAN>`_
 
-    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
-
     """
 
     return pd.Series(
@@ -910,9 +807,7 @@ def dbscan(
             min_samples=min_samples,
             metric=metric,
             metric_params=metric_params,
-            algorithm=algorithm,
             leaf_size=leaf_size,
-            p=p,
             n_jobs=n_jobs,
         ).fit_predict(list(s)),
         index=s.index,
@@ -922,11 +817,10 @@ def dbscan(
 def meanshift(
     s,
     bandwidth=None,
-    seeds=None,
     bin_seeding=False,
     min_bin_freq=1,
     cluster_all=True,
-    n_jobs=None,
+    n_jobs=-1,
     max_iter=300,
 ):
     """
@@ -954,12 +848,9 @@ def meanshift(
     bandwidth : float, default=None
         Bandwidth used in the RBF kernel.
 
-        If not given, the bandwidth is estimated using
-        sklearn.cluster.estimate_bandwidth; see the documentation for that
-        function for hints on scalability.
-
-    seeds : array-like of shape (n_samples, n_features), default=None
-        Seeds used to initialize kernels.
+        If not given, the bandwidth is estimated.
+        Estimating takes time at least quadratic in the number of samples (i.e. documents).
+        For large datasets, it’s wise to set the bandwidth to a small value.
 
     bin_seeding : bool, default=False
         If true, initial kernel locations are not locations of all
@@ -967,8 +858,6 @@ def meanshift(
         points, where points are binned onto a grid whose coarseness
         corresponds to the bandwidth. Setting this option to True will speed
         up the algorithm because fewer seeds will be initialized.
-        The default value is False.
-        Ignored if seeds argument is not None.
 
     min_bin_freq : int, default=1
        To speed up the algorithm, accept only those bins with at least
@@ -979,7 +868,7 @@ def meanshift(
         not within any kernel. Orphans are assigned to the nearest kernel.
         If false, then orphans are given cluster label -1.
 
-    n_jobs : int, default=None
+    n_jobs : int, default=-1
         The number of jobs to use for the computation.
         ``-1`` means using all processors
 
@@ -1010,14 +899,11 @@ def meanshift(
     --------
     `Mean-Shift on Wikipedia <https://en.wikipedia.org/wiki/Mean_shift>`_
 
-    :meth:`tfidf` to compute TF-IDF and :meth:`term_frequency` to compute term frequency
-
     """
 
     return pd.Series(
         MeanShift(
             bandwidth=bandwidth,
-            seeds=seeds,
             bin_seeding=bin_seeding,
             min_bin_freq=min_bin_freq,
             cluster_all=cluster_all,
@@ -1033,3 +919,74 @@ Topic modelling
 """
 
 # TODO.
+
+"""
+Normalization.
+"""
+
+
+def normalize(s: pd.Series, norm="l2") -> pd.Series:
+    """
+    Normalize every cell in a Pandas Series.
+
+    Input has to be a Representation Series.
+
+    Parameters
+    ----------
+    s: Pandas Series
+
+    norm: str, default to "l2"
+        One of "l1", "l2", or "max". The norm that is used.
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> idx = pd.MultiIndex.from_tuples(
+    ...             [(0, "a"), (0, "b"), (1, "c"), (1, "d")], names=("document", "word")
+    ...         )
+    >>> s = pd.Series([1, 2, 3, 4], index=idx)
+    >>> hero.normalize(s, norm="max")
+    document  word
+    0         a       0.50
+              b       1.00
+    1         c       0.75
+              d       1.00
+    dtype: Sparse[float64, nan]
+
+
+    See Also
+    --------
+    Representation Series link TODO add link to tutorial
+
+    `Norm on Wikipedia <https://en.wikipedia.org/wiki/Norm_(mathematics)>`_
+
+    """
+
+    is_valid_representation = (
+        isinstance(s.index, pd.MultiIndex) and s.index.nlevels == 2
+    )
+
+    if not is_valid_representation:
+        raise TypeError(
+            "The input Pandas Series should be a Representation Pandas Series and should have a MultiIndex. The given Pandas Series does not appears to have MultiIndex"
+        )
+    # TODO after merging representation: use _check_is_valid_representation instead
+
+    if pd.api.types.is_sparse(s):
+        s_coo_matrix = s.sparse.to_coo()[0]
+    else:
+        s = s.astype("Sparse")
+        s_coo_matrix = s.sparse.to_coo()[0]
+
+    s_for_vectorization = s_coo_matrix
+
+    result = sklearn_normalize(
+        s_for_vectorization, norm=norm
+    )  # Can handle sparse input.
+
+    result_coo = coo_matrix(result)
+    s_result = pd.Series.sparse.from_coo(result_coo)
+    s_result.index = s.index
+
+    return s_result

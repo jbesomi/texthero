@@ -234,6 +234,32 @@ Name: clean_text, dtype: float64
 
 The complete visualization module API can be found here: [api visualization](/docs/api-visualization).
 
+## Quick look into hero typing
+
+Texthero does introduce some different pandas series types for it's different categories of functions:
+1. __TextSeries__: Every cell is a text, i.e. a string. For example,
+`pd.Series(["test", "test"])` is a valid TextSeries. Those series will be the input and output type of the preprocessing functions like `clean`
+
+2. __TokenSeries__: Every cell is a list of words/tokens, i.e. a list
+of strings. For example, `pd.Series([["test"], ["token2", "token3"]])` is a valid TokenSeries. The NLP functions like `tfidf` do require a TokenSeries as an input. The function `tokenize` generates a TokenSeries
+
+3. __VectorSeries__: Every cell is a vector representing text, i.e.
+a list of floats. For example, `pd.Series([[1.0, 2.0], [3.0]])` is a valid VectorSeries. Most dimensionality reduction functions, like `pca` will take VectorSeries as an input and also return a VectorSeries.
+
+4. __RepresentationSeries__: Series is multiindexed with level one
+being the document, level two being the individual features and their values.
+For example,
+`pd.Series([1, 2, 3], index=pd.MultiIndex.from_tuples([("doc1", "word1"), ("doc1", "word2"), ("doc2", "word1")]))`
+is a valid RepresentationSeries. RepresentationSeries will be the output type from the NLP functions like `count` or `term frequency`
+
+To get more detailed insights into this topic, you can have a look at the typing tutorial. But in general, if you use texthero with the common pipeline:
+- cleaning the Series with functions from the preprocessing module
+- tokenising the Series and then perform NLP functions
+- calculating some Clustering
+- reduce the dimension to display the data
+
+you won't need to worry much about it, as the functions are build in the way, that the corresponding input and output types match.
+
 ## Summary
 
 We saw how in just a couple of lines of code we can represent and visualize any text dataset. We went from knowing nothing regarding the dataset to see that there are 5 (quite) distinct areas representig each topic. We went _from zero to hero_.

@@ -1,5 +1,6 @@
 """
-The texthero.preprocess module allow for efficient pre-processing of text-based Pandas Series and DataFrame.
+The texthero.preprocess module allow for efficient pre-processing of 
+text-based Pandas Series and DataFrame.
 """
 
 from gensim.sklearn_api.phrases import PhrasesTransformer
@@ -21,8 +22,8 @@ from texthero import stopwords as _stopwords
 from typing import List, Callable
 
 """
-Define all regex pattern, which will be used in the functions below. They define different charateristics, on how to clean
-a text
+Define all regex pattern, which will be used in the functions below.
+They define different charateristics, on how to clean a text
 """
 
 DIGITS_BLOCK = r"\b\d+\b"

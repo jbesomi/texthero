@@ -118,30 +118,6 @@ class TestPreprocessing(PandasTestCase):
     Test clean
     """
 
-    def _get_default_clean_pipeline(self):
-        """
-        Return a list contaning all the methods used in the default cleaning pipeline.
-
-        Return a list with the following functions:
-        1. :meth:`texthero.preprocessing.fillna`
-        2. :meth:`texthero.preprocessing.lowercase`
-        3. :meth:`texthero.preprocessing.remove_digits`
-        4. :meth:`texthero.preprocessing.remove_punctuation`
-        5. :meth:`texthero.preprocessing.remove_diacritics`
-        6. :meth:`texthero.preprocessing.remove_stopwords`
-        7. :meth:`texthero.preprocessing.remove_whitespace`
-        """
-
-        return [
-            preprocessing.fillna,
-            preprocessing.lowercase,
-            preprocessing.remove_digits,
-            preprocessing.remove_punctuation,
-            preprocessing.remove_diacritics,
-            preprocessing.remove_stopwords,
-            preprocessing.remove_whitespace,
-        ]
-
     def test_clean(self):
         s = pd.Series(
             ["This serös 42 should bE CLeaned.! I am a stopword    \n", np.NAN]
@@ -151,7 +127,7 @@ class TestPreprocessing(PandasTestCase):
         )
         self.assertEqual(
             preprocessing.clean(s),
-            preprocessing.clean(s_true, self._get_default_clean_pipeline()),
+            preprocessing.clean(s_true, preprocessing.get_default_pipeline()),
         )
 
     """

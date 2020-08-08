@@ -703,10 +703,12 @@ def kmeans(
     >>> import pandas as pd
     >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra",
     ...                "football, fun, sports", "music, fun, guitar"])
-    >>> s = s.pipe(hero.clean) \
-             .pipe(hero.tokenize) \
-             .pipe(hero.term_frequency) \
-             .pipe(hero.flatten) # TODO: when others get Representation Support: remove flatten
+    >>> s = (
+    ...     s.pipe(hero.clean)
+    ...      .pipe(hero.tokenize)
+    ...      .pipe(hero.term_frequency)
+    ...      .pipe(hero.flatten)
+    ... ) # TODO: when others get Representation Support: remove flatten
     >>> hero.kmeans(s, n_clusters=2, random_state=42)
     0    1
     1    0
@@ -804,10 +806,12 @@ def dbscan(
     >>> import pandas as pd
     >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra",
     ...                "football, fun, sports", "music, enjoy, guitar"])
-    >>> s = s.pipe(hero.clean) \
-             .pipe(hero.tokenize) \
-             .pipe(hero.tfidf) \
-             .pipe(hero.flatten) # TODO: when others get Representation Support: remove flatten
+    >>> s = (
+    ...     s.pipe(hero.clean)
+    ...      .pipe(hero.tokenize)
+    ...      .pipe(hero.tfidf)
+    ...      .pipe(hero.flatten)
+    ... )      # TODO: when others get Representation Support: remove flatten
     >>> hero.dbscan(s, min_samples=1, eps=4)
     0    0
     1    1

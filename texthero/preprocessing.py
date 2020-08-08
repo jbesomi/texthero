@@ -11,13 +11,20 @@ import unicodedata
 import numpy as np
 import pandas as pd
 import unidecode
+
+# Ignore gensim annoying warnings
+import warnings
 from nltk.stem import PorterStemmer, SnowballStemmer
 
 from texthero import stopwords as _stopwords
 
 from typing import List, Callable
 
-# REGEX pattern constants
+"""
+Define all regex pattern, which will be used in the functions below. They define different charateristics, on how to clean
+a text
+"""
+
 DIGITS_BLOCK = r"\b\d+\b"
 PUNCTUATION = rf"([{string.punctuation}])+"
 STOPWORD_TOKENIZER = r"""(?x)                          # Set flag to allow verbose regexps
@@ -29,34 +36,19 @@ ROUND_BRACKETS = r"\([^()]*\)"
 CURLY_BRACKETS = r"\{[^{}]*\}"
 SQUARE_BRACKETS = r"\[[^\[\]]*\]"
 ANGLE_BRACKETS = r"<[^<>]*>"
-HTML_TAG = r"""(?x)                    # Turn on free-spacing
+HTML_TAGS = r"""(?x)                    # Turn on free-spacing
             <[^>]+>                             # Remove <html> tags
             | &([a-z0-9]+|\#[0-9]{1,6}|\#x[0-9a-f]{1,6}); # Remove &nbsp;
             """
-
 URLS = r"http\S+"
 TAGS = r"@[a-zA-Z0-9]+"
 HASHTAGS = r"#[a-zA-Z0-9_]+"
 
+# In regex, the metacharacter 'w' is "a-z, A-Z, 0-9, including the _ (underscore) character." We therefore remove it from the punctuation string as this is already included in \w
+punct = string.punctuation.replace("_", "")
+TOKENIZE = rf"((\w)([{punct}])(?:\B|$)|(?:^|\B)([{punct}])(\w))"  # The standart tokenisation will seperate all "regex words" '\w' from each other and also
+# puts the punctuation in its own tokens
 
-def _get_pattern_for_tokenisation(punct: str) -> str:
-    """
-    Return the standart tokenisation pattern
-
-    The standart tokenisation will seperate all "regex words" '\w' from each other and also 
-    puts the punctuation in its own tokens
-
-    Parameters
-    ----------
-    punct : String
-            the text, which should get tokenized by this pattern, but all '_' characters should have been removed,
-            as '\w' in regex already includes this one
-    """
-    return rf"((\w)([{punct}])(?:\B|$)|(?:^|\B)([{punct}])(\w))"
-
-
-# Ignore gensim annoying warnings
-import warnings
 
 warnings.filterwarnings(action="ignore", category=UserWarning, module="gensim")
 
@@ -684,7 +676,7 @@ def remove_html_tags(s: pd.Series) -> pd.Series:
 
     """
 
-    return s.str.replace(HTML_TAG, "")
+    return s.str.replace(HTML_TAGS, "")
 
 
 def tokenize(s: pd.Series) -> pd.Series:
@@ -708,12 +700,7 @@ def tokenize(s: pd.Series) -> pd.Series:
 
     """
 
-    # In regex, the metacharacter 'w' is "a-z, A-Z, 0-9, including the _ (underscore) character." We therefore remove it from the punctuation string as this is already included in \w
-    punct = string.punctuation.replace("_", "")
-
-    return s.str.replace(
-        _get_pattern_for_tokenisation(punct), r"\2 \3 \4 \5"
-    ).str.split()
+    return s.str.replace(TOKENIZE, r"\2 \3 \4 \5").str.split()
 
 
 # Warning message for not-tokenized inputs

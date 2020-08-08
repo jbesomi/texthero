@@ -33,12 +33,14 @@ def flatten(
     fill_missing_with: Any = 0.0,
 ) -> pd.Series:
     """
-    Transform a Pandas Representation Series to a "normal" (flattened) Pandas Series.
+    Transform a Pandas Representation Series to a "normal" (flattened) Pandas
+    Series.
 
-    The given Series should have a multiindex with first level being the document
-    and second level being individual features of that document (e.g. tdidf scores per word).
-    The flattened Series has one cell per document, with the cell being a list of all
-    the individual features of that document.
+    The given Series should have a multiindex with first level being the
+    document and second level being individual features of that document
+    (e.g. tdidf scores per word). The flattened Series has one cell per
+    document, with the cell being a list of all the individual features of
+    that document.
 
     Parameters
     ----------
@@ -60,7 +62,9 @@ def flatten(
     >>> import texthero as hero
     >>> import pandas as pd
     >>> import numpy as np
-    >>> index = pd.MultiIndex.from_tuples([("doc0", "Word1"), ("doc0", "Word3"), ("doc1", "Word2")], names=['document', 'word'])
+    >>> index = pd.MultiIndex.from_tuples(
+    ...         [("doc0", "Word1"), ("doc0", "Word3"), ("doc1", "Word2")],
+    ...          names=['document', 'word'])
     >>> s = pd.Series([3, np.nan, 4], index=index)
     >>> s
     document  word 
@@ -153,7 +157,8 @@ def count(
     s : Pandas Series (tokenized)
 
     max_features : int, optional, default to None.
-        Maximum number of features to keep. Will keep all features if set to None.
+        Maximum number of features to keep. Will keep all features if set to
+        None.
 
     min_df : float in range [0.0, 1.0] or int, default=1
         When building the vocabulary ignore terms that have a document
@@ -163,8 +168,8 @@ def count(
         absolute counts.
 
     max_df : float in range [0.0, 1.0] or int, default=1.0
-        Ignore terms that have a document frequency (number of documents they appear in)
-        frequency strictly higher than the given threshold.
+        Ignore terms that have a document frequency (number of documents they
+        appear in) frequency strictly higher than the given threshold.
         If float, the parameter represents a proportion of documents, integer
         absolute counts.
 
@@ -240,7 +245,8 @@ def term_frequency(
     s : Pandas Series (tokenized)
 
     max_features : int, optional, default to None.
-        Maximum number of features to keep. Will keep all features if set to None.
+        Maximum number of features to keep. Will keep all features if set to
+        None.
 
     min_df : float in range [0.0, 1.0] or int, default=1
         When building the vocabulary ignore terms that have a document
@@ -250,8 +256,8 @@ def term_frequency(
         absolute counts.
 
     max_df : float in range [0.0, 1.0] or int, default=1.0
-        Ignore terms that have a document frequency (number of documents they appear in)
-        frequency strictly higher than the given threshold.
+        Ignore terms that have a document frequency (number of documents they
+        appear in) frequency strictly higher than the given threshold.
         If float, the parameter represents a proportion of documents, integer
         absolute counts.
 
@@ -307,22 +313,24 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.Series:
 
     *Term Frequency - Inverse Document Frequency (TF-IDF)* is a formula to
     calculate the _relative importance_ of the words in a document, taking
-    into account the words' occurences in other documents. It consists of two parts:
+    into account the words' occurences in other documents. It consists of two
+    parts:
 
-    The *term frequency (tf)* tells us how frequently a term is present in a document,
-    so tf(document d, term t) = number of times t appears in d.
+    The *term frequency (tf)* tells us how frequently a term is present in a
+    document, so tf(document d, term t) = number of times t appears in d.
 
-    The *inverse document frequency (idf)* measures how _important_ or _characteristic_
-    a term is among the whole corpus (i.e. among all documents).
-    Thus, idf(term t) = log((1 + number of documents) / (1 + number of documents where t is present)) + 1.
+    The *inverse document frequency (idf)* measures how _important_ or
+    _characteristic_ a term is among the whole corpus (i.e. among all
+    documents). Thus, idf(term t) = log((1 + number of documents) /
+    (1 + number of documents where t is present)) + 1.
 
     Finally, tf-idf(document d, term t) = tf(d, t) * idf(t).
 
     Different from the `sklearn-implementation of 
-    tfidf <https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html>`,
-    this function does *not* normalize the output in any way,
-    so the result is exactly what you
-    get applying the formula described above.
+    tfidf <https://scikit-learn.org/stable/modules/generated/sklearn.feature_
+    extraction.text.TfidfVectorizer.html>`, this function does *not* normalize
+    the output in any way, so the result is exactly what you get applying the
+    formula described above.
 
     Return a Document Representation Series with the
     tfidf of every word in the document.
@@ -353,8 +361,8 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.Series:
         absolute counts.
 
     max_df : float in range [0.0, 1.0] or int, default=1.0
-        Ignore terms that have a document frequency (number of documents they appear in)
-        frequency strictly higher than the given threshold.
+        Ignore terms that have a document frequency (number of documents they
+        appear in) frequency strictly higher than the given threshold.
         This arguments basically permits to remove corpus-specific stop words.
         If float, the parameter represents a proportion of documents, integer
         absolute counts.
@@ -419,18 +427,20 @@ def pca(s, n_components=2, random_state=None) -> pd.Series:
     Principal Component Analysis (PCA) is a statistical method that is used
     to reveal where the variance in a dataset comes from. For textual data,
     one could for example first represent a Series of documents using
-    :meth:`texthero.representation.tfidf` to get a vector representation
-    of each document. Then, PCA can generate new vectors from the tfidf representation
-    that showcase the differences among the documents most strongly in fewer dimensions.
+    :meth:`texthero.representation.tfidf` to get a vector representation of
+    each document. Then, PCA can generate new vectors from the tfidf
+    representation that showcase the differences among the documents most
+    strongly in fewer dimensions.
 
-    For example, the tfidf vectors will have length 100 if hero.tfidf was called
-    on a large corpus with max_features=100. Visualizing 100 dimensions is hard!
-    Using PCA with n_components=3, every document will now get a vector of
-    length 3, and the vectors will be chosen so that the document differences
-    are easily visible. The corpus can now be visualized in 3D and we can
-    get a good first view of the data!
+    For example, the tfidf vectors will have length 100 if hero.tfidf was
+    called on a large corpus with max_features=100. Visualizing 100 dimensions
+    is hard! Using PCA with n_components=3, every document will now get a
+    vector of length 3, and the vectors will be chosen so that the document
+    differences are easily visible. The corpus can now be visualized in 3D and
+    we can get a good first view of the data!
 
-    In general, *pca* should be called after the text has already been represented to a matrix form.
+    In general, *pca* should be called after the text has already been
+    represented to a matrix form.
 
     Parameters
     ----------
@@ -446,13 +456,15 @@ def pca(s, n_components=2, random_state=None) -> pd.Series:
 
     Returns
     -------
-    Pandas Series with the vector calculated by PCA for the document in every cell.
+    Pandas Series with the vector calculated by PCA for the document in every
+    cell.
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Football is great", "Hi, I'm Texthero, who are you? Tell me!"])
+    >>> s = pd.Series(["Football is great",
+    ...                "Hi, I'm Texthero, who are you? Tell me!"])
     >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
     >>> # Attention, your results might differ due to
     >>> # the randomness in PCA!
@@ -482,11 +494,11 @@ def nmf(s, n_components=2, random_state=None) -> pd.Series:
     of technical terms; see the example below). 
 
     Given a document-term matrix (so in
-    texthero usually a Series after applying :meth:`texthero.representation.tfidf`
-    or some other first representation function that assigns a scalar (a weight)
-    to each word), NMF will find n_components many topics (clusters)
-    and calculate a vector for each document that places it
-    correctly among the topics.
+    texthero usually a Series after applying
+    :meth:`texthero.representation.tfidf` or some other first representation
+    function that assigns a scalar (a weight) to each word), NMF will find
+    n_components many topics (clusters) and calculate a vector for each
+    document that places it correctly among the topics.
 
 
     Parameters
@@ -502,13 +514,15 @@ def nmf(s, n_components=2, random_state=None) -> pd.Series:
 
     Returns
     -------
-    Pandas Series with the vector calculated by NMF for the document in every cell.
+    Pandas Series with the vector calculated by NMF for the document in every
+    cell.
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Football, Sports, Soccer", "Music, Violin, Orchestra", "Football, Music"])
+    >>> s = pd.Series(["Football, Sports, Soccer", "Music, Violin, Orchestra",
+    ...                "Football, Music"])
     >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency)
     >>> hero.nmf(s) # doctest: +SKIP
     0                    [0.9080190347553924, 0.0]
@@ -523,7 +537,8 @@ def nmf(s, n_components=2, random_state=None) -> pd.Series:
 
     See also
     --------
-    `NMF on Wikipedia <https://en.wikipedia.org/wiki/Non-negative_matrix_factorization>`_
+    `NMF on Wikipedia
+    <https://en.wikipedia.org/wiki/Non-negative_matrix_factorization>`_
 
     """
     nmf = NMF(n_components=n_components, init="random", random_state=random_state,)
@@ -543,16 +558,14 @@ def tsne(
     Performs TSNE on the given pandas series.
 
     t-distributed Stochastic Neighbor Embedding (t-SNE) is
-    a machine learning algorithm used to visualize high-dimensional data in fewer
-    dimensions. In natural language processing, the high-dimensional
-    data is usually a document-term matrix
-    (so in texthero usually a Series after applying :meth:`texthero.representation.tfidf`
-    or some other first representation function that assigns a scalar (a weight)
-    to each word) that is hard to visualize as there
-    might be many terms. With t-SNE, every document
-    gets a new, low-dimensional (n_components entries)
-    vector in such a way that the differences / similarities between
-    documents are preserved.
+    a machine learning algorithm used to visualize high-dimensional data in
+    fewer dimensions. In natural language processing, the high-dimensional data
+    is usually a document-term matrix (so in texthero usually a Series after
+    applying :meth:`texthero.representation.tfidf` or some other first
+    representation function that assigns a scalar (a weight) to each word)
+    that is hard to visualize as there might be many terms. With t-SNE, every
+    document gets a new, low-dimensional (n_components entries) vector in such
+    a way that the differences / similarities between documents are preserved.
 
 
     Parameters
@@ -592,13 +605,15 @@ def tsne(
 
     Returns
     -------
-    Pandas Series with the vector calculated by t-SNE for the document in every cell.
+    Pandas Series with the vector calculated by t-SNE for the document in every
+    cell.
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Football, Sports, Soccer", "Music, Violin, Orchestra", "Football, Music"])
+    >>> s = pd.Series(["Football, Sports, Soccer", "Music, Violin, Orchestra",
+    ...                "Football, Music"])
     >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency)
     >>> hero.tsne(s, random_state=42) # doctest: +SKIP
     0      [-18.833383560180664, -276.800537109375]
@@ -608,7 +623,8 @@ def tsne(
 
     See also
     --------
-    `t-SNE on Wikipedia <https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding>`_
+    `t-SNE on Wikipedia <https://en.wikipedia.org/wiki/T-distributed_
+    stochastic_neighbor_embedding>`_
 
     """
     tsne = TSNE(
@@ -646,10 +662,10 @@ def kmeans(
     to separate them into two clusters). 
 
     Given a document-term matrix (so in
-    texthero usually a Series after applying :meth:`texthero.representation.tfidf`
-    or some other first representation function that assigns a scalar (a weight)
-    to each word), K-means will find k topics (clusters)
-    and assign a topic to each document.
+    texthero usually a Series after applying
+    :meth:`texthero.representation.tfidf` or some other first representation
+    function that assigns a scalar (a weight) to each word), K-means will find
+    k topics (clusters) and assign a topic to each document.
 
     Parameters
     ----------
@@ -685,8 +701,14 @@ def kmeans(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, fun, guitar"])
-    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency).pipe(hero.flatten) # TODO: when others get Representation Support: remove flatten
+    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra",
+    ...                "football, fun, sports", "music, fun, guitar"])
+    >>> s = (
+    ...     s.pipe(hero.clean)
+    ...      .pipe(hero.tokenize)
+    ...      .pipe(hero.term_frequency)
+    ...      .pipe(hero.flatten)
+    ... ) # TODO: when others get Representation Support: remove flatten
     >>> hero.kmeans(s, n_clusters=2, random_state=42)
     0    1
     1    0
@@ -736,10 +758,10 @@ def dbscan(
     number of clusters on its own.
 
     Given a document-term matrix (so in
-    texthero usually a Series after applying :meth:`texthero.representation.tfidf`
-    or some other first representation function that assigns a scalar (a weight)
-    to each word), DBSCAN will find topics (clusters)
-    and assign a topic to each document.
+    texthero usually a Series after applying
+    :meth:`texthero.representation.tfidf` or some other first representation
+    function that assigns a scalar (a weight) to each word), DBSCAN will find
+    topics (clusters) and assign a topic to each document.
 
     Parameters
     ----------
@@ -782,8 +804,14 @@ def dbscan(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, enjoy, guitar"])
-    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf).pipe(hero.flatten) # TODO: when others get Representation Support: remove flatten
+    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra",
+    ...                "football, fun, sports", "music, enjoy, guitar"])
+    >>> s = (
+    ...     s.pipe(hero.clean)
+    ...      .pipe(hero.tokenize)
+    ...      .pipe(hero.tfidf)
+    ...      .pipe(hero.flatten)
+    ... )      # TODO: when others get Representation Support: remove flatten
     >>> hero.dbscan(s, min_samples=1, eps=4)
     0    0
     1    1
@@ -836,10 +864,10 @@ def meanshift(
     number of clusters on its own.
 
     Given a document-term matrix (so in
-    texthero usually a Series after applying :meth:`texthero.representation.tfidf`
-    or some other first representation function that assigns a scalar (a weight)
-    to each word), mean shift will find topics (clusters)
-    and assign a topic to each document.
+    texthero usually a Series after applying
+    :meth:`texthero.representation.tfidf` or some other first representation
+    function that assigns a scalar (a weight) to each word), mean shift will
+    find topics (clusters) and assign a topic to each document.
 
     Parameters
     ----------
@@ -849,8 +877,9 @@ def meanshift(
         Bandwidth used in the RBF kernel.
 
         If not given, the bandwidth is estimated.
-        Estimating takes time at least quadratic in the number of samples (i.e. documents).
-        For large datasets, it’s wise to set the bandwidth to a small value.
+        Estimating takes time at least quadratic in the number of samples
+        (i.e. documents). For large datasets, it’s wise to set the bandwidth
+        to a small value.
 
     bin_seeding : bool, default=False
         If true, initial kernel locations are not locations of all
@@ -943,8 +972,8 @@ def normalize(s: pd.Series, norm="l2") -> pd.Series:
     >>> import texthero as hero
     >>> import pandas as pd
     >>> idx = pd.MultiIndex.from_tuples(
-    ...             [(0, "a"), (0, "b"), (1, "c"), (1, "d")], names=("document", "word")
-    ...         )
+    ...             [(0, "a"), (0, "b"), (1, "c"), (1, "d")],
+    ...              names=("document", "word"))
     >>> s = pd.Series([1, 2, 3, 4], index=idx)
     >>> hero.normalize(s, norm="max")
     document  word

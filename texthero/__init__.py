@@ -15,4 +15,7 @@ from .visualization import *
 from . import nlp
 from .nlp import *
 
+from . import embeddings
+from .embeddings import *
+
 from . import stopwords

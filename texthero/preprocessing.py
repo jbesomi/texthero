@@ -317,7 +317,6 @@ def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
     )
 
 
-
 @InputSeries(TextSeries)
 def replace_stopwords(
     s: TextSeries, symbol: str, stopwords: Optional[Set[str]] = None
@@ -726,7 +725,6 @@ def remove_html_tags(s: TextSeries) -> TextSeries:
     return s.str.replace(HTML_TAGS, "")
 
 
-
 @InputSeries(TextSeries)
 def tokenize(s: TextSeries) -> TokenSeries:
     """
@@ -843,7 +841,6 @@ def replace_urls(s: TextSeries, symbol: str) -> TextSeries:
     """
 
     return s.str.replace(URLS, symbol)
-
 
 
 @InputSeries(TextSeries)

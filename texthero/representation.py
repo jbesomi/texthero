@@ -10,10 +10,11 @@ from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA, NMF
 from sklearn.cluster import KMeans, DBSCAN, MeanShift
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.metrics import pairwise_distances
 from sklearn.preprocessing import normalize as sklearn_normalize
 from scipy.sparse import coo_matrix
 
-from typing import Optional, Union, Any
+from typing import Optional, Union, Any, List
 
 from texthero import preprocessing
 
@@ -1019,3 +1020,82 @@ def normalize(s: pd.Series, norm="l2") -> pd.Series:
     s_result.index = s.index
 
     return s_result
+
+
+"""
+Most similar
+"""
+
+
+def most_similar(s, vector: List[float], max_number=None):
+    """
+    Return the most similar vectors in s to the given vector.
+
+    To find the most similar documents to a document, first represent
+    the Pandas Series with the documents, e.g. with
+    :meth:`hero.representation.tfidf`_ . Then use this function
+    to find the most similar documents according to the representation.
+    Similar vectors are returned sorted by similarity descending.
+
+    Internally, euclidian distance is used to judge similarity.
+
+    Series s can either be a :class:`texthero._types.RepresentationSeries`
+    or a :class:`texthero._types.VectorSeries`.
+
+    Parameters
+    ----------
+    s : :class:`texthero._types.RepresentationSeries` or 
+        :class:`texthero._types.VectorSeries`
+        The Series in which to find the most similar vectors.
+
+    vector : List[float]
+        The vector for which we want to find the most similar documents.
+
+    max_number: int or None, default 100
+        Maximum amount of indexes of similar documents to return.
+        If None, returns all .
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["I like football", "Hey, watch out", "I like sports", "Cool stuff"])
+    >>> s_pca = s.pipe(hero.tokenize).pipe(hero.tfidf).pipe(hero.flatten).pipe(hero.pca) # TODO: remove flatten when pca is updated w.r.t. Representation Series
+    >>> # want to find the two most similar to "I like football", which has index 0
+    >>> s_most_similar = hero.most_similar(s_pca, s_pca[0], max_number=2)
+    >>> s_most_similar
+    0                       [0.0]
+    2    [2.1073424255447017e-08]
+    dtype: object
+    >>> # get text of the most similar ones (of course, the text is most similar to itself)
+    >>> s[s_most_similar.index]
+    0    I like football
+    2      I like sports
+    dtype: object
+
+    """
+    if _check_is_valid_representation(s):
+        if pd.api.types.is_sparse(s):
+            s_coo_matrix = s.sparse.to_coo()[0]
+        else:
+            s = s.astype("Sparse")
+            s_coo_matrix = s.sparse.to_coo()[0]
+
+        s_for_vectorization = s_coo_matrix
+        s_flat_index = s.index.levels[0]
+
+    else:
+        s_for_vectorization = list(s)
+        s_flat_index = s.index
+
+    s_distances = pd.Series(
+        pairwise_distances(s_for_vectorization, np.array([vector])).tolist(),
+        index=s_flat_index,
+    )
+
+    s_distances = s_distances.sort_values()
+
+    if max_number is not None:
+        return s_distances[:max_number]
+    else:
+        return s_distances

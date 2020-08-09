@@ -22,19 +22,16 @@ close to the vector of 'biology'.
 
 In Texthero, both options are supported. The second option is
 implemented through the `Flair library <https://github.com/flairNLP/flair>`_
-
-
-TODO :
-- think about:
-    - Do we (want to) support word embeddings? How? Why?
-    - Any opportunity for sparseness or alternatives to s.apply?
 """
 
 import pandas as pd
 import numpy as np
 
+# We only `import flair` and
+# call everything from flair directly,
+# e.g. flair.data.Tokens, to not pollute our
+# namespace with similarly sounding names.
 import flair
-from flair.data import Sentence, Token
 
 from typing import List, Union
 
@@ -48,7 +45,7 @@ Helper functions.
 
 def _texthero_init_for_flair_sentence(self, already_tokenized_text: List[str]):
     """
-    To use flair embeddings, flair needs as input a
+    To use Flair embeddings, Flair needs as input a
     'flair.Sentence' object. Creating such an object
     only works from strings in flair. However, we want
     our embeddings to work on TokenSeries, so we
@@ -57,9 +54,9 @@ def _texthero_init_for_flair_sentence(self, already_tokenized_text: List[str]):
     tokenized text.
     """
 
-    super(Sentence, self).__init__()
+    super(flair.data.Sentence, self).__init__()
 
-    self.tokens: List[Token] = []
+    self.tokens: List[flair.data.Token] = []
     self._embeddings: Dict = {}
     self.language_code: str = None
     self.tokenized = None
@@ -70,7 +67,7 @@ def _texthero_init_for_flair_sentence(self, already_tokenized_text: List[str]):
 
 
 # Overwrite flair Sentence __init__ method to handle already tokenized text
-Sentence.__init__ = _texthero_init_for_flair_sentence
+flair.data.Sentence.__init__ = _texthero_init_for_flair_sentence
 
 
 """
@@ -80,10 +77,16 @@ Support for flair embeddings.
 
 @InputSeries(TokenSeries)
 def embed(
-    s: TokenSeries, flair_embedding: Union[WordEmbeddings, DocumentEmbeddings]
+    s: TokenSeries, flair_embedding: flair.embeddings.DocumentEmbeddings
 ) -> VectorSeries:
     """
-    TODO
+    Generate a vector for each document using the given flair_embedding.
+
+    Given a tokenized Series and a
+    `Flair Document Embedding https://github.com/flairNLP/flair/blob/master/resources/docs/TUTORIAL_5_DOCUMENT_EMBEDDINGS.md`_,
+    return the document embedding for every
+    document in the tokenized Series.
+
     Examples
     --------
     >>> import texthero as hero
@@ -96,17 +99,20 @@ def embed(
     1    [-0.5505255, -0.21915795, -0.0913163, -0.26856...
     dtype: object
 
+    See Also
+    --------
+    `Flair Document Embedding https://github.com/flairNLP/flair/blob/master/resources/docs/TUTORIAL_5_DOCUMENT_EMBEDDINGS.md`_
     """
 
     def _embed_and_return_embedding(x):
         # flair embeddings need a 'flair Sentence' object as input.
-        x = Sentence(x)
+        x = flair.data.Sentence(x)
         # Calculate the embedding; flair writes it to x.embedding
         flair_embedding.embed(x)
-        # Return it as numpy array.
-        return x.embedding.detach().numpy()
+        # Return it as list.
+        return x.embedding.detach().tolist()
 
-    if isinstance(flair_embedding, DocumentEmbeddings):
+    if isinstance(flair_embedding, flair.embeddings.DocumentEmbeddings):
         s = s.apply(lambda x: _embed_and_return_embedding(x))
     else:
         raise ValueError(

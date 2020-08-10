@@ -1063,7 +1063,7 @@ def most_similar(s, vector: List[float], max_number=None):
     >>> s_pca = s.pipe(hero.tokenize).pipe(hero.tfidf).pipe(hero.flatten).pipe(hero.pca) # TODO: remove flatten when pca is updated w.r.t. Representation Series
     >>> # want to find the two most similar to "I like football", which has index 0
     >>> s_most_similar = hero.most_similar(s_pca, s_pca[0], max_number=2)
-    >>> s_most_similar
+    >>> s_most_similar  # doctest: +SKIP
     0                       [0.0]
     2    [2.1073424255447017e-08]
     dtype: object

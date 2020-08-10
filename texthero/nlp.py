@@ -5,7 +5,7 @@ The texthero.nlp module supports common NLP tasks such as named_entities, noun_c
 import spacy
 import pandas as pd
 
-from texthero._helper import TextSeries, InputSeries
+from texthero._types import TextSeries, InputSeries
 
 
 @InputSeries(TextSeries)

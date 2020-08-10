@@ -5,6 +5,10 @@ Map words into vectors using different algorithms such as TF-IDF, word2vec or Gl
 import pandas as pd
 import numpy as np
 
+import flair
+
+word_embedding = flair.embeddings.WordEmbeddings("turian")
+
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA, NMF

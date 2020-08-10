@@ -1028,13 +1028,12 @@ def drop_duplicates(
     threshold=1,
 ) -> TextSeries:
     """
-    Return the most similar vectors in s to the given vector.
+    Remove duplicates in a series.
 
-    To find the most similar documents to a document, first represent
+    To drop the most similar documents from a series, first represent
     the Pandas Series with the documents, e.g. with
     :meth:`hero.representation.tfidf`_ . Then use this function
-    to find the most similar documents according to the representation.
-    Similar vectors are returned sorted by similarity descending.
+    to drop the most similar documents according to the representation.
 
     Internally, euclidian distance is used to judge similarity.
 
@@ -1050,12 +1049,8 @@ def drop_duplicates(
                     :class:`texthero._types.VectorSeries`
         The Series by which the similarity is calculated.
 
-    vector : List[float]
-        The vector to which we want to find the most similar documents.
-
-    max_number: int or None, default 100
-        Maximum amount of indexes of similar documents to return.
-        If None, returns all .
+    threshold: float
+        The threshold by which it is judge how similar two documents are
 
     Examples
     --------
@@ -1063,11 +1058,12 @@ def drop_duplicates(
     >>> import pandas as pd
     >>> s = pd.Series(["I like football", "Hey, watch out", "I like sports", "Cool stuff"])
     >>> s_pca = s.pipe(hero.tokenize).pipe(hero.tfidf).pipe(hero.flatten).pipe(hero.pca) # TODO: remove flatten when pca is updated w.r.t. Representation Series
-    >>> # want to find the two most similar to "I like football", which has index 0
-    >>> s_most_similar = hero.most_similar(s, s_pca, s_pca[0], max_number=2)
-    >>> s_most_similar
-    0    I like football
-    2      I like sports
+    >>> # want to remove a duplicate, in this case "I like sports" and "I like football" are 
+    >>> # considered as one
+    >>> drop_duplicates = hero.drop_duplicates(s, s_pca, 1)
+    >>> 0    I like football
+    1     Hey, watch out
+    3         Cool stuff
     dtype: object
 
     """
@@ -1083,19 +1079,26 @@ def drop_duplicates(
     else:
         s_represented_for_vectorization = list(s_represented)
 
+    # calculating the distance between those vectors and returns the distances saved in a matrix
     distance_matrix = pairwise_distances(
         s_represented_for_vectorization
     )
     
     list_index_remove = []
     set_index_remove = set()
+
     for i in range(distance_matrix.shape[0]):
+        # if i is in the remove set, then we want to ignore it, so we won't remove a chain of vectors; e. g.:
+        # {[3], [3.5] [4]} and threshold is 0.75, then without it, we would remove the last two, so we just remove
+        # the second vector.
         if i not in set_index_remove:
+            # as matrix is symmetric, we just need to take care of the 'bigger' indexes
             for j in range(i+1, distance_matrix.shape[0]):
                 if distance_matrix[i][j] <= threshold:
                     list_index_remove.append(j)
                     set_index_remove.add(j)
 
+    # convert list to pandas series, in order to use the beauty of masks
     s_part_will_be_droped = s.take(list_index_remove)
     drop_mask = ~s.index.isin(s_part_will_be_droped.index)
     return s[drop_mask]

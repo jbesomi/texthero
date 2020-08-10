@@ -17,6 +17,7 @@ from scipy.sparse import coo_matrix
 from typing import Optional, Union, Any, List
 
 from texthero import preprocessing
+from texthero._types import TextSeries, VectorSeries, RepresentationSeries, InputSeries
 
 import logging
 import warnings
@@ -1027,7 +1028,13 @@ Most similar
 """
 
 
-def most_similar(s, vector: List[float], max_number=None):
+@InputSeries(TextSeries)
+def most_similar(
+    s: TextSeries,
+    s_represented: Union[VectorSeries, RepresentationSeries],
+    vector: List[float],
+    max_number=None,
+) -> TextSeries:
     """
     Return the most similar vectors in s to the given vector.
 
@@ -1044,12 +1051,15 @@ def most_similar(s, vector: List[float], max_number=None):
 
     Parameters
     ----------
-    s : :class:`texthero._types.RepresentationSeries` or 
-        :class:`texthero._types.VectorSeries`
-        The Series in which to find the most similar vectors.
+    s : :class:`texthero._types.TextSeries` 
+        The Series in which we want to find similar documents.
+
+    s_represented : :class:`texthero._types.RepresentationSeries` or 
+                    :class:`texthero._types.VectorSeries`
+        The Series by which the similarity is calculated.
 
     vector : List[float]
-        The vector for which we want to find the most similar documents.
+        The vector to which we want to find the most similar documents.
 
     max_number: int or None, default 100
         Maximum amount of indexes of similar documents to return.
@@ -1062,40 +1072,37 @@ def most_similar(s, vector: List[float], max_number=None):
     >>> s = pd.Series(["I like football", "Hey, watch out", "I like sports", "Cool stuff"])
     >>> s_pca = s.pipe(hero.tokenize).pipe(hero.tfidf).pipe(hero.flatten).pipe(hero.pca) # TODO: remove flatten when pca is updated w.r.t. Representation Series
     >>> # want to find the two most similar to "I like football", which has index 0
-    >>> s_most_similar = hero.most_similar(s_pca, s_pca[0], max_number=2)
-    >>> s_most_similar  # doctest: +SKIP
-    0                       [0.0]
-    2    [2.1073424255447017e-08]
-    dtype: object
-    >>> # get text of the most similar ones (of course, the text is most similar to itself)
-    >>> s[s_most_similar.index]
+    >>> s_most_similar = hero.most_similar(s, s_pca, s_pca[0], max_number=2)
+    >>> s_most_similar
     0    I like football
     2      I like sports
     dtype: object
 
     """
-    if _check_is_valid_representation(s):
-        if pd.api.types.is_sparse(s):
-            s_coo_matrix = s.sparse.to_coo()[0]
+    if _check_is_valid_representation(s_represented):
+        if pd.api.types.is_sparse(s_represented):
+            s_represented_coo_matrix = s_represented.sparse.to_coo()[0]
         else:
-            s = s.astype("Sparse")
-            s_coo_matrix = s.sparse.to_coo()[0]
+            s_represented = s_represented.astype("Sparse")
+            s_represented_coo_matrix = s_represented.sparse.to_coo()[0]
 
-        s_for_vectorization = s_coo_matrix
-        s_flat_index = s.index.levels[0]
+        s_represented_for_vectorization = s_represented_coo_matrix
+        s_represented_flat_index = s_represented.index.levels[0]
 
     else:
-        s_for_vectorization = list(s)
-        s_flat_index = s.index
+        s_represented_for_vectorization = list(s_represented)
+        s_represented_flat_index = s_represented.index
 
     s_distances = pd.Series(
-        pairwise_distances(s_for_vectorization, np.array([vector])).tolist(),
-        index=s_flat_index,
+        pairwise_distances(
+            s_represented_for_vectorization, np.array([vector])
+        ).tolist(),
+        index=s_represented_flat_index,
     )
 
     s_distances = s_distances.sort_values()
 
     if max_number is not None:
-        return s_distances[:max_number]
+        return s[s_distances[:max_number].index]
     else:
-        return s_distances
+        return s[s_distances.index]

@@ -10,12 +10,14 @@ from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA, NMF
 from sklearn.cluster import KMeans, DBSCAN, MeanShift
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.metrics import pairwise_distances
 from sklearn.preprocessing import normalize as sklearn_normalize
 from scipy.sparse import coo_matrix
 
-from typing import Optional, Union, Any
+from typing import Optional, Union, Any, List
 
 from texthero import preprocessing
+from texthero._types import TextSeries, VectorSeries, RepresentationSeries, InputSeries
 
 import logging
 import warnings
@@ -1019,3 +1021,81 @@ def normalize(s: pd.Series, norm="l2") -> pd.Series:
     s_result.index = s.index
 
     return s_result
+@InputSeries(TextSeries)
+def drop_duplicates(
+    s: TextSeries,
+    s_represented: Union[VectorSeries, RepresentationSeries],
+    threshold=1,
+) -> TextSeries:
+    """
+    Return the most similar vectors in s to the given vector.
+
+    To find the most similar documents to a document, first represent
+    the Pandas Series with the documents, e.g. with
+    :meth:`hero.representation.tfidf`_ . Then use this function
+    to find the most similar documents according to the representation.
+    Similar vectors are returned sorted by similarity descending.
+
+    Internally, euclidian distance is used to judge similarity.
+
+    Series s can either be a :class:`texthero._types.RepresentationSeries`
+    or a :class:`texthero._types.VectorSeries`.
+
+    Parameters
+    ----------
+    s : :class:`texthero._types.TextSeries` 
+        The Series in which we want to find similar documents.
+
+    s_represented : :class:`texthero._types.RepresentationSeries` or 
+                    :class:`texthero._types.VectorSeries`
+        The Series by which the similarity is calculated.
+
+    vector : List[float]
+        The vector to which we want to find the most similar documents.
+
+    max_number: int or None, default 100
+        Maximum amount of indexes of similar documents to return.
+        If None, returns all .
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["I like football", "Hey, watch out", "I like sports", "Cool stuff"])
+    >>> s_pca = s.pipe(hero.tokenize).pipe(hero.tfidf).pipe(hero.flatten).pipe(hero.pca) # TODO: remove flatten when pca is updated w.r.t. Representation Series
+    >>> # want to find the two most similar to "I like football", which has index 0
+    >>> s_most_similar = hero.most_similar(s, s_pca, s_pca[0], max_number=2)
+    >>> s_most_similar
+    0    I like football
+    2      I like sports
+    dtype: object
+
+    """
+    if _check_is_valid_representation(s_represented):
+        if pd.api.types.is_sparse(s_represented):
+            s_represented_coo_matrix = s_represented.sparse.to_coo()[0]
+        else:
+            s_represented = s_represented.astype("Sparse")
+            s_represented_coo_matrix = s_represented.sparse.to_coo()[0]
+
+        s_represented_for_vectorization = s_represented_coo_matrix
+
+    else:
+        s_represented_for_vectorization = list(s_represented)
+
+    distance_matrix = pairwise_distances(
+        s_represented_for_vectorization
+    )
+    
+    list_index_remove = []
+    set_index_remove = set()
+    for i in range(distance_matrix.shape[0]):
+        if i not in set_index_remove:
+            for j in range(i+1, distance_matrix.shape[0]):
+                if distance_matrix[i][j] <= threshold:
+                    list_index_remove.append(j)
+                    set_index_remove.add(j)
+
+    s_part_will_be_droped = s.take(list_index_remove)
+    drop_mask = ~s.index.isin(s_part_will_be_droped.index)
+    return s[drop_mask]

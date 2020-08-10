@@ -67,7 +67,8 @@ def _texthero_init_for_flair_sentence(self, already_tokenized_text: List[str]):
 
 
 # Overwrite flair Sentence __init__ method to handle already tokenized text
-flair.data.Sentence.__init__ = _texthero_init_for_flair_sentence
+def _flair_setup_for_texthero():
+    flair.data.Sentence.__init__ = _texthero_init_for_flair_sentence
 
 
 """
@@ -92,7 +93,7 @@ def embed(
     >>> import texthero as hero
     >>> import pandas as pd
     >>> from flair.embeddings import TransformerDocumentEmbeddings
-    >>> embedding = TransformerDocumentEmbeddings('bert-base-uncased')
+    >>> embedding = TransformerDocumentEmbeddings("google/reformer-crime-and-punishment")
     >>> s = pd.Series(["Text of doc 1", "Text of doc 2"]).pipe(hero.tokenize)
     >>> hero.embed(s, embedding)  # doctest: +SKIP
     0    [-0.6618074, -0.20467158, -0.05876905, -0.3482...
@@ -103,6 +104,16 @@ def embed(
     --------
     `Flair Document Embedding https://github.com/flairNLP/flair/blob/master/resources/docs/TUTORIAL_5_DOCUMENT_EMBEDDINGS.md`_
     """
+    try:
+        import flair
+    except:
+        raise ImportError(
+            "To use this function, you need to have"
+            " the flair library (https://github.com/flairNLP/flair)"
+            " installed and imported!"
+        )
+
+    _flair_setup_for_texthero()
 
     def _embed_and_return_embedding(x):
         # flair embeddings need a 'flair Sentence' object as input.

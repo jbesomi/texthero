@@ -3,160 +3,203 @@ Visualize insights and statistics of a text-based Pandas DataFrame.
 """
 
 import pandas as pd
+import numpy as np
 import plotly.express as px
 
 from wordcloud import WordCloud
 
 from texthero import preprocessing
+from texthero._types import TextSeries, InputSeries
 import string
 
-# from typing import Boolean
+from matplotlib.colors import LinearSegmentedColormap as lsg
+import matplotlib.pyplot as plt
 
-
-@pd.api.extensions.register_series_accessor("words")
-class WordsAccessor:
-    """
-    To access plot directly from a series.
-
-    This is just for testing.
-
-    Example
-    -------
-    df['text'].words.plot()
-
-    
-    """
-
-    def __init__(self, pandas_obj):
-        self._validate(pandas_obj)
-        self._obj = pandas_obj
-
-    @staticmethod
-    def _validate(obj):
-        # verify there is a column latitude and a column longitude
-        # keeping as an example
-        return
-        if "pca" not in obj.columns:
-            raise AttributeError("Must have 'latitude' and 'longitude'.")
-
-    @property
-    def center(self):
-        # return the geographic center point of this DataFrame
-        # keeping as an example
-        return
-        lat = self._obj.latitude
-        lon = self._obj.longitude
-        return (float(lon.mean()), float(lat.mean()))
-
-    def plot(self, num_words=20, a=None):
-
-        top = top_words(self._obj)
-        df = px.data.tips()
-        fig = px.bar(x=top[:num_words].index, y=top[:num_words].values)
-        fig.update_traces(
-            marker=dict(colorscale="Portland", color=top[:num_words].values)
-        )
-        fig.show()
+from collections import Counter
 
 
 def scatterplot(
     df: pd.DataFrame,
     col: str,
     color: str = None,
+    hover_name: str = None,
     hover_data: [] = None,
     title="",
     return_figure=False,
 ):
     """
-    Show scatterplot using python plotly scatter.
+    Show scatterplot of DataFrame column using python plotly scatter.
+
+    Plot the values in column col. For example, if every cell in df[col]
+    is a list of three values (e.g. from doing PCA with 3 components),
+    a 3D-Plot is created and every cell entry [x, y, z] is visualized
+    as the point (x, y, z).
 
     Parameters
     ----------
-    df
-    col
-        The name of the column of the DataFrame used for x and y axis.
+    df: DataFrame with a column to be visualized.
+
+    col: str
+        The name of the column of the DataFrame to use for x and y (and z)
+        axis.
+
+    color: str, default to None.
+        Name of the column to use for coloring (rows with same value get same
+        color).
+
+    hover_name: str, default to None
+        Name of the column to supply title of hover data when hovering over a
+        point.
+
+    hover_data: List[str], default to [].
+        List of column names to supply data when hovering over a point.
+
+    title: str, default to "".
+        Title of the plot.
+
+    return_figure: optional, default to False.
+        Function returns the figure instead of showing it if set to True.
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> df = pd.DataFrame(["Football, Sports, Soccer",
+    ...                    "music, violin, orchestra", "football, fun, sports",
+    ...                    "music, fun, guitar"], columns=["texts"])
+    >>> df["texts"] = hero.clean(df["texts"]).pipe(hero.tokenize)
+    >>> df["pca"] = (
+    ...             hero.tfidf(df["texts"])
+    ...                 .pipe(hero.flatten)
+    ...                 .pipe(hero.pca, n_components=3)
+    ... ) # TODO: when others get Representation Support: remove flatten
+    >>> df["topics"] = (
+    ...                hero.tfidf(df["texts"])
+    ...                    .pipe(hero.flatten)
+    ...                    .pipe(hero.kmeans, n_clusters=2)
+    ... ) # TODO: when others get Representation Support: remove flatten
+    >>> hero.scatterplot(df, col="pca", color="topics",
+    ...                  hover_data=["texts"]) # doctest: +SKIP
     """
 
-    pca0 = df[col].apply(lambda x: x[0])
-    pca1 = df[col].apply(lambda x: x[1])
+    plot_values = np.stack(df[col], axis=1)
+    dimension = len(plot_values)
 
-    fig = px.scatter(
-        df, x=pca0, y=pca1, color=color, hover_data=hover_data, title=title
-    )
-    # fig.show(config={'displayModeBar': False})
-    fig.show()
+    if dimension < 2 or dimension > 3:
+        raise ValueError(
+            "The column you want to visualize has dimension < 2 or dimension > 3."
+            " The function can only visualize 2- and 3-dimensional data."
+        )
+
+    if dimension == 2:
+        x, y = plot_values[0], plot_values[1]
+
+        fig = px.scatter(
+            df,
+            x=x,
+            y=y,
+            color=color,
+            hover_data=hover_data,
+            title=title,
+            hover_name=hover_name,
+        )
+
+    else:
+        x, y, z = plot_values[0], plot_values[1], plot_values[2]
+
+        fig = px.scatter_3d(
+            df,
+            x=x,
+            y=y,
+            z=z,
+            color=color,
+            hover_data=hover_data,
+            title=title,
+            hover_name=hover_name,
+        )
 
     if return_figure:
         return fig
+    else:
+        fig.show()
 
 
 """
-
+Wordcloud
 """
 
 
+@InputSeries(TextSeries)
 def wordcloud(
-    s: pd.Series,
+    s: TextSeries,
     font_path: str = None,
     width: int = 400,
     height: int = 200,
-    margin=2,
-    ranks_only=None,
-    prefer_horizontal=0.9,
-    mask=None,
-    scale=1,
-    color_func=None,
     max_words=200,
-    min_font_size=4,
-    stopwords=None,
-    random_state=None,
-    background_color="black",
-    max_font_size=None,
-    font_step=1,
-    mode="RGB",
-    relative_scaling="auto",
-    regexp=None,
-    collocations=True,
-    colormap=None,
-    normalize_plurals=True,
+    mask=None,
     contour_width=0,
-    contour_color="black",
-    repeat=False,
-    include_numbers=False,
-    min_word_length=0,
-    collocation_threshold=30,
+    contour_color="PAPAYAWHIP",
+    min_font_size=4,
+    background_color="PAPAYAWHIP",
+    max_font_size=None,
+    relative_scaling="auto",
+    colormap=None,
     return_figure=False,
 ):
     """
     Plot wordcloud image using WordCloud from word_cloud package.
 
-    Most of the arguments are very similar if not equal to the mother function. In constrast, all words are taken into account when computing the wordcloud, inclusive stopwords. They can be easily removed with preprocessing.remove_stopwords.
+    Most of the arguments are very similar if not equal to the mother
+    function. In constrast, all words are taken into account when computing
+    the wordcloud, inclusive stopwords. They can be easily removed with
+    preprocessing.remove_stopwords.
 
-    Word are compute using generate_from_frequencies.
+    Words are computed using generate_from_frequencies.
+
+    To reduce blur in the wordcloud image, `width` and `height` should be at
+    least 400.
 
     Parameters
     ----------
-    s : pd.Series
+    s : :class:`texthero._types.TextSeries`
+
     font_path : str
-        Font path to the font that will be used (OTF or TTF). Defaults to DroidSansMono path on a Linux machine. If you are on another OS or don't have this font, you need to adjust this path.
+        Font path to the font that will be used (OTF or TTF). Defaults to
+        DroidSansMono path on a Linux machine. If you are on another OS or
+        don't have this font, you need to adjust this path.
+
     width : int
         Width of the canvas.
+
     height : int
         Height of the canvas.
+
     max_words : number (default=200)
         The maximum number of words.
+
     mask : nd-array or None (default=None)
-        When set, gives a binary mask on where to draw words. When set, width and height will be ignored and the shape of mask will be used instead. All white (#FF or #FFFFFF) entries will be considerd "masked out" while other entries will be free to draw on.
+        When set, gives a binary mask on where to draw words. When set, width
+        and height will be ignored and the shape of mask will be used instead.
+        All white (#FF or #FFFFFF) entries will be considerd "masked out"
+        while other entries will be free to draw on.
+
     contour_width: float (default=0)
         If mask is not None and contour_width > 0, draw the mask contour.
-    contour_color: color value (default="black")
+
+    contour_color: color value (default="PAPAYAWHIP")
         Mask contour color.
+
     min_font_size : int (default=4)
-        Smallest font size to use. Will stop when there is no more room in this size.
-    background_color : color value (default="black")
+        Smallest font size to use. Will stop when there is no more room in
+        this size.
+
+    background_color : color value (default="PAPAYAWHIP")
         Background color for the word cloud image.
+
     max_font_size : int or None (default=None)
-        Maximum font size for the largest word. If None, height of the image is used.
+        Maximum font size for the largest word. If None, height of the image
+        is used.
+
     relative_scaling : float (default='auto')
         Importance of relative word frequencies for font-size.  With
         relative_scaling=0, only word-ranks are considered.  With
@@ -165,35 +208,82 @@ def wordcloud(
         their rank, relative_scaling around .5 often looks good.
         If 'auto' it will be set to 0.5 unless repeat is true, in which
         case it will be set to 0.
+
     colormap : string or matplotlib colormap, default="viridis"
         Matplotlib colormap to randomly draw colors from for each word.
+
     """
-    # text = s.str.cat(sep=" ")
+    text = s.str.cat(sep=" ")
+
+    if colormap is None:
+
+        # Custom palette.
+        # TODO move it under tools.
+        corn = (255.0 / 256, 242.0 / 256, 117.0 / 256)
+        mango_tango = (255.0 / 256, 140.0 / 256, 66.0 / 256)
+        crayola = (63.0 / 256, 136.0 / 256, 197.0 / 256)
+        crimson = (215.0 / 256, 38.0 / 256, 61.0 / 256)
+        oxford_blue = (2.0 / 256, 24.0 / 256, 43.0 / 256)
+
+        texthero_cm = lsg.from_list(
+            "texthero", [corn, mango_tango, crayola, crimson, oxford_blue]
+        )
+
+        colormap = texthero_cm
+
+    words = s.str.cat(sep=" ").split()
 
     wordcloud = WordCloud(
-        background_color="white",
-        min_font_size=10,
-        stopwords=[],  # will use generate from frequencies.
-        normalize_plurals=False,
-    ).generate_from(text)
+        font_path=font_path,
+        width=width,
+        height=height,
+        max_words=max_words,
+        mask=mask,
+        contour_width=contour_width,
+        contour_color=contour_color,
+        min_font_size=min_font_size,
+        background_color=background_color,
+        max_font_size=max_font_size,
+        relative_scaling=relative_scaling,
+        colormap=colormap,
+        # stopwords=[],  # TODO. Will use generate from frequencies.
+        # normalize_plurals=False,  # TODO.
+    ).generate_from_frequencies(dict(Counter(words)))
 
-    fig = px.imshow(wordcloud, title=title)
-    fig.show()
+    # fig = px.imshow(wordcloud)
+    # fig.show()
+
+    fig, ax = plt.subplots(figsize=(20, 10))
+    ax.imshow(wordcloud, interpolation="bilinear")
+    ax.axis("off")
 
     if return_figure:
         return fig
 
 
-def top_words(s: pd.Series, normalize=False) -> pd.Series:
+@InputSeries(TextSeries)
+def top_words(s: TextSeries, normalize=False) -> pd.Series:
     r"""
     Return a pandas series with index the top words and as value the count.
 
-    Tokenization: split by space and remove all punctuations that are not between characters.
-    
+    Tokenization: split by space and remove all punctuations that are not
+    between characters.
+
     Parameters
     ----------
-    normalize :
+    normalize : optional, default to False.
         When set to true, return normalized values.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> import texthero as hero
+    >>> s = pd.Series("one two two three three three")
+    >>> hero.top_words(s)
+    three    3
+    two      2
+    one      1
+    dtype: int64
 
     """
 
@@ -201,6 +291,9 @@ def top_words(s: pd.Series, normalize=False) -> pd.Series:
     # This means, they have either a non word-bounding \B, are at the start ^, or at the end $
     # As re.sub replace all and not just the matching group, add matching parenthesis to the character
     # to keep during replacement.
+
+    # TODO replace it with tokenizer.
+
     pattern = (
         rf"((\w)[{string.punctuation}](?:\B|$)|(?:^|\B)[{string.punctuation}](\w))"
     )

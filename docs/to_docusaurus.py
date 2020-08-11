@@ -155,12 +155,15 @@ for a in glob.glob("./_build/html/api/*.html"):
 
     hide_title = "true"
 
+    api_sidebars[module_name].sort()
+
     api_sidebars[module_name] = api_sidebars[module_name] + ["api/" + id]
 
     in_html_filename = f"{ROOT_HTML_DIRECTORY}/api/{object_name}.html"
     out_md_filename = f"{ROOT_MD_DIRECTORY}/api/{object_name}.md"
 
     to_md(in_html_filename, out_md_filename, id, title, hide_title)
+
 
 # Load, update and save again sidebars.json
 with open(SIDEBARS_FILEPATH) as js:

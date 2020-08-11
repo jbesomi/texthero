@@ -19,6 +19,26 @@ def load_tests(loader, tests, ignore):
 
 class TestVisualization(PandasTestCase):
     """
+    Test scatterplot.
+    """
+
+    def test_scatterplot_dimension_too_high(self):
+        s = pd.Series([[1, 2, 3, 4], [1, 2, 3, 4]])
+        df = pd.DataFrame(s)
+        self.assertRaises(ValueError, visualization.scatterplot, df, col=0)
+
+    def test_scatterplot_dimension_too_low(self):
+        s = pd.Series([[1], [1]])
+        df = pd.DataFrame(s)
+        self.assertRaises(ValueError, visualization.scatterplot, df, col=0)
+
+    def test_scatterplot_return_figure(self):
+        s = pd.Series([[1, 2, 3], [1, 2, 3]])
+        df = pd.DataFrame(s)
+        ret = visualization.scatterplot(df, col=0, return_figure=True)
+        self.assertIsNotNone(ret)
+
+    """
     Test top_words.
     """
 
@@ -51,3 +71,11 @@ class TestVisualization(PandasTestCase):
         s = pd.Series("123. .321 -h1n1 -cov2")
         s_true = pd.Series([1, 1, 1, 1], index=["123", "321", "cov2", "h1n1"])
         self.assertEqual(visualization.top_words(s).sort_index(), s_true)
+
+    """
+    Test worcloud
+    """
+
+    def test_wordcloud(self):
+        s = pd.Series("one two three")
+        self.assertEqual(visualization.wordcloud(s), None)

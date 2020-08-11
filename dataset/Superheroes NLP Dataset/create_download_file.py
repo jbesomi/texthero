@@ -4,9 +4,9 @@ Create a "download.sh" file containing a list of all http url that needs to be d
 
 import helper as h
 
-#NUM_PAGE = 1
-#data_char = h.get_data("https://www.superherodb.com/characters/?page_nr={}".format(NUM_PAGE))
-#superhero_links = h.get_superheroes_links(data_char)
+# NUM_PAGE = 1
+# data_char = h.get_data("https://www.superherodb.com/characters/?page_nr={}".format(NUM_PAGE))
+# superhero_links = h.get_superheroes_links(data_char)
 
 
 # Get all superheroes link
@@ -14,12 +14,14 @@ import helper as h
 TOTAL_PAGES = 33
 all_links = []
 
-for p in range(1,33 + 1):
-    data_char = h.get_data("https://www.superherodb.com/characters/?page_nr={}".format(p))
+for p in range(1, 33 + 1):
+    data_char = h.get_data(
+        "https://www.superherodb.com/characters/?page_nr={}".format(p)
+    )
     all_links += h.get_superheroes_links(data_char)
 
 
-DOWNLOAD_DIR = "./data/raw/" 
+DOWNLOAD_DIR = "./data/raw/"
 
 file_content = ""
 command = "wget {} -t 5 --limit-rate=20K --show-progress -O {}\n"
@@ -34,15 +36,15 @@ for link in all_links:
     filename = DOWNLOAD_DIR + link.split("/")[-3]
 
     # Download about
-    filename_about =  filename + "_about.html"
+    filename_about = filename + "_about.html"
     file_content += command.format(link, filename_about)
 
     # Download history
-    filename_history =  filename + "_history.html"
+    filename_history = filename + "_history.html"
     file_content += command.format(link + "history/", filename_history)
 
     # Download powers
-    filename_powers =  filename + "_powers.html"
+    filename_powers = filename + "_powers.html"
     file_content += command.format(link + "powers/", filename_powers)
 
     file_content += "\n"
@@ -52,5 +54,5 @@ for link in all_links:
 print("There are ", len(filename_set), " files.")
 print("There are ", len(set(filename_set)), "unique files.")
 
-#with open("download.sh", "w") as file:
+# with open("download.sh", "w") as file:
 #    file.write(file_content)

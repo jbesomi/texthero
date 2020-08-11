@@ -234,3 +234,36 @@ class AbstractRepresentationTest(PandasTestCase):
         pd.testing.assert_series_equal(
             representation.flatten(s, index=s_true.index), s_true, check_names=False
         )
+
+    """
+    Test drop duplicates
+    """
+
+    def test_drop_duplicates(self):
+        s = pd.Series(
+            ["I like football", "Hey, watch out", "I like sports", "Cool stuff"]
+        )
+        s_pca = (
+            s.pipe(preprocessing.tokenize)
+            .pipe(representation.tfidf)
+            .pipe(representation.flatten)
+            .pipe(representation.pca)
+        )
+        pd.testing.assert_series_equal(
+            representation.drop_duplicates(s, s_pca, 1),
+            pd.Series(
+                ["I like football", "Hey, watch out", "Cool stuff"], index=[0, 1, 3]
+            ),
+        )
+
+    def test_keep_duplicates(self):
+        s = pd.Series(
+            ["I like football", "Hey, watch out", "I like sports", "Cool stuff"]
+        )
+        s_pca = (
+            s.pipe(preprocessing.tokenize)
+            .pipe(representation.tfidf)
+            .pipe(representation.flatten)
+            .pipe(representation.pca)
+        )
+        pd.testing.assert_series_equal(representation.drop_duplicates(s, s_pca, 0), s)

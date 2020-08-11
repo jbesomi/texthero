@@ -1021,6 +1021,8 @@ def normalize(s: pd.Series, norm="l2") -> pd.Series:
     s_result.index = s.index
 
     return s_result
+
+
 @InputSeries(TextSeries)
 def drop_duplicates(
     s: TextSeries,
@@ -1061,7 +1063,8 @@ def drop_duplicates(
     >>> # want to remove a duplicate, in this case "I like sports" and "I like football" are 
     >>> # considered as one
     >>> drop_duplicates = hero.drop_duplicates(s, s_pca, 1)
-    >>> 0    I like football
+    >>> drop_duplicates
+    0    I like football
     1     Hey, watch out
     3         Cool stuff
     dtype: object
@@ -1080,10 +1083,8 @@ def drop_duplicates(
         s_represented_for_vectorization = list(s_represented)
 
     # calculating the distance between those vectors and returns the distances saved in a matrix
-    distance_matrix = pairwise_distances(
-        s_represented_for_vectorization
-    )
-    
+    distance_matrix = pairwise_distances(s_represented_for_vectorization)
+
     list_index_remove = []
     set_index_remove = set()
 
@@ -1093,7 +1094,7 @@ def drop_duplicates(
         # the second vector.
         if i not in set_index_remove:
             # as matrix is symmetric, we just need to take care of the 'bigger' indexes
-            for j in range(i+1, distance_matrix.shape[0]):
+            for j in range(i + 1, distance_matrix.shape[0]):
                 if distance_matrix[i][j] <= threshold:
                     list_index_remove.append(j)
                     set_index_remove.add(j)

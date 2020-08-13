@@ -5,18 +5,22 @@ The texthero.nlp module supports common NLP tasks such as named_entities, noun_c
 import spacy
 import pandas as pd
 
+from texthero._types import TextSeries, InputSeries
 
-def named_entities(s: pd.Series, package="spacy") -> pd.Series:
+
+@InputSeries(TextSeries)
+def named_entities(s: TextSeries, package="spacy") -> pd.Series:
     """
     Return named-entities.
 
     Return a Pandas Series where each row contains a list of tuples
     with information about the named entities in the row's document.
 
-    Tuple: (`entity'name`, `entity'label`, `starting character`, `ending character`)
+    Tuple: (`entity'name`, `entity'label`, `starting character`,
+            `ending character`)
 
-    Under the hood, `named_entities` makes use of 
-    `Spacy name entity recognition <https://spacy.io/usage/linguistic-features#named-entities>`_
+    Under the hood, `named_entities` makes use of `Spacy name entity
+    recognition <https://spacy.io/usage/linguistic-features#named-entities>`_
 
     List of labels:
      - `PERSON`: People, including fictional.
@@ -43,8 +47,9 @@ def named_entities(s: pd.Series, package="spacy") -> pd.Series:
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series("Yesterday I was in NY with Bill de Blasio")
-    >>> hero.named_entities(s)[0]
-    [('Yesterday', 'DATE', 0, 9), ('NY', 'GPE', 19, 21), ('Bill de Blasio', 'PERSON', 27, 41)]
+    >>> hero.named_entities(s)[0] # doctest: +NORMALIZE_WHITESPACE
+    [('Yesterday', 'DATE', 0, 9), ('NY', 'GPE', 19, 21),
+     ('Bill de Blasio', 'PERSON', 27, 41)]
     """
     entities = []
 
@@ -59,7 +64,8 @@ def named_entities(s: pd.Series, package="spacy") -> pd.Series:
     return pd.Series(entities, index=s.index)
 
 
-def noun_chunks(s: pd.Series) -> pd.Series:
+@InputSeries(TextSeries)
+def noun_chunks(s: TextSeries) -> pd.Series:
     """
     Return noun chunks (noun phrases).
 
@@ -68,10 +74,10 @@ def noun_chunks(s: pd.Series) -> pd.Series:
 
     Tuple: (`chunk'text`, `chunk'label`, `starting index`, `ending index`)
 
-    Noun chunks or noun phrases are phrases that have noun at their head or nucleus 
-    i.e., they ontain the noun and other words that describe that noun. 
-    A detailed explanation on noun chunks: https://en.wikipedia.org/wiki/Noun_phrase
-    Internally `noun_chunks` makes use of Spacy's dependency parsing:
+    Noun chunks or noun phrases are phrases that have noun at their head or
+    nucleus i.e., they ontain the noun and other words that describe that noun.
+    A detailed explanation on noun chunks: https://en.wikipedia.org/wiki/Noun
+    phrase. Internally `noun_chunks` makes use of Spacy's dependency parsing:
     https://spacy.io/usage/linguistic-features#dependency-parse
 
     Examples
@@ -100,19 +106,23 @@ def noun_chunks(s: pd.Series) -> pd.Series:
     return pd.Series(noun_chunks, index=s.index)
 
 
-def count_sentences(s: pd.Series) -> pd.Series:
+@InputSeries(TextSeries)
+def count_sentences(s: TextSeries) -> pd.Series:
     """
     Count the number of sentences per cell in a Pandas Series.
 
     Return a new Pandas Series with the number of sentences per cell.
 
-    This makes use of the SpaCy `sentencizer <https://spacy.io/api/sentencizer>`_
+    This makes use of the SpaCy `sentencizer
+    <https://spacy.io/api/sentencizer>`_
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Yesterday I was in NY with Bill de Blasio. Great story...", "This is the F.B.I.! What? Open up!"])
+    >>> s = pd.Series(
+    ...     ["Yesterday I was in NY with Bill de Blasio. Great story...",
+    ...      "This is the F.B.I.! What? Open up!"])
     >>> hero.count_sentences(s)
     0    2
     1    3
@@ -130,22 +140,31 @@ def count_sentences(s: pd.Series) -> pd.Series:
     return pd.Series(number_of_sentences, index=s.index)
 
 
-def pos_tag(s: pd.Series) -> pd.Series:
+@InputSeries(TextSeries)
+def pos_tag(s: TextSeries) -> pd.Series:
     """
     Return a Pandas Series with part-of-speech tagging
 
-    Return new Pandas Series where each rows contains a list of tuples containing information about part-of-speech tagging
+    Return new Pandas Series where each rows contains a list of tuples
+    containing information about part-of-speech tagging.
 
-    Tuple (`token name`,`Coarse-grained POS`,`Fine-grained POS`, `starting character`, `ending character`)
-    
-    A difference between the coarse-grained POS and the Fine-grained POS is that the last one is more specific about marking,
-    for example if the coarse-grained POS has a NOUN value, then the refined POS will give more details about the type of 
-    the noun, whether it is singular, plural and/or proper.
-    You can use the spacy `explain` function to find out which fine-grained POS it is.
-    
-    You can see more details about Fine-grained POS at: <https://spacy.io/api/annotation#pos-en>
+    Tuple: (`token name`,`Coarse-grained POS`,`Fine-grained POS`,
+            `starting character`, `ending character`)
 
-    This makes use of the SpaCy `processing pipeline. <https://spacy.io/usage/processing-pipelines#pipelines>`.
+    A difference between the coarse-grained POS and the Fine-grained POS is
+    that the last one is more specific about marking, for example if the
+    coarse-grained POS has a NOUN value, then the refined POS will give more
+    details about the type of the noun, whether it is singular, plural and/or
+    proper.
+    
+    You can use the spacy `explain` function to find out which fine-grained
+    POS it is.
+
+    You can see more details about Fine-grained POS at:
+    <https://spacy.io/api/annotation#pos-en>
+
+    This makes use of the SpaCy `processing pipeline
+    <https://spacy.io/usage/processing-pipelines#pipelines>`.
 
     List of POS/Tag:
      - `ADJ`: Adjective. Examples: big, old, green.
@@ -168,15 +187,18 @@ def pos_tag(s: pd.Series) -> pd.Series:
      - `X`: Other.
      - `SPACE`: Space.
 
-    Internally pos_tag makes use of Spacy's dependency tagging: <https://spacy.io/api/annotation#pos-tagging>`
+    Internally pos_tag makes use of Spacy's dependency tagging:
+    <https://spacy.io/api/annotation#pos-tagging>`
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series("Today is such a beautiful day")
-    >>> print(hero.pos_tag(s)[0])
-    [('Today', 'NOUN', 'NN', 0, 5), ('is', 'AUX', 'VBZ', 6, 8), ('such', 'DET', 'PDT', 9, 13), ('a', 'DET', 'DT', 14, 15), ('beautiful', 'ADJ', 'JJ', 16, 25), ('day', 'NOUN', 'NN', 26, 29)]
+    >>> print(hero.pos_tag(s)[0]) # doctest: +NORMALIZE_WHITESPACE
+    [('Today', 'NOUN', 'NN', 0, 5), ('is', 'AUX', 'VBZ', 6, 8), ('such', 'DET',
+     'PDT', 9, 13), ('a', 'DET', 'DT', 14, 15), ('beautiful', 'ADJ', 'JJ', 16,
+     25), ('day', 'NOUN', 'NN', 26, 29)]
     """
 
     pos_tags = []

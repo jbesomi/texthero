@@ -9,6 +9,7 @@ import plotly.express as px
 from wordcloud import WordCloud
 
 from texthero import preprocessing
+from texthero._types import TextSeries, InputSeries
 import string
 
 from matplotlib.colors import LinearSegmentedColormap as lsg
@@ -39,13 +40,16 @@ def scatterplot(
     df: DataFrame with a column to be visualized.
 
     col: str
-        The name of the column of the DataFrame to use for x and y (and z) axis.
+        The name of the column of the DataFrame to use for x and y (and z)
+        axis.
 
     color: str, default to None.
-        Name of the column to use for coloring (rows with same value get same color).
+        Name of the column to use for coloring (rows with same value get same
+        color).
 
     hover_name: str, default to None
-        Name of the column to supply title of hover data when hovering over a point.
+        Name of the column to supply title of hover data when hovering over a
+        point.
 
     hover_data: List[str], default to [].
         List of column names to supply data when hovering over a point.
@@ -60,11 +64,22 @@ def scatterplot(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> df = pd.DataFrame(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, fun, guitar"], columns=["texts"])
+    >>> df = pd.DataFrame(["Football, Sports, Soccer",
+    ...                    "music, violin, orchestra", "football, fun, sports",
+    ...                    "music, fun, guitar"], columns=["texts"])
     >>> df["texts"] = hero.clean(df["texts"]).pipe(hero.tokenize)
-    >>> df["pca"] = hero.tfidf(df["texts"]).pipe(hero.pca, n_components=3)
-    >>> df["topics"] = hero.tfidf(df["texts"]).pipe(hero.kmeans, n_clusters=2)
-    >>> hero.scatterplot(df, col="pca", color="topics", hover_data=["texts"]) # doctest: +SKIP
+    >>> df["pca"] = (
+    ...             hero.tfidf(df["texts"])
+    ...                 .pipe(hero.flatten)
+    ...                 .pipe(hero.pca, n_components=3)
+    ... ) # TODO: when others get Representation Support: remove flatten
+    >>> df["topics"] = (
+    ...                hero.tfidf(df["texts"])
+    ...                    .pipe(hero.flatten)
+    ...                    .pipe(hero.kmeans, n_clusters=2)
+    ... ) # TODO: when others get Representation Support: remove flatten
+    >>> hero.scatterplot(df, col="pca", color="topics",
+    ...                  hover_data=["texts"]) # doctest: +SKIP
     """
 
     plot_values = np.stack(df[col], axis=1)
@@ -114,8 +129,9 @@ Wordcloud
 """
 
 
+@InputSeries(TextSeries)
 def wordcloud(
-    s: pd.Series,
+    s: TextSeries,
     font_path: str = None,
     width: int = 400,
     height: int = 200,
@@ -145,7 +161,7 @@ def wordcloud(
 
     Parameters
     ----------
-    s : pd.Series
+    s : :class:`texthero._types.TextSeries`
 
     font_path : str
         Font path to the font that will be used (OTF or TTF). Defaults to
@@ -245,11 +261,13 @@ def wordcloud(
         return fig
 
 
-def top_words(s: pd.Series, normalize=False) -> pd.Series:
+@InputSeries(TextSeries)
+def top_words(s: TextSeries, normalize=False) -> pd.Series:
     r"""
     Return a pandas series with index the top words and as value the count.
 
-    Tokenization: split by space and remove all punctuations that are not between characters.
+    Tokenization: split by space and remove all punctuations that are not
+    between characters.
 
     Parameters
     ----------

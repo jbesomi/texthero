@@ -11,9 +11,11 @@ import numpy as np
 import pandas as pd
 
 from spacy.lang.zh import Chinese
-import texthero as hero
 
-# Standard functions supported Chinese
+import texthero as hero
+from texthero._types import TokenSeries, TextSeries, InputSeries
+
+# Standard functions that supports Chinese
 from texthero.preprocessing import (
     fillna,
     has_content,
@@ -55,12 +57,14 @@ __all__ = [
 
 def get_default_pipeline() -> List[Callable[[pd.Series], pd.Series]]:
     """
-    Return a list contaning all the methods used in the default cleaning pipeline.
-
     Return a list with the following functions:
     1. :meth:`texthero.preprocessing.fillna`
     2. :meth:`texthero.preprocessing.remove_whitespace`
     3. :meth:`texthero.preprocessing.tokenize`
+
+    See also
+    --------
+    :meth:`texthero.preprocessing.get_default_pipeline`
     """
     return [
         fillna,
@@ -70,10 +74,9 @@ def get_default_pipeline() -> List[Callable[[pd.Series], pd.Series]]:
     ]
 
 
-def clean(s: pd.Series, pipeline=None) -> pd.Series:
+@InputSeries(TextSeries)
+def clean(s: TextSeries, pipeline=None) -> TextSeries:
     """
-    Pre-process a text-based Pandas Series, by using the following default pipline.
-
     Default pipeline:
     1. :meth:`texthero.preprocessing.fillna`
     2. :meth:`texthero.preprocessing.remove_whitespace`
@@ -81,7 +84,7 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
     
     Parameters
     ----------
-    s : Pandas Series
+    s : :class:`texthero._types.TextSeries`
 
     pipeline :List[Callable[[Pandas Series], Pandas Series]]
        inserting specific pipeline to clean a text
@@ -96,6 +99,10 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
     >>> hero.clean(s)
     0    [我, 昨天, 吃, 烤鸭, 去, 了, 。, 挺好吃, 的, 。]
     dtype: object
+
+    See also
+    --------
+    :meth:`texthero.preprocessing.clean`
     """
     if not pipeline:
         pipeline = get_default_pipeline()
@@ -103,15 +110,12 @@ def clean(s: pd.Series, pipeline=None) -> pd.Series:
     return hero.preprocessing.clean(s, pipeline)
 
 
-def replace_tags(s: pd.Series, symbol: str) -> pd.Series:
-    """Replace all tags from a given Pandas Series with symbol.
-
-    A tag is a string formed by @ concatenated with a sequence of Chinese & English characters and digits. 
-    Example: @我爱texthero123.
-
+@InputSeries(TextSeries)
+def replace_tags(s: TextSeries, symbol: str) -> TextSeries:
+    """
     Parameters
     ----------
-    s : Pandas Series
+    s : :class:`texthero._types.TextSeries`
 
     symbols : str
         Symbols to replace
@@ -125,18 +129,18 @@ def replace_tags(s: pd.Series, symbol: str) -> pd.Series:
     0    你好啊TAG。
     dtype: object
 
+    See also
+    --------
+    :meth:`texthero.preprocessing.replace_tags`
     """
 
     pattern = r"@[a-zA-Z0-9\u4e00-\u9fa5]+"
     return s.str.replace(pattern, symbol)
 
 
-def remove_tags(s: pd.Series) -> pd.Series:
-    """Remove all tags from a given Pandas Series.
-
-    A tag is a string formed by @ concatenated with a sequence of Chinese & English characters and digits. 
-    Example: @我爱texthero123. Tags are replaced by an empty space ` `.
-
+@InputSeries(TextSeries)
+def remove_tags(s: TextSeries) -> TextSeries:
+    """
     Examples
     --------
     >>> import texthero.lang.zh as hero
@@ -148,20 +152,17 @@ def remove_tags(s: pd.Series) -> pd.Series:
 
     See also
     --------
-    :meth:`texthero.preprocessing.replace_tags` for replacing a tag with a custom symbol.
+    :meth:`texthero.preprocessing.remove_tags`
     """
     return replace_tags(s, " ")
 
 
-def replace_hashtags(s: pd.Series, symbol: str) -> pd.Series:
-    """Replace all hashtags from a Pandas Series with symbol
-
-    A hashtag is a string formed by # concatenated with a sequence of Chinese & English characters, digits and underscores. 
-    Example: #杰克_texthero_123. 
-
+@InputSeries(TextSeries)
+def replace_hashtags(s: TextSeries, symbol: str) -> TextSeries:
+    """
     Parameters
     ----------
-    s : Pandas Series
+    s : :class:`texthero._types.TextSeries`
 
     symbols : str
         Symbols to replace
@@ -175,17 +176,17 @@ def replace_hashtags(s: pd.Series, symbol: str) -> pd.Series:
     0    今天天气真不错HASHTAG。
     dtype: object
 
+    See also
+    --------
+    :meth:`texthero.preprocessing.replace_hashtags`
     """
     pattern = r"#[a-zA-Z0-9_\u4e00-\u9fa5]+"
     return s.str.replace(pattern, symbol)
 
 
-def remove_hashtags(s: pd.Series) -> pd.Series:
-    """Remove all hashtags from a given Pandas Series
-
-    A hashtag is a string formed by # concatenated with a sequence of Chinese & English characters, digits and underscores. 
-    Example: #杰克_texthero_123. 
-
+@InputSeries(TextSeries)
+def remove_hashtags(s: TextSeries) -> TextSeries:
+    """
     Examples
     --------
     >>> import texthero.lang.zh as hero
@@ -197,21 +198,14 @@ def remove_hashtags(s: pd.Series) -> pd.Series:
 
     See also
     --------
-    :meth:`texthero.preprocessing.replace_hashtags` for replacing a hashtag with a custom symbol.
+    :meth:`texthero.preprocessing.remove_hashtags`
     """
     return replace_hashtags(s, " ")
 
 
-def tokenize(s: pd.Series) -> pd.Series:
+@InputSeries(TextSeries)
+def tokenize(s: TextSeries) -> TokenSeries:
     """
-    Tokenize each row of the given Series.
-
-    Tokenize each row of the given Pandas Series and return a Pandas Series where each row contains a list of tokens.
-
-
-    Algorithm: add a space between any punctuation symbol at
-    exception if the symbol is between two alphanumeric character and split.
-
     Examples
     --------
     >>> import texthero.lang.zh as hero
@@ -221,7 +215,9 @@ def tokenize(s: pd.Series) -> pd.Series:
     0    [我, 昨天, 吃, 烤鸭, 去, 了, 。]
     dtype: object
 
+    See also
+    --------
+    :meth:`texthero.preprocessing.tokenize`
     """
-
     tokenizer = Chinese()
     return s.apply(lambda string: [token.text for token in tokenizer(string)])

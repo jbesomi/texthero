@@ -5,7 +5,6 @@ Useful helper functions for the texthero library.
 import pandas as pd
 import functools
 import warnings
-import wrapt
 
 
 """

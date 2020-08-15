@@ -5,7 +5,6 @@ The texthero.lang.zh.preprocessing module for Chinese.
 import re
 import string
 from typing import Optional, Set
-import wrapt
 
 import numpy as np
 import pandas as pd

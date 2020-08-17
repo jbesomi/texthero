@@ -385,10 +385,14 @@ class TestPreprocessing(PandasTestCase):
     """
     Correcting mistakes
     """
-    
+
     def test_correct_mistakes(self):
-        s = pd.Series("whereis th elove hehad dated forImuch of thepast who couqdn'tread in sixthgrade and ins pired him")
-        s_true = pd.Series("where is the love he had dated for much of the past who couldn't read in sixth grade and inspired him")
+        s = pd.Series(
+            "whereis th elove hehad dated forImuch of thepast who couqdn'tread in sixthgrade and ins pired him"
+        )
+        s_true = pd.Series(
+            "where is the love he had dated for much of the past who couldn't read in sixth grade and inspired him"
+        )
         self.assertEqual(preprocessing.correct_mistakes(s), s_true)
 
     def test_correct_mistakes_spacing(self):
@@ -396,8 +400,12 @@ class TestPreprocessing(PandasTestCase):
         s_true = pd.Series("the quick brown fox jumps over the lazy dog")
         self.assertEqual(preprocessing.correct_mistakes(s, True), s_true)
 
-        s = pd.Series("itwasthebestoftimesitwastheworstoftimesitwastheageofwisdomitwastheageoffoolishness")
-        s_true = pd.Series("it was the best of times it was the worst of times it was the age of wisdom it was the age of foolishness")
+        s = pd.Series(
+            "itwasthebestoftimesitwastheworstoftimesitwastheageofwisdomitwastheageoffoolishness"
+        )
+        s_true = pd.Series(
+            "it was the best of times it was the worst of times it was the age of wisdom it was the age of foolishness"
+        )
         self.assertEqual(preprocessing.correct_mistakes(s, True), s_true)
 
         s = pd.Series("sometimes spacing is notcorrecta nd shoul dbe fixed")

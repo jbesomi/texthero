@@ -27,90 +27,14 @@ Helper
 """
 
 
-def flatten(
-    s: Union[pd.Series, pd.Series.sparse],
-    index: pd.Index = None,
-    fill_missing_with: Any = 0.0,
-) -> pd.Series:
+def _check_is_valid_DocumentTermDF(df: Union[pd.DataFrame, pd.Series]) -> bool:
     """
-    Transform a Pandas Representation Series to a "normal" (flattened) Pandas Series.
+    Check if the given Pandas Series is a Document Term DF.
 
-    The given Series should have a multiindex with first level being the document
-    and second level being individual features of that document (e.g. tdidf scores per word).
-    The flattened Series has one cell per document, with the cell being a list of all
-    the individual features of that document.
-
-    Parameters
-    ----------
-    s : Sparse Pandas Series or Pandas Series
-        The multiindexed Pandas Series to flatten.
-
-    index : Pandas Index, optional, default to None
-        The index the flattened Series should have.
-
-    fill_missing_with : Any, default to 0.0
-        Value to fill the NaNs (missing values) with. This _does not_ mean
-        that existing values that are np.nan are replaced, but rather that
-        features that are not present in one document but present in others
-        are filled with fill_missing_with. See example below.
-
-
-    Examples
-    --------
-    >>> import texthero as hero
-    >>> import pandas as pd
-    >>> import numpy as np
-    >>> index = pd.MultiIndex.from_tuples([("doc0", "Word1"), ("doc0", "Word3"), ("doc1", "Word2")], names=['document', 'word'])
-    >>> s = pd.Series([3, np.nan, 4], index=index)
-    >>> s
-    document  word 
-    doc0      Word1    3.0
-              Word3    NaN
-    doc1      Word2    4.0
-    dtype: float64
-    >>> hero.flatten(s, fill_missing_with=0.0)
-    document
-    doc0    [3.0, 0.0, nan]
-    doc1    [0.0, 4.0, 0.0]
-    dtype: object
+    Returns true if input is Document Term DF, else False.
 
     """
-    s = s.unstack(fill_value=fill_missing_with)
-
-    if index is not None:
-        s = s.reindex(index, fill_value=fill_missing_with)
-        # Reindexing makes the documents for which no values
-        # are present in the Sparse Representation Series
-        # "reappear" correctly.
-
-    s = pd.Series(s.values.tolist(), index=s.index)
-
-    return s
-
-
-def _check_is_valid_representation(s: pd.Series) -> bool:
-    """
-    Check if the given Pandas Series is a Document Representation Series.
-
-    Returns true if Series is Document Representation Series, else False.
-
-    """
-
-    # TODO: in Version 2 when only representation is accepted as input -> change "return False" to "raise ValueError"
-
-    if not isinstance(s.index, pd.MultiIndex):
-        return False
-        # raise ValueError(
-        #     f"The input Pandas Series should be a Representation Pandas Series and should have a MultiIndex. The given Pandas Series does not appears to have MultiIndex"
-        # )
-
-    if s.index.nlevels != 2:
-        return False
-        # raise ValueError(
-        #     f"The input Pandas Series should be a Representation Pandas Series and should have a MultiIndex, where the first level represent the document and the second one the words/token. The given Pandas Series has {s.index.nlevels} number of levels instead of 2."
-        # )
-
-    return True
+    return isinstance(df, pd.DataFrame) and isinstance(df.columns, pd.MultiIndex)
 
 
 # Warning message for not-tokenized inputs
@@ -132,21 +56,17 @@ def count(
     min_df=1,
     max_df=1.0,
     binary=False,
-) -> pd.Series:
+) -> pd.DataFrame:
     """
     Represent a text-based Pandas Series using count.
 
-    Return a Document Representation Series with the
+    Return a Document Term DataFrame with the
     number of occurences of a document's words for every
     document.
     TODO add tutorial link
 
     The input Series should already be tokenized. If not, it will
     be tokenized before count is calculated.
-
-    Use :meth:`hero.representation.flatten` on the output to get
-    a standard Pandas Series with the document vectors
-    in every cell.
 
     Parameters
     ----------
@@ -177,15 +97,14 @@ def count(
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
     >>> hero.count(s)
-    0  Sentence    1
-       one         1
-    1  Sentence    1
-       two         1
-    dtype: Sparse[int64, 0]
+           count        
+        Sentence one two
+    0        1   1   0
+    1        1   0   1
 
     See Also
     --------
-    Document Representation Series: TODO add tutorial link
+    Document Term DataFrame: TODO add tutorial link
     """
     # TODO. Can be rewritten without sklearn.
 
@@ -204,36 +123,29 @@ def count(
     )
 
     tf_vectors_csr = tf.fit_transform(s)
-    tf_vectors_coo = coo_matrix(tf_vectors_csr)
 
-    s_out = pd.Series.sparse.from_coo(tf_vectors_coo)
+    multiindexed_columns = pd.MultiIndex.from_tuples(
+        [("count", word) for word in tf.get_feature_names()]
+    )
 
-    features_names = tf.get_feature_names()
-
-    # Map word index to word name
-    s_out.index = s_out.index.map(lambda x: (s.index[x[0]], features_names[x[1]]))
-
-    return s_out
+    return pd.DataFrame.sparse.from_spmatrix(
+        tf_vectors_csr, s.index, multiindexed_columns
+    )
 
 
 def term_frequency(
     s: pd.Series, max_features: Optional[int] = None, min_df=1, max_df=1.0,
-) -> pd.Series:
+) -> pd.DataFrame:
     """
     Represent a text-based Pandas Series using term frequency.
 
-    Return a Document Representation Series with the
+    Return a Document Term DataFrame with the
     term frequencies of the terms for every
     document.
     TODO add tutorial link
 
     The input Series should already be tokenized. If not, it will
     be tokenized before term_frequency is calculated.
-
-    Use :meth:`hero.representation.flatten` on the output to get
-    a standard Pandas Series with the document vectors
-    in every cell.
-
 
     Parameters
     ----------
@@ -261,16 +173,14 @@ def term_frequency(
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one hey", "Sentence two"]).pipe(hero.tokenize)
     >>> hero.term_frequency(s)
-    0  Sentence    0.2
-       hey         0.2
-       one         0.2
-    1  Sentence    0.2
-       two         0.2
-    dtype: Sparse[float64, nan]
+      term_frequency               
+            Sentence  hey  one  two
+    0            0.2  0.2  0.2  0.0
+    1            0.2  0.0  0.0  0.2
 
     See Also
     --------
-    Document Representation Series: TODO add tutorial link
+    Document Term DataFrame: TODO add tutorial link
     """
     # Check if input is tokenized. Else, print warning and tokenize.
     if not isinstance(s.iloc[0], list):
@@ -291,17 +201,16 @@ def term_frequency(
     total_count_coo = np.sum(tf_vectors_coo)
     frequency_coo = np.divide(tf_vectors_coo, total_count_coo)
 
-    s_out = pd.Series.sparse.from_coo(frequency_coo)
+    multiindexed_columns = pd.MultiIndex.from_tuples(
+        [("term_frequency", word) for word in tf.get_feature_names()]
+    )
 
-    features_names = tf.get_feature_names()
-
-    # Map word index to word name
-    s_out.index = s_out.index.map(lambda x: (s.index[x[0]], features_names[x[1]]))
-
-    return s_out
+    return pd.DataFrame.sparse.from_spmatrix(
+        frequency_coo, s.index, multiindexed_columns
+    )
 
 
-def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.Series:
+def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFrame:
     """
     Represent a text-based Pandas Series using TF-IDF.
 
@@ -324,19 +233,12 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.Series:
     so the result is exactly what you
     get applying the formula described above.
 
-    Return a Document Representation Series with the
+    Return a Document Term DataFrame with the
     tfidf of every word in the document.
     TODO add tutorial link
 
     The input Series should already be tokenized. If not, it will
     be tokenized before tfidf is calculated.
-
-    If working with big pandas Series, you might want to limit
-    the number of features through the max_features parameter.
-
-    Use :meth:`hero.representation.flatten` on the output to get
-    a standard Pandas Series with the document vectors
-    in every cell.
 
     Parameters
     ----------
@@ -365,17 +267,16 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.Series:
     >>> import pandas as pd
     >>> s = pd.Series(["Hi Bye", "Test Bye Bye"]).pipe(hero.tokenize)
     >>> hero.tfidf(s)
-    0  Bye     1.000000
-       Hi      1.405465
-    1  Bye     2.000000
-       Test    1.405465
-    dtype: Sparse[float64, nan]
+      tfidf                    
+        Bye        Hi      Test
+    0   1.0  1.405465  0.000000
+    1   2.0  0.000000  1.405465
 
     See Also
     --------
     `TF-IDF on Wikipedia <https://en.wikipedia.org/wiki/Tf-idf>`_
 
-    Document Representation Series: TODO add tutorial link
+    Document Term DataFrame: TODO add tutorial link
     """
 
     # Check if input is tokenized. Else, print warning and tokenize.
@@ -395,16 +296,13 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.Series:
 
     tfidf_vectors_csr = tfidf.fit_transform(s)
 
-    # Result from sklearn is in Compressed Sparse Row format.
-    # Pandas Sparse Series can only be initialized from Coordinate format.
-    tfidf_vectors_coo = coo_matrix(tfidf_vectors_csr)
-    s_out = pd.Series.sparse.from_coo(tfidf_vectors_coo)
+    multiindexed_columns = pd.MultiIndex.from_tuples(
+        [("tfidf", word) for word in tfidf.get_feature_names()]
+    )
 
-    # Map word index to word name and keep original index of documents.
-    feature_names = tfidf.get_feature_names()
-    s_out.index = s_out.index.map(lambda x: (s.index[x[0]], feature_names[x[1]]))
-
-    return s_out
+    return pd.DataFrame.sparse.from_spmatrix(
+        tfidf_vectors_csr, s.index, multiindexed_columns
+    )
 
 
 """
@@ -412,7 +310,9 @@ Dimensionality reduction
 """
 
 
-def pca(s, n_components=2, random_state=None) -> pd.Series:
+def pca(
+    s: Union[pd.Series, pd.DataFrame], n_components=2, random_state=None
+) -> pd.Series:
     """
     Perform principal component analysis on the given Pandas Series.
 
@@ -434,7 +334,7 @@ def pca(s, n_components=2, random_state=None) -> pd.Series:
 
     Parameters
     ----------
-    s : Pandas Series
+    s : Pandas Series or MuliIndex Sparse DataFrame
 
     n_components : Int. Default is 2.
         Number of components to keep (dimensionality of output vectors).
@@ -468,10 +368,18 @@ def pca(s, n_components=2, random_state=None) -> pd.Series:
 
     """
     pca = PCA(n_components=n_components, random_state=random_state, copy=False)
-    return pd.Series(pca.fit_transform(list(s)).tolist(), index=s.index)
+
+    if _check_is_valid_DocumentTermDF(s):
+        values = s.values
+    else:
+        values = list(s)
+
+    return pd.Series(pca.fit_transform(values).tolist(), index=s.index)
 
 
-def nmf(s, n_components=2, random_state=None) -> pd.Series:
+def nmf(
+    s: Union[pd.Series, pd.DataFrame], n_components=2, random_state=None
+) -> pd.Series:
     """
     Performs non-negative matrix factorization.
 
@@ -491,7 +399,7 @@ def nmf(s, n_components=2, random_state=None) -> pd.Series:
 
     Parameters
     ----------
-    s : Pandas Series
+    s : Pandas Series or Pandas MultiIndex Sparse DataFrame
 
     n_components : Int. Default is 2.
         Number of components to keep (dimensionality of output vectors).
@@ -527,11 +435,17 @@ def nmf(s, n_components=2, random_state=None) -> pd.Series:
 
     """
     nmf = NMF(n_components=n_components, init="random", random_state=random_state,)
-    return pd.Series(nmf.fit_transform(list(s)).tolist(), index=s.index)
+
+    if _check_is_valid_DocumentTermDF(s):
+        values = s.sparse.to_coo()
+    else:
+        values = list(s)
+
+    return pd.Series(nmf.fit_transform(values).tolist(), index=s.index)
 
 
 def tsne(
-    s: pd.Series,
+    s: Union[pd.Series, pd.DataFrame],
     n_components=2,
     perplexity=30.0,
     learning_rate=200.0,
@@ -557,7 +471,7 @@ def tsne(
 
     Parameters
     ----------
-    s : Pandas Series
+    s : Pandas Series or Pandas MultiIndex Sparse DataFrame
 
     n_components : int, default is 2.
         Number of components to keep (dimensionality of output vectors).
@@ -619,7 +533,13 @@ def tsne(
         random_state=random_state,
         n_jobs=n_jobs,
     )
-    return pd.Series(tsne.fit_transform(list(s)).tolist(), index=s.index)
+
+    if _check_is_valid_DocumentTermDF(s):
+        values = s.sparse.to_coo()
+    else:
+        values = list(s)
+
+    return pd.Series(tsne.fit_transform(values).tolist(), index=s.index)
 
 
 """
@@ -628,7 +548,7 @@ Clustering
 
 
 def kmeans(
-    s: pd.Series,
+    s: Union[pd.Series, pd.DataFrame],
     n_clusters=5,
     n_init=10,
     max_iter=300,
@@ -653,7 +573,7 @@ def kmeans(
 
     Parameters
     ----------
-    s: Pandas Series
+    s: Pandas Series or Pandas MultiIndex Sparse DataFrame
 
     n_clusters: Int, default to 5.
         The number of clusters to separate the data into.
@@ -686,7 +606,7 @@ def kmeans(
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, fun, guitar"])
-    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency).pipe(hero.flatten) # TODO: when others get Representation Support: remove flatten
+    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency)
     >>> hero.kmeans(s, n_clusters=2, random_state=42)
     0    1
     1    0
@@ -702,7 +622,12 @@ def kmeans(
     `kmeans on Wikipedia <https://en.wikipedia.org/wiki/K-means_clustering>`_
 
     """
-    vectors = list(s)
+
+    if _check_is_valid_DocumentTermDF(s):
+        vectors = s.sparse.to_coo()
+    else:
+        vectors = list(s)
+
     kmeans = KMeans(
         n_clusters=n_clusters,
         n_init=n_init,
@@ -715,7 +640,7 @@ def kmeans(
 
 
 def dbscan(
-    s,
+    s: Union[pd.Series, pd.DataFrame],
     eps=0.5,
     min_samples=5,
     metric="euclidean",
@@ -743,7 +668,7 @@ def dbscan(
 
     Parameters
     ----------
-    s: Pandas Series
+    s: Pandas Series or Pandas MultiIndex Sparse DataFrame
 
     eps : float, default=0.5
         The maximum distance between two samples for one to be considered
@@ -783,7 +708,7 @@ def dbscan(
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, enjoy, guitar"])
-    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf).pipe(hero.flatten) # TODO: when others get Representation Support: remove flatten
+    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
     >>> hero.dbscan(s, min_samples=1, eps=4)
     0    0
     1    1
@@ -801,6 +726,11 @@ def dbscan(
 
     """
 
+    if _check_is_valid_DocumentTermDF(s):
+        vectors = s.sparse.to_coo()
+    else:
+        vectors = list(s)
+
     return pd.Series(
         DBSCAN(
             eps=eps,
@@ -809,13 +739,13 @@ def dbscan(
             metric_params=metric_params,
             leaf_size=leaf_size,
             n_jobs=n_jobs,
-        ).fit_predict(list(s)),
+        ).fit_predict(vectors),
         index=s.index,
     ).astype("category")
 
 
 def meanshift(
-    s,
+    s: Union[pd.Series, pd.DataFrame],
     bandwidth=None,
     bin_seeding=False,
     min_bin_freq=1,
@@ -843,7 +773,7 @@ def meanshift(
 
     Parameters
     ----------
-    s: Pandas Series
+    s: Pandas Series or Pandas MultiIndex Sparse DataFrame
 
     bandwidth : float, default=None
         Bandwidth used in the RBF kernel.
@@ -901,6 +831,11 @@ def meanshift(
 
     """
 
+    if _check_is_valid_DocumentTermDF(s):
+        vectors = s.values
+    else:
+        vectors = list(s)
+
     return pd.Series(
         MeanShift(
             bandwidth=bandwidth,
@@ -909,7 +844,7 @@ def meanshift(
             cluster_all=cluster_all,
             n_jobs=n_jobs,
             max_iter=max_iter,
-        ).fit_predict(list(s)),
+        ).fit_predict(vectors),
         index=s.index,
     ).astype("category")
 
@@ -962,31 +897,18 @@ def normalize(s: pd.Series, norm="l2") -> pd.Series:
     `Norm on Wikipedia <https://en.wikipedia.org/wiki/Norm_(mathematics)>`_
 
     """
+    isDocumentTermDF = _check_is_valid_DocumentTermDF(s)
 
-    is_valid_representation = (
-        isinstance(s.index, pd.MultiIndex) and s.index.nlevels == 2
-    )
-
-    if not is_valid_representation:
-        raise TypeError(
-            "The input Pandas Series should be a Representation Pandas Series and should have a MultiIndex. The given Pandas Series does not appears to have MultiIndex"
-        )
-    # TODO after merging representation: use _check_is_valid_representation instead
-
-    if pd.api.types.is_sparse(s):
-        s_coo_matrix = s.sparse.to_coo()[0]
+    if isDocumentTermDF:
+        s_for_vectorization = s.sparse.to_coo()
     else:
-        s = s.astype("Sparse")
-        s_coo_matrix = s.sparse.to_coo()[0]
-
-    s_for_vectorization = s_coo_matrix
+        s_for_vectorization = list(s)
 
     result = sklearn_normalize(
         s_for_vectorization, norm=norm
     )  # Can handle sparse input.
 
-    result_coo = coo_matrix(result)
-    s_result = pd.Series.sparse.from_coo(result_coo)
-    s_result.index = s.index
-
-    return s_result
+    if isDocumentTermDF:
+        return pd.DataFrame.sparse.from_spmatrix(result, s.index, s.columns)
+    else:
+        return pd.Series(result.tolist(), index=s.index)

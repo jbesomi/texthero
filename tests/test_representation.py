@@ -50,16 +50,9 @@ s_tokenized_with_noncontinuous_index = pd.Series(
     [["Test", "Test", "TEST", "!"], ["Test", "?", ".", "."]], index=[5, 7]
 )
 
-s_tokenized_output_index = pd.MultiIndex.from_tuples(
-    [(0, "!"), (0, "TEST"), (0, "Test"), (1, "."), (1, "?"), (1, "Test")],
-)
+s_tokenized_output_index = [0,1]
 
-s_tokenized_output_noncontinuous_index = pd.MultiIndex.from_tuples(
-    [(5, "!"), (5, "TEST"), (5, "Test"), (7, "."), (7, "?"), (7, "Test")],
-)
-
-s_tokenized_output_min_df_index = pd.MultiIndex.from_tuples([(0, "Test"), (1, "Test")],)
-
+s_tokenized_output_index_noncontinous = [5,7]
 
 test_cases_vectorization = [
     # format: [function_name, function, correct output for tokenized input above, dtype of output]
@@ -182,55 +175,3 @@ class AbstractRepresentationTest(PandasTestCase):
         ).astype("Sparse")
 
         self.assertEqual(representation.tfidf(s), s_true)
-
-    """
-    flatten.
-    """
-
-    def test_flatten(self):
-        index = pd.MultiIndex.from_tuples(
-            [("doc0", "Word1"), ("doc0", "Word3"), ("doc1", "Word2")],
-        )
-        s = pd.Series([3, np.nan, 4], index=index)
-
-        s_true = pd.Series(
-            [[3.0, 0.0, np.nan], [0.0, 4.0, 0.0]], index=["doc0", "doc1"],
-        )
-
-        pd.testing.assert_series_equal(
-            representation.flatten(s), s_true, check_names=False
-        )
-
-    def test_flatten_fill_missing_with(self):
-        index = pd.MultiIndex.from_tuples(
-            [("doc0", "Word1"), ("doc0", "Word3"), ("doc1", "Word2")],
-        )
-        s = pd.Series([3, np.nan, 4], index=index)
-
-        s_true = pd.Series(
-            [[3.0, "FILLED", np.nan], ["FILLED", 4.0, "FILLED"]],
-            index=["doc0", "doc1"],
-        )
-
-        pd.testing.assert_series_equal(
-            representation.flatten(s, fill_missing_with="FILLED"),
-            s_true,
-            check_names=False,
-        )
-
-    def test_flatten_missing_row(self):
-        # Simulating a row with no features, so it's completely missing from
-        # the representation series.
-        index = pd.MultiIndex.from_tuples(
-            [("doc0", "Word1"), ("doc0", "Word3"), ("doc1", "Word2")],
-        )
-        s = pd.Series([3, np.nan, 4], index=index)
-
-        s_true = pd.Series(
-            [[3.0, 0.0, np.nan], [0.0, 4.0, 0.0], [0.0, 0.0, 0.0]],
-            index=["doc0", "doc1", "doc2"],
-        )
-
-        pd.testing.assert_series_equal(
-            representation.flatten(s, index=s_true.index), s_true, check_names=False
-        )

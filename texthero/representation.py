@@ -101,9 +101,12 @@ def count(
       Sentence one two
     0        1   1   0
     1        1   0   1
-# FIXME columns pandas doctest
+   
     See Also
     --------
+
+    # FIXME columns pandas doctest
+
     Document Term DataFrame: TODO add tutorial link
     """
     # TODO. Can be rewritten without sklearn.
@@ -375,7 +378,10 @@ def pca(
         values = list(s)
 
     return pd.Series(pca.fit_transform(values).tolist(), index=s.index)
+
+
 # FIXME: merge master again
+
 
 def nmf(
     s: Union[pd.Series, pd.DataFrame], n_components=2, random_state=None
@@ -437,11 +443,12 @@ def nmf(
     nmf = NMF(n_components=n_components, init="random", random_state=random_state,)
 
     if _check_is_valid_DocumentTermDF(s):
-        values = s.sparse.to_coo()
+        s_coo = s.sparse.to_coo()
+        s_for_vectorization = s_coo.astype("float64")
     else:
-        values = list(s)
+        s_for_vectorization = list(s)
 
-    return pd.Series(nmf.fit_transform(values).tolist(), index=s.index)
+    return pd.Series(nmf.fit_transform(s_for_vectorization).tolist(), index=s.index)
 
 
 def tsne(
@@ -535,11 +542,12 @@ def tsne(
     )
 
     if _check_is_valid_DocumentTermDF(s):
-        values = s.sparse.to_coo()
+        s_coo = s.sparse.to_coo()
+        s_for_vectorization = s_coo.astype("float64")
     else:
-        values = list(s)
+        s_for_vectorization = list(s)
 
-    return pd.Series(tsne.fit_transform(values).tolist(), index=s.index)
+    return pd.Series(tsne.fit_transform(s_for_vectorization).tolist(), index=s.index)
 
 
 """
@@ -624,9 +632,10 @@ def kmeans(
     """
 
     if _check_is_valid_DocumentTermDF(s):
-        vectors = s.sparse.to_coo()
+        s_coo = s.sparse.to_coo()
+        s_for_vectorization = s_coo.astype("float64")
     else:
-        vectors = list(s)
+        s_for_vectorization = list(s)
 
     kmeans = KMeans(
         n_clusters=n_clusters,
@@ -635,8 +644,8 @@ def kmeans(
         random_state=random_state,
         copy_x=True,
         algorithm=algorithm,
-    ).fit(vectors)
-    return pd.Series(kmeans.predict(vectors), index=s.index).astype("category")
+    ).fit(s_for_vectorization)
+    return pd.Series(kmeans.predict(s_for_vectorization), index=s.index).astype("category")
 
 
 def dbscan(
@@ -727,9 +736,10 @@ def dbscan(
     """
 
     if _check_is_valid_DocumentTermDF(s):
-        vectors = s.sparse.to_coo()
+        s_coo = s.sparse.to_coo()
+        s_for_vectorization = s_coo.astype("float64")
     else:
-        vectors = list(s)
+        s_for_vectorization = list(s)
 
     return pd.Series(
         DBSCAN(
@@ -739,7 +749,7 @@ def dbscan(
             metric_params=metric_params,
             leaf_size=leaf_size,
             n_jobs=n_jobs,
-        ).fit_predict(vectors),
+        ).fit_predict(s_for_vectorization),
         index=s.index,
     ).astype("category")
 
@@ -877,17 +887,15 @@ def normalize(s: pd.Series, norm="l2") -> pd.Series:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> idx = pd.MultiIndex.from_tuples(
-    ...             [(0, "a"), (0, "b"), (1, "c"), (1, "d")], names=("document", "word")
-    ...         )
-    >>> s = pd.Series([1, 2, 3, 4], index=idx)
+    >>> col = pd.MultiIndex.from_tuples([(0, "a"), (0, "b"), (1, "c"), (1, "d")])
+    >>> s = pd.DataFrame([[1, 2, 3, 4],[4, 2, 7, 5],[2, 2, 3, 5],[1, 2, 9, 8]], columns=col).astype("Sparse")
     >>> hero.normalize(s, norm="max")
-    document  word
-    0         a       0.50
-              b       1.00
-    1         c       0.75
-              d       1.00
-    dtype: Sparse[float64, nan]
+              0               1          
+              a         b     c         d
+    0  0.250000  0.500000  0.75  1.000000
+    1  0.571429  0.285714  1.00  0.714286
+    2  0.400000  0.400000  0.60  1.000000
+    3  0.111111  0.222222  1.00  0.888889
 
 
     See Also
@@ -900,7 +908,8 @@ def normalize(s: pd.Series, norm="l2") -> pd.Series:
     isDocumentTermDF = _check_is_valid_DocumentTermDF(s)
 
     if isDocumentTermDF:
-        s_for_vectorization = s.sparse.to_coo()
+        s_coo = s.sparse.to_coo()
+        s_for_vectorization = s_coo.astype("float64")
     else:
         s_for_vectorization = list(s)
 

@@ -70,7 +70,7 @@ test_cases_vectorization = [
             [[1, 0, 0, 1, 2], [0, 2, 1, 0, 1]],
             index=s_tokenized_output_index,
             columns=_get_multiindex_for_tokenized_output("count"),
-        ).astype("Sparse"),
+        ).astype("Sparse[int64, 0]"),
     ],
     [
         "term_frequency",
@@ -108,7 +108,7 @@ test_cases_vectorization_min_df = [
             [2, 1],
             index=s_tokenized_output_index,
             columns=pd.MultiIndex.from_tuples([("count", "Test")]),
-        ).astype("Sparse"),
+        ).astype("Sparse[int64, 0]"),
     ],
     [
         "term_frequency",
@@ -123,7 +123,7 @@ test_cases_vectorization_min_df = [
         "tfidf",
         representation.tfidf,
         pd.DataFrame(
-            [2.0, 1.0],
+            [2, 1],
             index=s_tokenized_output_index,
             columns=pd.MultiIndex.from_tuples([("tfidf", "Test")]),
         ).astype("Sparse"),
@@ -146,20 +146,20 @@ class AbstractRepresentationTest(PandasTestCase):
     def test_vectorization_simple(self, name, test_function, correct_output):
         s_true = correct_output
         result_s = test_function(s_tokenized)
-        pd.testing.assert_series_equal(s_true, result_s, check_less_precise=True)
+        pd.testing.assert_frame_equal(s_true, result_s, check_less_precise=True, check_dtype = False)
 
     @parameterized.expand(test_cases_vectorization)
     def test_vectorization_noncontinuous_index_kept(
         self, name, test_function, correct_output=None
     ):
         result_s = test_function(s_tokenized_with_noncontinuous_index)
-        pd.testing.assert_series_equal(s_tokenized_output_index_noncontinous, result_s)
+        pd.testing.assert_frame_equal(s_tokenized_output_index_noncontinous, result_s.index, check_dtype = False)
 
     @parameterized.expand(test_cases_vectorization_min_df)
     def test_vectorization_min_df(self, name, test_function, correct_output):
         s_true = correct_output
         result_s = test_function(s_tokenized, min_df=2)
-        pd.testing.assert_series_equal(s_true, result_s, check_less_precise=True)
+        pd.testing.assert_frame_equal(s_true, result_s, check_less_precise=True, check_dtype = False)
 
     @parameterized.expand(test_cases_vectorization)
     def test_vectorization_not_tokenized_yet_warning(self, name, test_function, *args):

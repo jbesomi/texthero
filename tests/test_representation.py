@@ -50,32 +50,84 @@ s_tokenized_with_noncontinuous_index = pd.Series(
     [["Test", "Test", "TEST", "!"], ["Test", "?", ".", "."]], index=[5, 7]
 )
 
-s_tokenized_output_index = [0,1]
+s_tokenized_output_index = [0, 1]
 
-s_tokenized_output_index_noncontinous = [5,7]
+s_tokenized_output_index_noncontinous = [5, 7]
+
+
+def _get_multiindex_for_tokenized_output(first_level_name):
+    return pd.MultiIndex.from_product(
+        [[first_level_name], ["!", ".", "?", "TEST", "Test"]]
+    )
+
 
 test_cases_vectorization = [
-    # format: [function_name, function, correct output for tokenized input above, dtype of output]
-    ["count", representation.count, [1, 1, 2, 2, 1, 1], "int"],
+    # format: [function_name, function, correct output for tokenized input above]
+    [
+        "count",
+        representation.count,
+        pd.DataFrame(
+            [[1, 0, 0, 1, 2], [0, 2, 1, 0, 1]],
+            index=s_tokenized_output_index,
+            columns=_get_multiindex_for_tokenized_output("count"),
+        ).astype("Sparse"),
+    ],
     [
         "term_frequency",
         representation.term_frequency,
-        [0.125, 0.125, 0.250, 0.250, 0.125, 0.125],
-        "float",
+        pd.DataFrame(
+            [[0.125, 0.0, 0.0, 0.125, 0.250], [0.0, 0.25, 0.125, 0.0, 0.125]],
+            index=s_tokenized_output_index,
+            columns=_get_multiindex_for_tokenized_output("term_frequency"),
+        ).astype("Sparse"),
     ],
     [
         "tfidf",
         representation.tfidf,
-        [_tfidf(x[1], s_tokenized, x[0]) for x in s_tokenized_output_index],
-        "float",
+        pd.DataFrame(
+            [
+                [
+                    _tfidf(x, s_tokenized, 0)  # Testing the tfidf formula here
+                    for x in ["!", ".", "?", "TEST", "Test"]
+                ],
+                [_tfidf(x, s_tokenized, 0) for x in ["!", ".", "?", "TEST", "Test"]],
+            ],
+            index=s_tokenized_output_index,
+            columns=_get_multiindex_for_tokenized_output("tfidf"),
+        ).astype("Sparse"),
     ],
 ]
 
+
 test_cases_vectorization_min_df = [
-    # format: [function_name, function, correct output for tokenized input above, dtype of output]
-    ["count", representation.count, [2, 1], "int"],
-    ["term_frequency", representation.term_frequency, [0.666667, 0.333333], "float",],
-    ["tfidf", representation.tfidf, [2.0, 1.0], "float",],
+    # format: [function_name, function, correct output for tokenized input above]
+    [
+        "count",
+        representation.count,
+        pd.DataFrame(
+            [2, 1],
+            index=s_tokenized_output_index,
+            columns=pd.MultiIndex.from_tuples([("count", "Test")]),
+        ).astype("Sparse"),
+    ],
+    [
+        "term_frequency",
+        representation.term_frequency,
+        pd.DataFrame(
+            [0.666667, 0.333333],
+            index=s_tokenized_output_index,
+            columns=pd.MultiIndex.from_tuples([("term_frequency", "Test")]),
+        ).astype("Sparse"),
+    ],
+    [
+        "tfidf",
+        representation.tfidf,
+        pd.DataFrame(
+            [2.0, 1.0],
+            index=s_tokenized_output_index,
+            columns=pd.MultiIndex.from_tuples([("tfidf", "Test")]),
+        ).astype("Sparse"),
+    ],
 ]
 
 
@@ -91,62 +143,23 @@ class AbstractRepresentationTest(PandasTestCase):
     """
 
     @parameterized.expand(test_cases_vectorization)
-    def test_vectorization_simple(
-        self, name, test_function, correct_output_values, int_or_float
-    ):
-        if int_or_float == "int":
-            s_true = pd.Series(
-                correct_output_values, index=s_tokenized_output_index, dtype="int"
-            ).astype(pd.SparseDtype(np.int64, 0))
-        else:
-            s_true = pd.Series(
-                correct_output_values, index=s_tokenized_output_index, dtype="float"
-            ).astype(pd.SparseDtype("float", np.nan))
+    def test_vectorization_simple(self, name, test_function, correct_output):
+        s_true = correct_output
         result_s = test_function(s_tokenized)
-
-        pd.testing.assert_series_equal(s_true, result_s)
+        pd.testing.assert_series_equal(s_true, result_s, check_less_precise=True)
 
     @parameterized.expand(test_cases_vectorization)
     def test_vectorization_noncontinuous_index_kept(
-        self, name, test_function, correct_output_values, int_or_float
+        self, name, test_function, correct_output=None
     ):
-        if int_or_float == "int":
-            s_true = pd.Series(
-                correct_output_values,
-                index=s_tokenized_output_noncontinuous_index,
-                dtype="int",
-            ).astype(pd.SparseDtype(np.int64, 0))
-        else:
-            s_true = pd.Series(
-                correct_output_values,
-                index=s_tokenized_output_noncontinuous_index,
-                dtype="float",
-            ).astype(pd.SparseDtype("float", np.nan))
-
         result_s = test_function(s_tokenized_with_noncontinuous_index)
-
-        pd.testing.assert_series_equal(s_true, result_s)
+        pd.testing.assert_series_equal(s_tokenized_output_index_noncontinous, result_s)
 
     @parameterized.expand(test_cases_vectorization_min_df)
-    def test_vectorization_min_df(
-        self, name, test_function, correct_output_values, int_or_float
-    ):
-        if int_or_float == "int":
-            s_true = pd.Series(
-                correct_output_values,
-                index=s_tokenized_output_min_df_index,
-                dtype="int",
-            ).astype(pd.SparseDtype(np.int64, 0))
-        else:
-            s_true = pd.Series(
-                correct_output_values,
-                index=s_tokenized_output_min_df_index,
-                dtype="float",
-            ).astype(pd.SparseDtype("float", np.nan))
-
+    def test_vectorization_min_df(self, name, test_function, correct_output):
+        s_true = correct_output
         result_s = test_function(s_tokenized, min_df=2)
-
-        pd.testing.assert_series_equal(s_true, result_s)
+        pd.testing.assert_series_equal(s_true, result_s, check_less_precise=True)
 
     @parameterized.expand(test_cases_vectorization)
     def test_vectorization_not_tokenized_yet_warning(self, name, test_function, *args):
@@ -159,19 +172,3 @@ class AbstractRepresentationTest(PandasTestCase):
             test_function(s_not_tokenized, max_features=1, min_df=1, max_df=1.0)
         except TypeError:
             self.fail("Sklearn arguments not handled correctly.")
-
-    """
-    Individual / special tests.
-    """
-
-    def test_tfidf_formula(self):
-        s = pd.Series(["Hi Bye", "Test Bye Bye"])
-        s = preprocessing.tokenize(s)
-        s_true_index = pd.MultiIndex.from_tuples(
-            [(0, "Bye"), (0, "Hi"), (1, "Bye"), (1, "Test")],
-        )
-        s_true = pd.Series(
-            [_tfidf(x[1], s, x[0]) for x in s_true_index], index=s_true_index
-        ).astype("Sparse")
-
-        self.assertEqual(representation.tfidf(s), s_true)

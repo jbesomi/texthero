@@ -97,11 +97,11 @@ def count(
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
     >>> hero.count(s)
-           count        
-        Sentence one two
+         count        
+      Sentence one two
     0        1   1   0
     1        1   0   1
-
+# FIXME columns pandas doctest
     See Also
     --------
     Document Term DataFrame: TODO add tutorial link
@@ -375,7 +375,7 @@ def pca(
         values = list(s)
 
     return pd.Series(pca.fit_transform(values).tolist(), index=s.index)
-
+# FIXME: merge master again
 
 def nmf(
     s: Union[pd.Series, pd.DataFrame], n_components=2, random_state=None

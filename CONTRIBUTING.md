@@ -71,7 +71,7 @@ Texthero is there for the NLP-community. If you have an idea on how we can impro
 1. Respect [numpydoc docstring guide](https://numpydoc.readthedocs.io/en/latest/format.html). Look at the code for similarity.
 1. Respect [PEP 257 -- Docstring Conventions](https://www.python.org/dev/peps/pep-0257/)
 1. Maximum docstring line length should be 75 characters. This should be manually done as `black` formatting does not enforce limits on docstring line length.
-1. Multiline code in docstring should be enclosed in parenthesis where each line after the first starting with an ellipsis (`...`), like so:
+1. In docstring examples, on long `pipe`, consider enclosing the code in parenthesis like so:
 >```
 >>>> s = (
 >...     s.pipe(hero.clean)

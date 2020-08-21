@@ -90,7 +90,7 @@ test_cases_vectorization = [
                     _tfidf(x, s_tokenized, 0)  # Testing the tfidf formula here
                     for x in ["!", ".", "?", "TEST", "Test"]
                 ],
-                [_tfidf(x, s_tokenized, 0) for x in ["!", ".", "?", "TEST", "Test"]],
+                [_tfidf(x, s_tokenized, 1) for x in ["!", ".", "?", "TEST", "Test"]],
             ],
             index=s_tokenized_output_index,
             columns=_get_multiindex_for_tokenized_output("tfidf"),
@@ -146,20 +146,28 @@ class AbstractRepresentationTest(PandasTestCase):
     def test_vectorization_simple(self, name, test_function, correct_output):
         s_true = correct_output
         result_s = test_function(s_tokenized)
-        pd.testing.assert_frame_equal(s_true, result_s, check_less_precise=True, check_dtype = False)
+        pd.testing.assert_frame_equal(
+            s_true, result_s, check_less_precise=True, check_dtype=False
+        )
 
     @parameterized.expand(test_cases_vectorization)
     def test_vectorization_noncontinuous_index_kept(
         self, name, test_function, correct_output=None
     ):
         result_s = test_function(s_tokenized_with_noncontinuous_index)
-        pd.testing.assert_frame_equal(s_tokenized_output_index_noncontinous, result_s.index, check_dtype = False)
+        pd.testing.assert_series_equal(
+            pd.Series(s_tokenized_output_index_noncontinous),
+            pd.Series(result_s.index),
+            check_dtype=False,
+        )
 
     @parameterized.expand(test_cases_vectorization_min_df)
     def test_vectorization_min_df(self, name, test_function, correct_output):
         s_true = correct_output
         result_s = test_function(s_tokenized, min_df=2)
-        pd.testing.assert_frame_equal(s_true, result_s, check_less_precise=True, check_dtype = False)
+        pd.testing.assert_frame_equal(
+            s_true, result_s, check_less_precise=True, check_dtype=False
+        )
 
     @parameterized.expand(test_cases_vectorization)
     def test_vectorization_not_tokenized_yet_warning(self, name, test_function, *args):

@@ -657,7 +657,9 @@ def kmeans(
         copy_x=True,
         algorithm=algorithm,
     ).fit(s_for_vectorization)
-    return pd.Series(kmeans.predict(s_for_vectorization), index=s.index).astype("category")
+    return pd.Series(kmeans.predict(s_for_vectorization), index=s.index).astype(
+        "category"
+    )
 
 
 def dbscan(

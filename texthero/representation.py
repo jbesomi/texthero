@@ -37,36 +37,6 @@ def _check_is_valid_DocumentTermDF(df: Union[pd.DataFrame, pd.Series]) -> bool:
     return isinstance(df, pd.DataFrame) and isinstance(df.columns, pd.MultiIndex)
 
 
-    s = pd.Series(list(s.values), index=s.index)
-
-    return s
-
-
-def _check_is_valid_representation(s: pd.Series) -> bool:
-    """
-    Check if the given Pandas Series is a Document Representation Series.
-
-    Returns true if Series is Document Representation Series, else False.
-
-    """
-
-    # TODO: in Version 2 when only representation is accepted as input -> change "return False" to "raise ValueError"
-
-    if not isinstance(s.index, pd.MultiIndex):
-        return False
-        # raise ValueError(
-        #     f"The input Pandas Series should be a Representation Pandas Series and should have a MultiIndex. The given Pandas Series does not appears to have MultiIndex"
-        # )
-
-    if s.index.nlevels != 2:
-        return False
-        # raise ValueError(
-        #     f"The input Pandas Series should be a Representation Pandas Series and should have a MultiIndex, where the first level represent the document and the second one the words/token. The given Pandas Series has {s.index.nlevels} number of levels instead of 2."
-        # )
-
-    return True
-
-
 # Warning message for not-tokenized inputs
 _not_tokenized_warning_message = (
     "It seems like the given Pandas Series s is not tokenized. This function will"
@@ -963,4 +933,4 @@ def normalize(s: pd.Series, norm="l2") -> pd.Series:
     if isDocumentTermDF:
         return pd.DataFrame.sparse.from_spmatrix(result, s.index, s.columns)
     else:
-        return pd.Series(list(result), index=s.index)
+        return pd.Series((result), index=s.index)

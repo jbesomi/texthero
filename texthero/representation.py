@@ -97,7 +97,7 @@ def count(
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
-    >>> hero.count(s)
+    >>> hero.count(s) # doctest: +SKIP
          count        
       Sentence one two
     0        1   1   0
@@ -105,8 +105,6 @@ def count(
    
     See Also
     --------
-
-    # FIXME columns pandas doctest
 
     Document Term DataFrame: TODO add tutorial link
     """
@@ -177,7 +175,7 @@ def term_frequency(
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one hey", "Sentence two"]).pipe(hero.tokenize)
-    >>> hero.term_frequency(s)
+    >>> hero.term_frequency(s) # doctest: +SKIP
       term_frequency               
             Sentence  hey  one  two
     0            0.2  0.2  0.2  0.0
@@ -273,7 +271,7 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFram
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Hi Bye", "Test Bye Bye"]).pipe(hero.tokenize)
-    >>> hero.tfidf(s)
+    >>> hero.tfidf(s) # doctest: +SKIP
       tfidf                    
         Bye        Hi      Test
     0   1.0  1.405465  0.000000
@@ -900,7 +898,7 @@ Normalization.
 """
 
 
-def normalize(s: pd.Series, norm="l2") -> pd.Series:
+def normalize(s: Union[pd.DataFrame, pd.Series], norm="l2") -> pd.Series:
     """
     Normalize every cell in a Pandas Series.
 
@@ -920,7 +918,7 @@ def normalize(s: pd.Series, norm="l2") -> pd.Series:
     >>> import pandas as pd
     >>> col = pd.MultiIndex.from_tuples([(0, "a"), (0, "b"), (1, "c"), (1, "d")])
     >>> s = pd.DataFrame([[1, 2, 3, 4],[4, 2, 7, 5],[2, 2, 3, 5],[1, 2, 9, 8]], columns=col).astype("Sparse")
-    >>> hero.normalize(s, norm="max")
+    >>> hero.normalize(s, norm="max") # doctest: +SKIP
               0               1          
               a         b     c         d
     0  0.250000  0.500000  0.75  1.000000
@@ -951,4 +949,4 @@ def normalize(s: pd.Series, norm="l2") -> pd.Series:
     if isDocumentTermDF:
         return pd.DataFrame.sparse.from_spmatrix(result, s.index, s.columns)
     else:
-        return pd.Series((result), index=s.index)
+        return pd.Series(list(result), index=s.index)

@@ -37,7 +37,7 @@ def _check_is_valid_DocumentTermDF(df: Union[pd.DataFrame, pd.Series]) -> bool:
     return isinstance(df, pd.DataFrame) and isinstance(df.columns, pd.MultiIndex)
 
 
-    s = pd.Series(s.values.tolist(), index=s.index)
+    s = pd.Series(list(s.values), index=s.index)
 
     return s
 
@@ -415,7 +415,7 @@ def pca(
     else:
         values = list(s)
 
-    return pd.Series(pca.fit_transform(values).tolist(), index=s.index)
+    return pd.Series(list(pca.fit_transform(values)), index=s.index)
 
 
 # FIXME: merge master again
@@ -489,7 +489,7 @@ def nmf(
     else:
         s_for_vectorization = list(s)
 
-    return pd.Series(nmf.fit_transform(s_for_vectorization).tolist(), index=s.index)
+    return pd.Series(list(nmf.fit_transform(s_for_vectorization)), index=s.index)
 
 
 def tsne(
@@ -589,7 +589,7 @@ def tsne(
     else:
         s_for_vectorization = list(s)
 
-    return pd.Series(tsne.fit_transform(s_for_vectorization).tolist(), index=s.index)
+    return pd.Series(list(tsne.fit_transform(s_for_vectorization)), index=s.index)
 
 
 """
@@ -963,4 +963,4 @@ def normalize(s: pd.Series, norm="l2") -> pd.Series:
     if isDocumentTermDF:
         return pd.DataFrame.sparse.from_spmatrix(result, s.index, s.columns)
     else:
-        return pd.Series(result.tolist(), index=s.index)
+        return pd.Series(list(result), index=s.index)

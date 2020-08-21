@@ -50,9 +50,9 @@ s_tokenized_with_noncontinuous_index = pd.Series(
     [["Test", "Test", "TEST", "!"], ["Test", "?", ".", "."]], index=[5, 7]
 )
 
-s_tokenized_output_index = [0, 1]
+s_tokenized_output_index = pd.Index([0, 1])
 
-s_tokenized_output_index_noncontinous = [5, 7]
+s_tokenized_output_index_noncontinous = pd.Index([5, 7])
 
 
 def _get_multiindex_for_tokenized_output(first_level_name):
@@ -79,7 +79,8 @@ test_cases_vectorization = [
             [[0.125, 0.0, 0.0, 0.125, 0.250], [0.0, 0.25, 0.125, 0.0, 0.125]],
             index=s_tokenized_output_index,
             columns=_get_multiindex_for_tokenized_output("term_frequency"),
-        ).astype("Sparse"),
+            dtype="Sparse",
+        ).astype("Sparse[float64, nan]"),
     ],
     [
         "tfidf",
@@ -94,7 +95,7 @@ test_cases_vectorization = [
             ],
             index=s_tokenized_output_index,
             columns=_get_multiindex_for_tokenized_output("tfidf"),
-        ).astype("Sparse"),
+        ).astype("Sparse[float64, nan]"),
     ],
 ]
 
@@ -117,7 +118,7 @@ test_cases_vectorization_min_df = [
             [0.666667, 0.333333],
             index=s_tokenized_output_index,
             columns=pd.MultiIndex.from_tuples([("term_frequency", "Test")]),
-        ).astype("Sparse"),
+        ).astype("Sparse[float64, nan]"),
     ],
     [
         "tfidf",
@@ -126,7 +127,7 @@ test_cases_vectorization_min_df = [
             [2, 1],
             index=s_tokenized_output_index,
             columns=pd.MultiIndex.from_tuples([("tfidf", "Test")]),
-        ).astype("Sparse"),
+        ).astype("Sparse[float64, nan]"),
     ],
 ]
 
@@ -155,10 +156,8 @@ class AbstractRepresentationTest(PandasTestCase):
         self, name, test_function, correct_output=None
     ):
         result_s = test_function(s_tokenized_with_noncontinuous_index)
-        pd.testing.assert_series_equal(
-            pd.Series(s_tokenized_output_index_noncontinous),
-            pd.Series(result_s.index),
-            check_dtype=False,
+        pd.testing.assert_index_equal(
+            s_tokenized_output_index_noncontinous, result_s.index
         )
 
     @parameterized.expand(test_cases_vectorization_min_df)

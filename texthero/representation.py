@@ -145,7 +145,7 @@ def term_frequency(
 
     Return a Document Term DataFrame with the
     term frequencies of the terms for every
-    document.
+    document. The output is sparse.
     TODO add tutorial link
 
     The input Series should already be tokenized. If not, it will
@@ -241,7 +241,7 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFram
     formula described above.
 
     Return a Document Term DataFrame with the
-    tfidf of every word in the document.
+    tfidf of every word in the document. The output is sparse.
     TODO add tutorial link
 
     The input Series should already be tokenized. If not, it will
@@ -341,9 +341,13 @@ def pca(
     In general, *pca* should be called after the text has already been
     represented to a matrix form.
 
+    PCA cannot directly handle sparse input, so when calling pca on a
+    DocumentTermDF, the input has to be expanded which can lead to
+    memory problems with big datasets.
+
     Parameters
     ----------
-    s : Pandas Series or MuliIndex Sparse DataFrame
+    s : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
 
     n_components : Int. Default is 2.
         Number of components to keep (dimensionality of output vectors).
@@ -388,9 +392,6 @@ def pca(
     return pd.Series(list(pca.fit_transform(values)), index=s.index)
 
 
-# FIXME: merge master again
-
-
 def nmf(
     s: Union[pd.Series, pd.DataFrame], n_components=2, random_state=None
 ) -> pd.Series:
@@ -410,10 +411,12 @@ def nmf(
     n_components many topics (clusters) and calculate a vector for each
     document that places it correctly among the topics.
 
+    NMF can directly handle sparse input, so when calling nmf on a
+    DocumentTermDF, the advantage of sparseness is kept.
 
     Parameters
     ----------
-    s : Pandas Series or Pandas MultiIndex Sparse DataFrame
+    s : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
 
     n_components : Int. Default is 2.
         Number of components to keep (dimensionality of output vectors).
@@ -484,10 +487,12 @@ def tsne(
     document gets a new, low-dimensional (n_components entries) vector in such
     a way that the differences / similarities between documents are preserved.
 
+    T-SNE can directly handle sparse input, so when calling tsne on a
+    DocumentTermDF, the advantage of sparseness is kept.
 
     Parameters
     ----------
-    s : Pandas Series or Pandas MultiIndex Sparse DataFrame
+    s : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
 
     n_components : int, default is 2.
         Number of components to keep (dimensionality of output vectors).
@@ -591,9 +596,12 @@ def kmeans(
     function that assigns a scalar (a weight) to each word), K-means will find
     k topics (clusters) and assign a topic to each document.
 
+    Kmeans can directly handle sparse input, so when calling kmeans on a
+    DocumentTermDF, the advantage of sparseness is kept.
+
     Parameters
     ----------
-    s: Pandas Series or Pandas MultiIndex Sparse DataFrame
+    s: Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
 
     n_clusters: Int, default to 5.
         The number of clusters to separate the data into.
@@ -689,9 +697,12 @@ def dbscan(
     function that assigns a scalar (a weight) to each word), DBSCAN will find
     topics (clusters) and assign a topic to each document.
 
+    DBSCAN can directly handle sparse input, so when calling dbscan on a
+    DocumentTermDF, the advantage of sparseness is kept.
+
     Parameters
     ----------
-    s: Pandas Series or Pandas MultiIndex Sparse DataFrame
+    s: Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
 
     eps : float, default=0.5
         The maximum distance between two samples for one to be considered
@@ -795,9 +806,13 @@ def meanshift(
     function that assigns a scalar (a weight) to each word), mean shift will
     find topics (clusters) and assign a topic to each document.
 
+    Menashift cannot directly handle sparse input, so when calling meanshift on a
+    DocumentTermDF, the input has to be expanded which can lead to
+    memory problems with big datasets.
+
     Parameters
     ----------
-    s: Pandas Series or Pandas MultiIndex Sparse DataFrame
+    s: Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
 
     bandwidth : float, default=None
         Bandwidth used in the RBF kernel.
@@ -889,11 +904,12 @@ def normalize(s: pd.Series, norm="l2") -> pd.Series:
     """
     Normalize every cell in a Pandas Series.
 
-    Input has to be a Representation Series.
+    Input can be VectorSeries or DocumentTermDF. For DocumentTermDFs,
+    the sparseness is kept.
 
     Parameters
     ----------
-    s: Pandas Series
+    s: Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
 
     norm: str, default to "l2"
         One of "l1", "l2", or "max". The norm that is used.

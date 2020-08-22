@@ -17,7 +17,7 @@
    <a href="https://github.com/jbesomi/texthero/blob/master/LICENSE">
         <img src="https://img.shields.io/github/license/jbesomi/texthero.svg"
              alt="Github license">
-   </a>   
+   </a>
 </p>
 
 <p align="center">
@@ -114,6 +114,7 @@ df['pca'] = (
    .pipe(hero.clean)
    .pipe(hero.tokenize)
    .pipe(hero.tfidf)
+   .pipe(hero.normalize)
    .pipe(hero.pca)
 )
 hero.scatterplot(df, 'pca', color='topic', title="PCA BBC Sport news")
@@ -133,20 +134,20 @@ df = pd.read_csv(
     "https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv"
 )
 
-df['tfidf'] = (
+df['tokenized'] = (
     df['text']
     .pipe(hero.clean)
     .pipe(hero.tokenize)
-    .pipe(hero.tfidf)
 )
 
 df['kmeans_labels'] = (
-    df['tfidf']
+    df['tokenized']
+    .pipe(hero.tfidf)
+    .pipe(hero.normalize)
     .pipe(hero.kmeans, n_clusters=5)
-    .astype(str)
 )
 
-df['pca'] = df['tfidf'].pipe(hero.pca)
+df['pca'] = df['tokenized'].pipe(hero.tfidf).pipe(hero.normalize)pipe(hero.pca)
 
 hero.scatterplot(df, 'pca', color='kmeans_labels', title="K-means BBC Sport news")
 ```

@@ -28,7 +28,7 @@ jobs:
         - pip3 install --no-deps torch===1.6.0 -f https://download.pytorch.org/whl/torch_stable.html
       env: PATH=/c/Python38:/c/Python38/Scripts:$PATH
 
-install: 
+install:
     - pip3 install --upgrade pip  # all three OSes agree about 'pip3'
     - pip3 install ".[dev]" .
 

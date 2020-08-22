@@ -16,6 +16,7 @@ jobs:
       language: shell       # 'language: python' is an error on Travis CI macOS
       install:
         - pip3 install --upgrade pip  # all three OSes agree about 'pip3'
+        - pip3 install black
         - pip3 install --user ".[dev]" .
 
     - name: "Python 3.8.0 on Windows"

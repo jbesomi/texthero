@@ -85,7 +85,7 @@ class HeroTypes(pd.Series, pd.DataFrame):
     4. DocumentTermDF: DataFrame is sparse and multiindexed in the columns with every subcolumn
     being an individual feature
     For example,
-    `pd.DataFrame([[1, 2, 3], [4,5,6]], columns=pd.MultiIndex.from_tuples([("count", "hi"), ("cound", "servus"), ("doc2", "hola")]))`
+    `pd.DataFrame([[1, 2, 3], [4,5,6]], columns=pd.MultiIndex.from_tuples([("count", "hi"), ("count", "servus"), ("count", "hola")]))`
     is a valid DocumentTermDF.
 
     These types of Series are supposed to make using the library
@@ -197,7 +197,7 @@ class DocumentTermDF(HeroTypes):
     multiindexed in the columns with every subcolumn
     being an individual feature.
     For example,
-    `pd.DataFrame([[1, 2, 3], [4,5,6]], columns=pd.MultiIndex.from_tuples([("count", "hi"), ("cound", "servus"), ("doc2", "hola")]))`
+    `pd.DataFrame([[1, 2, 3], [4,5,6]], columns=pd.MultiIndex.from_tuples([("count", "hi"), ("count", "servus"), ("count", "hola")]))`
     is a valid DocumentTermDF.
     """
 

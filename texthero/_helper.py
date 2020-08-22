@@ -73,7 +73,7 @@ def handle_nans(replace_nans_with):
     return decorator
 
 
-'''
+"""
 Pandas Integration of DocumentTermDF
 
 It's really important that users can seamlessly integrate texthero's function
@@ -132,11 +132,11 @@ do is this: Calling `df["count"] = hero.count(df["texts"])` is
 internally this: `pd.DataFrame.__setitem__(self=df, key="count", value=hero.count(df["texts"]))`.
 We will overwrite this method so that if _self_ is not multiindexed yet
 and _value_ is multiindexed, we transform _self_ (so `df` here) to
-be multiindexed and we can then easily integrate our column-multiindexed output from texthero:
+be multiindexed and we can then easily integrate our column-multiindexed output from texthero.
+See the implementation below for details.
 
-If `df` is multiindexed, we get the desired result through `pd.concat([df, hero.count(df["texts"])], axis=1)`.
-
-Pseudocode (& real code): working on this atm :3rd_place_medal: 
+Additionally, we support this for pd.concat in a similar way; again, see the
+implementation below for details.
 
 Advantages / Why does this work?
 
@@ -159,7 +159,7 @@ Advantages / Why does this work?
 Disadvantage:
 
     - poor performance, so we discurage user from using it, but we still want to support it
-'''
+"""
 
 # Store the original __setitem__ function as _original__setitem__
 _pd_original__setitem__ = pd.DataFrame.__setitem__
@@ -168,7 +168,7 @@ pd.DataFrame._original__setitem__ = _pd_original__setitem__
 
 # Define a new __setitem__ function that will replace pd.DataFrame.__setitem__
 def _hero__setitem__(self, key, value):
-    '''
+    """
     Called when doing self["key"] = value.
     E.g. df["count"] = hero.count(df["texts"]) is internally doing
     pd.DataFrame.__setitem__(self=df, key="count", value=hero.count(df["texts"]).
@@ -204,25 +204,32 @@ def _hero__setitem__(self, key, value):
         4. we do self[value.columns] = value as that's exactly the command
            that correctly integrates the multiindexed `value` into `self`
 
-    '''
-
+    """
 
     # 1.
-    if isinstance(value, pd.DataFrame) and isinstance(value.columns, pd.MultiIndex) and isinstance(key, str):
+    if (
+        isinstance(value, pd.DataFrame)
+        and isinstance(value.columns, pd.MultiIndex)
+        and isinstance(key, str)
+    ):
 
         # 2.
         if not isinstance(self.columns, pd.MultiIndex):
-            self.columns = pd.MultiIndex.from_tuples([(col_name, "") for col_name in self.columns.values])
+            self.columns = pd.MultiIndex.from_tuples(
+                [(col_name, "") for col_name in self.columns.values]
+            )
 
         # 3.
-        value.columns = pd.MultiIndex.from_tuples([(key, subcol_name) for _, subcol_name in value.columns.values])
+        value.columns = pd.MultiIndex.from_tuples(
+            [(key, subcol_name) for _, subcol_name in value.columns.values]
+        )
 
         # 4.
         self[value.columns] = value
 
     else:
 
-       self._original__setitem__(key, value)
+        self._original__setitem__(key, value)
 
 
 # Replace __setitem__ with our custom function

@@ -4,6 +4,7 @@ The texthero.nlp module supports common NLP tasks such as named_entities, noun_c
 
 import spacy
 import pandas as pd
+import en_core_web_sm
 
 from texthero._types import TextSeries, InputSeries
 from texthero import stopwords as _stopwords
@@ -54,14 +55,7 @@ def named_entities(s: TextSeries, package="spacy") -> pd.Series:
     """
     entities = []
 
-    try:
-        # If not present, download 'en_core_web_sm'
-        nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser"])
-    except OSError:
-        from spacy.cli.download import download as spacy_download
-
-        spacy_download("en_core_web_sm")
-        nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser"])
+    nlp = en_core_web_sm.load(disable=["tagger", "parser"])
 
     # nlp.pipe is now 'ner'
     for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
@@ -100,14 +94,7 @@ def noun_chunks(s: TextSeries) -> pd.Series:
 
     noun_chunks = []
 
-    try:
-        # If not present, download 'en_core_web_sm'
-        nlp = spacy.load("en_core_web_sm", disable=["ner"])
-    except OSError:
-        from spacy.cli.download import download as spacy_download
-
-        spacy_download("en_core_web_sm")
-        nlp = spacy.load("en_core_web_sm", disable=["ner"])
+    nlp = en_core_web_sm.load(disable=["ner"])
 
     # nlp.pipe is now "tagger", "parser"
     for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
@@ -145,14 +132,7 @@ def count_sentences(s: TextSeries) -> pd.Series:
     """
     number_of_sentences = []
 
-    try:
-        # If not present, download 'en_core_web_sm'
-        nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser", "ner"])
-    except OSError:
-        from spacy.cli.download import download as spacy_download
-
-        spacy_download("en_core_web_sm")
-        nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser", "ner"])
+    nlp = en_core_web_sm.load(disable=["tagger", "parser", "ner"])
 
     nlp.add_pipe(nlp.create_pipe("sentencizer"))  # Pipe is only "sentencizer"
 
@@ -226,14 +206,7 @@ def pos_tag(s: TextSeries) -> pd.Series:
 
     pos_tags = []
 
-    try:
-        # If not present, download 'en_core_web_sm'
-        nlp = spacy.load("en_core_web_sm", disable=["ner", "parser"])
-    except OSError:
-        from spacy.cli.download import download as spacy_download
-
-        spacy_download("en_core_web_sm")
-        nlp = spacy.load("en_core_web_sm", disable=["ner", "parser"])
+    nlp = en_core_web_sm.load(disable=["parser", "ner"])
 
     # nlp.pipe is now "tagger"
     for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):

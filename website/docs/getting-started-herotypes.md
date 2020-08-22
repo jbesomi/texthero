@@ -1,4 +1,4 @@
-<h1 align="center">HeroSeries</h1>
+<h1 align="center">HeroTypes</h1>
 
 In Texthero, we're always working with Pandas Series and Pandas Dataframes to gain insights from text data! To make things easier and more intuitive, we differentiate between different types of Series/DataFrames, depending on where we are on the road to understanding our dataset.
 
@@ -149,7 +149,7 @@ We can see that only around 1.2% of our _DocumentTermDF_ `data_count` is filled,
 
 <h4 align="left">When and how is it used? Do I have to work with multiindexes?!</h4>
 
-The _DocumentTermDF_ is mostly used internally for performance reasons. For example, as you can see above, the default output from `hero.count` is such a Series, but if you apply e.g. `hero.pca` afterwards, you don't even notice the _DocumentTermDF_: `s.pipe(hero.count).pipe(hero.pca)` works just fine; everything is seamlessly integrated in the library.
+The _DocumentTermDF_ is mostly used internally for performance reasons. For example, as you can see above, the default output from `hero.count` is such a Series, but if you apply e.g. `hero.pca` afterwards, you don't even notice the _DocumentTermDF_: `s.pipe(hero.count).pipe(hero.normalize).pipe(hero.pca)` works just fine; everything is seamlessly integrated in the library.
 
 The only thing you _can_ but _should not_ do is store a _DocumentTermDF_ in your dataframe, as the performance is really bad. If you really want to, here's the two options:
 ```python

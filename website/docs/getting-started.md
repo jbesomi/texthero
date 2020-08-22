@@ -152,15 +152,12 @@ Usually, documents about similar topics use similar terms, so their tfidf-vector
 
 ###### Integration of the calculation into an existing dataframe
 
-The only thing you _can_ but _should not_ do is store a _DocumentTermDF_ in your dataframe, as the performance is really bad. If you really want to, here's the two options:
+The only thing you _can_ but _should not_ do is store a _DocumentTermDF_ in your dataframe, as the performance is really bad. If you really want to, you can do it like this like this:
  ```python
  >>> data = pd.read_csv("https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv")
  >>> data_count = data["text"].pipe(count)
 
- >>> # Option 1: recommended if you really want to put the DocumenTermDF into your DataFrame
- >>> data = pd.concat(data, data_count)
-
- >>> # Option 1: not recommended as performance is not optimal
+ >>> # NOT recommended as performance is not optimal
  >>> data["count"] = data_count
  ```
 

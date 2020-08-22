@@ -59,6 +59,7 @@ def named_entities(s: TextSeries, package="spacy") -> pd.Series:
         nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser"])
     except OSError:
         from spacy.cli.download import download as spacy_download
+
         spacy_download("en_core_web_sm")
         nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser"])
 
@@ -104,6 +105,7 @@ def noun_chunks(s: TextSeries) -> pd.Series:
         nlp = spacy.load("en_core_web_sm", disable=["ner"])
     except OSError:
         from spacy.cli.download import download as spacy_download
+
         spacy_download("en_core_web_sm")
         nlp = spacy.load("en_core_web_sm", disable=["ner"])
 
@@ -148,6 +150,7 @@ def count_sentences(s: TextSeries) -> pd.Series:
         nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser", "ner"])
     except OSError:
         from spacy.cli.download import download as spacy_download
+
         spacy_download("en_core_web_sm")
         nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser", "ner"])
 
@@ -228,6 +231,7 @@ def pos_tag(s: TextSeries) -> pd.Series:
         nlp = spacy.load("en_core_web_sm", disable=["ner", "parser"])
     except OSError:
         from spacy.cli.download import download as spacy_download
+
         spacy_download("en_core_web_sm")
         nlp = spacy.load("en_core_web_sm", disable=["ner", "parser"])
 

@@ -73,18 +73,47 @@ class TestTypes(PandasTestCase):
             self.fail("Failed although input type is correct.")
 
     def test_inputseries_correct_type_documentrepresentationseries(self):
-        @_types.InputSeries(_types.RepresentationSeries)
+        @_types.InputSeries(_types.DocumentTermDF)
         def f(s):
             pass
 
         try:
             f(
-                pd.Series(
-                    [1, 2, 3],
-                    index=pd.MultiIndex.from_tuples(
+                pd.DataFrame(
+                    [[1, 2, 3]],
+                    columns=pd.MultiIndex.from_tuples(
                         [("doc1", "word1"), ("doc1", "word2"), ("doc2", "word1")]
                     ),
+                    dtype="Sparse",
                 )
             )
         except TypeError:
             self.fail("Failed although input type is correct.")
+
+    def test_several_possible_types_correct_type(self):
+        @_types.InputSeries([_types.DocumentTermDF, _types.VectorSeries])
+        def f(x):
+            pass
+
+        try:
+            f(
+                pd.DataFrame(
+                    [[1, 2, 3]],
+                    columns=pd.MultiIndex.from_tuples(
+                        [("doc1", "word1"), ("doc1", "word2"), ("doc2", "word1")]
+                    ),
+                    dtype="Sparse",
+                )
+            )
+
+            f(pd.Series([[1.0, 2.0]]))
+
+        except TypeError:
+            self.fail("Failed although input type is correct.")
+
+    def test_several_possible_types_wrong_type(self):
+        @_types.InputSeries([_types.DocumentTermDF, _types.VectorSeries])
+        def f(x):
+            pass
+
+        self.assertRaises(TypeError, f, pd.Series([["token", "ized"]]))

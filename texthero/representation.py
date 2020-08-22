@@ -14,6 +14,13 @@ from sklearn.preprocessing import normalize as sklearn_normalize
 from scipy.sparse import coo_matrix
 
 from typing import Optional, Union, Any
+from texthero._types import (
+    TextSeries,
+    TokenSeries,
+    VectorSeries,
+    DocumentTermDF,
+    InputSeries,
+)
 
 from texthero import preprocessing
 
@@ -25,16 +32,6 @@ import warnings
 """
 Helper
 """
-
-
-def _check_is_valid_DocumentTermDF(df: Union[pd.DataFrame, pd.Series]) -> bool:
-    """
-    Check if the given Pandas Series is a Document Term DF.
-
-    Returns true if input is Document Term DF, else False.
-
-    """
-    return isinstance(df, pd.DataFrame) and isinstance(df.columns, pd.MultiIndex)
 
 
 # Warning message for not-tokenized inputs
@@ -50,13 +47,14 @@ Vectorization
 """
 
 
+@InputSeries([TokenSeries, TextSeries])
 def count(
-    s: pd.Series,
+    s: Union[TokenSeries, TextSeries],
     max_features: Optional[int] = None,
     min_df=1,
     max_df=1.0,
     binary=False,
-) -> pd.DataFrame:
+) -> DocumentTermDF:
     """
     Represent a text-based Pandas Series using count.
 
@@ -135,9 +133,13 @@ def count(
     )
 
 
+@InputSeries([TokenSeries, TextSeries])
 def term_frequency(
-    s: pd.Series, max_features: Optional[int] = None, min_df=1, max_df=1.0,
-) -> pd.DataFrame:
+    s: Union[TokenSeries, TextSeries],
+    max_features: Optional[int] = None,
+    min_df=1,
+    max_df=1.0,
+) -> DocumentTermDF:
     """
     Represent a text-based Pandas Series using term frequency.
 
@@ -213,7 +215,10 @@ def term_frequency(
     )
 
 
-def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFrame:
+@InputSeries([TokenSeries, TextSeries])
+def tfidf(
+    s: Union[TokenSeries, TextSeries], max_features=None, min_df=1, max_df=1.0,
+) -> DocumentTermDF:
     """
     Represent a text-based Pandas Series using TF-IDF.
 
@@ -315,9 +320,10 @@ Dimensionality reduction
 """
 
 
+@InputSeries([VectorSeries, DocumentTermDF])
 def pca(
-    s: Union[pd.Series, pd.DataFrame], n_components=2, random_state=None
-) -> pd.Series:
+    s: Union[VectorSeries, DocumentTermDF], n_components=2, random_state=None
+) -> VectorSeries:
     """
     Perform principal component analysis on the given Pandas Series.
 
@@ -382,7 +388,7 @@ def pca(
     """
     pca = PCA(n_components=n_components, random_state=random_state, copy=False)
 
-    if _check_is_valid_DocumentTermDF(s):
+    if DocumentTermDF.check_type(s)[0]:
         values = s.values
     else:
         values = list(s)
@@ -390,9 +396,10 @@ def pca(
     return pd.Series(list(pca.fit_transform(values)), index=s.index)
 
 
+@InputSeries([VectorSeries, DocumentTermDF])
 def nmf(
-    s: Union[pd.Series, pd.DataFrame], n_components=2, random_state=None
-) -> pd.Series:
+    s: Union[VectorSeries, DocumentTermDF], n_components=2, random_state=None
+) -> VectorSeries:
     """
     Performs non-negative matrix factorization.
 
@@ -454,7 +461,7 @@ def nmf(
     """
     nmf = NMF(n_components=n_components, init="random", random_state=random_state,)
 
-    if _check_is_valid_DocumentTermDF(s):
+    if DocumentTermDF.check_type(s)[0]:
         s_coo = s.sparse.to_coo()
         s_for_vectorization = s_coo.astype("float64")
     else:
@@ -463,15 +470,16 @@ def nmf(
     return pd.Series(list(nmf.fit_transform(s_for_vectorization)), index=s.index)
 
 
+@InputSeries([VectorSeries, DocumentTermDF])
 def tsne(
-    s: Union[pd.Series, pd.DataFrame],
+    s: Union[VectorSeries, DocumentTermDF],
     n_components=2,
     perplexity=30.0,
     learning_rate=200.0,
     n_iter=1000,
     random_state=None,
     n_jobs=-1,
-) -> pd.Series:
+) -> VectorSeries:
     """
     Performs TSNE on the given pandas series.
 
@@ -556,7 +564,7 @@ def tsne(
         n_jobs=n_jobs,
     )
 
-    if _check_is_valid_DocumentTermDF(s):
+    if DocumentTermDF.check_type(s)[0]:
         s_coo = s.sparse.to_coo()
         s_for_vectorization = s_coo.astype("float64")
     else:
@@ -570,14 +578,15 @@ Clustering
 """
 
 
+@InputSeries([VectorSeries, DocumentTermDF])
 def kmeans(
-    s: Union[pd.Series, pd.DataFrame],
+    s: Union[VectorSeries, DocumentTermDF],
     n_clusters=5,
     n_init=10,
     max_iter=300,
     random_state=None,
     algorithm="auto",
-):
+) -> VectorSeries:
     """
     Performs K-means clustering algorithm.
 
@@ -649,7 +658,7 @@ def kmeans(
 
     """
 
-    if _check_is_valid_DocumentTermDF(s):
+    if DocumentTermDF.check_type(s)[0]:
         s_coo = s.sparse.to_coo()
         s_for_vectorization = s_coo.astype("float64")
     else:
@@ -668,15 +677,16 @@ def kmeans(
     )
 
 
+@InputSeries([VectorSeries, DocumentTermDF])
 def dbscan(
-    s: Union[pd.Series, pd.DataFrame],
+    s: Union[VectorSeries, DocumentTermDF],
     eps=0.5,
     min_samples=5,
     metric="euclidean",
     metric_params=None,
     leaf_size=30,
     n_jobs=-1,
-):
+) -> VectorSeries:
     """
     Perform DBSCAN clustering.
 
@@ -758,7 +768,7 @@ def dbscan(
 
     """
 
-    if _check_is_valid_DocumentTermDF(s):
+    if DocumentTermDF.check_type(s)[0]:
         s_coo = s.sparse.to_coo()
         s_for_vectorization = s_coo.astype("float64")
     else:
@@ -777,6 +787,7 @@ def dbscan(
     ).astype("category")
 
 
+@InputSeries([VectorSeries, DocumentTermDF])
 def meanshift(
     s: Union[pd.Series, pd.DataFrame],
     bandwidth=None,
@@ -785,7 +796,7 @@ def meanshift(
     cluster_all=True,
     n_jobs=-1,
     max_iter=300,
-):
+) -> VectorSeries:
     """
     Perform mean shift clustering.
 
@@ -869,7 +880,7 @@ def meanshift(
 
     """
 
-    if _check_is_valid_DocumentTermDF(s):
+    if DocumentTermDF.check_type(s)[0]:
         vectors = s.values
     else:
         vectors = list(s)
@@ -898,7 +909,10 @@ Normalization.
 """
 
 
-def normalize(s: Union[pd.DataFrame, pd.Series], norm="l2") -> pd.Series:
+@InputSeries([VectorSeries, DocumentTermDF])
+def normalize(
+    s: Union[VectorSeries, DocumentTermDF], norm="l2"
+) -> Union[VectorSeries, DocumentTermDF]:
     """
     Normalize every cell in a Pandas Series.
 
@@ -929,12 +943,12 @@ def normalize(s: Union[pd.DataFrame, pd.Series], norm="l2") -> pd.Series:
 
     See Also
     --------
-    Representation Series link TODO add link to tutorial
+    DocumentTermDF link TODO add link to tutorial
 
     `Norm on Wikipedia <https://en.wikipedia.org/wiki/Norm_(mathematics)>`_
 
     """
-    isDocumentTermDF = _check_is_valid_DocumentTermDF(s)
+    isDocumentTermDF = DocumentTermDF.check_type(s)[0]
 
     if isDocumentTermDF:
         s_coo = s.sparse.to_coo()

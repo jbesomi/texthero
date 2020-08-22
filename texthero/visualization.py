@@ -71,11 +71,11 @@ def scatterplot(
     >>> df["pca"] = (
     ...             hero.tfidf(df["texts"])
     ...                 .pipe(hero.pca, n_components=3)
-    ... ) # TODO: when others get Representation Support: remove flatten
+    ... )
     >>> df["topics"] = (
     ...                hero.tfidf(df["texts"])
     ...                    .pipe(hero.kmeans, n_clusters=2)
-    ... ) # TODO: when others get Representation Support: remove flatten
+    ... )
     >>> hero.scatterplot(df, col="pca", color="topics",
     ...                  hover_data=["texts"]) # doctest: +SKIP
     """

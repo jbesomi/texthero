@@ -2,13 +2,13 @@
 embeddings.py
 -------------
 
-Embed documents and work with the embeddings to find similar documents,
+Embed documents and use the embeddings to find similar documents,
 find topics, ... .
 
 There are many different ways to transform text data into vectors to gain
 insights from them. The resulting vectors are called _embeddings_.
 A _word embedding_ assigns a vector to each word, a _document embedding_
-(sometimes called thought _thought vector_)
+(sometimes called _thought vector_)
 assigns a vector to each document.
 
 One way to get embeddings is to use a function such as tfidf,
@@ -88,6 +88,14 @@ def embed(
     return the document embedding for every
     document in the tokenized Series.
 
+    Parameters
+    ----------
+    s : :class:`texthero._types.TokenSeries`
+        The series we want to calculate embeddings for.
+
+    flair_embedding : flair.embeddings.DocumentEmbeddings
+        The document embedding we want to use.
+
     Examples
     --------
     >>> import texthero as hero
@@ -103,6 +111,9 @@ def embed(
     See Also
     --------
     `Flair Document Embedding https://github.com/flairNLP/flair/blob/master/resources/docs/TUTORIAL_5_DOCUMENT_EMBEDDINGS.md`_
+
+    TODO: Add a link to the Flair/Texthero article that explains how
+          to flair with Texthero and how to install flair+torch
     """
     try:
         import flair

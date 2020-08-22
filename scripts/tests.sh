@@ -2,4 +2,4 @@
 
 cd ..
 
-python3 -m unittest discover -b -s tests -t .
+python3 -m unittest discover -s tests -t .

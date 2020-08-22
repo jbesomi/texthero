@@ -144,11 +144,21 @@ TFIDF is a formula to calculate the _relative importance_ of the words in a docu
 into account the words' occurrences in other documents.
 
 ```python
-df['tfidf'] = hero.tfidf(df['tokenized_text'])
+df = pd.concat([df, hero.tfidf(df['tokenized_text']])
 ```
 
 Now, we have calculated a vector for each document that tells us what words are characteristic for the document.
 Usually, documents about similar topics use similar terms, so their tfidf-vectors will be similar too.
+
+###### Usage of concat
+
+Here you will have probably noticed something very odd. We didn't used the
+assignement operator to insert the new created DataFrame.  This is due to the
+reason, that for each word in every document we created a new DataFrame column. This makes the insertion operation very expensive and therefore we recommend to use concat instead. Currently just the functions `count`, `term_frequency` and `tfidf` return that kind of DocumentTermDF. To read more about the different PandasTypes, introduced in this library, have a look at this tutorial.
+
+##### Normalisation of the data
+
+It is very imporant to normalize your data before you start to analyse them. The normalisation helps you to minimise the variance of your dataset, which is necessary to analyse your data further in a meaningful way, as outliers and and different ranges of numbers are now "handled". This is just a generalisation, as every clustering and dimension reduction algorithm works differently.
 
 ##### Dimensionality reduction with PCA
 
@@ -173,6 +183,7 @@ df['pca'] = (
       .pipe(hero.clean)
       .pipe(hero.tokenize)
       .pipe(hero.tfidf)
+      .pipe(hero.normalize)
       .pipe(hero.pca)
 )
 ```
@@ -246,11 +257,11 @@ of strings. For example, `pd.Series([["test"], ["token2", "token3"]])` is a vali
 3. __VectorSeries__: Every cell is a vector representing text, i.e.
 a list of floats. For example, `pd.Series([[1.0, 2.0], [3.0]])` is a valid VectorSeries. Most dimensionality reduction functions, like `pca` will take VectorSeries as an input and also return a VectorSeries.
 
-4. __RepresentationSeries__: Series is multiindexed with level one
-being the document, level two being the individual features and their values.
-For example,
-`pd.Series([1, 2, 3], index=pd.MultiIndex.from_tuples([("doc1", "word1"), ("doc1", "word2"), ("doc2", "word1")]))`
-is a valid RepresentationSeries. RepresentationSeries will be the output type from the NLP functions like `count` or `term frequency`
+4. **DocumentTermDF**: A DataFrame where the rows are the documents and the columns are the words/terms in all the documents. The columns are multiindexed with level one
+ being the content name (e.g. "tfidf"), level two being the individual features and their values.
+ For example,
+ `pd.DataFrame([[1, 2, 3], [4,5,6]], columns=pd.MultiIndex.from_tuples([("count", "hi"), ("count", "servus"), ("count", "hola")]))`
+ is a valid RepresentationSeries.
 
 To get more detailed insights into this topic, you can have a look at the typing tutorial. But in general, if you use texthero with the common pipeline:
 - cleaning the Series with functions from the preprocessing module
@@ -262,7 +273,7 @@ you won't need to worry much about it, as the functions are build in the way, th
 
 ## Summary
 
-We saw how in just a couple of lines of code we can represent and visualize any text dataset. We went from knowing nothing regarding the dataset to see that there are 5 (quite) distinct areas representig each topic. We went _from zero to hero_.
+We saw how in just a couple of lines of code we can represent and visualize any text dataset. We went from knowing nothing regarding the dataset to see that there are 5 (quite) distinct areas representing each a topic. We went _from zero to hero_.
 
 ```python
 import texthero as hero

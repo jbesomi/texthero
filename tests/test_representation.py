@@ -163,7 +163,7 @@ class AbstractRepresentationTest(PandasTestCase):
     @parameterized.expand(test_cases_vectorization)
     def test_vectorization_arguments_to_sklearn(self, name, test_function, *args):
         try:
-            test_function(s_not_tokenized, max_features=1, min_df=1, max_df=1.0)
+            test_function(s_tokenized, max_features=1, min_df=1, max_df=1.0)
         except TypeError:
             self.fail("Sklearn arguments not handled correctly.")
 

@@ -144,17 +144,25 @@ TFIDF is a formula to calculate the _relative importance_ of the words in a docu
 into account the words' occurrences in other documents.
 
 ```python
-df = pd.concat([df, hero.tfidf(df['tokenized_text']])
+df_tfidf = hero.tfidf(df["tokenized_text"])
 ```
 
 Now, we have calculated a vector for each document that tells us what words are characteristic for the document.
 Usually, documents about similar topics use similar terms, so their tfidf-vectors will be similar too.
 
-###### Usage of concat
+###### Integration of the calculation into an existing dataframe
 
-Here you will have probably noticed something very odd. We didn't used the
-assignement operator to insert the new created DataFrame.  This is due to the
-reason, that for each word in every document we created a new DataFrame column. This makes the insertion operation very expensive and therefore we recommend to use concat instead. Currently just the functions `count`, `term_frequency` and `tfidf` return that kind of DocumentTermDF. To read more about the different PandasTypes, introduced in this library, have a look at this tutorial.
+The only thing you _can_ but _should not_ do is store a _DocumentTermDF_ in your dataframe, as the performance is really bad. If you really want to, here's the two options:
+ ```python
+ >>> data = pd.read_csv("https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv")
+ >>> data_count = data["text"].pipe(count)
+
+ >>> # Option 1: recommended if you really want to put the DocumenTermDF into your DataFrame
+ >>> data = pd.concat(data, data_count)
+
+ >>> # Option 1: not recommended as performance is not optimal
+ >>> data["count"] = data_count
+ ```
 
 ##### Normalisation of the data
 
@@ -287,6 +295,7 @@ df['pca'] = (
     .pipe(hero.clean)
     .pipe(hero.tokenize)
     .pipe(hero.tfidf)
+    .pipe(hero.normalize)
     .pipe(hero.pca)
 )
 

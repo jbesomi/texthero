@@ -149,16 +149,13 @@ We can see that only around 1.2% of our _DocumentTermDF_ `data_count` is filled,
 
 <h4 align="left">When and how is it used? Do I have to work with multiindexes?!</h4>
 
-The _DocumentTermDF_ is mostly used internally for performance reasons. For example, as you can see above, the default output from `hero.count` is such a Series, but if you apply e.g. `hero.pca` afterwards, you don't even notice the _DocumentTermDF_: `s.pipe(hero.count).pipe(hero.normalize).pipe(hero.pca)` works just fine; everything is seamlessly integrated in the library.
+The _DocumentTermDF_ is mostly used internally for performance reasons. For example, as you can see above, the default output from `hero.count` is such a DataFrame, but if you apply e.g. `hero.pca` afterwards, you don't even notice the _DocumentTermDF_: `s.pipe(hero.count).pipe(hero.normalize).pipe(hero.pca)` works just fine; everything is seamlessly integrated in the library.
 
-The only thing you _can_ but _should not_ do is store a _DocumentTermDF_ in your dataframe, as the performance is really bad. If you really want to, here's the two options:
+The only thing you _can_ but _should not_ do is store a _DocumentTermDF_ in your dataframe, as the performance is really bad. If you really want to, you can do it like this like this:
 ```python
 >>> data = pd.read_csv("https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv")
 >>> data_count = data["text"].pipe(count)
 
->>> # Option 1: recommended if you really want to put the DocumenTermDF into your DataFrame
->>> data = pd.concat(data, data_count)
-
->>> # Option 1: not recommended as performance is not optimal
+>>> # NOT recommended as performance is not optimal
 >>> data["count"] = data_count
 ```

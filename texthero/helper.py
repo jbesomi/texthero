@@ -88,6 +88,7 @@ partitions = cores
 
 def parallel(s, func, *args, **kwargs):
     from texthero import config
+
     if len(s) < config.MIN_LINES_FOR_PARALLELIZATION or not config.PARALLELIZE:
         # Execute as usual.
         return func(s, *args, **kwargs)

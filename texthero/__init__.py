@@ -20,4 +20,4 @@ from . import stopwords
 from . import helper
 
 from . import config
-from config import *
+from .config import *

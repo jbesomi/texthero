@@ -177,7 +177,7 @@ class TestPreprocessing(PandasTestCase):
     def test_tokenize_not_split_in_between_punctuation(self):
         s = pd.Series(["don't say hello-world hello_world"])
         s_true = pd.Series([["don't", "say", "hello-world", "hello_world"]])
-        self.assertEqual(preprocessing.tokenize(s), s_true)
+        pd.testing.assert_series_equal(preprocessing.tokenize(s), s_true)
 
     """
      Has content
@@ -186,7 +186,7 @@ class TestPreprocessing(PandasTestCase):
     def test_has_content(self):
         s = pd.Series(["c", np.nan, "\t\n", " ", "", "has content", None])
         s_true = pd.Series([True, False, False, False, False, True, False])
-        self.assertEqual(preprocessing.has_content(s), s_true)
+        pd.testing.assert_series_equal(preprocessing.has_content(s), s_true)
 
     """
     Test remove urls
@@ -195,17 +195,17 @@ class TestPreprocessing(PandasTestCase):
     def test_remove_urls(self):
         s = pd.Series("http://tests.com http://www.tests.com")
         s_true = pd.Series("   ")
-        self.assertEqual(preprocessing.remove_urls(s), s_true)
+        pd.testing.assert_series_equal(preprocessing.remove_urls(s), s_true)
 
     def test_remove_urls_https(self):
         s = pd.Series("https://tests.com https://www.tests.com")
         s_true = pd.Series("   ")
-        self.assertEqual(preprocessing.remove_urls(s), s_true)
+        pd.testing.assert_series_equal(preprocessing.remove_urls(s), s_true)
 
     def test_remove_urls_multiline(self):
         s = pd.Series("https://tests.com \n https://tests.com")
         s_true = pd.Series("  \n  ")
-        self.assertEqual(preprocessing.remove_urls(s), s_true)
+        pd.testing.assert_series_equal(preprocessing.remove_urls(s), s_true)
 
     """
     Remove brackets

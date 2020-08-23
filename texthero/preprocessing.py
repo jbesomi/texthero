@@ -24,8 +24,10 @@ import warnings
 
 warnings.filterwarnings(action="ignore", category=UserWarning, module="gensim")
 
-def _fillna(s:TextSeries) -> TextSeries:
+
+def _fillna(s: TextSeries) -> TextSeries:
     return s.fillna("").astype("str")
+
 
 @InputSeries(TextSeries)
 def fillna(s: TextSeries) -> TextSeries:
@@ -46,6 +48,7 @@ def fillna(s: TextSeries) -> TextSeries:
     dtype: object
     """
     return parallel(s, _fillna)
+
 
 def _lowercase(s: TextSeries) -> TextSeries:
     return s.str.lower()
@@ -68,12 +71,14 @@ def lowercase(s: TextSeries) -> TextSeries:
     """
     return parallel(s, _lowercase)
 
+
 def _replace_digits(s: TextSeries, symbols: str = " ", only_blocks=True) -> TextSeries:
     if only_blocks:
         pattern = r"\b\d+\b"
         return s.str.replace(pattern, symbols)
     else:
         return s.str.replace(r"\d+", symbols)
+
 
 @InputSeries(TextSeries)
 def replace_digits(s: TextSeries, symbols: str = " ", only_blocks=True) -> TextSeries:
@@ -107,11 +112,8 @@ def replace_digits(s: TextSeries, symbols: str = " ", only_blocks=True) -> TextS
     0    X falconX
     dtype: object
     """
-    return parallel(s,_replace_digits,symbols=symbols, only_blocks = only_blocks)
-    
+    return parallel(s, _replace_digits, symbols=symbols, only_blocks=only_blocks)
 
-def _remove_digits(s: TextSeries, only_blocks=True) -> TextSeries:
-    return replace_digits(s, " ", only_blocks)
 
 @InputSeries(TextSeries)
 def remove_digits(s: TextSeries, only_blocks=True) -> TextSeries:
@@ -144,7 +146,9 @@ def remove_digits(s: TextSeries, only_blocks=True) -> TextSeries:
     0     ex hero is fun  
     dtype: object
     """
-    return parallel(s, _remove_digits)
+
+    return replace_digits(s, " ", only_blocks)
+
 
 def _replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
     return s.str.replace(rf"([{string.punctuation}])+", symbol)
@@ -177,10 +181,7 @@ def replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
     0    Finnaly <PUNCT> 
     dtype: object
     """
-    return parallel(s, replace_punctuation, symbol = symbol)
-
-def _remove_punctuation(s: TextSeries) -> TextSeries:
-    return replace_punctuation(s, " ")
+    return parallel(s, _replace_punctuation, symbol=symbol)
 
 
 @InputSeries(TextSeries)
@@ -204,7 +205,8 @@ def remove_punctuation(s: TextSeries) -> TextSeries:
     0    Finnaly 
     dtype: object
     """
-    return parallel(s, _remove_punctuation)
+    return replace_punctuation(s, " ")
+
 
 def _remove_diacritics_algorithm(text: str) -> str:
     """
@@ -215,16 +217,18 @@ def _remove_diacritics_algorithm(text: str) -> str:
     >>> from texthero.preprocessing import _remove_diacritics
     >>> import pandas as pd
     >>> text = "Montréal, über, 12.89, Mère, Françoise, noël, 889, اِس, اُس"
-    >>> _remove_diacritics(text)
+    >>> _remove_diacritics_algorithm(text)
     'Montreal, uber, 12.89, Mere, Francoise, noel, 889, اس, اس'
     """
+
     nfkd_form = unicodedata.normalize("NFKD", text)
     # unicodedata.combining(char) checks if the character is in
     # composed form (consisting of several unicode chars combined), i.e. a diacritic
     return "".join([char for char in nfkd_form if not unicodedata.combining(char)])
 
+
 def _remove_diacritics(s: TextSeries) -> TextSeries:
-    return s.astype("unicode").apply(_remove_diacritics)
+    return s.astype("unicode").apply(_remove_diacritics_algorithm)
 
 
 @InputSeries(TextSeries)
@@ -246,7 +250,8 @@ def remove_diacritics(s: TextSeries) -> TextSeries:
     'Montreal, uber, 12.89, Mere, Francoise, noel, 889, اس, اس'
 
     """
-    return parallel(s,_remove_diacritics)
+    return parallel(s, _remove_diacritics)
+
 
 def _remove_whitespace(s: TextSeries) -> TextSeries:
     return s.str.replace("\xa0", " ").str.split().str.join(" ")
@@ -295,7 +300,7 @@ def _replace_stopwords_algorithm(text: str, words: Set[str], symbol: str = " ") 
     >>> s = "the book of the jungle"
     >>> symbol = "$"
     >>> stopwords = ["the", "of"]
-    >>> _replace_stopwords(s, stopwords, symbol)
+    >>> _replace_stopwords_algorithm(s, stopwords, symbol)
     '$ book $ $ jungle'
 
     """
@@ -308,10 +313,11 @@ def _replace_stopwords_algorithm(text: str, words: Set[str], symbol: str = " ") 
 
     return "".join(t if t not in words else symbol for t in re.findall(pattern, text))
 
+
 def _replace_stopwords(
     s: TextSeries, symbol: str, stopwords: Optional[Set[str]] = None
 ) -> TextSeries:
-    return s.apply(_replace_stopwords, args=(stopwords, symbol))
+    return s.apply(_replace_stopwords_algorithm, words=stopwords, symbol=symbol)
 
 
 @InputSeries(TextSeries)
@@ -346,8 +352,8 @@ def replace_stopwords(
     """
     if stopwords is None:
         stopwords = _stopwords.DEFAULT
-    return parallel(s, _replace_stopwords, symbol = symbol, stopwords = stopwords)
-   
+    return parallel(s, _replace_stopwords, symbol=symbol, stopwords=stopwords)
+
 
 @InputSeries(TextSeries)
 def remove_stopwords(
@@ -393,12 +399,11 @@ def remove_stopwords(
 
     """
     return replace_stopwords(s, symbol="", stopwords=stopwords)
- 
+
 
 def _stem(s, stemmer):
-
     def _stem_algorithm(text):
-        return " ".join([stemmer.stem(word) for word in text])    
+        return " ".join([stemmer.stem(word) for word in text])
 
     return s.str.split().apply(_stem_algorithm)
 
@@ -452,7 +457,6 @@ def stem(s: TextSeries, stem="snowball", language="english") -> TextSeries:
         stemmer = SnowballStemmer(language)
     else:
         raise ValueError("stem argument must be either 'porter' of 'stemmer'")
-
 
     return parallel(s, _stem, stemmer=stemmer)
 
@@ -565,6 +569,7 @@ def drop_no_content(s: TextSeries) -> TextSeries:
     """
     return s[has_content(s)]
 
+
 def _remove_round_brackets(s: TextSeries) -> TextSeries:
     return s.str.replace(r"\([^()]*\)", "")
 
@@ -592,7 +597,8 @@ def remove_round_brackets(s: TextSeries) -> TextSeries:
     :meth:`remove_square_brackets`
 
     """
-    return parallel(s,_remove_round_brackets)
+    return parallel(s, _remove_round_brackets)
+
 
 def _remove_curly_brackets(s: TextSeries) -> TextSeries:
     return s.str.replace(r"\{[^{}]*\}", "")
@@ -651,7 +657,8 @@ def remove_square_brackets(s: TextSeries) -> TextSeries:
     :meth:`remove_curly_brackets`
 
     """
-    parallel(s, _remove_square_brackets)
+    return parallel(s, _remove_square_brackets)
+
 
 def _remove_angle_brackets(s: TextSeries) -> TextSeries:
     return s.str.replace(r"<[^<>]*>", "")
@@ -717,6 +724,7 @@ def remove_brackets(s: TextSeries) -> TextSeries:
 
 
 def _remove_html_tags(s: TextSeries) -> TextSeries:
+
     pattern = r"""(?x)                              # Turn on free-spacing
       <[^>]+>                                       # Remove <html> tags
       | &([a-z0-9]+|\#[0-9]{1,6}|\#x[0-9a-f]{1,6}); # Remove &nbsp;
@@ -877,7 +885,7 @@ def replace_urls(s: TextSeries, symbol: str) -> TextSeries:
     :meth:`texthero.preprocessing.remove_urls`
 
     """
-    parallel(s, _replace_urls, symbol=symbol)
+    return parallel(s, _replace_urls, symbol=symbol)
 
 
 @InputSeries(TextSeries)

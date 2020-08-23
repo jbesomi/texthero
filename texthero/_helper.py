@@ -75,137 +75,38 @@ def handle_nans(replace_nans_with):
     return decorator
 
 
-
-
-
-def parallelize2(func):
-    """
-    TODO
-    """
-
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-
-        # Get first input argument (the series).
-        s = args[0]
-
-        # If enough rows for us to parallelize
-        if len(s) > MIN_LINES_FOR_PARALLELIZATION:
-
-            partitions = mp.cpu_count()
-
-            # split data into batches
-            data_split = np.array_split(s, partitions)
-
-            # open threadpool
-            pool = mp.Pool(partitions)
-
-            # Execute in parallel and concat results (order is kept).
-            s_result = pd.concat(
-                pool.map(functools.partial(func, *args, **kwargs), data_split)
-            )
-
-            pool.close()
-            pool.join()
-
-            return s_result
-
-        else:
-            # Apply function as usual.
-            return func(*args, **kwargs)
-
-    setattr(sys.modules[func.__module__], func.__name__, wrapper)
-
-    return wrapper
-
-
-#def _f(s, t):
-#    return s.str.split()
-
-
-
-#def f(*args, **kwargs)= parallelize(_f, *args, **kwargs)
-
-
-MIN_LINES_FOR_PARALLELIZATION = 0
-
-
-def doit(s, f):
-    return s.apply(f)
-
-import re
-
-#def g(s):
-#    return s.apply(lambda x: re.sub(r"j", "br", x))
-
 """
-lambda x: _map_apply
+Parallelization.
 """
 
-def _hero_apply(s, func, *args, **kwargs):
 
-    # If enough rows for us to parallelize
-    if len(s) > MIN_LINES_FOR_PARALLELIZATION:
+cores = mp.cpu_count()
+partitions = cores
 
-        partitions = mp.cpu_count()
+MIN_LINES_FOR_PARALLELIZATION = 10000
+PARALLELIZE = True
 
-        # split data into batches
-        data_split = np.array_split(s, partitions)
 
-        # open threadpool
-        pool = mp.Pool(partitions)
+def parallel(s, func, *args, **kwargs):
 
+    if len(s) < MIN_LINES_FOR_PARALLELIZATION or not PARALLELIZE:
+        # Execute as usual.
+        return func(s, *args, **kwargs)
+
+    else:
+        # Execute in parallel.
+
+        # Split the data up into batches.
+        s_split = np.array_split(s, partitions)
+
+        # Open threadpool.
+        pool = mp.Pool(cores)
         # Execute in parallel and concat results (order is kept).
         s_result = pd.concat(
-            pool.map(func, data_split)
+            pool.map(functools.partial(func, *args, **kwargs), s_split)
         )
 
         pool.close()
         pool.join()
 
         return s_result
-
-    else:
-        # Apply function as usual.
-        return func(s, *args, **kwargs)
-
-
-
-"""
-s = _hero_apply(s, lambda x: re.sub(r"", "", x))
-
-def _hero_apply:
-    split up s
-    for s_partial in s:
-        s_partial_result = s_partial.apply()
-"""
-
-
-import numpy as np
-from multiprocessing import cpu_count
- 
-cores = cpu_count() #Number of CPU cores on your system
-partitions = cores #Define as many partitions as you want
- 
-def parallel(data, func, *args, **kwargs):
-
-    data_split = np.array_split(data, partitions)
-    pool = mp.Pool(cores)
-    data = pd.concat(
-                pool.map(
-                    functools.partial(func, *args, **kwargs), data_split
-                )
-            )
-
-    pool.close()
-    pool.join()
-    return data
-
-"""
-import texthero as t
-from texthero._helper import g
-import pandas as pd
-s = pd.Series(["Ja1a 9" for _ in range(10)])
-
-t._helper.parallel(s, t.preprocessing.replace_digits, symbols="nee", only_blocks=False)
-"""

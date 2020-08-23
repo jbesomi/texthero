@@ -206,7 +206,7 @@ def remove_punctuation(s: TextSeries) -> TextSeries:
     """
     return parallel(s, _remove_punctuation)
 
-def _remove_diacritics(text: str) -> str:
+def _remove_diacritics_algorithm(text: str) -> str:
     """
     Remove diacritics and accents from one string.
 
@@ -222,6 +222,9 @@ def _remove_diacritics(text: str) -> str:
     # unicodedata.combining(char) checks if the character is in
     # composed form (consisting of several unicode chars combined), i.e. a diacritic
     return "".join([char for char in nfkd_form if not unicodedata.combining(char)])
+
+def _remove_diacritics(s: TextSeries) -> TextSeries:
+    return s.astype("unicode").apply(_remove_diacritics)
 
 
 @InputSeries(TextSeries)
@@ -243,7 +246,10 @@ def remove_diacritics(s: TextSeries) -> TextSeries:
     'Montreal, uber, 12.89, Mere, Francoise, noel, 889, اس, اس'
 
     """
-    return s.astype("unicode").apply(_remove_diacritics)
+    return parallel(s,_remove_diacritics)
+
+def _remove_whitespace(s: TextSeries) -> TextSeries:
+    return s.str.replace("\xa0", " ").str.split().str.join(" ")
 
 
 @InputSeries(TextSeries)
@@ -266,11 +272,10 @@ def remove_whitespace(s: TextSeries) -> TextSeries:
     0    Title Subtitle ...
     dtype: object
     """
+    return parallel(s, _remove_whitespace)
 
-    return s.str.replace("\xa0", " ").str.split().str.join(" ")
 
-
-def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
+def _replace_stopwords_algorithm(text: str, words: Set[str], symbol: str = " ") -> str:
     """
     Remove words in a set from a string, replacing them with a symbol.
 
@@ -303,6 +308,11 @@ def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
 
     return "".join(t if t not in words else symbol for t in re.findall(pattern, text))
 
+def _replace_stopwords(
+    s: TextSeries, symbol: str, stopwords: Optional[Set[str]] = None
+) -> TextSeries:
+    return s.apply(_replace_stopwords, args=(stopwords, symbol))
+
 
 @InputSeries(TextSeries)
 def replace_stopwords(
@@ -334,11 +344,10 @@ def replace_stopwords(
     dtype: object
 
     """
-
     if stopwords is None:
         stopwords = _stopwords.DEFAULT
-    return s.apply(_replace_stopwords, args=(stopwords, symbol))
-
+    return parallel(s, _replace_stopwords, symbol = symbol, stopwords = stopwords)
+   
 
 @InputSeries(TextSeries)
 def remove_stopwords(
@@ -384,6 +393,14 @@ def remove_stopwords(
 
     """
     return replace_stopwords(s, symbol="", stopwords=stopwords)
+ 
+
+def _stem(s, stemmer):
+
+    def _stem_algorithm(text):
+        return " ".join([stemmer.stem(word) for word in text])    
+
+    return s.str.split().apply(_stem_algorithm)
 
 
 @InputSeries(TextSeries)
@@ -436,10 +453,8 @@ def stem(s: TextSeries, stem="snowball", language="english") -> TextSeries:
     else:
         raise ValueError("stem argument must be either 'porter' of 'stemmer'")
 
-    def _stem(text):
-        return " ".join([stemmer.stem(word) for word in text])
 
-    return s.str.split().apply(_stem)
+    return parallel(s, _stem, stemmer=stemmer)
 
 
 def get_default_pipeline() -> List[Callable[[pd.Series], pd.Series]]:
@@ -550,6 +565,9 @@ def drop_no_content(s: TextSeries) -> TextSeries:
     """
     return s[has_content(s)]
 
+def _remove_round_brackets(s: TextSeries) -> TextSeries:
+    return s.str.replace(r"\([^()]*\)", "")
+
 
 @InputSeries(TextSeries)
 def remove_round_brackets(s: TextSeries) -> TextSeries:
@@ -574,8 +592,7 @@ def remove_round_brackets(s: TextSeries) -> TextSeries:
     :meth:`remove_square_brackets`
 
     """
-    return s.str.replace(r"\([^()]*\)", "")
-
+    return parallel(s,_remove_round_brackets)
 
 @InputSeries(TextSeries)
 def remove_curly_brackets(s: TextSeries) -> TextSeries:

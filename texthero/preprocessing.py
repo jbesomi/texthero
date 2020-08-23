@@ -594,6 +594,10 @@ def remove_round_brackets(s: TextSeries) -> TextSeries:
     """
     return parallel(s,_remove_round_brackets)
 
+def _remove_curly_brackets(s: TextSeries) -> TextSeries:
+    return s.str.replace(r"\{[^{}]*\}", "")
+
+
 @InputSeries(TextSeries)
 def remove_curly_brackets(s: TextSeries) -> TextSeries:
     """
@@ -617,7 +621,11 @@ def remove_curly_brackets(s: TextSeries) -> TextSeries:
     :meth:`remove_square_brackets`
 
     """
-    return s.str.replace(r"\{[^{}]*\}", "")
+    return parallel(s, _remove_curly_brackets)
+
+
+def _remove_square_brackets(s: TextSeries) -> TextSeries:
+    return s.str.replace(r"\[[^\[\]]*\]", "")
 
 
 @InputSeries(TextSeries)
@@ -642,9 +650,11 @@ def remove_square_brackets(s: TextSeries) -> TextSeries:
     :meth:`remove_round_brackets`
     :meth:`remove_curly_brackets`
 
-
     """
-    return s.str.replace(r"\[[^\[\]]*\]", "")
+    parallel(s, _remove_square_brackets)
+
+def _remove_angle_brackets(s: TextSeries) -> TextSeries:
+    return s.str.replace(r"<[^<>]*>", "")
 
 
 @InputSeries(TextSeries)
@@ -670,7 +680,7 @@ def remove_angle_brackets(s: TextSeries) -> TextSeries:
     :meth:`remove_square_brackets`
 
     """
-    return s.str.replace(r"<[^<>]*>", "")
+    return parallel(s, _remove_angle_brackets)
 
 
 @InputSeries(TextSeries)
@@ -706,6 +716,15 @@ def remove_brackets(s: TextSeries) -> TextSeries:
     )
 
 
+def _remove_html_tags(s: TextSeries) -> TextSeries:
+    pattern = r"""(?x)                              # Turn on free-spacing
+      <[^>]+>                                       # Remove <html> tags
+      | &([a-z0-9]+|\#[0-9]{1,6}|\#x[0-9a-f]{1,6}); # Remove &nbsp;
+      """
+
+    return s.str.replace(pattern, "")
+
+
 @InputSeries(TextSeries)
 def remove_html_tags(s: TextSeries) -> TextSeries:
     """
@@ -725,13 +744,18 @@ def remove_html_tags(s: TextSeries) -> TextSeries:
     dtype: object
 
     """
+    return parallel(s, _remove_html_tags)
 
-    pattern = r"""(?x)                              # Turn on free-spacing
-      <[^>]+>                                       # Remove <html> tags
-      | &([a-z0-9]+|\#[0-9]{1,6}|\#x[0-9a-f]{1,6}); # Remove &nbsp;
-      """
 
-    return s.str.replace(pattern, "")
+def _tokenize(s: TextSeries) -> TokenSeries:
+    punct = string.punctuation.replace("_", "")
+    # In regex, the metacharacter 'w' is "a-z, A-Z, 0-9, including the _ (underscore)
+    # character." We therefore remove it from the punctuation string as this is already
+    # included in \w.
+
+    pattern = rf"((\w)([{punct}])(?:\B|$)|(?:^|\B)([{punct}])(\w))"
+
+    return s.str.replace(pattern, r"\2 \3 \4 \5").str.split()
 
 
 @InputSeries(TextSeries)
@@ -756,14 +780,7 @@ def tokenize(s: TextSeries) -> TokenSeries:
 
     """
 
-    punct = string.punctuation.replace("_", "")
-    # In regex, the metacharacter 'w' is "a-z, A-Z, 0-9, including the _ (underscore)
-    # character." We therefore remove it from the punctuation string as this is already
-    # included in \w.
-
-    pattern = rf"((\w)([{punct}])(?:\B|$)|(?:^|\B)([{punct}])(\w))"
-
-    return s.str.replace(pattern, r"\2 \3 \4 \5").str.split()
+    return parallel(s, _tokenize)
 
 
 # Warning message for not-tokenized inputs
@@ -828,6 +845,11 @@ def phrases(
     return pd.Series(phrases.fit_transform(s.values), index=s.index)
 
 
+def _replace_urls(s: TextSeries, symbol: str) -> TextSeries:
+    pattern = r"http\S+"
+    return s.str.replace(pattern, symbol)
+
+
 @InputSeries(TextSeries)
 def replace_urls(s: TextSeries, symbol: str) -> TextSeries:
     r"""Replace all urls with the given symbol.
@@ -855,10 +877,7 @@ def replace_urls(s: TextSeries, symbol: str) -> TextSeries:
     :meth:`texthero.preprocessing.remove_urls`
 
     """
-
-    pattern = r"http\S+"
-
-    return s.str.replace(pattern, symbol)
+    parallel(s, _replace_urls, symbol=symbol)
 
 
 @InputSeries(TextSeries)
@@ -886,6 +905,12 @@ def remove_urls(s: TextSeries) -> TextSeries:
 
 
 @InputSeries(TextSeries)
+def _replace_tags(s: TextSeries, symbol: str) -> TextSeries:
+    pattern = r"@[a-zA-Z0-9]+"
+    return s.str.replace(pattern, symbol)
+
+
+@InputSeries(TextSeries)
 def replace_tags(s: TextSeries, symbol: str) -> TextSeries:
     """Replace all tags from a given Pandas Series with symbol.
 
@@ -909,9 +934,7 @@ def replace_tags(s: TextSeries, symbol: str) -> TextSeries:
     dtype: object
 
     """
-
-    pattern = r"@[a-zA-Z0-9]+"
-    return s.str.replace(pattern, symbol)
+    return parallel(s, _replace_tags, symbol=symbol)
 
 
 @InputSeries(TextSeries)
@@ -939,6 +962,11 @@ def remove_tags(s: TextSeries) -> TextSeries:
     return replace_tags(s, " ")
 
 
+def _replace_hashtags(s: TextSeries, symbol: str) -> TextSeries:
+    pattern = r"#[a-zA-Z0-9_]+"
+    return s.str.replace(pattern, symbol)
+
+
 @InputSeries(TextSeries)
 def replace_hashtags(s: TextSeries, symbol: str) -> TextSeries:
     """Replace all hashtags from a Pandas Series with symbol
@@ -963,8 +991,7 @@ def replace_hashtags(s: TextSeries, symbol: str) -> TextSeries:
     dtype: object
 
     """
-    pattern = r"#[a-zA-Z0-9_]+"
-    return s.str.replace(pattern, symbol)
+    return parallel(s, _replace_hashtags, symbol=symbol)
 
 
 @InputSeries(TextSeries)

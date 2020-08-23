@@ -16,6 +16,7 @@ from nltk.stem import PorterStemmer, SnowballStemmer
 from texthero import stopwords as _stopwords
 from texthero._types import TokenSeries, TextSeries, InputSeries
 from texthero.helper import parallel
+from texthero import helper, config
 
 from typing import List, Callable, Union
 

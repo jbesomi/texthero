@@ -11,7 +11,7 @@ import unittest
 import warnings
 import string
 
-from texthero import _helper, preprocessing, nlp
+from texthero import helper, preprocessing, nlp
 
 """
 Doctests.
@@ -19,7 +19,7 @@ Doctests.
 
 
 def load_tests(loader, tests, ignore):
-    tests.addTests(doctest.DocTestSuite(_helper))
+    tests.addTests(doctest.DocTestSuite(helper))
     return tests
 
 
@@ -36,7 +36,7 @@ class TestHelpers(PandasTestCase):
     def test_handle_nans(self):
         s = pd.Series(["Test", np.nan, pd.NA])
 
-        @_helper.handle_nans(replace_nans_with="This was a NAN")
+        @helper.handle_nans(replace_nans_with="This was a NAN")
         def f(s):
             return s
 
@@ -52,7 +52,7 @@ class TestHelpers(PandasTestCase):
     def test_handle_nans_no_nans_in_input(self):
         s = pd.Series(["Test"])
 
-        @_helper.handle_nans(replace_nans_with="This was a NAN")
+        @helper.handle_nans(replace_nans_with="This was a NAN")
         def f(s):
             return s
 
@@ -64,7 +64,7 @@ class TestHelpers(PandasTestCase):
     def test_handle_nans_index(self):
         s = pd.Series(["Test", np.nan, pd.NA], index=[4, 5, 6])
 
-        @_helper.handle_nans(replace_nans_with="This was a NAN")
+        @helper.handle_nans(replace_nans_with="This was a NAN")
         def f(s):
             return s
 
@@ -83,12 +83,12 @@ class TestPreprocessingParallelized(PandasTestCase):
     """
 
     def setUp(self):
-        _helper.MIN_LINES_FOR_PARALLELIZATION = 0
-        _helper.PARALLELIZE = True
+        helper.MIN_LINES_FOR_PARALLELIZATION = 0
+        helper.PARALLELIZE = True
 
     def tearDown(self):
-        _helper.MIN_LINES_FOR_PARALLELIZATION = 10000
-        _helper.PARALLELIZE = True
+        helper.MIN_LINES_FOR_PARALLELIZATION = 10000
+        helper.PARALLELIZE = True
 
     def parallelized_test_helper(self, func, s, non_parallel_s_true, **kwargs):
 

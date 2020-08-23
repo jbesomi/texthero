@@ -6,7 +6,7 @@ import spacy
 import pandas as pd
 
 from texthero._types import TextSeries, InputSeries
-from texthero._helper import parallel
+from texthero.helper import parallel
 
 
 def _named_entities(s: TextSeries, nlp) -> pd.Series:

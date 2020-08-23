@@ -11,7 +11,7 @@ import unittest
 import warnings
 import string
 
-from texthero import _helper, preprocessing
+from texthero import _helper, preprocessing, nlp
 
 """
 Doctests.
@@ -142,13 +142,15 @@ class TestPreprocessingParallelized(PandasTestCase):
     def test_replace_digits(self):
         s = pd.Series("1234 falcon9")
         s_true = pd.Series("X falcon9")
-        self.assertEqual(preprocessing.replace_digits(s, "X"), s_true)
+        self.parallelized_test_helper(
+            preprocessing.replace_digits, s, s_true, symbols="X"
+        )
 
     def test_replace_digits_any(self):
         s = pd.Series("1234 falcon9")
         s_true = pd.Series("X falconX")
-        self.assertEqual(
-            preprocessing.replace_digits(s, "X", only_blocks=False), s_true
+        self.parallelized_test_helper(
+            preprocessing.replace_digits, s, s_true, symbols="X", only_blocks=False
         )
 
     """
@@ -160,7 +162,7 @@ class TestPreprocessingParallelized(PandasTestCase):
         s_true = pd.Series(
             "Remove all  punctuation   "
         )  # TODO maybe just remove space?
-        self.assertEqual(preprocessing.remove_punctuation(s), s_true)
+        self.parallelized_test_helper(preprocessing.remove_punctuation, s, s_true)
 
     """
     Remove diacritics.
@@ -169,7 +171,7 @@ class TestPreprocessingParallelized(PandasTestCase):
     def test_remove_diactitics(self):
         s = pd.Series("Montréal, über, 12.89, Mère, Françoise, noël, 889, اِس, اُس")
         s_true = pd.Series("Montreal, uber, 12.89, Mere, Francoise, noel, 889, اس, اس")
-        self.assertEqual(preprocessing.remove_diacritics(s), s_true)
+        self.parallelized_test_helper(preprocessing.remove_diacritics, s, s_true)
 
     """
     Remove whitespace.
@@ -178,7 +180,7 @@ class TestPreprocessingParallelized(PandasTestCase):
     def test_remove_whitespace(self):
         s = pd.Series("hello   world  hello        world ")
         s_true = pd.Series("hello world hello world")
-        self.assertEqual(preprocessing.remove_whitespace(s), s_true)
+        self.parallelized_test_helper(preprocessing.remove_whitespace, s, s_true)
 
     """
     Test pipeline.
@@ -188,39 +190,7 @@ class TestPreprocessingParallelized(PandasTestCase):
         s = pd.Series("E-I-E-I-O\nAnd on")
         s_true = pd.Series("e-i-e-i-o\n ")
         pipeline = [preprocessing.lowercase, preprocessing.remove_stopwords]
-        self.assertEqual(preprocessing.clean(s, pipeline=pipeline), s_true)
-
-    """
-    Test stopwords.
-    """
-
-    def test_remove_stopwords(self):
-        text = "i am quite intrigued"
-        text_default_preprocessed = "  quite intrigued"
-        text_spacy_preprocessed = "   intrigued"
-        text_custom_preprocessed = "i  quite "
-
-        self.assertEqual(
-            preprocessing.remove_stopwords(pd.Series(text)),
-            pd.Series(text_default_preprocessed),
-        )
-        self.assertEqual(
-            preprocessing.remove_stopwords(
-                pd.Series(text), stopwords=stopwords.SPACY_EN
-            ),
-            pd.Series(text_spacy_preprocessed),
-        )
-        self.assertEqual(
-            preprocessing.remove_stopwords(
-                pd.Series(text), stopwords={"am", "intrigued"}
-            ),
-            pd.Series(text_custom_preprocessed),
-        )
-
-    def test_stopwords_are_set(self):
-        self.assertEqual(type(stopwords.DEFAULT), set)
-        self.assertEqual(type(stopwords.NLTK_EN), set)
-        self.assertEqual(type(stopwords.SPACY_EN), set)
+        self.parallelized_test_helper(preprocessing.clean, s, s_true, pipeline=pipeline)
 
     """
     Test remove html tags
@@ -229,7 +199,7 @@ class TestPreprocessingParallelized(PandasTestCase):
     def test_remove_html_tags(self):
         s = pd.Series("<html>remove <br>html</br> tags<html> &nbsp;")
         s_true = pd.Series("remove html tags ")
-        self.assertEqual(preprocessing.remove_html_tags(s), s_true)
+        self.parallelized_test_helper(preprocessing.remove_html_tags, s, s_true)
 
     """
     Text tokenization
@@ -238,31 +208,16 @@ class TestPreprocessingParallelized(PandasTestCase):
     def test_tokenize(self):
         s = pd.Series("text to tokenize")
         s_true = pd.Series([["text", "to", "tokenize"]])
-        self.assertEqual(preprocessing.tokenize(s), s_true)
-
-    def test_tokenize_multirows(self):
-        s = pd.Series(["first row", "second row"])
-        s_true = pd.Series([["first", "row"], ["second", "row"]])
-        self.assertEqual(preprocessing.tokenize(s), s_true)
-
-    def test_tokenize_split_punctuation(self):
-        s = pd.Series(["ready. set, go!"])
-        s_true = pd.Series([["ready", ".", "set", ",", "go", "!"]])
-        self.assertEqual(preprocessing.tokenize(s), s_true)
-
-    def test_tokenize_not_split_in_between_punctuation(self):
-        s = pd.Series(["don't say hello-world hello_world"])
-        s_true = pd.Series([["don't", "say", "hello-world", "hello_world"]])
-        pd.testing.assert_series_equal(preprocessing.tokenize(s), s_true)
+        self.parallelized_test_helper(preprocessing.tokenize, s, s_true)
 
     """
-     Has content
+    Has content
     """
 
     def test_has_content(self):
         s = pd.Series(["c", np.nan, "\t\n", " ", "", "has content", None])
         s_true = pd.Series([True, False, False, False, False, True, False])
-        pd.testing.assert_series_equal(preprocessing.has_content(s), s_true)
+        self.parallelized_test_helper(preprocessing.has_content, s, s_true)
 
     """
     Test remove urls
@@ -271,154 +226,18 @@ class TestPreprocessingParallelized(PandasTestCase):
     def test_remove_urls(self):
         s = pd.Series("http://tests.com http://www.tests.com")
         s_true = pd.Series("   ")
-        pd.testing.assert_series_equal(preprocessing.remove_urls(s), s_true)
-
-    def test_remove_urls_https(self):
-        s = pd.Series("https://tests.com https://www.tests.com")
-        s_true = pd.Series("   ")
-        pd.testing.assert_series_equal(preprocessing.remove_urls(s), s_true)
-
-    def test_remove_urls_multiline(self):
-        s = pd.Series("https://tests.com \n https://tests.com")
-        s_true = pd.Series("  \n  ")
-        pd.testing.assert_series_equal(preprocessing.remove_urls(s), s_true)
+        self.parallelized_test_helper(preprocessing.remove_urls, s, s_true)
 
     """
     Remove brackets
     """
-
-    def test_remove_round_brackets(self):
-        s = pd.Series("Remove all (brackets)(){/}[]<>")
-        s_true = pd.Series("Remove all {/}[]<>")
-        self.assertEqual(preprocessing.remove_round_brackets(s), s_true)
-
-    def test_remove_curly_brackets(self):
-        s = pd.Series("Remove all (brackets)(){/}[]<> { }")
-        s_true = pd.Series("Remove all (brackets)()[]<> ")
-        self.assertEqual(preprocessing.remove_curly_brackets(s), s_true)
-
-    def test_remove_square_brackets(self):
-        s = pd.Series("Remove all [brackets](){/}[]<>")
-        s_true = pd.Series("Remove all (){/}<>")
-        self.assertEqual(preprocessing.remove_square_brackets(s), s_true)
-
-    def test_remove_angle_brackets(self):
-        s = pd.Series("Remove all <brackets>(){/}[]<>")
-        s_true = pd.Series("Remove all (){/}[]")
-        self.assertEqual(preprocessing.remove_angle_brackets(s), s_true)
 
     def test_remove_brackets(self):
         s = pd.Series(
             "Remove all [square_brackets]{/curly_brackets}(round_brackets)<angle_brackets>"
         )
         s_true = pd.Series("Remove all ")
-        self.assertEqual(preprocessing.remove_brackets(s), s_true)
-
-    """
-    Test phrases
-    """
-
-    def test_phrases(self):
-        s = pd.Series(
-            [
-                ["New", "York", "is", "a", "beautiful", "city"],
-                ["Look", ":", "New", "York", "!"],
-                ["Very", "beautiful", "city", "New", "York"],
-            ]
-        )
-
-        s_true = pd.Series(
-            [
-                ["New_York", "is", "a", "beautiful", "city"],
-                ["Look", ":", "New_York", "!"],
-                ["Very", "beautiful", "city", "New_York"],
-            ]
-        )
-
-        self.assertEqual(preprocessing.phrases(s, min_count=2, threshold=1), s_true)
-
-    def test_phrases_min_count(self):
-        s = pd.Series(
-            [
-                ["New", "York", "is", "a", "beautiful", "city"],
-                ["Look", ":", "New", "York", "!"],
-                ["Very", "beautiful", "city", "New", "York"],
-            ]
-        )
-
-        s_true = pd.Series(
-            [
-                ["New_York", "is", "a", "beautiful_city"],
-                ["Look", ":", "New_York", "!"],
-                ["Very", "beautiful_city", "New_York"],
-            ]
-        )
-
-        self.assertEqual(preprocessing.phrases(s, min_count=1, threshold=1), s_true)
-
-    def test_phrases_threshold(self):
-        s = pd.Series(
-            [
-                ["New", "York", "is", "a", "beautiful", "city"],
-                ["Look", ":", "New", "York", "!"],
-                ["Very", "beautiful", "city", "New", "York"],
-            ]
-        )
-
-        s_true = pd.Series(
-            [
-                ["New_York", "is", "a", "beautiful", "city"],
-                ["Look", ":", "New_York", "!"],
-                ["Very", "beautiful", "city", "New_York"],
-            ]
-        )
-
-        self.assertEqual(preprocessing.phrases(s, min_count=2, threshold=2), s_true)
-
-    def test_phrases_symbol(self):
-        s = pd.Series(
-            [
-                ["New", "York", "is", "a", "beautiful", "city"],
-                ["Look", ":", "New", "York", "!"],
-                ["Very", "beautiful", "city", "New", "York"],
-            ]
-        )
-
-        s_true = pd.Series(
-            [
-                ["New->York", "is", "a", "beautiful", "city"],
-                ["Look", ":", "New->York", "!"],
-                ["Very", "beautiful", "city", "New->York"],
-            ]
-        )
-
-        self.assertEqual(
-            preprocessing.phrases(s, min_count=2, threshold=1, symbol="->"), s_true
-        )
-
-    def test_phrases_not_tokenized_yet(self):
-        s = pd.Series(
-            [
-                "New York is a beautiful city",
-                "Look: New York!",
-                "Very beautiful city New York",
-            ]
-        )
-
-        s_true = pd.Series(
-            [
-                ["New", "York", "is", "a", "beautiful", "city"],
-                ["Look", ":", "New", "York", "!"],
-                ["Very", "beautiful", "city", "New", "York"],
-            ]
-        )
-
-        with warnings.catch_warnings():  # avoid print warning
-            warnings.simplefilter("ignore")
-            self.assertEqual(preprocessing.phrases(s), s_true)
-
-        with self.assertWarns(DeprecationWarning):  # check raise warning
-            preprocessing.phrases(s)
+        self.parallelized_test_helper(preprocessing.remove_brackets, s, s_true)
 
     """
     Test replace and remove tags
@@ -427,20 +246,15 @@ class TestPreprocessingParallelized(PandasTestCase):
     def test_replace_tags(self):
         s = pd.Series("Hi @tag, we will replace you")
         s_true = pd.Series("Hi TAG, we will replace you")
-
-        self.assertEqual(preprocessing.replace_tags(s, symbol="TAG"), s_true)
+        self.parallelized_test_helper(
+            preprocessing.replace_tags, s, s_true, symbol="TAG"
+        )
 
     def test_remove_tags_alphabets(self):
         s = pd.Series("Hi @tag, we will remove you")
         s_true = pd.Series("Hi  , we will remove you")
 
-        self.assertEqual(preprocessing.remove_tags(s), s_true)
-
-    def test_remove_tags_numeric(self):
-        s = pd.Series("Hi @123, we will remove you")
-        s_true = pd.Series("Hi  , we will remove you")
-
-        self.assertEqual(preprocessing.remove_tags(s), s_true)
+        self.parallelized_test_helper(preprocessing.remove_tags, s, s_true)
 
     """
     Test replace and remove hashtags
@@ -450,10 +264,76 @@ class TestPreprocessingParallelized(PandasTestCase):
         s = pd.Series("Hi #hashtag, we will replace you")
         s_true = pd.Series("Hi HASHTAG, we will replace you")
 
-        self.assertEqual(preprocessing.replace_hashtags(s, symbol="HASHTAG"), s_true)
+        self.parallelized_test_helper(
+            preprocessing.replace_hashtags, s, s_true, symbol="HASHTAG"
+        )
 
     def test_remove_hashtags(self):
         s = pd.Series("Hi #hashtag_trending123, we will remove you")
         s_true = pd.Series("Hi  , we will remove you")
 
-        self.assertEqual(preprocessing.remove_hashtags(s), s_true)
+        self.parallelized_test_helper(preprocessing.remove_hashtags, s, s_true)
+
+    """
+    Test NLP for parallelization
+    """
+
+    """
+    Named entity.
+    """
+
+    def test_named_entities(self):
+        s = pd.Series("New York is a big city")
+        s_true = pd.Series([[("New York", "GPE", 0, 8)]])
+        self.parallelized_test_helper(nlp.named_entities, s, s_true)
+
+    """
+    Noun chunks.
+    """
+
+    def test_noun_chunks(self):
+        s = pd.Series("Today is such a beautiful day")
+        s_true = pd.Series(
+            [[("Today", "NP", 0, 5), ("such a beautiful day", "NP", 9, 29)]]
+        )
+
+        self.parallelized_test_helper(nlp.noun_chunks, s, s_true)
+
+    """
+    Count sentences.
+    """
+
+    def test_count_sentences(self):
+        s = pd.Series("I think ... it counts correctly. Doesn't it? Great!")
+        s_true = pd.Series(3)
+        self.parallelized_test_helper(nlp.count_sentences, s, s_true)
+
+    """
+    POS tagging.
+    """
+
+    def test_pos(self):
+        s = pd.Series(["Today is such a beautiful day", "São Paulo is a great city"])
+
+        s_true = pd.Series(
+            [
+                [
+                    ("Today", "NOUN", "NN", 0, 5),
+                    ("is", "AUX", "VBZ", 6, 8),
+                    ("such", "DET", "PDT", 9, 13),
+                    ("a", "DET", "DT", 14, 15),
+                    ("beautiful", "ADJ", "JJ", 16, 25),
+                    ("day", "NOUN", "NN", 26, 29),
+                ],
+                [
+                    ("São", "PROPN", "NNP", 0, 3),
+                    ("Paulo", "PROPN", "NNP", 4, 9),
+                    ("is", "AUX", "VBZ", 10, 12),
+                    ("a", "DET", "DT", 13, 14),
+                    ("great", "ADJ", "JJ", 15, 20),
+                    ("city", "NOUN", "NN", 21, 25),
+                ],
+            ]
+        )
+
+        self.parallelized_test_helper(nlp.pos_tag, s, s_true)

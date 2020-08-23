@@ -6,6 +6,19 @@ import spacy
 import pandas as pd
 
 from texthero._types import TextSeries, InputSeries
+from texthero._helper import parallel
+
+
+def _named_entities(s: TextSeries, nlp) -> pd.Series:
+
+    entities = []
+
+    for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
+        entities.append(
+            [(ent.text, ent.label_, ent.start_char, ent.end_char) for ent in doc.ents]
+        )
+
+    return pd.Series(entities, index=s.index)
 
 
 @InputSeries(TextSeries)
@@ -51,17 +64,26 @@ def named_entities(s: TextSeries, package="spacy") -> pd.Series:
     [('Yesterday', 'DATE', 0, 9), ('NY', 'GPE', 19, 21),
      ('Bill de Blasio', 'PERSON', 27, 41)]
     """
-    entities = []
 
     nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser"])
     # nlp.pipe is now 'ner'
 
+    return parallel(s, _named_entities, nlp=nlp)
+
+
+def _noun_chunks(s: TextSeries, nlp) -> pd.Series:
+
+    noun_chunks = []
+
     for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
-        entities.append(
-            [(ent.text, ent.label_, ent.start_char, ent.end_char) for ent in doc.ents]
+        noun_chunks.append(
+            [
+                (chunk.text, chunk.label_, chunk.start_char, chunk.end_char)
+                for chunk in doc.noun_chunks
+            ]
         )
 
-    return pd.Series(entities, index=s.index)
+    return pd.Series(noun_chunks, index=s.index)
 
 
 @InputSeries(TextSeries)
@@ -90,20 +112,21 @@ def noun_chunks(s: TextSeries) -> pd.Series:
     dtype: object
     """
 
-    noun_chunks = []
-
     nlp = spacy.load("en_core_web_sm", disable=["ner"])
     # nlp.pipe is now "tagger", "parser"
 
-    for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
-        noun_chunks.append(
-            [
-                (chunk.text, chunk.label_, chunk.start_char, chunk.end_char)
-                for chunk in doc.noun_chunks
-            ]
-        )
+    return parallel(s, _noun_chunks, nlp=nlp)
 
-    return pd.Series(noun_chunks, index=s.index)
+
+def _count_sentences(s: TextSeries, nlp) -> pd.Series:
+
+    number_of_sentences = []
+
+    for doc in nlp.pipe(s.values, batch_size=32):
+        sentences = len(list(doc.sents))
+        number_of_sentences.append(sentences)
+
+    return pd.Series(number_of_sentences, index=s.index)
 
 
 @InputSeries(TextSeries)
@@ -128,16 +151,26 @@ def count_sentences(s: TextSeries) -> pd.Series:
     1    3
     dtype: int64
     """
-    number_of_sentences = []
 
     nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser", "ner"])
     nlp.add_pipe(nlp.create_pipe("sentencizer"))  # Pipe is only "sentencizer"
 
-    for doc in nlp.pipe(s.values, batch_size=32):
-        sentences = len(list(doc.sents))
-        number_of_sentences.append(sentences)
+    return parallel(s, _count_sentences, nlp=nlp)
 
-    return pd.Series(number_of_sentences, index=s.index)
+
+def _pos_tag(s: TextSeries, nlp) -> pd.Series:
+
+    pos_tags = []
+
+    for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
+        pos_tags.append(
+            [
+                (token.text, token.pos_, token.tag_, token.idx, token.idx + len(token))
+                for token in doc
+            ]
+        )
+
+    return pd.Series(pos_tags, index=s.index)
 
 
 @InputSeries(TextSeries)
@@ -201,17 +234,7 @@ def pos_tag(s: TextSeries) -> pd.Series:
      25), ('day', 'NOUN', 'NN', 26, 29)]
     """
 
-    pos_tags = []
-
     nlp = spacy.load("en_core_web_sm", disable=["parser", "ner"])
     # nlp.pipe is now "tagger"
 
-    for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
-        pos_tags.append(
-            [
-                (token.text, token.pos_, token.tag_, token.idx, token.idx + len(token))
-                for token in doc
-            ]
-        )
-
-    return pd.Series(pos_tags, index=s.index)
+    return parallel(s, _pos_tag, nlp=nlp)

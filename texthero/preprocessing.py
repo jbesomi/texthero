@@ -15,6 +15,7 @@ from nltk.stem import PorterStemmer, SnowballStemmer
 
 from texthero import stopwords as _stopwords
 from texthero._types import TokenSeries, TextSeries, InputSeries
+from texthero._helper import parallel
 
 from typing import List, Callable, Union
 
@@ -23,6 +24,8 @@ import warnings
 
 warnings.filterwarnings(action="ignore", category=UserWarning, module="gensim")
 
+def _fillna(s:TextSeries) -> TextSeries:
+    return s.fillna("").astype("str")
 
 @InputSeries(TextSeries)
 def fillna(s: TextSeries) -> TextSeries:
@@ -42,7 +45,10 @@ def fillna(s: TextSeries) -> TextSeries:
     3    You're
     dtype: object
     """
-    return s.fillna("").astype("str")
+    return parallel(s, _fillna)
+
+def _lowercase(s: TextSeries) -> TextSeries:
+    return s.str.lower()
 
 
 @InputSeries(TextSeries)
@@ -60,8 +66,14 @@ def lowercase(s: TextSeries) -> TextSeries:
     0    this is new york with upper letters
     dtype: object
     """
-    return s.str.lower()
+    return parallel(s, _lowercase)
 
+def _replace_digits(s: TextSeries, symbols: str = " ", only_blocks=True) -> TextSeries:
+    if only_blocks:
+        pattern = r"\b\d+\b"
+        return s.str.replace(pattern, symbols)
+    else:
+        return s.str.replace(r"\d+", symbols)
 
 @InputSeries(TextSeries)
 def replace_digits(s: TextSeries, symbols: str = " ", only_blocks=True) -> TextSeries:
@@ -95,13 +107,11 @@ def replace_digits(s: TextSeries, symbols: str = " ", only_blocks=True) -> TextS
     0    X falconX
     dtype: object
     """
+    return parallel(s,_replace_digits,symbols=symbols, only_blocks = only_blocks)
+    
 
-    if only_blocks:
-        pattern = r"\b\d+\b"
-        return s.str.replace(pattern, symbols)
-    else:
-        return s.str.replace(r"\d+", symbols)
-
+def _remove_digits(s: TextSeries, only_blocks=True) -> TextSeries:
+    return replace_digits(s, " ", only_blocks)
 
 @InputSeries(TextSeries)
 def remove_digits(s: TextSeries, only_blocks=True) -> TextSeries:
@@ -134,8 +144,10 @@ def remove_digits(s: TextSeries, only_blocks=True) -> TextSeries:
     0     ex hero is fun  
     dtype: object
     """
+    return parallel(s, _remove_digits)
 
-    return replace_digits(s, " ", only_blocks)
+def _replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
+    return s.str.replace(rf"([{string.punctuation}])+", symbol)
 
 
 @InputSeries(TextSeries)
@@ -165,8 +177,10 @@ def replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
     0    Finnaly <PUNCT> 
     dtype: object
     """
+    return parallel(s, replace_punctuation, symbol = symbol)
 
-    return s.str.replace(rf"([{string.punctuation}])+", symbol)
+def _remove_punctuation(s: TextSeries) -> TextSeries:
+    return replace_punctuation(s, " ")
 
 
 @InputSeries(TextSeries)
@@ -190,8 +204,7 @@ def remove_punctuation(s: TextSeries) -> TextSeries:
     0    Finnaly 
     dtype: object
     """
-    return replace_punctuation(s, " ")
-
+    return parallel(s, _remove_punctuation)
 
 def _remove_diacritics(text: str) -> str:
     """

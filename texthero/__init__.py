@@ -18,3 +18,6 @@ from .nlp import *
 from . import stopwords
 
 from . import helper
+
+from . import config
+from config import *

@@ -8,6 +8,8 @@ import numpy as np
 import functools
 import warnings
 
+from texthero import config
+
 
 """
 Warnings.
@@ -83,13 +85,10 @@ Parallelization.
 cores = mp.cpu_count()
 partitions = cores
 
-MIN_LINES_FOR_PARALLELIZATION = 10000
-PARALLELIZE = True
-
 
 def parallel(s, func, *args, **kwargs):
 
-    if len(s) < MIN_LINES_FOR_PARALLELIZATION or not PARALLELIZE:
+    if len(s) < config.MIN_LINES_FOR_PARALLELIZATION or not config.PARALLELIZE:
         # Execute as usual.
         return func(s, *args, **kwargs)
 

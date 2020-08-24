@@ -9,7 +9,7 @@ import plotly.express as px
 from wordcloud import WordCloud
 
 from texthero import preprocessing
-from texthero._types import TextSeries, InputSeries
+from texthero._types import TextSeries, InputSeries, DocumentTermDF
 import string
 
 from matplotlib.colors import LinearSegmentedColormap as lsg
@@ -18,8 +18,8 @@ import matplotlib.pyplot as plt
 from scipy.sparse import csr_matrix, issparse
 from sklearn.preprocessing import normalize as sklearn_normalize
 import pyLDAvis
-from pyLDAvis import display as notebook_display
-from pyLDAvis import show as local_display
+from pyLDAvis import display as display_notebook
+from pyLDAvis import show as display_browser
 
 from collections import Counter
 
@@ -374,8 +374,13 @@ def _prepare_matrices_for_pyLDAvis(
     return document_topic_distributions, topic_term_distributions
 
 
-def plot_topics(s_document_term, s_document_topic, return_figure=False):
+def plot_topics(s_document_term: DocumentTermDF, s_document_topic):
     """
+
+
+    **To show the plot**:
+    - Interactively in a Jupyter Notebook: do `hero.display_notebook(hero.plot_topics(...))`
+    - In a new browser window: do `hero.display_browser(hero.plot_topics(...))`
 
     Note: If the plot is not shown, try 
     doing `figure = hero.plot_topics(..., return_figure=True)`
@@ -429,7 +434,7 @@ def plot_topics(s_document_term, s_document_topic, return_figure=False):
     )
 
 
-    figure = pyLDAvis.prepare(
+    return pyLDAvis.prepare(
         **{
             "vocab": vocab,
             "doc_lengths": doc_lengths,
@@ -438,27 +443,3 @@ def plot_topics(s_document_term, s_document_topic, return_figure=False):
             "topic_term_dists": topic_term_distributions,
         }
     )
-
-    if return_figure:
-        return figure
-
-    else:
-        try:
-            pyLDAvis.enable_notebook()
-            pyLDAvis.display(figure)  # For Jupyter Notebooks
-        except:
-            pyLDAvis.show(figure)  # For command line / scripts
-
-"""
-import texthero as hero
-from sklearn.preprocessing import normalize as sklearn_normalize
-import pyLDAvis
-from scipy.sparse import csr_matrix
-import pandas as pd
-from sklearn.datasets import fetch_20newsgroups
-newsgroups = fetch_20newsgroups(remove=('headers', 'footers', 'quotes'))
-s = pd.Series(newsgroups.data)
-s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf, max_df=0.5, min_df=100)
-s_cluster = s_tfidf.pipe(hero.pca, n_components=20).pipe(hero.dbscan)
-hero.plot_topics(s_tfidf, s_cluster) # doctest: +SKIP
-"""

@@ -2,6 +2,7 @@ import string
 
 import pandas as pd
 import doctest
+import warnings
 
 from texthero import visualization, preprocessing, representation
 from . import PandasTestCase
@@ -84,38 +85,41 @@ class TestVisualization(PandasTestCase):
     Test visualize_topics
     """
 
-    def test_visualize_topics_clustering_input(self):
+    def test_visualize_topics_clustering_for_second_input(self):
 
         s = pd.read_csv(
             "https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/bbcsport.csv",
-            usecols=["text"],
-        )["text"]
+        )["text"][:100]
 
         s_tfidf = (
             s.pipe(preprocessing.clean)
             .pipe(preprocessing.tokenize)
             .pipe(representation.tfidf)
         )
-        s_cluster = s_tfidf.pipe(representation.pca, n_components=20).pipe(
-            representation.dbscan
+        s_cluster = (
+            s_tfidf.pipe(representation.normalize)
+            .pipe(representation.pca, n_components=20)
+            .pipe(representation.kmeans)
         )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.assertIsNotNone(visualization.visualize_topics(s_tfidf, s_cluster))
 
-        self.assertIsNotNone(visualization.visualize_topics(s_tfidf, s_cluster))
-
-    def test_visualize_topics_lsa_lda_tsvd_input(self):
+    def test_visualize_topics_topic_modelling_for_second_input(self):
 
         s = pd.read_csv(
             "https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/bbcsport.csv",
-            usecols=["text"],
-        )["text"]
+        )["text"][:100]
 
         s_tfidf = (
             s.pipe(preprocessing.clean)
             .pipe(preprocessing.tokenize)
-            .pipe(representation.tfidf, max_df=0.5, min_df=100)
+            .pipe(representation.tfidf)
         )
-        s_lda = s_tfidf.pipe(representation.lda, n_components=20).pipe(
-            representation.dbscan
+        s_lda = s_tfidf.pipe(representation.normalize).pipe(
+            representation.lda, n_components=20
         )
 
-        self.assertIsNotNone(visualization.visualize_topics(s_tfidf, s_lda))
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.assertIsNotNone(visualization.visualize_topics(s_tfidf, s_lda))

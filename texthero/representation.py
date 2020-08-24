@@ -603,8 +603,7 @@ def truncatedSVD(
     Returns
     -------
     Pandas Series with the vector calculated by truncadedSVD for the document in every
-    cell and the truncadedSVD object in the metadata. This will be used in the 
-    :meth:`visualize_topics`
+    cell.
 
     Examples
     --------
@@ -638,8 +637,6 @@ def truncatedSVD(
         list(truncatedSVD.fit_transform(s_for_vectorization)), index=s.index
     )
 
-    result._metadata.append(("vectorizer", truncatedSVD))
-
     return result
 
 
@@ -653,12 +650,12 @@ def lda(
     """
     Performs Latent Dirichlet Allocation on the given pandas series.
 
-   Latent Dirichlet Allocation(LDA) is a topic modeling algorithm 
-   based on Dirichlet distribution. In natural language processing
-   LDA is often used to categorise documents into diffenrent topics
-   and generate top words from these topics. In this process LDA is
-   used in combination with algorithms, which generate document-term-
-   matrixes, like :meth:`count` or :meth:`tfidf`
+    Latent Dirichlet Allocation(LDA) is a topic modeling algorithm 
+    based on Dirichlet distribution. In natural language processing
+    LDA is often used to categorise documents into diffenrent topics
+    and generate top words from these topics. In this process LDA is
+    used in combination with algorithms, which generate document-term-
+    matrixes, like :meth:`count` or :meth:`tfidf`
 
     TruncatedSVD can directly handle sparse input, so when calling truncatedSVD on a
     DocumentTermDF, the advantage of sparseness is kept.
@@ -671,7 +668,7 @@ def lda(
         Number of components to keep (in NLP context number of topics)
 
     max_iter : int, optional (default: 10)
-       The maximum number of iterations.
+        The maximum number of iterations.
 
     random_state : int, default=None
         Determines the random number generator. Pass an int for reproducible
@@ -681,8 +678,7 @@ def lda(
     Returns
     -------
     Pandas Series with the vector calculated by LDA for the document in every
-    cell and the LDA object in the metadata. This will be used in the 
-    :meth:`visualize_topics`
+    cell.
 
     Examples
     --------
@@ -714,8 +710,6 @@ def lda(
         s_for_vectorization = list(s)
 
     result = pd.Series(list(lda.fit_transform(s_for_vectorization)), index=s.index)
-
-    result._metadata.append(("vectorizer", lda))
 
     return result
 

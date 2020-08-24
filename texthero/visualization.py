@@ -312,15 +312,18 @@ def top_words(s: TextSeries, normalize=False) -> pd.Series:
     )
 
 
-def _get_matrices_for_visualize_topics(s_document_term, s_document_topic, vectorizer):
+def _get_matrices_for_visualize_topics(
+    s_document_term, s_document_topic, clustering_function_used
+):
 
-    if vectorizer:
+    if not clustering_function_used:
         # Here, s_document_topic is output of hero.lda or hero.truncatedSVD.
 
         document_term_matrix = s_document_term.sparse.to_coo()
         document_topic_matrix = np.array(list(s_document_topic))
 
-        topic_term_matrix = vectorizer.components_
+        # topic_term_matrix = vectorizer.components_
+        topic_term_matrix = document_topic_matrix.T * document_term_matrix
 
     else:
         # Here, s_document_topic is output of some hero clustering function.
@@ -412,11 +415,6 @@ def visualize_topics(s_document_term, s_document_topic):
     - Interactively in a Jupyter Notebook: do `hero.display_notebook(hero.visualize_topics(...))`
     - In a new browser window: do `hero.display_browser(hero.visualize_topics(...))`
 
-    Note: If the plot is not shown, try 
-    doing `figure = hero.visualize_topics(..., return_figure=True)`
-    followed by `hero.notebook_display(figure)` if you're working
-    in a Jupyter Notebook, else `hero.local_display(figure)`.
-
     Parameters
     ----------
     s_document_term: pd.DataFrame
@@ -446,10 +444,11 @@ def visualize_topics(s_document_term, s_document_topic):
 
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> df = pd.read_csv("https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/bbcsport.csv", columns=["text"])
-    >>> # Use max_df=0.5, min_df=100 in tfidf to speed things up (fewer features).
-    >>> s_tfidf = df["text"].pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf, max_df=0.5, min_df=100)
-    >>> s_cluster = s_tfidf.pipe(hero.pca, n_components=20).pipe(hero.dbscan)
+    >>> # Take first 1000 documents of some dataset.
+    >>> df = pd.read_csv("https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/bbcsport.csv")[:100]
+    >>> # Use max_df=0.5, min_df=10 in tfidf to speed things up (fewer features).
+    >>> s_tfidf = df["text"].pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf, max_df=0.5, min_df=10)
+    >>> s_cluster = s_tfidf.pipe(hero.normalize).pipe(hero.pca, n_components=20).pipe(hero.dbscan)
     >>> # Display in a new browser window:
     >>> hero.display_browser(hero.visualize_topics(s_tfidf, s_cluster)) # doctest: +SKIP
     >>> # Display inside the current Jupyter Notebook:
@@ -476,16 +475,7 @@ def visualize_topics(s_document_term, s_document_topic):
     TODO add tutorial link
 
     """
-    metadata_list = s_document_topic._metadata
-
-    for item in metadata_list:
-        if isinstance(item, tuple):
-            if item[0] == "vectorizer":
-                vectorizer = item[1]
-                break
-    else:
-        # no vectorizer found
-        vectorizer = None
+    clustering_function_used = s_document_topic.dtype.name == "category"
 
     # Get / build matrices from input
     (
@@ -494,7 +484,7 @@ def visualize_topics(s_document_term, s_document_topic):
         document_topic_matrix,
         topic_term_matrix,
     ) = _get_matrices_for_visualize_topics(
-        s_document_term, s_document_topic, vectorizer
+        s_document_term, s_document_topic, clustering_function_used
     )
 
     vocab = list(s_document_term.columns.levels[1])
@@ -513,5 +503,6 @@ def visualize_topics(s_document_term, s_document_topic):
             "term_frequency": term_frequency,
             "doc_topic_dists": document_topic_distributions,
             "topic_term_dists": topic_term_distributions,
+            "R": 15,
         }
     )

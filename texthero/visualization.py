@@ -15,7 +15,7 @@ import string
 from matplotlib.colors import LinearSegmentedColormap as lsg
 import matplotlib.pyplot as plt
 
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, issparse
 from sklearn.preprocessing import normalize as sklearn_normalize
 import pyLDAvis
 
@@ -310,26 +310,13 @@ def top_words(s: TextSeries, normalize=False) -> pd.Series:
     )
 
 
-def plot_topics(s_document_term, s_document_topic, return_figure=False):
-
-    metadata_list = s_document_topic._metadata
-
-    for item in metadata_list:
-        if isinstance(item, tuple):
-            if item[0] == "vectorizer":
-                vectorizer = item[1]
-                break
-    else:
-        # no vectorizer found
-        vectorizer = None
-
-    # Get / build matrices from input
+def _get_matrices_for_plot_topics(s_document_term, s_document_topic, vectorizer):
 
     if vectorizer:
-        # TODO check sparseness
+
         # s_document_topic is output of hero.lda or hero.lsi
-        document_term_matrix = s_document_term.values
-        document_topic_matrix = s_document_topic.values
+        document_term_matrix = s_document_term.sparse.to_coo()
+        document_topic_matrix = np.array(list(s_document_topic))
 
         topic_term_matrix = vectorizer.components_
 
@@ -356,69 +343,103 @@ def plot_topics(s_document_term, s_document_topic, return_figure=False):
 
         topic_term_matrix = document_topic_matrix.T * document_term_matrix
 
-    vocab = list(s_document_term.columns.levels[1])
-    doc_lengths = list(s_document_term.sum(axis=1))
-    term_frequency = list(s_document_term.sum(axis=0))
+    return s_document_term, s_document_topic, document_topic_matrix, topic_term_matrix
+
+
+def _prepare_matrices_for_pyLDAvis(
+    document_topic_matrix, topic_term_matrix
+):
 
     document_topic_distributions = sklearn_normalize(
         document_topic_matrix, norm="l1", axis=1
     )
 
-    topic_term_distributions = sklearn_normalize(topic_term_matrix, norm="l1", axis=1)
+    topic_term_distributions = sklearn_normalize(
+        topic_term_matrix, norm="l1", axis=1)
+
+
+    # Make sparse matrices dense for pyLDAvis
+    if issparse(document_topic_distributions):
+        document_topic_distributions = document_topic_distributions.toarray().tolist()
+    else:
+        document_topic_distributions = document_topic_distributions.tolist()
+
+    if issparse(topic_term_distributions):
+        topic_term_distributions = topic_term_distributions.toarray().tolist()
+    else:
+        topic_term_distributions = topic_term_distributions.tolist()
+
+    return document_topic_distributions, topic_term_distributions
+
+
+def plot_topics(s_document_term, s_document_topic, return_figure=False):
+    """
+
+    Parameters
+    ----------
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> from sklearn.preprocessing import normalize as sklearn_normalize
+    >>> import pyLDAvis
+    >>> from scipy.sparse import csr_matrix
+    >>> import pandas as pd
+    >>> from sklearn.datasets import fetch_20newsgroups
+    >>> newsgroups = fetch_20newsgroups(remove=('headers', 'footers', 'quotes'))
+    >>> s = pd.Series(newsgroups.data)
+    >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf, max_df=0.5, min_df=100)
+    >>> s_cluster = s_tfidf.pipe(hero.pca, n_components=20).pipe(hero.dbscan)
+    >>> hero.plot_topics(s_tfidf, s_cluster) # doctest: +SKIP
+
+    See Also
+    --------
+    """
+    metadata_list = s_document_topic._metadata
+
+    for item in metadata_list:
+        if isinstance(item, tuple):
+            if item[0] == "vectorizer":
+                vectorizer = item[1]
+                break
+    else:
+        # no vectorizer found
+        vectorizer = None
+
+    # Get / build matrices from input
+
+    s_document_term, s_document_topic, document_topic_matrix, topic_term_matrix = _get_matrices_for_plot_topics(
+        s_document_term,
+        s_document_topic,
+        vectorizer
+    )
+
+
+    vocab = list(s_document_term.columns.levels[1])
+    doc_lengths = list(s_document_term.sum(axis=1))
+    term_frequency = list(s_document_term.sum(axis=0))
+
+
+    document_topic_distributions, topic_term_distributions = _prepare_matrices_for_pyLDAvis(
+        document_topic_matrix, topic_term_matrix
+    )
+
 
     figure = pyLDAvis.prepare(
         **{
             "vocab": vocab,
             "doc_lengths": doc_lengths,
             "term_frequency": term_frequency,
-            "doc_topic_dists": document_topic_distributions.toarray().tolist(),
-            "topic_term_dists": topic_term_distributions.toarray().tolist(),
+            "doc_topic_dists": document_topic_distributions,
+            "topic_term_dists": topic_term_distributions,
         }
     )
 
     if return_figure:
         return figure
     else:
-        pyLDAvis.display(figure)
-
-
-"""
-# plot_topics(s_document_term, s_document_topic)
-import pyLDAvis
-import pyLDAvis.sklearn
-import pandas as pd
-
-from sklearn.datasets import fetch_20newsgroups
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-from sklearn.decomposition import LatentDirichletAllocation
-
-newsgroups = fetch_20newsgroups(remove=('headers', 'footers', 'quotes'))
-docs_raw = newsgroups.data
-
-
-# TFIDF matrix & vectorizer
-
-tf_vectorizer = CountVectorizer(strip_accents='unicode',
-                                stop_words='english',
-                                lowercase=True,
-                                token_pattern=r'\b[a-zA-Z]{3,}\b',
-                                max_df=0.5,
-                                min_df=100)
-
-tfidf_vectorizer = TfidfVectorizer(**tf_vectorizer.get_params())
-dtm_tfidf = tfidf_vectorizer.fit_transform(docs_raw)
-
-# LDA
-
-lda_tfidf = LatentDirichletAllocation(n_components=20, random_state=0)
-lda_tfidf.fit(dtm_tfidf)
-
-
-# Prep & Visualize
-vis = pyLDAvis.sklearn.prepare(lda_tfidf, dtm_tfidf, tfidf_vectorizer)
-pyLDAvis.show(vis)
-"""
-
+        pyLDAvis.display(figure)  # For Jupyter Notebooks
+        pyLDAvis.show(figure)  # For command line / scripts
 
 """
 import texthero as hero
@@ -428,11 +449,8 @@ from scipy.sparse import csr_matrix
 import pandas as pd
 from sklearn.datasets import fetch_20newsgroups
 newsgroups = fetch_20newsgroups(remove=('headers', 'footers', 'quotes'))
-
 s = pd.Series(newsgroups.data)
 s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf, max_df=0.5, min_df=100)
 s_cluster = s_tfidf.pipe(hero.pca, n_components=20).pipe(hero.dbscan)
-
-vis = hero.plot_topics(s_tfidf, s_cluster)
-pyLDAvis.show(vis)
+hero.plot_topics(s_tfidf, s_cluster) # doctest: +SKIP
 """

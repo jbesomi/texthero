@@ -3,7 +3,7 @@ import string
 import pandas as pd
 import doctest
 
-from texthero import visualization
+from texthero import visualization, preprocessing, representation
 from . import PandasTestCase
 
 
@@ -79,3 +79,33 @@ class TestVisualization(PandasTestCase):
     def test_wordcloud(self):
         s = pd.Series("one two three")
         self.assertEqual(visualization.wordcloud(s), None)
+
+    """
+    Test plot_topics
+    """
+
+    def test_plot_topics_clustering_input(self):
+
+        from sklearn.datasets import fetch_20newsgroups
+        newsgroups = fetch_20newsgroups(remove=('headers', 'footers', 'quotes'))
+        s = pd.Series(newsgroups.data)
+        s_tfidf = s.pipe(preprocessing.clean).pipe(
+            preprocessing.tokenize).pipe(representation.tfidf, max_df=0.5, min_df=100)
+        s_cluster = s_tfidf.pipe(
+            representation.pca, n_components=20).pipe(representation.dbscan)
+
+        self.assertIsNotNone(visualization.plot_topics(s_tfidf, s_cluster, return_figure=True))
+
+    def test_plot_topics_lsa_lda_tsvd_input(self):
+
+        from sklearn.datasets import fetch_20newsgroups
+        newsgroups = fetch_20newsgroups(
+            remove=('headers', 'footers', 'quotes'))
+        s = pd.Series(newsgroups.data)
+        s_tfidf = s.pipe(preprocessing.clean).pipe(
+            preprocessing.tokenize).pipe(representation.tfidf, max_df=0.5, min_df=100)
+        s_lda = s_tfidf.pipe(
+            representation.lda, n_components=20).pipe(representation.dbscan)
+
+        self.assertIsNotNone(visualization.plot_topics(
+            s_tfidf, s_lda, return_figure=True))

@@ -18,6 +18,8 @@ import matplotlib.pyplot as plt
 from scipy.sparse import csr_matrix, issparse
 from sklearn.preprocessing import normalize as sklearn_normalize
 import pyLDAvis
+from pyLDAvis import display as notebook_display
+from pyLDAvis import show as local_display
 
 from collections import Counter
 
@@ -375,6 +377,11 @@ def _prepare_matrices_for_pyLDAvis(
 def plot_topics(s_document_term, s_document_topic, return_figure=False):
     """
 
+    Note: If the plot is not shown, try 
+    doing `figure = hero.plot_topics(..., return_figure=True)`
+    followed by `hero.notebook_display(figure)` if you're working
+    in a Jupyter Notebook, else `hero.local_display(figure)`.
+
     Parameters
     ----------
 
@@ -434,13 +441,13 @@ def plot_topics(s_document_term, s_document_topic, return_figure=False):
 
     if return_figure:
         return figure
+
     else:
         try:
             pyLDAvis.enable_notebook()
+            pyLDAvis.display(figure)  # For Jupyter Notebooks
         except:
-            pass
-        pyLDAvis.display(figure)  # For Jupyter Notebooks
-        pyLDAvis.show(figure)  # For command line / scripts
+            pyLDAvis.show(figure)  # For command line / scripts
 
 """
 import texthero as hero

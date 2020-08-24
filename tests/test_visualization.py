@@ -81,33 +81,41 @@ class TestVisualization(PandasTestCase):
         self.assertEqual(visualization.wordcloud(s), None)
 
     """
-    Test plot_topics
+    Test visualize_topics
     """
 
-    def test_plot_topics_clustering_input(self):
+    def test_visualize_topics_clustering_input(self):
 
         s = pd.read_csv(
             "https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/bbcsport.csv",
-            columns=["text"]
+            columns=["text"],
         )["text"]
 
-        s_tfidf = s.pipe(preprocessing.clean).pipe(
-            preprocessing.tokenize).pipe(representation.tfidf, max_df=0.5, min_df=100)
-        s_cluster = s_tfidf.pipe(
-            representation.pca, n_components=20).pipe(representation.dbscan)
+        s_tfidf = (
+            s.pipe(preprocessing.clean)
+            .pipe(preprocessing.tokenize)
+            .pipe(representation.tfidf, max_df=0.5, min_df=100)
+        )
+        s_cluster = s_tfidf.pipe(representation.pca, n_components=20).pipe(
+            representation.dbscan
+        )
 
-        self.assertIsNotNone(visualization.plot_topics(s_tfidf, s_cluster))
+        self.assertIsNotNone(visualization.visualize_topics(s_tfidf, s_cluster))
 
-    def test_plot_topics_lsa_lda_tsvd_input(self):
+    def test_visualize_topics_lsa_lda_tsvd_input(self):
 
         s = pd.read_csv(
             "https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/bbcsport.csv",
-            columns=["text"]
+            columns=["text"],
         )["text"]
 
-        s_tfidf = s.pipe(preprocessing.clean).pipe(
-            preprocessing.tokenize).pipe(representation.tfidf, max_df=0.5, min_df=100)
-        s_lda = s_tfidf.pipe(
-            representation.lda, n_components=20).pipe(representation.dbscan)
+        s_tfidf = (
+            s.pipe(preprocessing.clean)
+            .pipe(preprocessing.tokenize)
+            .pipe(representation.tfidf, max_df=0.5, min_df=100)
+        )
+        s_lda = s_tfidf.pipe(representation.lda, n_components=20).pipe(
+            representation.dbscan
+        )
 
-        self.assertIsNotNone(visualization.plot_topics(s_tfidf, s_lda))
+        self.assertIsNotNone(visualization.visualize_topics(s_tfidf, s_lda))

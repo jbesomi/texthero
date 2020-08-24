@@ -312,7 +312,7 @@ def top_words(s: TextSeries, normalize=False) -> pd.Series:
     )
 
 
-def _get_matrices_for_plot_topics(s_document_term, s_document_topic, vectorizer):
+def _get_matrices_for_visualize_topics(s_document_term, s_document_topic, vectorizer):
 
     if vectorizer:
 
@@ -348,17 +348,13 @@ def _get_matrices_for_plot_topics(s_document_term, s_document_topic, vectorizer)
     return s_document_term, s_document_topic, document_topic_matrix, topic_term_matrix
 
 
-def _prepare_matrices_for_pyLDAvis(
-    document_topic_matrix, topic_term_matrix
-):
+def _prepare_matrices_for_pyLDAvis(document_topic_matrix, topic_term_matrix):
 
     document_topic_distributions = sklearn_normalize(
         document_topic_matrix, norm="l1", axis=1
     )
 
-    topic_term_distributions = sklearn_normalize(
-        topic_term_matrix, norm="l1", axis=1)
-
+    topic_term_distributions = sklearn_normalize(topic_term_matrix, norm="l1", axis=1)
 
     # Make sparse matrices dense for pyLDAvis
     if issparse(document_topic_distributions):
@@ -374,16 +370,16 @@ def _prepare_matrices_for_pyLDAvis(
     return document_topic_distributions, topic_term_distributions
 
 
-def plot_topics(s_document_term: DocumentTermDF, s_document_topic):
+def visualize_topics(s_document_term, s_document_topic):  # TODO: add types to signature when they're merged
     """
 
 
     **To show the plot**:
-    - Interactively in a Jupyter Notebook: do `hero.display_notebook(hero.plot_topics(...))`
-    - In a new browser window: do `hero.display_browser(hero.plot_topics(...))`
+    - Interactively in a Jupyter Notebook: do `hero.display_notebook(hero.visualize_topics(...))`
+    - In a new browser window: do `hero.display_browser(hero.visualize_topics(...))`
 
     Note: If the plot is not shown, try 
-    doing `figure = hero.plot_topics(..., return_figure=True)`
+    doing `figure = hero.visualize_topics(..., return_figure=True)`
     followed by `hero.notebook_display(figure)` if you're working
     in a Jupyter Notebook, else `hero.local_display(figure)`.
 
@@ -399,7 +395,7 @@ def plot_topics(s_document_term: DocumentTermDF, s_document_topic):
     >>> s = pd.Series(newsgroups.data)
     >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf, max_df=0.5, min_df=100)
     >>> s_cluster = s_tfidf.pipe(hero.pca, n_components=20).pipe(hero.dbscan)
-    >>> hero.plot_topics(s_tfidf, s_cluster) # doctest: +SKIP
+    >>> hero.visualize_topics(s_tfidf, s_cluster) # doctest: +SKIP
 
     See Also
     --------
@@ -417,22 +413,21 @@ def plot_topics(s_document_term: DocumentTermDF, s_document_topic):
 
     # Get / build matrices from input
 
-    s_document_term, s_document_topic, document_topic_matrix, topic_term_matrix = _get_matrices_for_plot_topics(
+    (
         s_document_term,
         s_document_topic,
-        vectorizer
-    )
-
+        document_topic_matrix,
+        topic_term_matrix,
+    ) = _get_matrices_for_visualize_topics(s_document_term, s_document_topic, vectorizer)
 
     vocab = list(s_document_term.columns.levels[1])
     doc_lengths = list(s_document_term.sum(axis=1))
     term_frequency = list(s_document_term.sum(axis=0))
 
-
-    document_topic_distributions, topic_term_distributions = _prepare_matrices_for_pyLDAvis(
-        document_topic_matrix, topic_term_matrix
-    )
-
+    (
+        document_topic_distributions,
+        topic_term_distributions,
+    ) = _prepare_matrices_for_pyLDAvis(document_topic_matrix, topic_term_matrix)
 
     return pyLDAvis.prepare(
         **{

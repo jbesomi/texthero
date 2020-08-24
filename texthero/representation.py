@@ -604,7 +604,7 @@ def truncatedSVD(
     -------
     Pandas Series with the vector calculated by truncadedSVD for the document in every
     cell and the truncadedSVD object in the metadata. This will be used in the 
-    :meth:`plot_topics`
+    :meth:`visualize_topics`
 
     Examples
     --------
@@ -644,8 +644,11 @@ def truncatedSVD(
 
 
 def lda(
-    s: Union[pd.Series, pd.DataFrame], n_components=10, max_iter=10, random_state=None,
-    n_jobs = -1
+    s: Union[pd.Series, pd.DataFrame],
+    n_components=10,
+    max_iter=10,
+    random_state=None,
+    n_jobs=-1,
 ) -> pd.Series:
     """
     Performs Latent Dirichlet Allocation on the given pandas series.
@@ -679,7 +682,7 @@ def lda(
     -------
     Pandas Series with the vector calculated by LDA for the document in every
     cell and the LDA object in the metadata. This will be used in the 
-    :meth:`plot_topics`
+    :meth:`visualize_topics`
 
     Examples
     --------
@@ -710,13 +713,12 @@ def lda(
     else:
         s_for_vectorization = list(s)
 
-    result = pd.Series(
-        list(lda.fit_transform(s_for_vectorization)), index=s.index
-    )
+    result = pd.Series(list(lda.fit_transform(s_for_vectorization)), index=s.index)
 
     result._metadata.append(("vectorizer", lda))
 
     return result
+
 
 """
 Clustering

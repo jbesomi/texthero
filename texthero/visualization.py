@@ -9,7 +9,7 @@ import plotly.express as px
 from wordcloud import WordCloud
 
 from texthero import preprocessing
-from texthero._types import TextSeries, InputSeries, DocumentTermDF
+from texthero._types import TextSeries, InputSeries
 import string
 
 from matplotlib.colors import LinearSegmentedColormap as lsg

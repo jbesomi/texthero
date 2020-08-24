@@ -88,13 +88,13 @@ class TestVisualization(PandasTestCase):
 
         s = pd.read_csv(
             "https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/bbcsport.csv",
-            columns=["text"],
+            usecols=["text"],
         )["text"]
 
         s_tfidf = (
             s.pipe(preprocessing.clean)
             .pipe(preprocessing.tokenize)
-            .pipe(representation.tfidf, max_df=0.5, min_df=100)
+            .pipe(representation.tfidf)
         )
         s_cluster = s_tfidf.pipe(representation.pca, n_components=20).pipe(
             representation.dbscan
@@ -106,7 +106,7 @@ class TestVisualization(PandasTestCase):
 
         s = pd.read_csv(
             "https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/bbcsport.csv",
-            columns=["text"],
+            usecols=["text"],
         )["text"]
 
         s_tfidf = (

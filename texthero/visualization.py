@@ -9,7 +9,7 @@ import plotly.express as px
 from wordcloud import WordCloud
 
 from texthero import preprocessing
-from texthero._types import TextSeries, InputSeries, DocumentTermDF
+from texthero._types import TextSeries, InputSeries
 import string
 
 from matplotlib.colors import LinearSegmentedColormap as lsg
@@ -315,19 +315,21 @@ def top_words(s: TextSeries, normalize=False) -> pd.Series:
 def _get_matrices_for_visualize_topics(s_document_term, s_document_topic, vectorizer):
 
     if vectorizer:
+        # Here, s_document_topic is output of hero.lda or hero.truncatedSVD.
 
-        # s_document_topic is output of hero.lda or hero.lsi
         document_term_matrix = s_document_term.sparse.to_coo()
         document_topic_matrix = np.array(list(s_document_topic))
 
         topic_term_matrix = vectorizer.components_
 
     else:
-        # s_document_topic is output of some hero clustering function
+        # Here, s_document_topic is output of some hero clustering function.
+
+        # First remove documents that are not assigned to any cluster.
         indexes_of_unassigned_documents = s_document_topic == -1
         s_document_term = s_document_term[~indexes_of_unassigned_documents]
         s_document_topic = s_document_topic[~indexes_of_unassigned_documents]
-        s_document_topic.cat.remove_unused_categories(inplace=True)
+        s_document_topic = s_document_topic.cat.remove_unused_categories()
 
         document_term_matrix = s_document_term.sparse.to_coo()
 
@@ -370,8 +372,40 @@ def _prepare_matrices_for_pyLDAvis(document_topic_matrix, topic_term_matrix):
     return document_topic_distributions, topic_term_distributions
 
 
-def visualize_topics(s_document_term, s_document_topic):  # TODO: add types to signature when they're merged
+def visualize_topics(s_document_term, s_document_topic):
+    # TODO: add types everywhere when they're merged
     """
+    Visualize the topics of your dataset. First input has
+    to be output of one of 
+    - :meth:`texthero.representation.tfidf`
+    - :meth:`texthero.representation.count`
+    - :meth:`texthero.representation.term_frequency`
+
+    (tfidf suggested).
+
+    Second input can either be the result of
+    clustering, so output of one of
+    - :meth:`texthero.representation.kmeans`
+    - :meth:`texthero.representation.meanshift`
+    - :meth:`texthero.representation.dbscan`
+
+    or the result of a topic modelling function, so
+    one of
+    - :meth:`texthero.representation.lda`
+    - :meth:`texthero.representation.truncatedSVD`
+
+    (topic modelling output suggested).
+
+    The function uses the given clustering
+    or topic modelling from the second input, which relates
+    documents to topics. The first input
+    relates documents to terms. From those
+    two relations (documents->topics, documents->terms),
+    the function calculates a distribution of
+    documents to topics, and a distribution
+    of topics to terms. These distributions
+    are passed to `pyLDAvis <https://pyldavis.readthedocs.io/en/latest/>`_,
+    which visualizes them.
 
 
     **To show the plot**:
@@ -385,20 +419,62 @@ def visualize_topics(s_document_term, s_document_topic):  # TODO: add types to s
 
     Parameters
     ----------
+    s_document_term: pd.DataFrame
+
+    One of 
+    - :meth:`texthero.representation.tfidf`
+    - :meth:`texthero.representation.count`
+    - :meth:`texthero.representation.term_frequency`
+
+    s_document_topic: pd.Series
+
+    One of
+    - :meth:`texthero.representation.kmeans`
+    - :meth:`texthero.representation.meanshift`
+    - :meth:`texthero.representation.dbscan`
+    (using clustering functions, documents
+    that are not assigned to a cluster are
+    not considered in the visualization)
+    or one of
+    - :meth:`texthero.representation.lda`
+    - :meth:`texthero.representation.truncatedSVD`
+
 
     Examples
     --------
+    Using Clustering:
+
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> from sklearn.datasets import fetch_20newsgroups
-    >>> newsgroups = fetch_20newsgroups(remove=('headers', 'footers', 'quotes'))
-    >>> s = pd.Series(newsgroups.data)
-    >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf, max_df=0.5, min_df=100)
+    >>> df = pd.read_csv("https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/bbcsport.csv", columns=["text"])
+    >>> # Use max_df=0.5, min_df=100 in tfidf to speed things up (fewer features).
+    >>> s_tfidf = df["text"].pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf, max_df=0.5, min_df=100)
     >>> s_cluster = s_tfidf.pipe(hero.pca, n_components=20).pipe(hero.dbscan)
-    >>> hero.visualize_topics(s_tfidf, s_cluster) # doctest: +SKIP
+    >>> # Display in a new browser window:
+    >>> hero.display_browser(hero.visualize_topics(s_tfidf, s_cluster)) # doctest: +SKIP
+    >>> # Display inside the current Jupyter Notebook:
+    >>> hero.display_notebook(hero.visualize_topics(s_tfidf, s_cluster)) # doctest: +SKIP
+
+    Using LDA:
+
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> df = pd.read_csv("https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/bbcsport.csv")
+    >>> # Use max_df=0.5, min_df=100 in tfidf to speed things up (fewer features).
+    >>> s_tfidf = df["text"].pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf, max_df=0.5, min_df=100)
+    >>> s_lda = s_tfidf.pipe(hero.lda, n_components=20)
+    >>> # Display in a new browser window:
+    >>> hero.display_browser(hero.visualize_topics(s_tfidf, s_cluster)) # doctest: +SKIP
+    >>> # Display inside the current Jupyter Notebook:
+    >>> hero.display_notebook(hero.visualize_topics(s_tfidf, s_cluster)) # doctest: +SKIP
+
 
     See Also
     --------
+    `pyLDAvis <https://pyldavis.readthedocs.io/en/latest/>`_
+
+    TODO add tutorial link
+
     """
     metadata_list = s_document_topic._metadata
 
@@ -412,13 +488,14 @@ def visualize_topics(s_document_term, s_document_topic):  # TODO: add types to s
         vectorizer = None
 
     # Get / build matrices from input
-
     (
         s_document_term,
         s_document_topic,
         document_topic_matrix,
         topic_term_matrix,
-    ) = _get_matrices_for_visualize_topics(s_document_term, s_document_topic, vectorizer)
+    ) = _get_matrices_for_visualize_topics(
+        s_document_term, s_document_topic, vectorizer
+    )
 
     vocab = list(s_document_term.columns.levels[1])
     doc_lengths = list(s_document_term.sum(axis=1))

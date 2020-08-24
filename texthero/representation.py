@@ -7,7 +7,7 @@ import numpy as np
 
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.manifold import TSNE
-from sklearn.decomposition import PCA, NMF, TruncatedSVD
+from sklearn.decomposition import PCA, NMF, TruncatedSVD, LatentDirichletAllocation
 from sklearn.cluster import KMeans, DBSCAN, MeanShift
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import normalize as sklearn_normalize
@@ -571,7 +571,7 @@ def truncatedSVD(
     """
     Performs TruncatedSVD on the given pandas series.
 
-    TruncatedSVD is an algorithmen, which can be used to reduce the dimensions
+    TruncatedSVD is an algorithmn, which can be used to reduce the dimensions
     of a given series. In natural language processing, the high-dimensional data
     is usually a document-term matrix (so in texthero usually a Series after
     applying :meth:`texthero.representation.tfidf` or some other first
@@ -610,8 +610,8 @@ def truncatedSVD(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Football, Sports, Soccer", "Music, Violin, Orchestra","Football, Music"])
-    ...                
+    >>> s = pd.Series(["Football, Sports, Soccer", "Music, Violin, Orchestra",
+    ...                "Football, Music"])                
     >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency)
     >>> hero.truncatedSVD(s, random_state=42) # doctest: +SKIP
     0      [0.14433756729740624, 0.15309310892394884]
@@ -621,7 +621,7 @@ def truncatedSVD(
 
     See also
     --------
-    `truncatedSVD on Wikipedia <https://en.wikipedia.org/wiki/Singular_value_decomposition#Truncated_SVD>`_
+    `truncatedSVD on Wikipedia <https://en.wikipedia.org/wiki/Singular_value_decomposition#Truncated_SVD>`
 
     """
     truncatedSVD = TruncatedSVD(
@@ -638,10 +638,85 @@ def truncatedSVD(
         list(truncatedSVD.fit_transform(s_for_vectorization)), index=s.index
     )
 
-    result._metadata.append(("vectorizer", TruncatedSVD))
+    result._metadata.append(("vectorizer", truncatedSVD))
 
     return result
 
+
+def lda(
+    s: Union[pd.Series, pd.DataFrame], n_components=10, max_iter=10, random_state=None,
+    n_jobs = -1
+) -> pd.Series:
+    """
+    Performs Latent Dirichlet Allocation on the given pandas series.
+
+   Latent Dirichlet Allocation(LDA) is a topic modeling algorithm 
+   based on Dirichlet distribution. In natural language processing
+   LDA is often used to categorise documents into diffenrent topics
+   and generate top words from these topics. In this process LDA is
+   used in combination with algorithms, which generate document-term-
+   matrixes, like :meth:`count` or :meth:`tfidf`
+
+    TruncatedSVD can directly handle sparse input, so when calling truncatedSVD on a
+    DocumentTermDF, the advantage of sparseness is kept.
+
+    Parameters
+    ----------
+    s : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+
+    n_components : int, default is 2.
+        Number of components to keep (in NLP context number of topics)
+
+    max_iter : int, optional (default: 10)
+       The maximum number of iterations.
+
+    random_state : int, default=None
+        Determines the random number generator. Pass an int for reproducible
+        results across multiple function calls.
+
+
+    Returns
+    -------
+    Pandas Series with the vector calculated by LDA for the document in every
+    cell and the LDA object in the metadata. This will be used in the 
+    :meth:`plot_topics`
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["Football, Sports, Soccer", "Music, Violin, Orchestra",
+    ...                "Football, Music"])                
+    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency)
+    >>> hero.lda(s, random_state=42) # doctest: +SKIP
+    0    [0.07272782580722714, 0.0727702366844115, 0.07...
+    1    [0.07272782580700803, 0.07277023650761331, 0.0...
+    2    [0.08000075593366586, 0.27990110380876265, 0.0...
+    dtype: object
+
+    See also
+    --------
+    `LDA on Wikipedia <https://de.wikipedia.org/wiki/Latent_Dirichlet_Allocation`
+
+    """
+
+    lda = LatentDirichletAllocation(
+        n_components=n_components, max_iter=max_iter, random_state=random_state
+    )
+
+    if _check_is_valid_DocumentTermDF(s):
+        s_coo = s.sparse.to_coo()
+        s_for_vectorization = s_coo.astype("float64")
+    else:
+        s_for_vectorization = list(s)
+
+    result = pd.Series(
+        list(lda.fit_transform(s_for_vectorization)), index=s.index
+    )
+
+    result._metadata.append(("vectorizer", lda))
+
+    return result
 
 """
 Clustering

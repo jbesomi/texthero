@@ -379,7 +379,7 @@ def plot_topics(s_document_term, s_document_topic, return_figure=False):
     if return_figure:
         return figure
     else:
-        pyLDAvis.show(figure)
+        pyLDAvis.display(figure)
 
 
 """

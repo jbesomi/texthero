@@ -79,3 +79,20 @@ class TestVisualization(PandasTestCase):
     def test_wordcloud(self):
         s = pd.Series("one two three")
         self.assertEqual(visualization.wordcloud(s), None)
+
+    """
+    Test plot_topics
+    """
+
+    def test_plot_topics_clustering_input(self):
+        import texthero as hero
+        from sklearn.preprocessing import normalize as sklearn_normalize
+        import pyLDAvis
+        from scipy.sparse import csr_matrix
+        import pandas as pd
+        from sklearn.datasets import fetch_20newsgroups
+        newsgroups = fetch_20newsgroups(remove=('headers', 'footers', 'quotes'))
+        s = pd.Series(newsgroups.data)
+        s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf, max_df=0.5, min_df=100)
+        s_cluster = s_tfidf.pipe(hero.pca, n_components=20).pipe(hero.dbscan)
+        hero.plot_topics(s_tfidf, s_cluster) # doctest: +SKIP

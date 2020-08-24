@@ -381,9 +381,6 @@ def plot_topics(s_document_term, s_document_topic, return_figure=False):
     Examples
     --------
     >>> import texthero as hero
-    >>> from sklearn.preprocessing import normalize as sklearn_normalize
-    >>> import pyLDAvis
-    >>> from scipy.sparse import csr_matrix
     >>> import pandas as pd
     >>> from sklearn.datasets import fetch_20newsgroups
     >>> newsgroups = fetch_20newsgroups(remove=('headers', 'footers', 'quotes'))
@@ -438,6 +435,10 @@ def plot_topics(s_document_term, s_document_topic, return_figure=False):
     if return_figure:
         return figure
     else:
+        try:
+            pyLDAvis.enable_notebook()
+        except:
+            pass
         pyLDAvis.display(figure)  # For Jupyter Notebooks
         pyLDAvis.show(figure)  # For command line / scripts
 

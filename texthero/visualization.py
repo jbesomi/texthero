@@ -310,7 +310,7 @@ def top_words(s: TextSeries, normalize=False) -> pd.Series:
     )
 
 
-def plot_topics(s_document_term, s_document_topic):
+def plot_topics(s_document_term, s_document_topic, return_figure=False):
 
     metadata_list = s_document_topic._metadata
 
@@ -365,8 +365,8 @@ def plot_topics(s_document_term, s_document_topic):
     )
 
     topic_term_distributions = sklearn_normalize(topic_term_matrix, norm="l1", axis=1)
-    print(document_term_matrix.shape, topic_term_distributions.shape)
-    return pyLDAvis.prepare(
+
+    figure = pyLDAvis.prepare(
         **{
             "vocab": vocab,
             "doc_lengths": doc_lengths,
@@ -375,6 +375,11 @@ def plot_topics(s_document_term, s_document_topic):
             "topic_term_dists": topic_term_distributions.toarray().tolist(),
         }
     )
+
+    if return_figure:
+        return figure
+    else:
+        pyLDAvis.show(figure)
 
 
 """

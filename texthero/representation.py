@@ -7,7 +7,7 @@ import numpy as np
 
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.manifold import TSNE
-from sklearn.decomposition import PCA, NMF
+from sklearn.decomposition import PCA, NMF, TruncatedSVD
 from sklearn.cluster import KMeans, DBSCAN, MeanShift
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import normalize as sklearn_normalize
@@ -563,6 +563,84 @@ def tsne(
         s_for_vectorization = list(s)
 
     return pd.Series(list(tsne.fit_transform(s_for_vectorization)), index=s.index)
+
+
+def truncatedSVD(
+    s: Union[pd.Series, pd.DataFrame], n_components=2, n_iter=5, random_state=None,
+) -> pd.Series:
+    """
+    Performs TruncatedSVD on the given pandas series.
+
+    TruncatedSVD is an algorithmen, which can be used to reduce the dimensions
+    of a given series. In natural language processing, the high-dimensional data
+    is usually a document-term matrix (so in texthero usually a Series after
+    applying :meth:`texthero.representation.tfidf` or some other first
+    representation function that assigns a scalar (a weight) to each word).
+    This is used as a tool to extract the most important topics and words
+    of a given Series. In this context it is refered to as latent semantic analysis (LSA),
+    or Latent Semantic Analysis (LSI)
+    <https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.TruncatedSVD.html>
+
+    TruncatedSVD can directly handle sparse input, so when calling truncatedSVD on a
+    DocumentTermDF, the advantage of sparseness is kept.
+
+    Parameters
+    ----------
+    s : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+
+    n_components : int, default is 2.
+        Number of components to keep (dimensionality of output vectors).
+        For LSA, a value of 100 is recommended
+
+    n_iter : int, optional (default: 5)
+       Number of iterations for randomized SVD solver.
+
+    random_state : int, default=None
+        Determines the random number generator. Pass an int for reproducible
+        results across multiple function calls.
+
+
+    Returns
+    -------
+    Pandas Series with the vector calculated by truncadedSVD for the document in every
+    cell and the truncadedSVD object in the metadata. This will be used in the 
+    :meth:`plot_topics`
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["Football, Sports, Soccer", "Music, Violin, Orchestra","Football, Music"])
+    ...                
+    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency)
+    >>> hero.truncatedSVD(s, random_state=42) # doctest: +SKIP
+    0      [0.14433756729740624, 0.15309310892394884]
+    1      [0.14433756729740663, -0.1530931089239484]
+    2    [0.14433756729740646, 7.211110073938366e-17]
+    dtype: object
+
+    See also
+    --------
+    `truncatedSVD on Wikipedia <https://en.wikipedia.org/wiki/Singular_value_decomposition#Truncated_SVD>`_
+
+    """
+    truncatedSVD = TruncatedSVD(
+        n_components=n_components, n_iter=n_iter, random_state=random_state
+    )
+
+    if _check_is_valid_DocumentTermDF(s):
+        s_coo = s.sparse.to_coo()
+        s_for_vectorization = s_coo.astype("float64")
+    else:
+        s_for_vectorization = list(s)
+
+    result = pd.Series(
+        list(truncatedSVD.fit_transform(s_for_vectorization)), index=s.index
+    )
+
+    result._metadata.append(("vectorizer", TruncatedSVD))
+
+    return result
 
 
 """

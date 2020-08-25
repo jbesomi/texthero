@@ -159,6 +159,12 @@ test_cases_dim_reduction_and_clustering = [
         pd.Series([1, 0], index=[5, 7], dtype="category"),
     ],
     [
+        "truncatedSVD",
+        representation.truncatedSVD,
+        pd.Series([[1.0], [0.0]], index=[5, 7],),
+    ],
+    ["lda", representation.lda, pd.Series([[1.0], [1.0]], index=[5, 7],),],
+    [
         "dbscan",
         representation.dbscan,
         pd.Series([-1, -1], index=[5, 7], dtype="category"),
@@ -234,6 +240,8 @@ class AbstractRepresentationTest(PandasTestCase):
             result_s = test_function(s_vector_series, random_state=42, n_clusters=2)
         elif name == "dbscan" or name == "meanshift" or name == "normalize":
             result_s = test_function(s_vector_series)
+        elif name == "lda" or name == "truncatedSVD":
+            result_s = test_function(s_vector_series, n_components=1, random_state=42)
         else:
             result_s = test_function(s_vector_series, random_state=42)
 
@@ -260,6 +268,8 @@ class AbstractRepresentationTest(PandasTestCase):
             result_s = test_function(s_documenttermDF, random_state=42, n_clusters=2)
         elif name == "dbscan" or name == "meanshift" or name == "normalize":
             result_s = test_function(s_documenttermDF)
+        elif name == "lda" or name == "truncatedSVD":
+            result_s = test_function(s_documenttermDF, n_components=1, random_state=42)
         else:
             result_s = test_function(s_documenttermDF, random_state=42)
 

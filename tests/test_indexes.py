@@ -62,6 +62,8 @@ test_cases_representation = [
     ["pca", representation.pca, (s_numeric_lists, 0)],
     ["nmf", representation.nmf, (s_numeric_lists,)],
     ["tsne", representation.tsne, (s_numeric_lists,)],
+    ["truncatedSVD", representation.tsne, (s_numeric_lists, 1)],
+    ["lda", representation.tsne, (s_numeric_lists, 1)],
     ["kmeans", representation.kmeans, (s_numeric_lists, 1)],
     ["dbscan", representation.dbscan, (s_numeric_lists,)],
     ["meanshift", representation.meanshift, (s_numeric_lists,)],

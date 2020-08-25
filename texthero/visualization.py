@@ -446,7 +446,7 @@ def _prepare_matrices_for_pyLDAvis(
 
 
 def visualize_topics(
-    s_document_term: pd.DataFrame, s_document_topic: pd.Series, return_figure=False,
+    s_document_term: pd.DataFrame, s_document_topic: pd.Series
 ):
     # TODO: add types everywhere when they're merged
     """

@@ -179,6 +179,11 @@ test_cases_dim_reduction_and_clustering = [
         representation.normalize,
         pd.Series([[1.0, 0.0], [0.0, 0.0]], index=[5, 7],),
     ],
+    [
+        "topics_from_topic_model",
+        representation.topics_from_topic_model,
+        pd.Series([0, 0], index=[5, 7], dtype="category"),
+    ],
 ]
 
 
@@ -242,6 +247,10 @@ class AbstractRepresentationTest(PandasTestCase):
             result_s = test_function(s_vector_series)
         elif name == "lda" or name == "truncatedSVD":
             result_s = test_function(s_vector_series, n_components=1, random_state=42)
+        elif name == "topics_from_topic_model":
+            result_s = test_function(
+                representation.lda(s_vector_series, n_components=1, random_state=42)
+            )
         else:
             result_s = test_function(s_vector_series, random_state=42)
 
@@ -260,7 +269,7 @@ class AbstractRepresentationTest(PandasTestCase):
     ):
         s_true = correct_output
 
-        if name == "normalize":
+        if name == "normalize" or "topics_from_topic_model":
             # testing this below separately
             return
 

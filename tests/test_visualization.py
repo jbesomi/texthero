@@ -133,3 +133,57 @@ class TestVisualization(PandasTestCase):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             self.assertIsNotNone(visualization.visualize_topics(s_tfidf, s_lda))
+
+    def test_top_words_per_document(self):
+        s = pd.Series(
+            [
+                "Football, Sports, Soccer",
+                "music, violin, orchestra",
+                "football, fun, sports",
+                "music, band, guitar",
+            ]
+        )
+
+        s_tfidf = (
+            s.pipe(preprocessing.clean)
+            .pipe(preprocessing.tokenize)
+            .pipe(representation.tfidf)
+        )
+        s_result = visualization.top_words_per_document(s_tfidf, n_words=2)
+
+        s_true = pd.Series(
+            [
+                ["soccer", "sports"],
+                ["violin", "orchestra"],
+                ["fun", "sports"],
+                ["guitar", "band"],
+            ],
+            name="Term",
+        )
+        pd.testing.assert_series_equal(s_result, s_true)
+
+    def test_top_words_per_topic(self):
+        s = pd.Series(
+            [
+                "Football, Sports, Soccer",
+                "music, violin, orchestra",
+                "football, fun, sports",
+                "music, band, guitar",
+            ]
+        )
+        s_tfidf = (
+            s.pipe(preprocessing.clean)
+            .pipe(preprocessing.tokenize)
+            .pipe(representation.tfidf)
+        )
+        s_cluster = (
+            s_tfidf.pipe(representation.normalize)
+            .pipe(representation.pca, n_components=2, random_state=42)
+            .pipe(representation.kmeans, n_clusters=2, random_state=42)
+        )
+        s_result = visualization.top_words_per_topic(s_tfidf, s_cluster, n_words=3)
+        s_true = pd.Series(
+            [["music", "violin", "orchestra"],["sports", "football", "soccer"]],
+            name="Term"
+        )
+        pd.testing.assert_series_equal(s_result, s_true, check_names=False)

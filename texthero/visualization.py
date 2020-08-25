@@ -647,9 +647,10 @@ def top_words_per_document(s_document_term, n_words=3):
     >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, band, guitar"])
     >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
     >>> hero.top_words_per_document(s_tfidf, n_words=2) # doctest: +SKIP
-    Category
-    0    [sports, football, soccer]
-    1    [music, violin, orchestra]
+    0       [soccer, sports]
+    1    [violin, orchestra]
+    2          [fun, sports]
+    3         [guitar, band]
     Name: Term, dtype: object
 
     See Also
@@ -666,7 +667,7 @@ def top_words_per_document(s_document_term, n_words=3):
         s_document_term, s_cluster.astype("category"), n_words=n_words
     )
 
-    return s_top_words_per_document.reindex(s.index)
+    return s_top_words_per_document.reindex(s_document_term.index)
 
 
 """

@@ -275,7 +275,7 @@ def top_words(s: TextSeries, normalize=False) -> pd.Series:
     Tokenization: split by space and remove all punctuations that are not
     between characters.
 
-    Parameters
+    Parameters 
     ----------
     normalize : optional, default to False.
         When set to true, return normalized values.
@@ -423,7 +423,7 @@ def _prepare_matrices_for_pyLDAvis(
     Then densify the (potentially) sparse matrices for pyLDAvis.
     """
 
-    # Get distributions through normalization.
+    # Get distributions through normalization
     document_topic_distributions = sklearn_normalize(
         document_topic_matrix, norm="l1", axis=1
     )
@@ -445,9 +445,7 @@ def _prepare_matrices_for_pyLDAvis(
     return document_topic_distributions, topic_term_distributions
 
 
-def visualize_topics(
-    s_document_term: pd.DataFrame, s_document_topic: pd.Series
-):
+def visualize_topics(s_document_term: pd.DataFrame, s_document_topic: pd.Series):
     # TODO: add types everywhere when they're merged
     """
     Visualize the topics of your dataset. First input has
@@ -464,12 +462,7 @@ def visualize_topics(
     - :meth:`texthero.representation.meanshift`
     - :meth:`texthero.representation.dbscan`
 
-    or the result of a topic modelling function, so
-    one of
-    - :meth:`texthero.representation.lda`
-    - :meth:`texthero.representation.truncatedSVD`
-
-    (topic modelling output suggested).
+    or the result of :meth:`texthero.representation.lda`.
 
     The function uses the given clustering
     or topic modelling from the second input, which relates
@@ -517,9 +510,9 @@ def visualize_topics(
     >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
     >>> s_cluster = s_tfidf.pipe(hero.normalize).pipe(hero.pca, n_components=2).pipe(hero.kmeans, n_clusters=2)
     >>> # Display in a new browser window:
-    >>> hero.browser_display(hero.visualize_topics(s_tfidf, s_cluster, show_in_new_window=True)) # doctest: +SKIP
+    >>> hero.browser_display(hero.visualize_topics(s_tfidf, s_cluster)) # doctest: +SKIP
     >>> # Display inside the current Jupyter Notebook:
-    >>> hero.notebook_display(hero.visualize_topics(s_tfidf, s_cluster, show_in_new_window=False)) # doctest: +SKIP
+    >>> hero.notebook_display(hero.visualize_topics(s_tfidf, s_cluster)) # doctest: +SKIP
 
     Using LDA:
 
@@ -527,11 +520,11 @@ def visualize_topics(
     >>> import pandas as pd
     >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, band, guitar"])
     >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
-    >>> s_lda = s_tfidf.pipe(hero.lda, n_components=5)
+    >>> s_lda = s_tfidf.pipe(hero.lda, n_components=2)
     >>> # Display in a new browser window:
-    >>> hero.visualize_topics(s_tfidf, s_lda, show_in_new_window=True) # doctest: +SKIP
+    >>> hero.browser_display(hero.visualize_topics(s_tfidf, s_lda)) # doctest: +SKIP
     >>> # Display inside the current Jupyter Notebook:
-    >>> hero.visualize_topics(s_tfidf, s_lda, show_in_new_window=False) # doctest: +SKIP
+    >>> hero.notebook_display(hero.visualize_topics(s_tfidf, s_lda)) # doctest: +SKIP
 
 
     See Also
@@ -662,9 +655,7 @@ def top_words_per_topic(
 
     """
 
-    pyLDAvis_result = visualize_topics(
-        s_document_term, s_clusters, return_figure=True
-    ).to_dict()
+    pyLDAvis_result = visualize_topics(s_document_term, s_clusters).to_dict()
 
     df_topics_and_their_top_words = pd.DataFrame(pyLDAvis_result["tinfo"])
 
@@ -769,3 +760,19 @@ def top_words_per_document(s_document_term: pd.DataFrame, n_words=3):
     )
 
     return s_top_words_per_document.reindex(s_document_term.index)
+
+
+"""
+import texthero as hero
+import pandas as pd
+df = pd.read_csv(
+    "https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv"
+)
+
+
+s_tfidf = df["text"].pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf, max_df = 0.5, min_df = 100)
+s_lda = s_tfidf.pipe(hero.truncatedSVD, n_components=5)
+# a, b = hero.visualize_topics(s_tfidf, s_lda)
+hero.browser_display(hero.visualize_topics(s_tfidf, s_lda))
+
+"""

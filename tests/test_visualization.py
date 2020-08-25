@@ -108,9 +108,7 @@ class TestVisualization(PandasTestCase):
         )
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            self.assertIsNotNone(
-                visualization.visualize_topics(s_tfidf, s_cluster)
-            )
+            self.assertIsNotNone(visualization.visualize_topics(s_tfidf, s_cluster))
 
     def test_visualize_topics_topic_modelling_for_second_input(self):
 
@@ -134,9 +132,7 @@ class TestVisualization(PandasTestCase):
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            self.assertIsNotNone(
-                visualization.visualize_topics(s_tfidf, s_lda)
-            )
+            self.assertIsNotNone(visualization.visualize_topics(s_tfidf, s_lda))
 
     def test_top_words_per_document(self):
         s = pd.Series(

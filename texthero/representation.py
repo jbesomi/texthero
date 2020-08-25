@@ -896,17 +896,16 @@ def truncatedSVD(
     s: Union[pd.Series, pd.DataFrame], n_components=2, n_iter=5, random_state=None,
 ) -> pd.Series:
     """
-    Performs TruncatedSVD on the given pandas series.
+    Perform TruncatedSVD on the given pandas Series.
 
-    TruncatedSVD is an algorithmn, which can be used to reduce the dimensions
+    TruncatedSVD is an algorithmn which can be used to reduce the dimensions
     of a given series. In natural language processing, the high-dimensional data
     is usually a document-term matrix (so in texthero usually a Series after
     applying :meth:`texthero.representation.tfidf` or some other first
     representation function that assigns a scalar (a weight) to each word).
     This is used as a tool to extract the most important topics and words
-    of a given Series. In this context it is refered to as latent semantic analysis (LSA),
-    or Latent Semantic Analysis (LSI)
-    <https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.TruncatedSVD.html>
+    of a given Series. In this context it is also referred to as
+    Latent Semantic Analysis (LSA) or Latent Semantic Indexing (LSI).
 
     TruncatedSVD can directly handle sparse input, so when calling truncatedSVD on a
     DocumentTermDF, the advantage of sparseness is kept.
@@ -917,7 +916,8 @@ def truncatedSVD(
 
     n_components : int, default is 2.
         Number of components to keep (dimensionality of output vectors).
-        For LSA, a value of 100 is recommended
+        When using truncatedSVD for Topic Modelling, this needs to be
+        the number of topics.
 
     n_iter : int, optional (default: 5)
        Number of iterations for randomized SVD solver.
@@ -947,7 +947,7 @@ def truncatedSVD(
 
     See also
     --------
-    `truncatedSVD on Wikipedia <https://en.wikipedia.org/wiki/Singular_value_decomposition#Truncated_SVD>`
+    `truncatedSVD on Wikipedia <https://en.wikipedia.org/wiki/Singular_value_decomposition#Truncated_SVD>`_
 
     """
     truncatedSVD = TruncatedSVD(
@@ -989,10 +989,12 @@ def lda(
 
     Parameters
     ----------
-    s : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    s : pd.Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
 
     n_components : int, default is 2.
-        Number of components to keep (in NLP context number of topics)
+        Number of components to keep (dimensionality of output vectors).
+        When using truncatedSVD for Topic Modelling, this needs to be
+        the number of topics.
 
     max_iter : int, optional (default: 10)
         The maximum number of iterations.
@@ -1000,7 +1002,6 @@ def lda(
     random_state : int, default=None
         Determines the random number generator. Pass an int for reproducible
         results across multiple function calls.
-
 
     Returns
     -------
@@ -1022,7 +1023,7 @@ def lda(
 
     See also
     --------
-    `LDA on Wikipedia <https://de.wikipedia.org/wiki/Latent_Dirichlet_Allocation`
+    `LDA on Wikipedia <https://de.wikipedia.org/wiki/Latent_Dirichlet_Allocation`_
 
     """
 
@@ -1041,7 +1042,7 @@ def lda(
     return result
 
 
-def topics_from_topic_model(s_document_topic):
+def topics_from_topic_model(s_document_topic: pd.Series) -> pd.Series:
     # TODO: add types everywhere when they're merged
     """
     Find the topics from a topic model. Input has
@@ -1049,7 +1050,8 @@ def topics_from_topic_model(s_document_topic):
     - :meth:`texthero.representation.lda`
     - :meth:`texthero.representation.truncatedSVD`,
     so the output of one of Texthero's Topic Modelling
-    functions.
+    functions that returns a relation
+    between documents and topics.
 
     The function uses the given relation of
     documents to topics to calculate the
@@ -1094,6 +1096,16 @@ def topics_from_topic_model(s_document_topic):
 
     document_topic_matrix = np.matrix(s_document_topic.tolist())
 
+    # The document_topic_matrix relates documents to topics,
+    # so it shows for each document (so for each row), how
+    # strongly that document belongs to a topic. So
+    # document_topic_matrix[X][Y] = how strongly document X belongs to topic Y.
+    # We use argmax to find the index of the topic that a document
+    # belongs most strongly to for each document (so for each row).
+    # E.g. when the first row of the document_topic_matrix is
+    # [0.2, 0.1, 0.2, 0.5], then the first document will be put into
+    # topic / cluster 3 as the third entry (counting from 0) is
+    # the best matching topic.
     cluster_IDs = np.argmax(document_topic_matrix, axis=1).getA1()
 
     return pd.Series(cluster_IDs, index=s_document_topic.index, dtype="category")

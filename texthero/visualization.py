@@ -19,10 +19,9 @@ from scipy.sparse import csr_matrix, issparse
 from sklearn.preprocessing import normalize as sklearn_normalize
 
 import pyLDAvis
-from pyLDAvis import display as display_notebook
-from pyLDAvis import show as display_browser
 
 from collections import Counter
+from typing import Tuple
 
 
 def scatterplot(
@@ -314,22 +313,60 @@ def top_words(s: TextSeries, normalize=False) -> pd.Series:
 
 
 def _get_matrices_for_visualize_topics(
-    s_document_term, s_document_topic, clustering_function_used
+    s_document_term: pd.DataFrame,
+    s_document_topic: pd.Series,
+    clustering_function_used: bool,
 ):
+    # TODO: add Hero types everywhere when they're merged
+    """
+    Helper function for visualize_topics. Used to extract and
+    calculate the matrices that pyLDAvis needs.
 
+    Recieves as first argument s_document_term, which is the output of
+    tfidf / count / term_frequency. From this, s_document_term.values
+    are the document_term_matrix in the code.
+
+    Recieves as second argument s_document_topic, which is either
+    the output of a clustering function (so a categorical Series)
+    or the output of a topic modelling function (so a VectorSeries).
+
+    In the first case (that's when clustering_function_used=True),
+    we create the document_topic_matrix
+    through the clusterIDs. So if document X is in cluster Y,
+    then document_topic_matrix[X][Y] = 1.
+    
+    For example, when
+    `s_document_topic = pd.Series([0, 2, 2, 1, 0, 1], dtype="category")`,
+    then the document_topic_matrix is
+    1 0 0
+    0 0 1
+    0 0 1
+    0 1 0
+    1 0 0
+    0 1 0
+
+    So e.g. document zero is in cluster 0, so document_topic_matrix[0][0] = 1.
+
+    In the second case (that's when lda or truncatedSVD were used),
+    their output is already the document_topic_matrix that relates
+    documents to topics.
+
+    We then have in both cases the document_term_matrix and the document_topic_matrix.
+    pyLDAvis still needs the topic_term_matrix, which we get through
+    topic_term_matrix = document_term_matrix.T * document_topic_matrix.
+
+    """
     if not clustering_function_used:
         # Here, s_document_topic is output of hero.lda or hero.truncatedSVD.
 
         document_term_matrix = s_document_term.sparse.to_coo()
         document_topic_matrix = np.array(list(s_document_topic))
 
-        # topic_term_matrix = vectorizer.components_
-        topic_term_matrix = document_topic_matrix.T * document_term_matrix
-
     else:
         # Here, s_document_topic is output of some hero clustering function.
 
         # First remove documents that are not assigned to any cluster.
+        # They have clusterID ==  -1.
         indexes_of_unassigned_documents = s_document_topic == -1
         s_document_term = s_document_term[~indexes_of_unassigned_documents]
         s_document_topic = s_document_topic[~indexes_of_unassigned_documents]
@@ -337,25 +374,54 @@ def _get_matrices_for_visualize_topics(
 
         document_term_matrix = s_document_term.sparse.to_coo()
 
-        # Construct document_topic_matrix
-        n_rows = len(s_document_topic.index)
-        n_cols = len(s_document_topic.values.categories)
+        # Construct document_topic_matrix from the cluster category Series
+        # as described in the docstring.
+        n_rows = len(s_document_topic.index)  # n_rows = number of documents
+        n_cols = len(s_document_topic.values.categories)  # n_cols = number of clusters
 
-        data = [1 for _ in range(n_rows)]
-        rows = range(n_rows)
+        # Will get binary matrix:
+        # document_topic_matrix[X][Y] = 1 <=> document X is in cluster Y.
+        # We construct this matrix sparsely in CSR format
+        # -> need the data (will only insert 1s, nothing else),
+        # the rows (so in which rows we want to insert, which is all of them
+        # as every document belongs to a cluster),
+        # and we need the columns (so in which cluster we want to insert,
+        # which is exactly the clusterID values).
+        data = [1 for _ in range(n_rows)]  # Will insert one 1 per row.
+        rows = range(n_rows)  # rows are just [0, 1, ..., n_rows]
         columns = s_document_topic.values
 
+        # Construct the sparse matrix.
         document_topic_matrix = csr_matrix(
             (data, (rows, columns)), shape=(n_rows, n_cols)
         )
 
-        topic_term_matrix = document_topic_matrix.T * document_term_matrix
+    topic_term_matrix = document_topic_matrix.T * document_term_matrix
 
     return s_document_term, s_document_topic, document_topic_matrix, topic_term_matrix
 
 
-def _prepare_matrices_for_pyLDAvis(document_topic_matrix, topic_term_matrix):
+def _prepare_matrices_for_pyLDAvis(
+    document_topic_matrix: np.matrix, topic_term_matrix: np.matrix
+):
+    # TODO: add types everywhere when they're merged
+    """
+    Helper function for visualize_topics. Used to prepare the
+    document_topic_matrix and the topic_term_matrix for pyLDAvis.
 
+    First normalizes both matrices to get the
+    document_topic_distributions and topic_term_distributions matrix.
+    For example, the first row of document_topic_distributions
+    has the probabilities of document zero to belong to the
+    different topics (so every row sums up to 1 (this is later
+    checked by pyLDAvis)). 
+    So document_topic_matrix[i][j] = proportion of document i
+    that belongs to topic j.
+
+    Then densify the (potentially) sparse matrices for pyLDAvis.
+    """
+
+    # Get distributions through normalization.
     document_topic_distributions = sklearn_normalize(
         document_topic_matrix, norm="l1", axis=1
     )
@@ -363,6 +429,7 @@ def _prepare_matrices_for_pyLDAvis(document_topic_matrix, topic_term_matrix):
     topic_term_distributions = sklearn_normalize(topic_term_matrix, norm="l1", axis=1)
 
     # Make sparse matrices dense for pyLDAvis
+
     if issparse(document_topic_distributions):
         document_topic_distributions = document_topic_distributions.toarray().tolist()
     else:
@@ -376,7 +443,12 @@ def _prepare_matrices_for_pyLDAvis(document_topic_matrix, topic_term_matrix):
     return document_topic_distributions, topic_term_distributions
 
 
-def visualize_topics(s_document_term, s_document_topic):
+def visualize_topics(
+    s_document_term: pd.DataFrame,
+    s_document_topic: pd.Series,
+    show_in_new_window=False,
+    return_figure=False,
+):
     # TODO: add types everywhere when they're merged
     """
     Visualize the topics of your dataset. First input has
@@ -413,31 +485,37 @@ def visualize_topics(s_document_term, s_document_topic):
 
 
     **To show the plot**:
-    - Interactively in a Jupyter Notebook: do `hero.display_notebook(hero.visualize_topics(...))`
-    - In a new browser window: do `hero.display_browser(hero.visualize_topics(...))`
+    - Interactively in a Jupyter Notebook: set show_in_new_window to False
+    - In a new browser window: set show_in_new_window to True
 
     Parameters
     ----------
     s_document_term: pd.DataFrame
-
-    One of 
-    - :meth:`texthero.representation.tfidf`
-    - :meth:`texthero.representation.count`
-    - :meth:`texthero.representation.term_frequency`
+        One of 
+        :meth:`texthero.representation.tfidf`
+        :meth:`texthero.representation.count`
+        :meth:`texthero.representation.term_frequency`
 
     s_document_topic: pd.Series
+        One of
+        :meth:`texthero.representation.kmeans`
+        :meth:`texthero.representation.meanshift`
+        :meth:`texthero.representation.dbscan`
+        (using clustering functkmeansions, documents
+        that are not assigned to a cluster are
+        not considered in the visualization)
+        or one of
+        :meth:`texthero.representation.lda`
+        :meth:`texthero.representation.truncatedSVD`
 
-    One of
-    - :meth:`texthero.representation.kmeans`
-    - :meth:`texthero.representation.meanshift`
-    - :meth:`texthero.representation.dbscan`
-    (using clustering functkmeansions, documents
-    that are not assigned to a cluster are
-    not considered in the visualization)
-    or one of
-    - :meth:`texthero.representation.lda`
-    - :meth:`texthero.representation.truncatedSVD`
+    show_in_new_window: bool, default to True
+        Whether to open a new browser window or
+        show the visualization inline (only
+        supported in Jupyter Notebooks).
 
+    return_figure: bool, default False
+        Whether to return the figure
+        instead of visualizing it.
 
     Examples
     --------
@@ -449,9 +527,9 @@ def visualize_topics(s_document_term, s_document_topic):
     >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
     >>> s_cluster = s_tfidf.pipe(hero.normalize).pipe(hero.pca, n_components=2).pipe(hero.kmeans, n_clusters=2)
     >>> # Display in a new browser window:
-    >>> hero.display_browser(hero.visualize_topics(s_tfidf, s_cluster)) # doctest: +SKIP
+    >>> hero.visualize_topics(s_tfidf, s_cluster, show_in_new_window=True) # doctest: +SKIP
     >>> # Display inside the current Jupyter Notebook:
-    >>> hero.display_notebook(hero.visualize_topics(s_tfidf, s_cluster)) # doctest: +SKIP
+    >>> hero.visualize_topics(s_tfidf, s_cluster, show_in_new_window=False) # doctest: +SKIP
 
     Using LDA:
 
@@ -461,9 +539,9 @@ def visualize_topics(s_document_term, s_document_topic):
     >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
     >>> s_lda = s_tfidf.pipe(hero.lda, n_components=5)
     >>> # Display in a new browser window:
-    >>> hero.display_browser(hero.visualize_topics(s_tfidf, s_lda)) # doctest: +SKIP
+    >>> hero.visualize_topics(s_tfidf, s_lda, show_in_new_window=True) # doctest: +SKIP
     >>> # Display inside the current Jupyter Notebook:
-    >>> hero.display_notebook(hero.visualize_topics(s_tfidf, s_cluster)) # doctest: +SKIP
+    >>> hero.visualize_topics(s_tfidf, s_lda, show_in_new_window=False) # doctest: +SKIP
 
 
     See Also
@@ -473,9 +551,12 @@ def visualize_topics(s_document_term, s_document_topic):
     TODO add tutorial link
 
     """
+    # Bool to note whether a clustering function or topic modelling
+    # functions was used for s_document_topic.
     clustering_function_used = s_document_topic.dtype.name == "category"
 
     # Get / build matrices from input
+    # (see helper function docstring for explanation)
     (
         s_document_term,
         s_document_topic,
@@ -489,11 +570,14 @@ def visualize_topics(s_document_term, s_document_topic):
     doc_lengths = list(s_document_term.sum(axis=1))
     term_frequency = list(s_document_term.sum(axis=0))
 
+    # Prepare matrices for input to pyLDAvis
+    # (see helper function docstring for explanation)
     (
         document_topic_distributions,
         topic_term_distributions,
     ) = _prepare_matrices_for_pyLDAvis(document_topic_matrix, topic_term_matrix)
 
+    # Create pyLDAvis visualization.
     figure = pyLDAvis.prepare(
         **{
             "vocab": vocab,
@@ -506,10 +590,21 @@ def visualize_topics(s_document_term, s_document_topic):
         }
     )
 
-    return figure
+    if return_figure:
+        return figure
+    else:
+        # Different pyLDAvis functions
+        # for showing in new window and
+        # showing inside a notebook.
+        if show_in_new_window:
+            pyLDAvis.show(figure)
+        else:
+            pyLDAvis.display(figure)
 
 
-def top_words_per_topic(s_document_term, s_clusters, n_words=5):
+def top_words_per_topic(
+    s_document_term: pd.DataFrame, s_clusters: pd.Series, n_words=5
+):
     # TODO: add types everywhere when they're merged
     """
     Find the top words per topic of your dataset. First input has
@@ -540,23 +635,27 @@ def top_words_per_topic(s_document_term, s_clusters, n_words=5):
     Parameters
     ----------
     s_document_term: pd.DataFrame
-
-    One of 
-    - :meth:`texthero.representation.tfidf`
-    - :meth:`texthero.representation.count`
-    - :meth:`texthero.representation.term_frequency`
+        One of 
+        :meth:`texthero.representation.tfidf`
+        :meth:`texthero.representation.count`
+        :meth:`texthero.representation.term_frequency`
 
     s_clusters: pd.Series
-
-    One of
-    - :meth:`texthero.representation.kmeans`
-    - :meth:`texthero.representation.meanshift`
-    - :meth:`texthero.representation.dbscan`
-    - :meth:`texthero.representation.topics_from_topic_model`
+        One of
+        :meth:`texthero.representation.kmeans`
+        :meth:`texthero.representation.meanshift`
+        :meth:`texthero.representation.dbscan`
+        :meth:`texthero.representation.topics_from_topic_model`
 
     n_words: int, default to 5
         Number of top words per topic, should
         be <= 30.
+
+    Returns
+    -------
+    Series with the topic IDs as index and
+    a list of n_words relevant words per
+    topic as values.
 
     Examples
     --------
@@ -568,20 +667,22 @@ def top_words_per_topic(s_document_term, s_clusters, n_words=5):
     >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
     >>> s_cluster = s_tfidf.pipe(hero.normalize).pipe(hero.pca, n_components=2).pipe(hero.kmeans, n_clusters=2)
     >>> hero.top_words_per_topic(s_tfidf, s_cluster) # doctest: +SKIP
-    Category
     0    [sports, football, soccer]
     1    [music, violin, orchestra]
-    Name: Term, dtype: object
+    dtype: object
 
     See Also
     --------
     `pyLDAvis <https://pyldavis.readthedocs.io/en/latest/>`_
+    and their methodology on how to find relevant terms.
 
     TODO add tutorial link
 
     """
 
-    pyLDAvis_result = visualize_topics(s_document_term, s_clusters).to_dict()
+    pyLDAvis_result = visualize_topics(
+        s_document_term, s_clusters, return_figure=True
+    ).to_dict()
 
     df_topics_and_their_top_words = pd.DataFrame(pyLDAvis_result["tinfo"])
 
@@ -609,13 +710,16 @@ def top_words_per_topic(s_document_term, s_clusters, n_words=5):
 
     s_topics_with_top_words = s_topics_with_top_words.apply(lambda x: x[:n_words])
 
+    # Remove series name "Term" from pyLDAvis
+    s_topics_with_top_words = s_topics_with_top_words.rename(None)
+
     return s_topics_with_top_words
 
 
-def top_words_per_document(s_document_term, n_words=3):
+def top_words_per_document(s_document_term: pd.DataFrame, n_words=3):
     # TODO: add types everywhere when they're merged
     """
-    Find the top words per topic of your dataset. First input has
+    Find the top words per document of your dataset. First input has
     to be output of one of 
     - :meth:`texthero.representation.tfidf`
     - :meth:`texthero.representation.count`
@@ -623,58 +727,61 @@ def top_words_per_document(s_document_term, n_words=3):
 
     (tfidf suggested).
 
-    TODO
+    The function assigns every document
+    to its own cluster (or "topic") and then uses
+    :meth:`top_words_per_topic` to find
+    the top words for every document.
 
     Parameters
     ----------
     s_document_term: pd.DataFrame
-
-    One of 
-    - :meth:`texthero.representation.tfidf`
-    - :meth:`texthero.representation.count`
-    - :meth:`texthero.representation.term_frequency`
+        One of
+        :meth:`texthero.representation.tfidf`
+        :meth:`texthero.representation.count`
+        :meth:`texthero.representation.term_frequency`
 
     n_words: int, default to 3
-        Number of top words per topic, should
+        Number of words to fetch per topic, should
         be <= 30.
+
+    Returns
+    -------
+    Series with the document IDs as index and
+    a list of n_words relevant words per
+    document as values.
 
     Examples
     --------
-    Using Clustering:
-
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, band, guitar"])
     >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
     >>> hero.top_words_per_document(s_tfidf, n_words=2) # doctest: +SKIP
-    Category
-    0    [sports, football, soccer]
-    1    [music, violin, orchestra]
-    Name: Term, dtype: object
+    0       [soccer, sports]
+    1    [violin, orchestra]
+    2          [fun, sports]
+    3         [guitar, band]
+    dtype: object
+    >>> # We can see that the function tries to
+    >>> # find terms that distinguish the documents,
+    >>> # so "music" is not chosen for documents
+    >>> # 1 and 3 as it's found in both.
 
     See Also
     --------
-    `pyLDAvis <https://pyldavis.readthedocs.io/en/latest/>`_
+    :meth:`top_words_per_topic`
 
     TODO add tutorial link
 
     """
+    # Create a categorical Series that has
+    # one new cluster for every document.
+    s_cluster = pd.Series(s_document_term.index.tolist(), dtype="category")
 
-    s_cluster = pd.Series(s_document_term.index.tolist())
-
+    # Call top_words_per_topic with the new cluster series
+    # (so every document is one distinct "topic")
     s_top_words_per_document = top_words_per_topic(
-        s_document_term, s_cluster.astype("category"), n_words=n_words
+        s_document_term, s_cluster, n_words=n_words
     )
 
-    return s_top_words_per_document.reindex(s.index)
-
-
-"""
-TODO
-
-- tests for top_words_per_document, top_words_per_topic, topics_from_topic_model
-    -> try second one also with error when category == -1 somewhere
-
-- docstrings of all functions (also private helpers) + comments
-
-"""
+    return s_top_words_per_document.reindex(s_document_term.index)

@@ -108,7 +108,9 @@ class TestVisualization(PandasTestCase):
         )
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            self.assertIsNotNone(visualization.visualize_topics(s_tfidf, s_cluster))
+            self.assertIsNotNone(
+                visualization.visualize_topics(s_tfidf, s_cluster, return_figure=True)
+            )
 
     def test_visualize_topics_topic_modelling_for_second_input(self):
 
@@ -132,4 +134,6 @@ class TestVisualization(PandasTestCase):
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            self.assertIsNotNone(visualization.visualize_topics(s_tfidf, s_lda))
+            self.assertIsNotNone(
+                visualization.visualize_topics(s_tfidf, s_lda, return_figure=True)
+            )

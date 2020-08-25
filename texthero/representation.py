@@ -565,155 +565,6 @@ def tsne(
     return pd.Series(list(tsne.fit_transform(s_for_vectorization)), index=s.index)
 
 
-def truncatedSVD(
-    s: Union[pd.Series, pd.DataFrame], n_components=2, n_iter=5, random_state=None,
-) -> pd.Series:
-    """
-    Performs TruncatedSVD on the given pandas series.
-
-    TruncatedSVD is an algorithmn, which can be used to reduce the dimensions
-    of a given series. In natural language processing, the high-dimensional data
-    is usually a document-term matrix (so in texthero usually a Series after
-    applying :meth:`texthero.representation.tfidf` or some other first
-    representation function that assigns a scalar (a weight) to each word).
-    This is used as a tool to extract the most important topics and words
-    of a given Series. In this context it is refered to as latent semantic analysis (LSA),
-    or Latent Semantic Analysis (LSI)
-    <https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.TruncatedSVD.html>
-
-    TruncatedSVD can directly handle sparse input, so when calling truncatedSVD on a
-    DocumentTermDF, the advantage of sparseness is kept.
-
-    Parameters
-    ----------
-    s : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
-
-    n_components : int, default is 2.
-        Number of components to keep (dimensionality of output vectors).
-        For LSA, a value of 100 is recommended
-
-    n_iter : int, optional (default: 5)
-       Number of iterations for randomized SVD solver.
-
-    random_state : int, default=None
-        Determines the random number generator. Pass an int for reproducible
-        results across multiple function calls.
-
-
-    Returns
-    -------
-    Pandas Series with the vector calculated by truncadedSVD for the document in every
-    cell.
-
-    Examples
-    --------
-    >>> import texthero as hero
-    >>> import pandas as pd
-    >>> s = pd.Series(["Football, Sports, Soccer", "Music, Violin, Orchestra",
-    ...                "Football, Music"])                
-    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency)
-    >>> hero.truncatedSVD(s, random_state=42) # doctest: +SKIP
-    0      [0.14433756729740624, 0.15309310892394884]
-    1      [0.14433756729740663, -0.1530931089239484]
-    2    [0.14433756729740646, 7.211110073938366e-17]
-    dtype: object
-
-    See also
-    --------
-    `truncatedSVD on Wikipedia <https://en.wikipedia.org/wiki/Singular_value_decomposition#Truncated_SVD>`
-
-    """
-    truncatedSVD = TruncatedSVD(
-        n_components=n_components, n_iter=n_iter, random_state=random_state
-    )
-
-    if _check_is_valid_DocumentTermDF(s):
-        s_coo = s.sparse.to_coo()
-        s_for_vectorization = s_coo.astype("float64")
-    else:
-        s_for_vectorization = list(s)
-
-    result = pd.Series(
-        list(truncatedSVD.fit_transform(s_for_vectorization)), index=s.index
-    )
-
-    return result
-
-
-def lda(
-    s: Union[pd.Series, pd.DataFrame],
-    n_components=10,
-    max_iter=10,
-    random_state=None,
-    n_jobs=-1,
-) -> pd.Series:
-    """
-    Performs Latent Dirichlet Allocation on the given pandas series.
-
-    Latent Dirichlet Allocation(LDA) is a topic modeling algorithm 
-    based on Dirichlet distribution. In natural language processing
-    LDA is often used to categorise documents into diffenrent topics
-    and generate top words from these topics. In this process LDA is
-    used in combination with algorithms, which generate document-term-
-    matrixes, like :meth:`count` or :meth:`tfidf`
-
-    TruncatedSVD can directly handle sparse input, so when calling truncatedSVD on a
-    DocumentTermDF, the advantage of sparseness is kept.
-
-    Parameters
-    ----------
-    s : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
-
-    n_components : int, default is 2.
-        Number of components to keep (in NLP context number of topics)
-
-    max_iter : int, optional (default: 10)
-        The maximum number of iterations.
-
-    random_state : int, default=None
-        Determines the random number generator. Pass an int for reproducible
-        results across multiple function calls.
-
-
-    Returns
-    -------
-    Pandas Series with the vector calculated by LDA for the document in every
-    cell.
-
-    Examples
-    --------
-    >>> import texthero as hero
-    >>> import pandas as pd
-    >>> s = pd.Series(["Football, Sports, Soccer", "Music, Violin, Orchestra",
-    ...                "Football, Music"])                
-    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency)
-    >>> hero.lda(s, random_state=42) # doctest: +SKIP
-    0    [0.07272782580722714, 0.0727702366844115, 0.07...
-    1    [0.07272782580700803, 0.07277023650761331, 0.0...
-    2    [0.08000075593366586, 0.27990110380876265, 0.0...
-    dtype: object
-
-    See also
-    --------
-    `LDA on Wikipedia <https://de.wikipedia.org/wiki/Latent_Dirichlet_Allocation`
-
-    """
-
-    lda = LatentDirichletAllocation(
-        n_components=n_components, max_iter=max_iter, random_state=random_state
-    )
-
-    if _check_is_valid_DocumentTermDF(s):
-        s_coo = s.sparse.to_coo()
-        s_for_vectorization = s_coo.astype("float64")
-    else:
-        s_for_vectorization = list(s)
-
-    result = pd.Series(list(lda.fit_transform(s_for_vectorization)), index=s.index)
-
-    return result
-
-
 """
 Clustering
 """
@@ -1040,7 +891,213 @@ def meanshift(
 Topic modelling
 """
 
-# TODO.
+
+def truncatedSVD(
+    s: Union[pd.Series, pd.DataFrame], n_components=2, n_iter=5, random_state=None,
+) -> pd.Series:
+    """
+    Performs TruncatedSVD on the given pandas series.
+
+    TruncatedSVD is an algorithmn, which can be used to reduce the dimensions
+    of a given series. In natural language processing, the high-dimensional data
+    is usually a document-term matrix (so in texthero usually a Series after
+    applying :meth:`texthero.representation.tfidf` or some other first
+    representation function that assigns a scalar (a weight) to each word).
+    This is used as a tool to extract the most important topics and words
+    of a given Series. In this context it is refered to as latent semantic analysis (LSA),
+    or Latent Semantic Analysis (LSI)
+    <https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.TruncatedSVD.html>
+
+    TruncatedSVD can directly handle sparse input, so when calling truncatedSVD on a
+    DocumentTermDF, the advantage of sparseness is kept.
+
+    Parameters
+    ----------
+    s : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+
+    n_components : int, default is 2.
+        Number of components to keep (dimensionality of output vectors).
+        For LSA, a value of 100 is recommended
+
+    n_iter : int, optional (default: 5)
+       Number of iterations for randomized SVD solver.
+
+    random_state : int, default=None
+        Determines the random number generator. Pass an int for reproducible
+        results across multiple function calls.
+
+
+    Returns
+    -------
+    Pandas Series with the vector calculated by truncadedSVD for the document in every
+    cell.
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["Football, Sports, Soccer", "Music, Violin, Orchestra",
+    ...                "Football, Music"])                
+    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency)
+    >>> hero.truncatedSVD(s, random_state=42) # doctest: +SKIP
+    0      [0.14433756729740624, 0.15309310892394884]
+    1      [0.14433756729740663, -0.1530931089239484]
+    2    [0.14433756729740646, 7.211110073938366e-17]
+    dtype: object
+
+    See also
+    --------
+    `truncatedSVD on Wikipedia <https://en.wikipedia.org/wiki/Singular_value_decomposition#Truncated_SVD>`
+
+    """
+    truncatedSVD = TruncatedSVD(
+        n_components=n_components, n_iter=n_iter, random_state=random_state
+    )
+
+    if _check_is_valid_DocumentTermDF(s):
+        s_coo = s.sparse.to_coo()
+        s_for_vectorization = s_coo.astype("float64")
+    else:
+        s_for_vectorization = list(s)
+
+    result = pd.Series(
+        list(truncatedSVD.fit_transform(s_for_vectorization)), index=s.index
+    )
+
+    return result
+
+
+def lda(
+    s: Union[pd.Series, pd.DataFrame],
+    n_components=10,
+    max_iter=10,
+    random_state=None,
+    n_jobs=-1,
+) -> pd.Series:
+    """
+    Performs Latent Dirichlet Allocation on the given pandas series.
+
+    Latent Dirichlet Allocation(LDA) is a topic modeling algorithm 
+    based on Dirichlet distribution. In natural language processing
+    LDA is often used to categorise documents into diffenrent topics
+    and generate top words from these topics. In this process LDA is
+    used in combination with algorithms, which generate document-term-
+    matrixes, like :meth:`count` or :meth:`tfidf`
+
+    TruncatedSVD can directly handle sparse input, so when calling truncatedSVD on a
+    DocumentTermDF, the advantage of sparseness is kept.
+
+    Parameters
+    ----------
+    s : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+
+    n_components : int, default is 2.
+        Number of components to keep (in NLP context number of topics)
+
+    max_iter : int, optional (default: 10)
+        The maximum number of iterations.
+
+    random_state : int, default=None
+        Determines the random number generator. Pass an int for reproducible
+        results across multiple function calls.
+
+
+    Returns
+    -------
+    Pandas Series with the vector calculated by LDA for the document in every
+    cell.
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["Football, Sports, Soccer", "Music, Violin, Orchestra",
+    ...                "Football, Music"])                
+    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency)
+    >>> hero.lda(s, random_state=42) # doctest: +SKIP
+    0    [0.07272782580722714, 0.0727702366844115, 0.07...
+    1    [0.07272782580700803, 0.07277023650761331, 0.0...
+    2    [0.08000075593366586, 0.27990110380876265, 0.0...
+    dtype: object
+
+    See also
+    --------
+    `LDA on Wikipedia <https://de.wikipedia.org/wiki/Latent_Dirichlet_Allocation`
+
+    """
+
+    lda = LatentDirichletAllocation(
+        n_components=n_components, max_iter=max_iter, random_state=random_state
+    )
+
+    if _check_is_valid_DocumentTermDF(s):
+        s_coo = s.sparse.to_coo()
+        s_for_vectorization = s_coo.astype("float64")
+    else:
+        s_for_vectorization = list(s)
+
+    result = pd.Series(list(lda.fit_transform(s_for_vectorization)), index=s.index)
+
+    return result
+
+
+def topics_from_topic_model(s_document_topic):
+    # TODO: add types everywhere when they're merged
+    """
+    Find the topics from a topic model. Input has
+    to be output of one of
+    - :meth:`texthero.representation.lda`
+    - :meth:`texthero.representation.truncatedSVD`,
+    so the output of one of Texthero's Topic Modelling
+    functions.
+
+    The function uses the given relation of
+    documents to topics to calculate the
+    best-matching topic per document and
+    returns a Series with the topic IDs.
+
+    Parameters
+    ----------
+    s_document_topic: pd.Series
+
+    One of 
+    - :meth:`texthero.representation.lda`
+    - :meth:`texthero.representation.truncatedSVD`,
+
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, band, guitar"])
+    >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
+    >>> # Use Latent Dirichlet Allocation to relate documents to topics.s
+    >>> s_lda = s_tfidf.pipe(hero.lda, n_components=2)
+    >>> # Extract the best-matching topic per document.
+    >>> hero.topics_from_topic_model(s_lda) # doctest: +SKIP
+    0    1
+    1    0
+    2    1
+    3    0
+    dtype: category
+    Categories (2, int64): [0, 1]
+
+
+    See Also
+    --------
+    TODO add tutorial link
+
+    :meth:`texthero.visualization.top_words_per_topic`_ to find the top words
+    per topic after applying this function.
+
+    """
+
+    document_topic_matrix = np.matrix(s_document_topic.tolist())
+
+    cluster_IDs = np.argmax(document_topic_matrix, axis=1).getA1()
+
+    return pd.Series(cluster_IDs, index=s_document_topic.index, dtype="category")
+
 
 """
 Normalization.

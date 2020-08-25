@@ -87,9 +87,14 @@ class TestVisualization(PandasTestCase):
 
     def test_visualize_topics_clustering_for_second_input(self):
 
-        s = pd.read_csv(
-            "https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/bbcsport.csv",
-        )["text"][:100]
+        s = pd.Series(
+            [
+                "Football, Sports, Soccer",
+                "music, violin, orchestra",
+                "football, fun, sports",
+                "music, band, guitar",
+            ]
+        )
 
         s_tfidf = (
             s.pipe(preprocessing.clean)
@@ -98,8 +103,8 @@ class TestVisualization(PandasTestCase):
         )
         s_cluster = (
             s_tfidf.pipe(representation.normalize)
-            .pipe(representation.pca, n_components=20)
-            .pipe(representation.kmeans)
+            .pipe(representation.pca, n_components=2)
+            .pipe(representation.kmeans, n_clusters=2)
         )
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -107,9 +112,14 @@ class TestVisualization(PandasTestCase):
 
     def test_visualize_topics_topic_modelling_for_second_input(self):
 
-        s = pd.read_csv(
-            "https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/bbcsport.csv",
-        )["text"][:100]
+        s = pd.Series(
+            [
+                "Football, Sports, Soccer",
+                "music, violin, orchestra",
+                "football, fun, sports",
+                "music, band, guitar",
+            ]
+        )
 
         s_tfidf = (
             s.pipe(preprocessing.clean)
@@ -117,7 +127,7 @@ class TestVisualization(PandasTestCase):
             .pipe(representation.tfidf)
         )
         s_lda = s_tfidf.pipe(representation.normalize).pipe(
-            representation.lda, n_components=20
+            representation.lda, n_components=2
         )
 
         with warnings.catch_warnings():

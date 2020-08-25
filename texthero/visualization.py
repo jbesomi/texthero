@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 
 from scipy.sparse import csr_matrix, issparse
 from sklearn.preprocessing import normalize as sklearn_normalize
+
 import pyLDAvis
 from pyLDAvis import display as display_notebook
 from pyLDAvis import show as display_browser
@@ -430,7 +431,7 @@ def visualize_topics(s_document_term, s_document_topic):
     - :meth:`texthero.representation.kmeans`
     - :meth:`texthero.representation.meanshift`
     - :meth:`texthero.representation.dbscan`
-    (using clustering functions, documents
+    (using clustering functkmeansions, documents
     that are not assigned to a cluster are
     not considered in the visualization)
     or one of
@@ -444,11 +445,9 @@ def visualize_topics(s_document_term, s_document_topic):
 
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> # Take first 1000 documents of some dataset.
-    >>> df = pd.read_csv("https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/bbcsport.csv")[:100]
-    >>> # Use max_df=0.5, min_df=10 in tfidf to speed things up (fewer features).
-    >>> s_tfidf = df["text"].pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf, max_df=0.5, min_df=10)
-    >>> s_cluster = s_tfidf.pipe(hero.normalize).pipe(hero.pca, n_components=20).pipe(hero.dbscan)
+    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, band, guitar"])
+    >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
+    >>> s_cluster = s_tfidf.pipe(hero.normalize).pipe(hero.pca, n_components=2).pipe(hero.kmeans, n_clusters=2)
     >>> # Display in a new browser window:
     >>> hero.display_browser(hero.visualize_topics(s_tfidf, s_cluster)) # doctest: +SKIP
     >>> # Display inside the current Jupyter Notebook:
@@ -458,12 +457,11 @@ def visualize_topics(s_document_term, s_document_topic):
 
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> df = pd.read_csv("https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/bbcsport.csv")
-    >>> # Use max_df=0.5, min_df=100 in tfidf to speed things up (fewer features).
-    >>> s_tfidf = df["text"].pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf, max_df=0.5, min_df=100)
-    >>> s_lda = s_tfidf.pipe(hero.lda, n_components=20)
+    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, band, guitar"])
+    >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
+    >>> s_lda = s_tfidf.pipe(hero.lda, n_components=5)
     >>> # Display in a new browser window:
-    >>> hero.display_browser(hero.visualize_topics(s_tfidf, s_cluster)) # doctest: +SKIP
+    >>> hero.display_browser(hero.visualize_topics(s_tfidf, s_lda)) # doctest: +SKIP
     >>> # Display inside the current Jupyter Notebook:
     >>> hero.display_notebook(hero.visualize_topics(s_tfidf, s_cluster)) # doctest: +SKIP
 
@@ -496,7 +494,7 @@ def visualize_topics(s_document_term, s_document_topic):
         topic_term_distributions,
     ) = _prepare_matrices_for_pyLDAvis(document_topic_matrix, topic_term_matrix)
 
-    return pyLDAvis.prepare(
+    figure = pyLDAvis.prepare(
         **{
             "vocab": vocab,
             "doc_lengths": doc_lengths,
@@ -504,5 +502,179 @@ def visualize_topics(s_document_term, s_document_topic):
             "doc_topic_dists": document_topic_distributions,
             "topic_term_dists": topic_term_distributions,
             "R": 15,
+            "sort_topics": False,
         }
     )
+
+    return figure
+
+
+def top_words_per_topic(s_document_term, s_clusters, n_words=5):
+    # TODO: add types everywhere when they're merged
+    """
+    Find the top words per topic of your dataset. First input has
+    to be output of one of 
+    - :meth:`texthero.representation.tfidf`
+    - :meth:`texthero.representation.count`
+    - :meth:`texthero.representation.term_frequency`
+
+    (tfidf suggested).
+
+    Second input has to be the result of
+    clustering, so output of one of
+    - :meth:`texthero.representation.kmeans`
+    - :meth:`texthero.representation.meanshift`
+    - :meth:`texthero.representation.dbscan`.
+
+    The function uses the given clustering
+    from the second input, which relates
+    documents to topics. The first input
+    relates documents to terms. From those
+    two relations (documents->topics, documents->terms),
+    the function calculates a distribution of
+    documents to topics, and a distribution
+    of topics to terms. These distributions
+    are used to find the most relevant
+    terms per topic.
+
+    Parameters
+    ----------
+    s_document_term: pd.DataFrame
+
+    One of 
+    - :meth:`texthero.representation.tfidf`
+    - :meth:`texthero.representation.count`
+    - :meth:`texthero.representation.term_frequency`
+
+    s_clusters: pd.Series
+
+    One of
+    - :meth:`texthero.representation.kmeans`
+    - :meth:`texthero.representation.meanshift`
+    - :meth:`texthero.representation.dbscan`
+    - :meth:`texthero.representation.topics_from_topic_model`
+
+    n_words: int, default to 5
+        Number of top words per topic, should
+        be <= 30.
+
+    Examples
+    --------
+    Using Clustering:
+
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, band, guitar"])
+    >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
+    >>> s_cluster = s_tfidf.pipe(hero.normalize).pipe(hero.pca, n_components=2).pipe(hero.kmeans, n_clusters=2)
+    >>> hero.top_words_per_topic(s_tfidf, s_cluster) # doctest: +SKIP
+    Category
+    0    [sports, football, soccer]
+    1    [music, violin, orchestra]
+    Name: Term, dtype: object
+
+    See Also
+    --------
+    `pyLDAvis <https://pyldavis.readthedocs.io/en/latest/>`_
+
+    TODO add tutorial link
+
+    """
+
+    pyLDAvis_result = visualize_topics(s_document_term, s_clusters).to_dict()
+
+    df_topics_and_their_top_words = pd.DataFrame(pyLDAvis_result["tinfo"])
+
+    # Throw out topic "Default"
+    df_topics_and_their_top_words = df_topics_and_their_top_words[
+        df_topics_and_their_top_words["Category"] != "Default"
+    ]
+
+    n_topics = df_topics_and_their_top_words["Category"].nunique()
+
+    # Our topics / clusters begin at 0 -> use i-1
+    replace_dict = {"Topic{}".format(i): i - 1 for i in range(1, n_topics + 1)}
+
+    df_topics_and_their_top_words["Category"] = df_topics_and_their_top_words[
+        "Category"
+    ].replace(replace_dict)
+
+    df_topics_and_their_top_words = df_topics_and_their_top_words.sort_values(
+        ["Category", "Freq"], ascending=[1, 0]
+    )
+
+    s_topics_with_top_words = df_topics_and_their_top_words.groupby("Category")[
+        "Term"
+    ].apply(list)
+
+    s_topics_with_top_words = s_topics_with_top_words.apply(lambda x: x[:n_words])
+
+    return s_topics_with_top_words
+
+
+def top_words_per_document(s_document_term, n_words=3):
+    # TODO: add types everywhere when they're merged
+    """
+    Find the top words per topic of your dataset. First input has
+    to be output of one of 
+    - :meth:`texthero.representation.tfidf`
+    - :meth:`texthero.representation.count`
+    - :meth:`texthero.representation.term_frequency`
+
+    (tfidf suggested).
+
+    TODO
+
+    Parameters
+    ----------
+    s_document_term: pd.DataFrame
+
+    One of 
+    - :meth:`texthero.representation.tfidf`
+    - :meth:`texthero.representation.count`
+    - :meth:`texthero.representation.term_frequency`
+
+    n_words: int, default to 3
+        Number of top words per topic, should
+        be <= 30.
+
+    Examples
+    --------
+    Using Clustering:
+
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, band, guitar"])
+    >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
+    >>> hero.top_words_per_document(s_tfidf, n_words=2) # doctest: +SKIP
+    Category
+    0    [sports, football, soccer]
+    1    [music, violin, orchestra]
+    Name: Term, dtype: object
+
+    See Also
+    --------
+    `pyLDAvis <https://pyldavis.readthedocs.io/en/latest/>`_
+
+    TODO add tutorial link
+
+    """
+
+    s_cluster = pd.Series(s_document_term.index.tolist())
+
+    s_top_words_per_document = top_words_per_topic(
+        s_document_term, s_cluster.astype("category"), n_words=n_words
+    )
+
+    return s_top_words_per_document.reindex(s.index)
+
+
+"""
+TODO
+
+- tests for top_words_per_document, top_words_per_topic, topics_from_topic_model
+    -> try second one also with error when category == -1 somewhere
+
+- docstrings of all functions (also private helpers) + comments
+
+"""

@@ -760,19 +760,3 @@ def top_words_per_document(s_document_term: pd.DataFrame, n_words=3):
     )
 
     return s_top_words_per_document.reindex(s_document_term.index)
-
-
-"""
-import texthero as hero
-import pandas as pd
-df = pd.read_csv(
-    "https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv"
-)
-
-
-s_tfidf = df["text"].pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf, max_df = 0.5, min_df = 100)
-s_lda = s_tfidf.pipe(hero.truncatedSVD, n_components=5)
-# a, b = hero.visualize_topics(s_tfidf, s_lda)
-hero.browser_display(hero.visualize_topics(s_tfidf, s_lda))
-
-"""

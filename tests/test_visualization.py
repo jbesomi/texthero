@@ -186,6 +186,6 @@ class TestVisualization(PandasTestCase):
         )
         s_result = visualization.top_words_per_topic(s_tfidf, s_cluster, n_words=3)
         s_true = pd.Series(
-            [["music", "violin", "orchestra"],["sports", "football", "soccer"]],
+            [["music", "violin", "orchestra"], ["sports", "football", "soccer"]],
         )
         pd.testing.assert_series_equal(s_result, s_true, check_names=False)

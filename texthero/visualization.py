@@ -776,7 +776,9 @@ def top_words_per_document(s_document_term: pd.DataFrame, n_words=3):
     """
     # Create a categorical Series that has
     # one new cluster for every document.
-    s_cluster = pd.Series(s_document_term.index.tolist(), dtype="category")
+    s_cluster = pd.Series(
+        np.arange(len(s_document_term)), index=s_document_term.index, dtype="category"
+    )
 
     # Call top_words_per_topic with the new cluster series
     # (so every document is one distinct "topic")

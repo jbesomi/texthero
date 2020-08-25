@@ -236,7 +236,7 @@ class AbstractRepresentationTest(PandasTestCase):
     """
 
     @parameterized.expand(test_cases_dim_reduction_and_clustering)
-    def test_dim_reduction_and_clustering_with_vector_series_input(
+    def test_dim_reduction_and_clustering_and_topic_modelling_with_vector_series_input(
         self, name, test_function, correct_output
     ):
         s_true = correct_output
@@ -264,7 +264,7 @@ class AbstractRepresentationTest(PandasTestCase):
         )
 
     @parameterized.expand(test_cases_dim_reduction_and_clustering)
-    def test_dim_reduction_and_clustering_with_documenttermDF_input(
+    def test_dim_reduction_and_clustering_and_topic_modelling_with_documenttermDF_input(
         self, name, test_function, correct_output
     ):
         s_true = correct_output

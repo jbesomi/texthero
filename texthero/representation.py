@@ -977,14 +977,14 @@ def lda(
     """
     Performs Latent Dirichlet Allocation on the given pandas series.
 
-    Latent Dirichlet Allocation(LDA) is a topic modeling algorithm 
+    Latent Dirichlet Allocation (LDA) is a topic modeling algorithm 
     based on Dirichlet distribution. In natural language processing
     LDA is often used to categorise documents into diffenrent topics
     and generate top words from these topics. In this process LDA is
-    used in combination with algorithms, which generate document-term-
+    used in combination with algorithms which generate document-term-
     matrixes, like :meth:`count` or :meth:`tfidf`
 
-    TruncatedSVD can directly handle sparse input, so when calling truncatedSVD on a
+    LDA can directly handle sparse input, so when calling truncatedSVD on a
     DocumentTermDF, the advantage of sparseness is kept.
 
     Parameters

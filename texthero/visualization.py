@@ -19,6 +19,8 @@ from scipy.sparse import csr_matrix, issparse
 from sklearn.preprocessing import normalize as sklearn_normalize
 
 import pyLDAvis
+from pyLDAvis import display as notebook_display
+from pyLDAvis import show as browser_display
 
 from collections import Counter
 from typing import Tuple
@@ -324,7 +326,7 @@ def _get_matrices_for_visualize_topics(
 
     Recieves as first argument s_document_term, which is the output of
     tfidf / count / term_frequency. From this, s_document_term.values
-    are the document_term_matrix in the code.
+    is the document_term_matrix in the code.
 
     Recieves as second argument s_document_topic, which is either
     the output of a clustering function (so a categorical Series)
@@ -444,10 +446,7 @@ def _prepare_matrices_for_pyLDAvis(
 
 
 def visualize_topics(
-    s_document_term: pd.DataFrame,
-    s_document_topic: pd.Series,
-    show_in_new_window=False,
-    return_figure=False,
+    s_document_term: pd.DataFrame, s_document_topic: pd.Series, return_figure=False,
 ):
     # TODO: add types everywhere when they're merged
     """
@@ -485,8 +484,8 @@ def visualize_topics(
 
 
     **To show the plot**:
-    - Interactively in a Jupyter Notebook: set show_in_new_window to False
-    - In a new browser window: set show_in_new_window to True
+    - Interactively in a Jupyter Notebook: use `hero.notebook_display(hero.visualize_topics(...))`
+    - In a new browser window: `hero.browser_display(hero.visualize_topics(...))`
 
     Parameters
     ----------
@@ -508,15 +507,6 @@ def visualize_topics(
         :meth:`texthero.representation.lda`
         :meth:`texthero.representation.truncatedSVD`
 
-    show_in_new_window: bool, default to True
-        Whether to open a new browser window or
-        show the visualization inline (only
-        supported in Jupyter Notebooks).
-
-    return_figure: bool, default False
-        Whether to return the figure
-        instead of visualizing it.
-
     Examples
     --------
     Using Clustering:
@@ -527,9 +517,9 @@ def visualize_topics(
     >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
     >>> s_cluster = s_tfidf.pipe(hero.normalize).pipe(hero.pca, n_components=2).pipe(hero.kmeans, n_clusters=2)
     >>> # Display in a new browser window:
-    >>> hero.visualize_topics(s_tfidf, s_cluster, show_in_new_window=True) # doctest: +SKIP
+    >>> hero.browser_display(hero.visualize_topics(s_tfidf, s_cluster, show_in_new_window=True)) # doctest: +SKIP
     >>> # Display inside the current Jupyter Notebook:
-    >>> hero.visualize_topics(s_tfidf, s_cluster, show_in_new_window=False) # doctest: +SKIP
+    >>> hero.notebook_display(hero.visualize_topics(s_tfidf, s_cluster, show_in_new_window=False)) # doctest: +SKIP
 
     Using LDA:
 
@@ -590,16 +580,7 @@ def visualize_topics(
         }
     )
 
-    if return_figure:
-        return figure
-    else:
-        # Different pyLDAvis functions
-        # for showing in new window and
-        # showing inside a notebook.
-        if show_in_new_window:
-            pyLDAvis.show(figure)
-        else:
-            pyLDAvis.display(figure)
+    return figure
 
 
 def top_words_per_topic(
@@ -619,7 +600,8 @@ def top_words_per_topic(
     clustering, so output of one of
     - :meth:`texthero.representation.kmeans`
     - :meth:`texthero.representation.meanshift`
-    - :meth:`texthero.representation.dbscan`.
+    - :meth:`texthero.representation.dbscan`
+    - :meth:`texthero.representation.topics_from_topic_model`
 
     The function uses the given clustering
     from the second input, which relates

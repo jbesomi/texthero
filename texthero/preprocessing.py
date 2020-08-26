@@ -1007,7 +1007,7 @@ def filter_extremes(
     -------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>>  s = pd.Series(
+    >>> s = pd.Series(
     ...        [
     ...         "Here one two one one one go there",
     ...         "two go one one one two two two is important",
@@ -1016,7 +1016,7 @@ def filter_extremes(
     >>> s.pipe(hero.tokenize).pipe(hero.filter_extremes, 3)
     0              [one, two, one, one, one, go]
     1    [two, go, one, one, one, two, two, two]
-
+    dtype: object
     """
     # Use term_frequency to do the filtering
     # for us (cannot do this faster as we

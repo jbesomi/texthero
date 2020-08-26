@@ -1010,9 +1010,9 @@ def describe(s: TextSeries, s_labels: pd.Series = None) -> pd.DataFrame:
     description["number of documents"] = len(s.index)
     description["number of unique documents"] = len(s.unique())
     description["number of missing documents"] = (~has_content_mask).sum()
-    description["most common words"] = visualization.top_words(s).index[:10].values
+    description["most common words"] = visualization.top_words(s).index[:10].tolist()
     description["most common words excluding stopwords"] = (
-        s.pipe(clean).pipe(visualization.top_words).index[:10].values
+        s.pipe(clean).pipe(visualization.top_words).index[:10].tolist()
     )
 
     description["average document length"] = document_lengths_description["mean"]

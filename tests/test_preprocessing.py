@@ -381,3 +381,78 @@ class TestPreprocessing(PandasTestCase):
         s_true = pd.Series("Hi  , we will remove you")
 
         self.assertEqual(preprocessing.remove_hashtags(s), s_true)
+
+    """
+    Test train_test_split
+    """
+
+    def test_train_test_split(self):
+        df = pd.DataFrame(["Here", "hello", "there", "Test"])
+        train_set, test_set = preprocessing.train_test_split(
+            df, random_state=42, test=0.5
+        )
+        df_train_true = pd.DataFrame(["Here", "there"], index=[0, 2])
+        df_test_true = pd.DataFrame(["hello", "Test"], index=[1, 3])
+        pd.testing.assert_frame_equal(train_set, df_train_true)
+        pd.testing.assert_frame_equal(test_set, df_test_true)
+
+    def test_train_test_split_wrong_param(self):
+        df = pd.DataFrame(["Here", "hello", "there", "Test"])
+        self.assertRaises(
+            ValueError, preprocessing.train_test_split, df=df, random_state=42, val=0.4
+        )
+
+    def test_train_test_split_wrong_param_2(self):
+        df = pd.DataFrame(["Here", "hello", "there", "Test"])
+        self.assertRaises(
+            ValueError,
+            preprocessing.train_test_split,
+            df=df,
+            random_state=42,
+            train=5,
+            test=3,
+        )
+
+    def test_train_test_val_split(self):
+        df = pd.DataFrame(["Here", "hello", "there", "Test"])
+        train_set, test_set, val_set = preprocessing.train_test_split(
+            df, random_state=42, test=0.5, val=0.25
+        )
+        df_train_true = pd.DataFrame(["there"], index=[2])
+        df_test_true = pd.DataFrame(["Test", "Here"], index=[3, 0])
+        df_val_true = pd.DataFrame(["hello"], index=[1])
+
+        pd.testing.assert_frame_equal(train_set, df_train_true)
+        pd.testing.assert_frame_equal(test_set, df_test_true)
+        pd.testing.assert_frame_equal(val_set, df_val_true)
+
+    def test_train_val_split_class_balance(self):
+        df = pd.DataFrame(
+            [
+                ["Here", 1],
+                ["hello", 1],
+                ["hello", 1],
+                ["there", 0],
+                ["there", 0],
+                ["Test", 0],
+                ["Bang", 2],
+                ["Bang", 2],
+                ["Bang", 2],
+            ]
+        )
+        train_set, test_set, val_set = preprocessing.train_test_split(
+            df, random_state=42, test=0.33, val=0.33, class_balance=df[1]
+        )
+        df_train_true = pd.DataFrame(
+            [["hello", 1], ["Bang", 2], ["there", 0]], index=[1, 6, 3]
+        )
+        df_test_true = pd.DataFrame(
+            [["Here", 1], ["Test", 0], ["Bang", 2]], index=[0, 5, 7]
+        )
+        df_val_true = pd.DataFrame(
+            [["hello", 1], ["Bang", 2], ["there", 0]], index=[2, 8, 4]
+        )
+
+        pd.testing.assert_frame_equal(train_set, df_train_true)
+        pd.testing.assert_frame_equal(test_set, df_test_true)
+        pd.testing.assert_frame_equal(val_set, df_val_true)

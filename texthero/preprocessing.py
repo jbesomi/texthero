@@ -7,6 +7,8 @@ import re
 import string
 from typing import Optional, Set
 import unicodedata
+import math
+from sklearn.model_selection import train_test_split as sklearn_train_test_split
 
 import numpy as np
 import pandas as pd
@@ -968,8 +970,10 @@ def train_test_split(
     val=0.0,
     class_balance=None,
     shuffle=True,
-    random_state=None
-) -> Union[Tuple[pd.DataFrame, pd.DataFrame], Tuple[pd.DataFrame, pd.DataFrame. pd.DataFrame]]:
+    random_state=None,
+) -> Union[
+    Tuple[pd.DataFrame, pd.DataFrame], Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]
+]:
     """
     Split DataFrame into random train and test (and validation) subsets
 
@@ -982,7 +986,6 @@ def train_test_split(
         If float, should be between 0.0 and 1.0 and represent the proportion of the dataset to include in the train split. 
         If int, represents the absolute number of train samples. 
         If 0.0, the value is automatically set to the complement of the test size.
-
 
     test: float or int, default=0.0
         If float, should be between 0.0 and 1.0 and represent the proportion of the dataset to include in the test split. 
@@ -1008,7 +1011,7 @@ def train_test_split(
 
     Return
     ------
-    train_set, test_set, Optional(val_set):
+    train_set, test_set, Optional[val_set]:
       Union[Tuple(pd.DataFrame, pd.DataFrame), Tuple(pd.DataFrame, pd.DataFrame. pd.DataFrame)]
         If val was not set, it will return a tuple of two DataFrames with the the
         train_set DataFrame on the first position and the test_set at the second
@@ -1020,9 +1023,33 @@ def train_test_split(
 
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> df = pd.read_csv("https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/bbcsport.csv")
-    >>>  
-        
+    >>> df = pd.read_csv(
+    ...    "https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/bbcsport.csv"
+    ... ) # doctest: +SKIP
+    >>> train_df, test_df = hero.train_test_split(
+    ...                  df, class_balance = df["topic"], random_state = 42, train=0.8
+    ... ) # doctest: +SKIP
+    >>> len(train_df) # doctest: +SKIP
+    589
+    >>> len(test_df) # doctest: +SKIP
+    148
+    >>> # to check wether we have a equal class distribution (in this case a class is a topic)
+    >>> # we will look at the percentage of each topic in the DataFrame
+    >>> train_df["topic"].value_counts() / train_df["topic"].value_counts().sum() # doctest: +SKIP
+    football     0.359932
+    rugby        0.198642
+    cricket      0.168081
+    athletics    0.137521
+    tennis       0.135823
+    Name: topic, dtype: float64
+    >>> # and now the same for the test dataset
+    >>> test_df["topic"].value_counts() / test_df["topic"].value_counts().sum() # doctest: +SKIP
+    football     0.358108
+    rugby        0.202703
+    cricket      0.168919
+    athletics    0.135135
+    tennis       0.135135
+    Name: topic, dtype: float64
     """
     # Will use the index for splitting internally
     index = df.index
@@ -1030,7 +1057,8 @@ def train_test_split(
 
     # Some parameters might be set to Int (= absolute no. of samples) -> transform to proportion
     train, test, val = map(
-        lambda x: x / n_samples if isinstance(x, int) else x, [train, test, val])
+        lambda x: x / n_samples if isinstance(x, int) else x, [train, test, val]
+    )
 
     # Cover all cases of input combinations
     # (we do this very explicitly so it's clear for debugging etc.)
@@ -1062,7 +1090,8 @@ def train_test_split(
     if not math.isclose(train + test + val, 1.0):
         raise ValueError(
             "The sum of test, train and val = {}, but it has to be equal to 1.0.".format(
-                train + test + val)
+                train + test + val
+            )
         )
 
     # Sklearn only splits into two sets (does not know validation set),
@@ -1076,7 +1105,7 @@ def train_test_split(
         test_size=test + val,
         random_state=random_state,
         stratify=class_balance,
-        shuffle=shuffle
+        shuffle=shuffle,
     )
 
     # Split 2:
@@ -1104,31 +1133,19 @@ def train_test_split(
             test_size=val,
             random_state=random_state,
             stratify=class_balance,
-            shuffle=shuffle
+            shuffle=shuffle,
         )
 
         # Return 2 DFs (3 if val != 0) by splitting along the index.
-        df_train, df_test, df_val = df.loc[index_train,
-                                           :], df.loc[index_test, :], df.loc[index_val, :]
+        df_train, df_test, df_val = (
+            df.loc[index_train, :],
+            df.loc[index_test, :],
+            df.loc[index_val, :],
+        )
 
         return df_train, df_test, df_val
 
     else:
-        df_train, df_test = df.loc[index_train,
-                                   :], df.loc[index_test_and_val, :]
+        df_train, df_test = df.loc[index_train, :], df.loc[index_test_and_val, :]
 
         return df_train, df_test
-
-
-"""
-train_df, test_df = train_test_split(
-    df,
-    class_balance = df["topic"]
-)
-
-train_df["topic"].value_counts() / train_df["topic"].value_counts().sum()
-
-    test_df["topic"].value_counts() / test_df["topic"].value_counts().sum()
-
-
-"""

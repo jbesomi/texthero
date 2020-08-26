@@ -381,3 +381,12 @@ class TestPreprocessing(PandasTestCase):
         s_true = pd.Series("Hi  , we will remove you")
 
         self.assertEqual(preprocessing.remove_hashtags(s), s_true)
+
+    """
+    Test describe DataFrame
+    """
+    def test_describe(self):
+        df = pd.DataFrame([["Here we go", "sport"],["There football England", "sport"], ["There rugby Australia", "sport"],[np.nan, "music"], ["super good music, like it", pd.NA], [pd.NA, pd.NA], ["This concert was so great", "music"]], columns= ["text", "topics"])
+        df_description = preprocessing.describe(df[0], df[1])
+        df_true = None
+        pd.testing.assert_frame_equal(df_true, df_description)

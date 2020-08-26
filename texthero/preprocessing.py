@@ -962,7 +962,10 @@ def remove_hashtags(s: TextSeries) -> TextSeries:
     return replace_hashtags(s, " ")
 
 
-def filter_extremes(s: pd.Series, max_words=None, min_df=1, max_df=1.0):
+@InputSeries(TokenSeries)
+def filter_extremes(
+    s: TokenSeries, max_words=None, min_df=1, max_df=1.0
+) -> TokenSeries:
     """
     Decrease the size of your documents by
     filtering out words by their frequency.
@@ -999,6 +1002,20 @@ def filter_extremes(s: pd.Series, max_words=None, min_df=1, max_df=1.0):
         Remove words that have a document frequency
         higher than max_df. If float, it represents a
         proportion of documents, integer absolute counts.
+
+    Example
+    -------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>>  s = pd.Series(
+    ...        [
+    ...         "Here one two one one one go there",
+    ...         "two go one one one two two two is important",
+    ...     ]
+    ... )
+    >>> s.pipe(hero.tokenize).pipe(hero.filter_extremes, 3)
+    0              [one, two, one, one, one, go]
+    1    [two, go, one, one, one, two, two, two]
 
     """
     # Use term_frequency to do the filtering

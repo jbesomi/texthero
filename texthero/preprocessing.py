@@ -16,7 +16,7 @@ from nltk.stem import PorterStemmer, SnowballStemmer
 from texthero import stopwords as _stopwords
 from texthero._types import TokenSeries, TextSeries, InputSeries
 
-from typing import List, Callable, Union
+from typing import List, Callable, Union, Tuple
 
 # Ignore gensim annoying warnings
 import warnings
@@ -959,3 +959,162 @@ def remove_hashtags(s: TextSeries) -> TextSeries:
         with a custom symbol.
     """
     return replace_hashtags(s, " ")
+
+
+def train_test_split(
+    df,
+    train=0.0,
+    test=0.0,
+    val=0.0,
+    class_balance=None,
+    shuffle=True,
+    random_state=None
+) -> Union[Tuple[pd.DataFrame, pd.DataFrame], Tuple[pd.DataFrame, pd.DataFrame. pd.DataFrame]]:
+    """
+    Split DataFrame into random train and test (and validation) subsets
+
+    For most maschine learning techniques it is important to split the dataset 
+    into different sub-sets to prevent overfitting
+
+    Parameters
+    ----------
+    train: float or int, default=0.0
+        If float, should be between 0.0 and 1.0 and represent the proportion of the dataset to include in the train split. 
+        If int, represents the absolute number of train samples. 
+        If 0.0, the value is automatically set to the complement of the test size.
+
+
+    test: float or int, default=0.0
+        If float, should be between 0.0 and 1.0 and represent the proportion of the dataset to include in the test split. 
+        If int, represents the absolute number of test samples. 
+        If 0.0, the value is set to the complement of the train size. 
+        If train_size is also 0.0, it will be set to 0.3.
+
+    val: float or int, default=0.0
+        If float, should be between 0.0 and 1.0 and represent the proportion of the dataset to include in the validation split. 
+        If int, represents the absolute number of validation samples. 
+        If 0.0, there will be no validation set created
+    
+    random_state: int or RandomState instance, default=None
+        Controls the shuffling applied to the data before applying the split. 
+        Pass an int for reproducible output across multiple function calls.
+    
+    shuffle: bool, default=True
+        Whether or not to shuffle the data before splitting. If shuffle=False then stratify must be None.
+   
+    stratify: array-like, default=None
+        If not None, data is split in a stratified fashion, using this as the class labels.
+
+
+    Return
+    ------
+    train_set, test_set, Optional(val_set):
+      Union[Tuple(pd.DataFrame, pd.DataFrame), Tuple(pd.DataFrame, pd.DataFrame. pd.DataFrame)]
+        If val was not set, it will return a tuple of two DataFrames with the the
+        train_set DataFrame on the first position and the test_set at the second
+        If val was set, it will return a tuple of three DataFrames with a validation_set
+        as a third entry
+
+    Example
+    -------
+
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> df = pd.read_csv("https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/bbcsport.csv")
+    >>>  
+        
+    """
+    # Will use the index for splitting internally
+    index = df.index
+    n_samples = len(index)
+
+    # Some parameters might be set to Int (= absolute no. of samples) -> transform to proportion
+    train, test, val = map(
+        lambda x: x / n_samples if isinstance(x, int) else x, [train, test, val])
+
+    # Cover all cases of input combinations
+    # (we do this very explicitly so it's clear for debugging etc.)
+
+    if not val:
+        if train and (not test):
+            test = 1.0 - train
+        elif (not train) and test:
+            train = 1.0 - test
+        elif (not train) and (not test):
+            # Default split if nothing is set
+            train, test = 0.7, 0.3
+        else:
+            # both set
+            pass
+
+    else:
+        if train and (not test):
+            test = 1.0 - train - val
+        elif (not train) and test:
+            train = 1.0 - val - test
+        elif (not train) and (not test):
+            raise ValueError("Cannot set only size of validation set.")
+        else:
+            # all three set
+            pass
+
+    # Validate the input.
+    if not math.isclose(train + test + val, 1.0):
+        raise ValueError(
+            "The sum of test, train and val = {}, but it has to be equal to 1.0.".format(
+                train + test + val)
+        )
+
+    # Sklearn only splits into two sets (does not know validation set),
+    # so we do two splits (on the DF's index). First to index_train and combined index_test_and_val,
+    # then we split the combined index_test_and_val into index_test and index_val.
+
+    # Split 1: split into train, test_and_val.
+    index_train, index_test_and_val = sklearn_train_test_split(
+        index,
+        train_size=train,
+        test_size=test + val,
+        random_state=random_state,
+        stratify=class_balance,
+        shuffle=shuffle
+    )
+
+    # Split 2:
+    # If users want to use a Y-column with class labels for
+    # stratification, we update it here to match the
+    # remaining X values for test_and_val.
+    if class_balance is not None:
+        class_balance = class_balance[index_test_and_val]
+
+    # We now adjust the proportions of train and test to
+    # add up to one (they're currently relative to the
+    # size of the whole dataset; they now need to be
+    # relative to the size of the remaining test_and_val dataset).
+    # E.g. test=0.3, val=0.1, so they are the proportions
+    # of the total df. This should now become
+    # test = 0.3 / (0.3 + 0.1) = 0.75 and val = 0.1 / (0.3 + 0.1) = 0.25
+    # to get them as proportions of the remaining dataset.
+    test, val = test / (test + val), val / (test + val)
+
+    if val > 0.0:  # sklearn cannot handle test_size = 0.0
+
+        index_test, index_val = sklearn_train_test_split(
+            index_test_and_val,
+            train_size=test,
+            test_size=val,
+            random_state=random_state,
+            stratify=class_balance,
+            shuffle=shuffle
+        )
+
+        # Return 2 DFs (3 if val != 0) by splitting along the index.
+        df_train, df_test, df_val = df.loc[index_train,
+                                           :], df.loc[index_test, :], df.loc[index_val, :]
+
+        return df_train, df_test, df_val
+
+    else:
+        df_train, df_test = df.loc[index_train,
+                                   :], df.loc[index_test_and_val, :]
+
+        return df_train, df_test

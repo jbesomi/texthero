@@ -15,6 +15,7 @@ from nltk.stem import PorterStemmer, SnowballStemmer
 
 from texthero import stopwords as _stopwords
 from texthero._types import TokenSeries, TextSeries, InputSeries
+from texthero import visualization
 
 from typing import List, Callable, Union
 
@@ -959,3 +960,53 @@ def remove_hashtags(s: TextSeries) -> TextSeries:
         with a custom symbol.
     """
     return replace_hashtags(s, " ")
+
+
+@InputSeries(TextSeries)
+def describe(s: TextSeries, s_labels: pd.Series = None) -> pd.Series:
+    """
+    Return general descriptions 
+    """
+    # Get values we need for several calculations.
+    description = {}
+    s_tokenized = tokenize(s)
+    has_content_mask = has_content(s)
+    document_lengths = s_tokenized[has_content_mask].map(lambda x: len(x))
+    document_lengths_description = document_lengths.describe()
+
+    # Collect statistics.
+    description["number of documents"] = len(s.index)
+    description["number of unique documents"] = len(s.unique())
+    description["number of missing documents"] = (~has_content_mask).sum()
+    description["most common words"] = visualization.top_words(s).index[:10].values
+    description["most common words excluding stopwords"] = s.pipe(clean).pipe(visualization.top_words).index[:10].values
+
+    description["average document length"] = document_lengths_description["mean"]
+    description["length of shortest document"] = document_lengths_description["min"]
+    description["length of longest document"] = document_lengths_description["max"]
+    description["standard deviation of document lengths"] = document_lengths_description["std"]
+    description["variance of document lengths"] = document_lengths_description["std"] ** 2
+    description["25th percentile document lengths"] = document_lengths_description["25%"]
+    description["50th percentile document lengths"] = document_lengths_description["50%"]
+    description["75th percentile document lengths"] = document_lengths_description["75%"]
+
+    # Create output Series.
+    s_description = pd.Series(description)
+
+    # Potentially add information about label distribution.
+    if s_labels is not None:
+
+        s_labels_distribution = s_labels.value_counts() / s_labels.value_counts().sum()
+
+        # Put the labels distribution into s_description with multiindex to look nice.
+        s_labels_distribution.index = pd.MultiIndex.from_product(
+            [["label distribution"], s_labels_distribution.index.values]
+        )
+
+        s_description.index = pd.MultiIndex.from_product(
+            [s_description.index.values, [""]]
+        )
+
+        s_description = pd.concat([s_description, s_labels_distribution])
+
+    return s_description

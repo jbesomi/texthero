@@ -15,6 +15,7 @@ from nltk.stem import PorterStemmer, SnowballStemmer
 
 from texthero import stopwords as _stopwords
 from texthero._types import TokenSeries, TextSeries, InputSeries
+from texthero import representation
 
 from typing import List, Callable, Union
 
@@ -959,3 +960,26 @@ def remove_hashtags(s: TextSeries) -> TextSeries:
         with a custom symbol.
     """
     return replace_hashtags(s, " ")
+
+
+def filter_extremes(
+    s: pd.Series,
+    max_features=None,
+    min_df=1,
+    max_df=1.0
+):
+    """
+    Filter out tokens in the dictionary by their frequency.
+    """
+
+    s_term_frequency = representation.term_frequency(
+        s,
+        max_features=max_features,
+        min_df=min_df,
+        max_df=max_df
+    )
+
+    tokens_to_keep = set(s_term_frequency.columns.levels[1])
+
+    # FIXME: Parallelize this after #162 is merged.
+    return s.apply(lambda token_list: [token for token in token_list if token in tokens_to_keep])

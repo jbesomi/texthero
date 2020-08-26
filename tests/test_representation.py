@@ -142,16 +142,29 @@ s_documenttermDF = pd.DataFrame(
 
 test_cases_dim_reduction_and_clustering = [
     # format: [function_name, function, correct output for s_vector_series and s_documenttermDF input above]
-    ["pca", representation.pca, pd.Series([[-0.5, 0.0], [0.5, 0.0]], index=[5, 7],),],
+    [
+        "pca",
+        representation.pca,
+        pd.Series(
+            [[-0.5, 0.0], [0.5, 0.0]],
+            index=[5, 7],
+        ),
+    ],
     [
         "nmf",
         representation.nmf,
-        pd.Series([[5.119042424626627, 0.0], [0.0, 0.0]], index=[5, 7],),
+        pd.Series(
+            [[5.119042424626627, 0.0], [0.0, 0.0]],
+            index=[5, 7],
+        ),
     ],
     [
         "tsne",
         representation.tsne,
-        pd.Series([[164.86682, 1814.1647], [-164.8667, -1814.1644]], index=[5, 7],),
+        pd.Series(
+            [[164.86682, 1814.1647], [-164.8667, -1814.1644]],
+            index=[5, 7],
+        ),
     ],
     [
         "kmeans",
@@ -171,7 +184,10 @@ test_cases_dim_reduction_and_clustering = [
     [
         "normalize",
         representation.normalize,
-        pd.Series([[1.0, 0.0], [0.0, 0.0]], index=[5, 7],),
+        pd.Series(
+            [[1.0, 0.0], [0.0, 0.0]],
+            index=[5, 7],
+        ),
     ],
 ]
 
@@ -283,5 +299,9 @@ class AbstractRepresentationTest(PandasTestCase):
         )
 
         pd.testing.assert_frame_equal(
-            result, correct_output, check_dtype=False, rtol=0.1, atol=0.1,
+            result,
+            correct_output,
+            check_dtype=False,
+            rtol=0.1,
+            atol=0.1,
         )

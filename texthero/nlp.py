@@ -156,7 +156,7 @@ def pos_tag(s: TextSeries) -> pd.Series:
     coarse-grained POS has a NOUN value, then the refined POS will give more
     details about the type of the noun, whether it is singular, plural and/or
     proper.
-    
+
     You can use the spacy `explain` function to find out which fine-grained
     POS it is.
 

@@ -78,7 +78,7 @@ def count(
 
     min_df : float in range [0.0, 1.0] or int, default=1
         When building the vocabulary ignore terms that have a document
-        frequency (number of documents they appear in) strictly 
+        frequency (number of documents they appear in) strictly
         lower than the given threshold.
         If float, the parameter represents a proportion of documents, integer
         absolute counts.
@@ -98,11 +98,11 @@ def count(
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
     >>> hero.count(s) # doctest: +SKIP
-         count        
+         count
       Sentence one two
     0        1   1   0
     1        1   0   1
-   
+
     See Also
     --------
 
@@ -136,7 +136,10 @@ def count(
 
 
 def term_frequency(
-    s: pd.Series, max_features: Optional[int] = None, min_df=1, max_df=1.0,
+    s: pd.Series,
+    max_features: Optional[int] = None,
+    min_df=1,
+    max_df=1.0,
 ) -> pd.DataFrame:
     """
     Represent a text-based Pandas Series using term frequency.
@@ -159,7 +162,7 @@ def term_frequency(
 
     min_df : float in range [0.0, 1.0] or int, default=1
         When building the vocabulary ignore terms that have a document
-        frequency (number of documents they appear in) strictly 
+        frequency (number of documents they appear in) strictly
         lower than the given threshold.
         If float, the parameter represents a proportion of documents, integer
         absolute counts.
@@ -176,7 +179,7 @@ def term_frequency(
     >>> import pandas as pd
     >>> s = pd.Series(["Text Text of doc one", "Text of of doc two", "Aha hi bnd one"]).pipe(hero.tokenize)
     >>> hero.term_frequency(s)  # doctest: +SKIP
-    term_frequency                                      
+    term_frequency
                 Aha Text   bnd  doc    hi   of   one  two
     0           0.00  0.4  0.00  0.2  0.00  0.2  0.20  0.0
     1           0.00  0.2  0.00  0.2  0.00  0.4  0.00  0.2
@@ -199,7 +202,12 @@ def term_frequency(
     return s_term_frequency
 
 
-def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFrame:
+def tfidf(
+    s: pd.Series,
+    max_features=None,
+    min_df=1,
+    max_df=1.0,
+) -> pd.DataFrame:
     """
     Represent a text-based Pandas Series using TF-IDF.
 
@@ -218,7 +226,7 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFram
 
     Finally, tf-idf(document d, term t) = tf(d, t) * idf(t).
 
-    Different from the `sklearn-implementation of 
+    Different from the `sklearn-implementation of
     tfidf <https://scikit-learn.org/stable/modules/generated/sklearn.feature_
     extraction.text.TfidfVectorizer.html>`, this function does *not* normalize
     the output in any way, so the result is exactly what you get applying the
@@ -240,7 +248,7 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFram
 
     min_df : float in range [0.0, 1.0] or int, default=1
         When building the vocabulary ignore terms that have a document
-        frequency (number of documents they appear in) strictly 
+        frequency (number of documents they appear in) strictly
         lower than the given threshold.
         If float, the parameter represents a proportion of documents, integer
         absolute counts.
@@ -258,7 +266,7 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFram
     >>> import pandas as pd
     >>> s = pd.Series(["Hi Bye", "Test Bye Bye"]).pipe(hero.tokenize)
     >>> hero.tfidf(s) # doctest: +SKIP
-      tfidf                    
+      tfidf
         Bye        Hi      Test
     0   1.0  1.405465  0.000000
     1   2.0  0.000000  1.405465
@@ -386,7 +394,7 @@ def nmf(
     natural language processing to find clusters of similar
     texts (e.g. some texts in a corpus might be about sports
     and some about music, so they will differ in the usage
-    of technical terms; see the example below). 
+    of technical terms; see the example below).
 
     Given a document-term matrix (so in
     texthero usually a Series after applying
@@ -429,7 +437,7 @@ def nmf(
     >>> # As we can see, the third document, which
     >>> # is a mix of sports and music, is placed
     >>> # between the two axes (the topics) while
-    >>> # the other documents are placed right on 
+    >>> # the other documents are placed right on
     >>> # one topic axis each.
 
     See also
@@ -438,7 +446,11 @@ def nmf(
     <https://en.wikipedia.org/wiki/Non-negative_matrix_factorization>`_
 
     """
-    nmf = NMF(n_components=n_components, init="random", random_state=random_state,)
+    nmf = NMF(
+        n_components=n_components,
+        init="random",
+        random_state=random_state,
+    )
 
     if _check_is_valid_DocumentTermDF(s):
         s_coo = s.sparse.to_coo()
@@ -568,11 +580,11 @@ def kmeans(
     Performs K-means clustering algorithm.
 
     K-means clustering is used in natural language processing
-    to separate texts into k clusters (groups) 
+    to separate texts into k clusters (groups)
     (e.g. some texts in a corpus might be about sports
     and some about music, so they will differ in the usage
     of technical terms; the K-means algorithm uses this
-    to separate them into two clusters). 
+    to separate them into two clusters).
 
     Given a document-term matrix (so in
     texthero usually a Series after applying
@@ -905,7 +917,7 @@ def normalize(s: Union[pd.DataFrame, pd.Series], norm="l2") -> pd.Series:
     >>> col = pd.MultiIndex.from_tuples([(0, "a"), (0, "b"), (1, "c"), (1, "d")])
     >>> s = pd.DataFrame([[1, 2, 3, 4],[4, 2, 7, 5],[2, 2, 3, 5],[1, 2, 9, 8]], columns=col).astype("Sparse")
     >>> hero.normalize(s, norm="max") # doctest: +SKIP
-              0               1          
+              0               1
               a         b     c         d
     0  0.250000  0.500000  0.75  1.000000
     1  0.571429  0.285714  1.00  0.714286

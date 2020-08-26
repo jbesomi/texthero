@@ -38,8 +38,8 @@ def fillna(s: TextSeries) -> TextSeries:
     >>> s = pd.Series(["I'm", np.NaN, pd.NA, "You're"])
     >>> hero.fillna(s)
     0       I'm
-    1          
-    2          
+    1
+    2
     3    You're
     dtype: object
     """
@@ -51,7 +51,7 @@ def lowercase(s: TextSeries) -> TextSeries:
     """
     Lowercase all texts in a series.
 
-    
+
     Examples
     --------
     >>> import texthero as hero
@@ -129,10 +129,10 @@ def remove_digits(s: TextSeries, only_blocks=True) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("7ex7hero is fun 1111")
     >>> hero.preprocessing.remove_digits(s)
-    0    7ex7hero is fun  
+    0    7ex7hero is fun
     dtype: object
     >>> hero.preprocessing.remove_digits(s, only_blocks=False)
-    0     ex hero is fun  
+    0     ex hero is fun
     dtype: object
     """
 
@@ -145,8 +145,8 @@ def replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
     Replace all punctuation with a given symbol.
 
     Replace all punctuation from the given
-    Pandas Series with a custom symbol. 
-    It considers as punctuation characters all :data:`string.punctuation` 
+    Pandas Series with a custom symbol.
+    It considers as punctuation characters all :data:`string.punctuation`
     symbols `!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~).`
 
 
@@ -155,7 +155,7 @@ def replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
     s : :class:`texthero._types.TextSeries`
 
     symbol : str (default single empty space)
-        Symbol to use as replacement for all string punctuation. 
+        Symbol to use as replacement for all string punctuation.
 
     Examples
     --------
@@ -163,7 +163,7 @@ def replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("Finnaly.")
     >>> hero.replace_punctuation(s, " <PUNCT> ")
-    0    Finnaly <PUNCT> 
+    0    Finnaly <PUNCT>
     dtype: object
     """
 
@@ -188,7 +188,7 @@ def remove_punctuation(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("Finnaly.")
     >>> hero.remove_punctuation(s)
-    0    Finnaly 
+    0    Finnaly
     dtype: object
     """
     return replace_punctuation(s, " ")
@@ -310,7 +310,7 @@ def replace_stopwords(
 
     stopwords : Set[str], Optional
         Set of stopwords string to remove. If not passed, by default it used
-        NLTK English stopwords. 
+        NLTK English stopwords.
 
     Examples
     --------
@@ -366,7 +366,7 @@ def remove_stopwords(
     >>> custom_stopwords = default_stopwords.union(set(["heroes"]))
     >>> s = pd.Series("Texthero is not only for the heroes")
     >>> hero.remove_stopwords(s, custom_stopwords)
-    0    Texthero      
+    0    Texthero
     dtype: object
 
 
@@ -476,7 +476,7 @@ def clean(s: TextSeries, pipeline=None) -> TextSeries:
 
     pipeline :List[Callable[[Pandas Series], Pandas Series]]
        inserting specific pipeline to clean a text
-   
+
     Examples
     --------
     For the default pipeline:
@@ -551,7 +551,7 @@ def remove_round_brackets(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("Texthero (is not a superhero!)")
     >>> hero.remove_round_brackets(s)
-    0    Texthero 
+    0    Texthero
     dtype: object
 
     See also
@@ -577,7 +577,7 @@ def remove_curly_brackets(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("Texthero {is not a superhero!}")
     >>> hero.remove_curly_brackets(s)
-    0    Texthero 
+    0    Texthero
     dtype: object
 
     See also
@@ -603,7 +603,7 @@ def remove_square_brackets(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("Texthero [is not a superhero!]")
     >>> hero.remove_square_brackets(s)
-    0    Texthero 
+    0    Texthero
     dtype: object
 
     See also
@@ -630,7 +630,7 @@ def remove_angle_brackets(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("Texthero <is not a superhero!>")
     >>> hero.remove_angle_brackets(s)
-    0    Texthero 
+    0    Texthero
     dtype: object
 
     See also
@@ -657,7 +657,7 @@ def remove_brackets(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("Texthero (round) [square] [curly] [angle]")
     >>> hero.remove_brackets(s)
-    0    Texthero    
+    0    Texthero
     dtype: object
 
     See also
@@ -760,13 +760,13 @@ def phrases(
     Parameters
     ----------
     s : :class:`texthero._types.TokenSeries`
-    
+
     min_count : Int, optional. Default is 5.
         ignore tokens with frequency less than this
-        
+
     threshold : Int, optional. Default is 10.
         ignore tokens with a score under that threshold
-        
+
     symbol : Str, optional. Default is '_'.
         character used to join collocation words
 
@@ -844,7 +844,7 @@ def remove_urls(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("Go to: https://example.com")
     >>> hero.remove_urls(s)
-    0    Go to:  
+    0    Go to:
     dtype: object
 
     See also
@@ -915,7 +915,7 @@ def replace_hashtags(s: TextSeries, symbol: str) -> TextSeries:
     """Replace all hashtags from a Pandas Series with symbol
 
     A hashtag is a string formed by # concatenated with a sequence of
-    characters, digits and underscores. Example: #texthero_123. 
+    characters, digits and underscores. Example: #texthero_123.
 
     Parameters
     ----------
@@ -923,7 +923,7 @@ def replace_hashtags(s: TextSeries, symbol: str) -> TextSeries:
 
     symbols : str
         Symbols to replace
-    
+
     Examples
     --------
     >>> import texthero as hero
@@ -943,7 +943,7 @@ def remove_hashtags(s: TextSeries) -> TextSeries:
     """Remove all hashtags from a given Pandas Series
 
     A hashtag is a string formed by # concatenated with a sequence of
-    characters, digits and underscores. Example: #texthero_123. 
+    characters, digits and underscores. Example: #texthero_123.
 
     Examples
     --------

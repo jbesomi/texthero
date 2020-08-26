@@ -1118,3 +1118,17 @@ def train_test_split(
                                    :], df.loc[index_test_and_val, :]
 
         return df_train, df_test
+
+
+"""
+train_df, test_df = train_test_split(
+    df,
+    class_balance = df["topic"]
+)
+
+train_df["topic"].value_counts() / train_df["topic"].value_counts().sum()
+
+    test_df["topic"].value_counts() / test_df["topic"].value_counts().sum()
+
+
+"""

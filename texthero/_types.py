@@ -42,6 +42,7 @@ These are the implemented types:
 - TextSeries: cells are text (i.e. strings), e.g. "Test"
 - TokenSeries: cells are lists of tokens (i.e. lists of strings), e.g. ["word1", "word2"]
 - VectorSeries: cells are vector representations of text, e.g. [0.25, 0.75]
+- ClusterSeries: Series has dtype "category", and every entry is a cluster-ID (e.g. 5 or "topic 1")
 - DocumentTermDF: DataFrame is sparse and multiindexed in the columns with every subcolumn
                   being an individual feature
 
@@ -69,7 +70,7 @@ class HeroTypes(pd.Series, pd.DataFrame):
     Hero Series Types
     =================
     In texthero, most functions operate on a Pandas Series as input
-    and give a Pandas Series as output. There are currently four
+    and give a Pandas Series as output. There are currently five
     main types of Series / DataFrames in use, which are supported as classes
     by the library:
 
@@ -82,7 +83,11 @@ class HeroTypes(pd.Series, pd.DataFrame):
     3. VectorSeries: Every cell is a vector representing text, i.e.
     a list of floats. For example, `pd.Series([[1.0, 2.0], [3.0]])` is a valid VectorSeries.
 
-    4. DocumentTermDF: DataFrame is sparse and multiindexed in the columns with every subcolumn
+    4. - ClusterSeries: Series has dtype "category" and every entry is a
+    cluster-ID (e.g. 5 or "topic 1"). For example, `pd.Series([0, 3, 0, 1], dtype="category")`
+    is a valid ClusterSeries.
+
+    5. DocumentTermDF: DataFrame is sparse and multiindexed in the columns with every subcolumn
     being an individual feature
     For example,
     `pd.DataFrame([[1, 2, 3], [4,5,6]], columns=pd.MultiIndex.from_tuples([("count", "hi"), ("count", "servus"), ("count", "hola")]))`
@@ -151,6 +156,30 @@ class TokenSeries(HeroTypes):
             )
 
         if not (isinstance(s, pd.Series) and is_list_of_strings(s.iloc[0])):
+            return False, error_string
+        else:
+            return True, ""
+
+
+class ClusterSeries(HeroTypes):
+    """
+    A ClusterSeries has dtype "category" and every entry is a
+    cluster-ID (e.g. 5 or "topic 1"). For example, `pd.Series([0, 3, 0, 1], dtype="category")`
+    is a valid ClusterSeries.
+    """
+
+    @staticmethod
+    def check_type(s: pd.Series) -> Tuple[bool, str]:
+        """
+        Check if a given Pandas Series has the properties of a ClusterSeries.
+        """
+
+        error_string = (
+            "should be ClusterSeries: the given Series does not have dtype 'category'."
+            " See help(hero.HeroTypes) for more information."
+        )
+
+        if not pd.api.types.is_categorical_dtype(s):
             return False, error_string
         else:
             return True, ""

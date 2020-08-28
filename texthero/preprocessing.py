@@ -38,8 +38,8 @@ def fillna(s: TextSeries) -> TextSeries:
     >>> s = pd.Series(["I'm", np.NaN, pd.NA, "You're"])
     >>> hero.fillna(s)
     0       I'm
-    1          
-    2          
+    1
+    2
     3    You're
     dtype: object
     """
@@ -129,10 +129,10 @@ def remove_digits(s: TextSeries, only_blocks=True) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("7ex7hero is fun 1111")
     >>> hero.preprocessing.remove_digits(s)
-    0    7ex7hero is fun  
+    0    7ex7hero is fun
     dtype: object
     >>> hero.preprocessing.remove_digits(s, only_blocks=False)
-    0     ex hero is fun  
+    0     ex hero is fun
     dtype: object
     """
 
@@ -163,7 +163,7 @@ def replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("Finnaly.")
     >>> hero.replace_punctuation(s, " <PUNCT> ")
-    0    Finnaly <PUNCT> 
+    0    Finnaly <PUNCT>
     dtype: object
     """
 
@@ -188,7 +188,7 @@ def remove_punctuation(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("Finnaly.")
     >>> hero.remove_punctuation(s)
-    0    Finnaly 
+    0    Finnaly
     dtype: object
     """
     return replace_punctuation(s, " ")
@@ -366,7 +366,7 @@ def remove_stopwords(
     >>> custom_stopwords = default_stopwords.union(set(["heroes"]))
     >>> s = pd.Series("Texthero is not only for the heroes")
     >>> hero.remove_stopwords(s, custom_stopwords)
-    0    Texthero      
+    0    Texthero
     dtype: object
 
     """
@@ -550,7 +550,7 @@ def remove_round_brackets(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("Texthero (is not a superhero!)")
     >>> hero.remove_round_brackets(s)
-    0    Texthero 
+    0    Texthero
     dtype: object
 
     See also
@@ -576,7 +576,7 @@ def remove_curly_brackets(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("Texthero {is not a superhero!}")
     >>> hero.remove_curly_brackets(s)
-    0    Texthero 
+    0    Texthero
     dtype: object
 
     See also
@@ -602,7 +602,7 @@ def remove_square_brackets(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("Texthero [is not a superhero!]")
     >>> hero.remove_square_brackets(s)
-    0    Texthero 
+    0    Texthero
     dtype: object
 
     See also
@@ -629,7 +629,7 @@ def remove_angle_brackets(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("Texthero <is not a superhero!>")
     >>> hero.remove_angle_brackets(s)
-    0    Texthero 
+    0    Texthero
     dtype: object
 
     See also
@@ -656,7 +656,7 @@ def remove_brackets(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("Texthero (round) [square] [curly] [angle]")
     >>> hero.remove_brackets(s)
-    0    Texthero    
+    0    Texthero
     dtype: object
 
     See also
@@ -843,7 +843,7 @@ def remove_urls(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("Go to: https://example.com")
     >>> hero.remove_urls(s)
-    0    Go to:  
+    0    Go to:
     dtype: object
 
     See also
@@ -961,7 +961,10 @@ def remove_hashtags(s: TextSeries) -> TextSeries:
     return replace_hashtags(s, " ")
 
 
-def filter_extremes(s: pd.Series, max_words=None, min_df=1, max_df=1.0):
+@InputSeries(TokenSeries)
+def filter_extremes(
+    s: TokenSeries, max_words=None, min_df=1, max_df=1.0
+) -> TokenSeries:
     """
     Decrease the size of your documents by
     filtering out words by their frequency.
@@ -999,6 +1002,20 @@ def filter_extremes(s: pd.Series, max_words=None, min_df=1, max_df=1.0):
         higher than max_df. If float, it represents a
         proportion of documents, integer absolute counts.
 
+    Example
+    -------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(
+    ...        [
+    ...         "Here one two one one one go there",
+    ...         "two go one one one two two two is important",
+    ...     ]
+    ... )
+    >>> s.pipe(hero.tokenize).pipe(hero.filter_extremes, 3)
+    0              [one, two, one, one, one, go]
+    1    [two, go, one, one, one, two, two, two]
+    dtype: object
     """
     # Use term_frequency to do the filtering
     # for us (cannot do this faster as we

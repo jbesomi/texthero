@@ -136,7 +136,10 @@ def count(
 
 
 def term_frequency(
-    s: pd.Series, max_features: Optional[int] = None, min_df=1, max_df=1.0,
+    s: pd.Series,
+    max_features: Optional[int] = None,
+    min_df=1,
+    max_df=1.0,
 ) -> pd.DataFrame:
     """
     Represent a text-based Pandas Series using term frequency.
@@ -199,7 +202,12 @@ def term_frequency(
     return s_term_frequency
 
 
-def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFrame:
+def tfidf(
+    s: pd.Series,
+    max_features=None,
+    min_df=1,
+    max_df=1.0,
+) -> pd.DataFrame:
     """
     Represent a text-based Pandas Series using TF-IDF.
 
@@ -438,7 +446,11 @@ def nmf(
     <https://en.wikipedia.org/wiki/Non-negative_matrix_factorization>`_
 
     """
-    nmf = NMF(n_components=n_components, init="random", random_state=random_state,)
+    nmf = NMF(
+        n_components=n_components,
+        init="random",
+        random_state=random_state,
+    )
 
     if _check_is_valid_DocumentTermDF(s):
         s_coo = s.sparse.to_coo()

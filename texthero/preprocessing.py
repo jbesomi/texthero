@@ -51,7 +51,7 @@ def lowercase(s: TextSeries) -> TextSeries:
     """
     Lowercase all texts in a series.
 
-    
+
     Examples
     --------
     >>> import texthero as hero
@@ -145,8 +145,8 @@ def replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
     Replace all punctuation with a given symbol.
 
     Replace all punctuation from the given
-    Pandas Series with a custom symbol. 
-    It considers as punctuation characters all :data:`string.punctuation` 
+    Pandas Series with a custom symbol.
+    It considers as punctuation characters all :data:`string.punctuation`
     symbols `!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~).`
 
 
@@ -155,7 +155,7 @@ def replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
     s : :class:`texthero._types.TextSeries`
 
     symbol : str (default single empty space)
-        Symbol to use as replacement for all string punctuation. 
+        Symbol to use as replacement for all string punctuation.
 
     Examples
     --------
@@ -310,7 +310,7 @@ def replace_stopwords(
 
     stopwords : Set[str], Optional
         Set of stopwords string to remove. If not passed, by default it used
-        NLTK English stopwords. 
+        NLTK English stopwords.
 
     Examples
     --------
@@ -368,7 +368,6 @@ def remove_stopwords(
     >>> hero.remove_stopwords(s, custom_stopwords)
     0    Texthero      
     dtype: object
-
 
     """
     return replace_stopwords(s, symbol="", stopwords=stopwords)
@@ -476,7 +475,7 @@ def clean(s: TextSeries, pipeline=None) -> TextSeries:
 
     pipeline :List[Callable[[Pandas Series], Pandas Series]]
        inserting specific pipeline to clean a text
-   
+
     Examples
     --------
     For the default pipeline:
@@ -760,13 +759,13 @@ def phrases(
     Parameters
     ----------
     s : :class:`texthero._types.TokenSeries`
-    
+
     min_count : Int, optional. Default is 5.
         ignore tokens with frequency less than this
-        
+
     threshold : Int, optional. Default is 10.
         ignore tokens with a score under that threshold
-        
+
     symbol : Str, optional. Default is '_'.
         character used to join collocation words
 
@@ -915,7 +914,7 @@ def replace_hashtags(s: TextSeries, symbol: str) -> TextSeries:
     """Replace all hashtags from a Pandas Series with symbol
 
     A hashtag is a string formed by # concatenated with a sequence of
-    characters, digits and underscores. Example: #texthero_123. 
+    characters, digits and underscores. Example: #texthero_123.
 
     Parameters
     ----------
@@ -923,7 +922,7 @@ def replace_hashtags(s: TextSeries, symbol: str) -> TextSeries:
 
     symbols : str
         Symbols to replace
-    
+
     Examples
     --------
     >>> import texthero as hero
@@ -943,7 +942,7 @@ def remove_hashtags(s: TextSeries) -> TextSeries:
     """Remove all hashtags from a given Pandas Series
 
     A hashtag is a string formed by # concatenated with a sequence of
-    characters, digits and underscores. Example: #texthero_123. 
+    characters, digits and underscores. Example: #texthero_123.
 
     Examples
     --------

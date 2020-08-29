@@ -760,3 +760,201 @@ def top_words_per_document(s_document_term: pd.DataFrame, n_words=3):
     )
 
     return s_top_words_per_document.reindex(s_document_term.index)
+
+
+# NEW PIPELINE: STEP 1
+def topic_matrices(
+    s_document_term: pd.DataFrame,
+    s_document_topic: pd.Series,
+):
+    # TODO: add Hero types everywhere when they're merged
+    # FIXME: new docstring ~ DocumentTerm & DocumentTopic -> DocumentTopic & TopicTerm.
+    """
+
+    Helper function for visualize_topics. Used to extract and
+    calculate the matrices that pyLDAvis needs.
+
+    Recieves as first argument s_document_term, which is the output of
+    tfidf / count / term_frequency. From this, s_document_term.values
+    is the document_term_matrix in the code.
+
+    Recieves as second argument s_document_topic, which is either
+    the output of a clustering function (so a categorical Series)
+    or the output of a topic modelling function (so a VectorSeries).
+
+    In the first case (that's when clustering_function_used=True),
+    we create the document_topic_matrix
+    through the clusterIDs. So if document X is in cluster Y,
+    then document_topic_matrix[X][Y] = 1.
+    
+    For example, when
+    `s_document_topic = pd.Series([0, 2, 2, 1, 0, 1], dtype="category")`,
+    then the document_topic_matrix is
+    1 0 0
+    0 0 1
+    0 0 1
+    0 1 0
+    1 0 0
+    0 1 0
+
+    So e.g. document zero is in cluster 0, so document_topic_matrix[0][0] = 1.
+
+    In the second case (that's when lda or truncatedSVD were used),
+    their output is already the document_topic_matrix that relates
+    documents to topics.
+
+    We then have in both cases the document_term_matrix and the document_topic_matrix.
+    pyLDAvis still needs the topic_term_matrix, which we get through
+    topic_term_matrix = document_term_matrix.T * document_topic_matrix.
+
+
+    Docuement Topic Matrix                 Topic Term Matrix             
+                          1  2  3                               1  2  3     
+    0                     1  2  3         0                     1  2  3     
+    1                     4  5  6  ,      1                     4  5  6
+
+
+    """
+    # Bool to note whether a clustering function or topic modelling
+    # functions was used for s_document_topic.
+    clustering_function_used = s_document_topic.dtype.name == "category"
+
+    if not clustering_function_used:
+        # Here, s_document_topic is output of hero.lda or hero.truncatedSVD.
+
+        document_term_matrix = s_document_term.sparse.to_coo()
+        document_topic_matrix = np.array(list(s_document_topic))
+        n_topics = len(document_topic_matrix[0])
+
+    else:
+        # Here, s_document_topic is output of some hero clustering function.
+
+        # First remove documents that are not assigned to any cluster.
+        # They have clusterID ==  -1.
+        indexes_of_unassigned_documents = s_document_topic == -1
+        s_document_term = s_document_term[~indexes_of_unassigned_documents]
+        s_document_topic = s_document_topic[~indexes_of_unassigned_documents]
+        s_document_topic = s_document_topic.cat.remove_unused_categories()
+
+        document_term_matrix = s_document_term.sparse.to_coo()
+
+        # Construct document_topic_matrix from the cluster category Series
+        # as described in the docstring.
+        n_rows = len(s_document_topic.index)  # n_rows = number of documents
+        # n_cols = number of clusters
+        n_topics = n_cols = len(s_document_topic.values.categories)
+
+        # Will get binary matrix:
+        # document_topic_matrix[X][Y] = 1 <=> document X is in cluster Y.
+        # We construct this matrix sparsely in CSR format
+        # -> need the data (will only insert 1s, nothing else),
+        # the rows (so in which rows we want to insert, which is all of them
+        # as every document belongs to a cluster),
+        # and we need the columns (so in which cluster we want to insert,
+        # which is exactly the clusterID values).
+        data = [1 for _ in range(n_rows)]  # Will insert one 1 per row.
+        rows = range(n_rows)  # rows are just [0, 1, ..., n_rows]
+        columns = s_document_topic.values
+
+        # Construct the sparse matrix.
+        document_topic_matrix = csr_matrix(
+            (data, (rows, columns)), shape=(n_rows, n_cols)
+        )
+
+    topic_term_matrix = document_topic_matrix.T * document_term_matrix
+
+    # Create s_document_topic and s_topic_term (both multiindexed)
+
+    # Create s_document_topic
+    s_document_topic_columns = pd.MultiIndex.from_product(
+        [["Document Topic Matrix"], range(n_topics)]
+    )
+    if isinstance(document_topic_matrix, csr_matrix):
+        s_document_topic = pd.DataFrame.sparse.from_spmatrix(
+            document_topic_matrix,
+            columns=s_document_topic_columns,
+            index=s_document_term.index
+        )
+
+    else:
+        s_document_topic = pd.DataFrame(
+            document_topic_matrix,
+            columns=s_document_topic_columns,
+            index=s_document_term.index
+        )
+
+    # Create s_topic_term
+    s_topic_term_columns = pd.MultiIndex.from_product(
+        [["Topic Term Matrix"], s_document_term.columns.tolist()]
+    )
+    if isinstance(topic_term_matrix, csr_matrix):
+        s_topic_term = pd.DataFrame.sparse.from_spmatrix(
+            topic_term_matrix,
+            columns=s_topic_term_columns
+        )
+
+    else:
+        s_topic_term = pd.DataFrame(
+            topic_term_matrix,
+            columns=s_topic_term_columns
+        )
+
+    return s_document_topic, s_topic_term
+
+# New Pipeline: Step 2
+# Users just need to l1-normalize
+
+
+# New Pipeline: Step 3
+def relevant_terms_per_topic(
+    s_document_term,
+    s_document_topic_distribution,
+    s_topic_term_distribution,
+    return_figure=False
+):
+    """
+    Use LDAvis to get topics & relevant terms.
+    """
+
+    # Define parameters for pyLDAvis.
+    vocab = s_document_term.columns.levels[1].tolist()
+    doc_lengths = list(s_document_term.sum(axis=1))
+    term_frequency = list(s_document_term.sum(axis=0))
+
+    doc_topic_dists = s_document_topic_distribution.values.tolist()
+    topic_term_dists = s_topic_term_distribution.values.tolist()
+
+    # Create pyLDAvis visualization.
+    figure = pyLDAvis.prepare(
+        **{
+            "vocab": vocab,
+            "doc_lengths": doc_lengths,
+            "term_frequency": term_frequency,
+            "doc_topic_dists": doc_topic_dists,
+            "topic_term_dists": topic_term_dists,
+            "R": 15,
+            "sort_topics": False,
+        }
+    )
+
+    # TODO Extract relevant info etc. from figure
+    if return_figure:
+        return figure
+
+"""
+Visualize_Topics:
+    Step 1: v/
+    Step 2: v/
+    Step 3: -> currently doing that to already return relevant_words_per_topic
+
+    -> Wrapper calls 1-3 and 3 w/ return_figure=True and plots that
+
+Top_Words_per_Topic:
+    like above
+
+Top_Words_per_Document:
+    have a look at that
+
+topics_from_topic_model:
+    have a look at that
+"""

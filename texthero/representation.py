@@ -218,10 +218,7 @@ def term_frequency(
 
 @InputSeries([TokenSeries, TextSeries])
 def tfidf(
-    s: Union[TokenSeries, TextSeries],
-    max_features=None,
-    min_df=1,
-    max_df=1.0,
+    s: Union[TokenSeries, TextSeries], max_features=None, min_df=1, max_df=1.0,
 ) -> DocumentTermDF:
     """
     Represent a text-based Pandas Series using TF-IDF.
@@ -463,11 +460,7 @@ def nmf(
     <https://en.wikipedia.org/wiki/Non-negative_matrix_factorization>`_
 
     """
-    nmf = NMF(
-        n_components=n_components,
-        init="random",
-        random_state=random_state,
-    )
+    nmf = NMF(n_components=n_components, init="random", random_state=random_state,)
 
     if DocumentTermDF.check_type(s)[0]:
         s_coo = s.sparse.to_coo()

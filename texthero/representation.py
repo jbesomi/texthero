@@ -11,7 +11,9 @@ from sklearn.decomposition import PCA, NMF, TruncatedSVD, LatentDirichletAllocat
 from sklearn.cluster import KMeans, DBSCAN, MeanShift
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import normalize as sklearn_normalize
-from scipy.sparse import coo_matrix
+from scipy.sparse import coo_matrix, csr_matrix, issparse
+
+import pyLDAvis
 
 from typing import Optional, Union, Any
 
@@ -1109,6 +1111,495 @@ def topics_from_topic_model(s_document_topic: pd.Series) -> pd.Series:
     cluster_IDs = np.argmax(document_topic_matrix, axis=1).getA1()
 
     return pd.Series(cluster_IDs, index=s_document_topic.index, dtype="category")
+
+
+def topic_matrices(
+    s_document_term: pd.DataFrame, s_document_topic: pd.Series,
+):
+    # TODO: add Hero types everywhere when they're merged
+    """
+    Get a DocumentTopic Matrix and a TopicTerm Matrix (both as Dataframes)
+    from a DocumentTerm Matrix and a DocumentTopic Matrix.
+
+    Recieves as first argument s_document_term, which is the
+    output of one of 
+    - :meth:`texthero.representation.tfidf`
+    - :meth:`texthero.representation.count`
+    - :meth:`texthero.representation.term_frequency`.
+
+    Recieves as second argument s_document_topic, which is either
+    the output of a clustering function
+    or the output of a topic modelling function,
+    so one of
+    - :meth:`texthero.representation.kmeans`
+    - :meth:`texthero.representation.dbscan`
+    - :meth:`texthero.representation.meanshift`
+    - :meth:`texthero.representation.lda`.
+
+    Both these matrices (the first one relating documents to
+    terms and the second one relating documents to topics)
+    are used to generate a DocumentTopic Matrix
+    (relating documents to topics) and a
+    TopicTerm Matrix (relating topics to terms).
+
+    When the second argument is the output of a clustering
+    function, we create the document_topic_matrix
+    through the cluster-IDs. So if document X is in cluster Y,
+    then document_topic_matrix[X][Y] = 1.
+
+    For example, when
+    `s_document_topic = pd.Series([0, 2, 2, 1], dtype="category")`,
+    then the document_topic_matrix is
+    ```python
+    1 0 0
+    0 0 1
+    0 0 1
+    0 1 0
+    ```
+
+    When the second argument is the output of a topic modelling function,
+    their output is already the document_topic_matrix that relates
+    documents to topics.
+
+    We then have in both cases the DocumentTerm Matrix and the DocumentTopic Matrix.
+    We then get the TopicTerm Matrix through
+    topic_term_matrix = document_term_matrix.T * document_topic_matrix.
+
+    Parameters
+    ----------
+    s_document_term : pd.DataFrame
+        Output of one of
+        :meth:`texthero.representation.tfidf`,
+        :meth:`texthero.representation.count`,
+        :meth:`texthero.representation.term_frequency`.
+
+    s_document_topic : pd.Series
+        Output of one of
+        :meth:`texthero.representation.kmeans`,
+        :meth:`texthero.representation.dbscan`,
+        :meth:`texthero.representation.meanshift`,
+        :meth:`texthero.representation.lda`.
+
+    Returns
+    -------
+    Tuple of DataFrames.
+
+    First one is
+    DocumentTopic DataFrame where the rows
+    are the documents and the columns are the
+    topics. So entry in row X and column Y
+    says how strongly document X belongs
+    to topic Y.
+
+    Second one is
+    TopicTerm DataFrame where the rows
+    are the topics and the columns are the
+    terms. So entry in row X and column Y
+    says how strongly term Y belongs
+    to topic X.
+
+    Examples
+    --------
+    Using Clustering:
+
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, band, guitar"])
+    >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
+    >>> s_cluster = s_tfidf.pipe(hero.normalize).pipe(hero.pca, n_components=2).pipe(hero.kmeans, n_clusters=2)
+    >>> s_document_topic, s_topic_term = hero.topic_matrices(s_tfidf, s_cluster)
+    >>> s_document_topic # doctest: +SKIP
+    Document Topic Matrix   
+                          0  1
+    0                     1  0
+    1                     0  1
+    2                     1  0
+    3                     0  1
+    >>> s_topic_term # doctest: +SKIP
+      Topic Term Matrix                                                                                
+                   band  football       fun    guitar     music orchestra    soccer    sports    violin
+    0          0.000000  3.021651  1.916291  0.000000  0.000000  0.000000  1.916291  3.021651  0.000000
+    1          1.916291  0.000000  0.000000  1.916291  3.021651  1.916291  0.000000  0.000000  1.916291
+
+    Using LDA:
+
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, band, guitar"])
+    >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
+    >>> s_lda = s_tfidf.pipe(hero.lda, n_components=2)
+    >>> s_document_topic, s_topic_term = hero.topic_matrices(s_tfidf, s_lda)
+    >>> s_document_topic # doctest: +SKIP
+      Document Topic Matrix          
+                      0         1
+    0              0.912814  0.087186
+    1              0.082094  0.917906
+    2              0.912814  0.087186
+    3              0.875660  0.124340
+    >>> s_topic_term # doctest: +SKIP
+      Topic Term Matrix                                                                                
+                   band  football       fun    guitar     music orchestra    soccer    sports    violin
+    0          1.678019  2.758205  1.749217  1.678019  1.447000  0.157316  1.749217  2.758205  0.157316
+    1          0.238271  0.263446  0.167074  0.238271  1.574651  1.758974  0.167074  0.263446  1.758974
+
+    See Also
+    --------
+    TODO add tutorial link
+
+    """
+    # Bool to note whether a clustering function or topic modelling
+    # functions was used for s_document_topic.
+    clustering_function_used = s_document_topic.dtype.name == "category"
+
+    if not clustering_function_used:
+        # Here, s_document_topic is output of hero.lda or hero.truncatedSVD.
+
+        document_term_matrix = s_document_term.sparse.to_coo()
+        document_topic_matrix = np.array(list(s_document_topic))
+        n_topics = len(document_topic_matrix[0])
+
+    else:
+        # Here, s_document_topic is output of some hero clustering function.
+
+        # First remove documents that are not assigned to any cluster.
+        # They have clusterID ==  -1.
+        indexes_of_unassigned_documents = s_document_topic == -1
+        s_document_term = s_document_term[~indexes_of_unassigned_documents]
+        s_document_topic = s_document_topic[~indexes_of_unassigned_documents]
+        s_document_topic = s_document_topic.cat.remove_unused_categories()
+
+        document_term_matrix = s_document_term.sparse.to_coo()
+
+        # Construct document_topic_matrix from the cluster category Series
+        # as described in the docstring.
+        n_rows = len(s_document_topic.index)  # n_rows = number of documents
+        # n_cols = number of clusters
+        n_topics = n_cols = len(s_document_topic.values.categories)
+
+        # Will get binary matrix:
+        # document_topic_matrix[X][Y] = 1 <=> document X is in cluster Y.
+        # We construct this matrix sparsely in CSR format
+        # -> need the data (will only insert 1s, nothing else),
+        # the rows (so in which rows we want to insert, which is all of them
+        # as every document belongs to a cluster),
+        # and we need the columns (so in which cluster we want to insert,
+        # which is exactly the clusterID values).
+        data = [1 for _ in range(n_rows)]  # Will insert one 1 per row.
+        rows = range(n_rows)  # rows are just [0, 1, ..., n_rows]
+        columns = s_document_topic.values
+
+        # Construct the sparse matrix.
+        document_topic_matrix = csr_matrix(
+            (data, (rows, columns)), shape=(n_rows, n_cols)
+        )
+
+    topic_term_matrix = document_topic_matrix.T * document_term_matrix
+
+    # Create s_document_topic and s_topic_term (both multiindexed)
+
+    # Create s_document_topic
+    s_document_topic_columns = pd.MultiIndex.from_product(
+        [["Document Topic Matrix"], range(n_topics)]
+    )
+
+    if issparse(document_topic_matrix):
+        s_document_topic = pd.DataFrame.sparse.from_spmatrix(
+            document_topic_matrix,
+            columns=s_document_topic_columns,
+            index=s_document_term.index,
+        )
+
+    else:
+        s_document_topic = pd.DataFrame(
+            document_topic_matrix,
+            columns=s_document_topic_columns,
+            index=s_document_term.index,
+            dtype="Sparse",
+        )
+
+    # Create s_topic_term
+    s_topic_term_columns = pd.MultiIndex.from_product(
+        [["Topic Term Matrix"], s_document_term.columns.levels[1].tolist()]
+    )
+
+    if issparse(topic_term_matrix):
+        s_topic_term = pd.DataFrame.sparse.from_spmatrix(
+            topic_term_matrix, columns=s_topic_term_columns
+        )
+
+    else:
+        s_topic_term = pd.DataFrame(
+            topic_term_matrix, columns=s_topic_term_columns, dtype="Sparse"
+        )
+
+    return s_document_topic, s_topic_term
+
+
+def relevant_words_per_topic(
+    s_document_term,
+    s_document_topic_distribution,
+    s_topic_term_distribution,
+    n_words=10,
+    return_figure=False,
+):
+    """
+    Use `LDAvis <https://github.com/bmabey/pyLDAvis>`_ 
+    to find the most relevant words for each topic.
+
+    First input is a DocumentTerm Matrix, so the
+    output of one of
+    - :meth:`texthero.representation.tfidf`
+    - :meth:`texthero.representation.count`
+    - :meth:`texthero.representation.term_frequency`.
+
+    Second input is a DocumentTopic Distribution,
+    so the l1-normalized (e.g. with :meth:`hero.representation.normalize`_)
+    first output of :meth:`hero.visualization.topic_matrices`_.
+
+    Third input is a TopicTerm Distribution,
+    so the l1-normalized (e.g. with :meth:`hero.representation.normalize`_)
+    second output of :meth:`hero.visualization.topic_matrices`_.
+
+    This function uses the three given relations
+    (documents->terms, documents->topics, topics->terms)
+    to find and return the most relevant words for each topic.
+    The `pyLDAvis library <https://github.com/bmabey/pyLDAvis>`_
+    is used to find relevant words.
+
+    Parameters
+    ----------
+    s_document_term : pd.DataFrame
+        Output of one of
+        :meth:`texthero.representation.tfidf`,
+        :meth:`texthero.representation.count`,
+        :meth:`texthero.representation.term_frequency`.
+
+    s_document_topic_distribution : pd.DataFrame
+        L1-Normalized first output of
+        :meth:`texthero.visualization.topic_matrices`.
+
+    s_topic_term_distribution : pd.DataFrame
+        L1-Normalized second output of
+        :meth:`texthero.visualization.topic_matrices`.
+
+    n_words: int, default to 5
+        Number of top words per topic, should
+        be <= 30.
+
+    Returns
+    -------
+    Pandas Series with the topic IDs as index and
+    a list of n_words relevant words per
+    topic as values.
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, band, guitar"])
+    >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
+    >>> s_cluster = s_tfidf.pipe(hero.normalize).pipe(hero.pca, n_components=2).pipe(hero.kmeans, n_clusters=2)
+    >>> s_document_topic, s_topic_term = hero.topic_matrices(s_tfidf, s_cluster)
+    >>> s_document_topic_distribution = hero.normalize(s_document_topic, norm="l1")
+    >>> s_topic_term_distribution = hero.normalize(s_topic_term, norm="l1")
+    >>> hero.relevant_words_per_topic(s_tfidf, s_document_topic_distribution, s_topic_term_distribution, n_words=2) # doctest: +SKIP
+    Topic
+    0       [music, violin]
+    1    [sports, football]
+    dtype: object
+
+    See Also
+    --------
+    `pyLDAvis <https://pyldavis.readthedocs.io/en/latest/>`_
+    for the methodology on how to find relevant terms.
+
+    TODO add tutorial link
+    """
+
+    # Define parameters for pyLDAvis.
+    vocab = s_document_term.columns.levels[1].tolist()
+    doc_lengths = list(s_document_term.sum(axis=1))
+    term_frequency = list(s_document_term.sum(axis=0))
+
+    doc_topic_dists = s_document_topic_distribution.values.tolist()
+    topic_term_dists = s_topic_term_distribution.values.tolist()
+
+    # Create pyLDAvis visualization.
+    figure = pyLDAvis.prepare(
+        **{
+            "vocab": vocab,
+            "doc_lengths": doc_lengths,
+            "term_frequency": term_frequency,
+            "doc_topic_dists": doc_topic_dists,
+            "topic_term_dists": topic_term_dists,
+            "R": 15,
+            "sort_topics": False,
+        }
+    )
+
+    if return_figure:
+        return figure
+
+    # Extract relevant data from LDAvis output.
+    # Most of the output is only useful for
+    # the visualization internally (e.g.
+    # term frequencies, ...).
+    # We're only interested in the
+    # relevant words per topic
+    # which LDAvis returns in the "tinfo" field.
+
+    pyLDAvis_data = figure.to_dict()
+
+    # The top words per topic are in "tinfo".
+    # We're not calculating/... anything below here,
+    # only parsing the LDAvis output into a nice Series
+    # we can return.
+    df_topics_and_their_relevant_words = pd.DataFrame(pyLDAvis_data["tinfo"])
+
+    # Throw out topic "Default"
+    df_topics_and_their_relevant_words = df_topics_and_their_relevant_words[
+        df_topics_and_their_relevant_words["Category"] != "Default"
+    ]
+
+    # Our topics / clusters begin at 0 -> use i-1 and rename e.g. "Topic4" to "3".
+    n_topics = df_topics_and_their_relevant_words["Category"].nunique()
+
+    replace_dict = {"Topic{}".format(i): i - 1 for i in range(1, n_topics + 1)}
+
+    df_topics_and_their_relevant_words["Category"] = df_topics_and_their_relevant_words[
+        "Category"
+    ].replace(replace_dict)
+
+    # Sort first by topic, then by word frequency.
+    df_topics_and_their_relevant_words = df_topics_and_their_relevant_words.sort_values(
+        ["Category", "Freq"], ascending=[1, 0]
+    )
+
+    # Group by topic and combine the relevant words into a list.
+    s_topics_with_relevant_words = df_topics_and_their_relevant_words.groupby(
+        "Category"
+    )["Term"].apply(list)
+
+    # Take the top n_words words for each topic.
+    s_topics_with_relevant_words = s_topics_with_relevant_words.apply(
+        lambda x: x[:n_words]
+    )
+
+    # Replace pyLDAvis names with ours.
+    s_topics_with_relevant_words = s_topics_with_relevant_words.rename(None)
+    s_topics_with_relevant_words.index.name = "Topic"
+
+    return s_topics_with_relevant_words
+
+
+def relevant_words_per_document(s_document_term, n_words=10):
+    """
+    Combine several Texthero functions to get the
+    most relevant words of every document in your dataset.
+
+    Using this function is equivalent to doing the following:
+
+    ```python
+
+    >>> # New Series where every document is its own cluster.
+    >>> s_cluster = pd.Series(
+    ...    np.arange(len(s_document_term)), index=s_document_term.index, dtype="category")  # doctest: +SKIP
+    >>> s_document_topic, s_topic_term = hero.topic_matrices(s_document_term, s_cluster)  # doctest: +SKIP
+    >>> s_document_topic_distribution = hero.normalize(s_document_topic, norm="l1")  # doctest: +SKIP
+    >>> s_topic_term_distribution = hero.normalize(s_topic_term, norm="l1")  # doctest: +SKIP
+    >>> relevant_words_per_topic(
+    ...  s_document_term,
+    ...  s_document_topic_distribution,
+    ...  s_topic_term_distribution)  # doctest: +SKIP
+
+    ```
+
+    First input has to be output of one of 
+    - :meth:`texthero.representation.tfidf`
+    - :meth:`texthero.representation.count`
+    - :meth:`texthero.representation.term_frequency`.
+
+    The function assigns every document
+    to its own cluster (or "topic") and then uses
+    :meth:`topic_matrices`_ and
+    :meth:`relevant_words_per_topic`_ to find
+    the most relevant words for every document
+    with `pyLDAvis <https://pyldavis.readthedocs.io/en/latest/>`_ .
+
+    Parameters
+    ----------
+    s_document_term: pd.DataFrame
+        Output of one of
+        :meth:`texthero.representation.tfidf`
+        :meth:`texthero.representation.count`
+        :meth:`texthero.representation.term_frequency`
+
+    n_words: int, default to 10
+        Number of words to fetch per topic, should
+        be <= 30.
+
+    Returns
+    -------
+    Series with the documents as index and
+    a list of n_words relevant words per
+    document as values.
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(
+    ...    ["Football, Sports, Soccer, Golf",
+    ...    "music, violin, orchestra",
+    ...    "football, fun, sports",
+    ...    "music, band, guitar"])
+    >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
+    >>> hero.relevant_words_per_document(s_tfidf, n_words=2) # doctest: +SKIP
+    0         [soccer, golf]
+    1    [violin, orchestra]
+    2          [fun, sports]
+    3         [guitar, band]
+    dtype: object
+    >>> # We can see that the function tries to
+    >>> # find terms that distinguish the documents,
+    >>> # so e.g. "music" is not chosen for documents
+    >>> # 1 and 3 as it's found in both of them.
+
+    See Also
+    --------
+    `pyLDAvis <https://pyldavis.readthedocs.io/en/latest/>`_
+    for the methodology on how to find relevant terms.
+
+    :meth:`texthero.representation.topic_matrices`_
+
+    :meth:`texthero.representation.relevant_words_per_topic`_
+
+    TODO add tutorial link
+    """
+
+    # Create a categorical Series that has
+    # one new cluster for every document.
+    s_cluster = pd.Series(
+        np.arange(len(s_document_term)), index=s_document_term.index, dtype="category"
+    )
+
+    # Get topic matrices.
+    s_document_topic, s_topic_term = topic_matrices(s_document_term, s_cluster)
+
+    # Get topic distributions through normalization.
+    s_document_topic_distribution = normalize(s_document_topic, norm="l1")
+    s_topic_term_distribution = normalize(s_topic_term, norm="l1")
+
+    # Call relevant_words_per_topic with the new cluster series
+    # (so every document is treated as one distinct "topic")
+    s_relevant_words_per_document = relevant_words_per_topic(
+        s_document_term,
+        s_document_topic_distribution,
+        s_topic_term_distribution,
+        n_words=n_words,
+    )
+
+    return s_relevant_words_per_document.reindex(s_document_term.index)
 
 
 """

@@ -79,15 +79,14 @@ test_cases_representation = [
         representation.topics_from_topic_model,
         (s_numeric_lists,),
     ],
-]
-
-test_cases_visualization = [
     [
         "top_words_per_document",
-        visualization.top_words_per_document,
+        representation.relevant_words_per_document,
         (df_document_term,),
     ],
 ]
+
+test_cases_visualization = []
 
 test_cases = (
     test_cases_nlp

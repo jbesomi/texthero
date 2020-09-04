@@ -72,8 +72,8 @@ class TestTypes(PandasTestCase):
         except TypeError:
             self.fail("Failed although input type is correct.")
 
-    def test_inputseries_correct_type_documentrepresentationseries(self):
-        @_types.InputSeries(_types.DocumentTermDF)
+    def test_inputseries_correct_type_MatrixDF(self):
+        @_types.InputSeries(_types.MatrixDF)
         def f(s):
             pass
 
@@ -81,9 +81,7 @@ class TestTypes(PandasTestCase):
             f(
                 pd.DataFrame(
                     [[1, 2, 3]],
-                    columns=pd.MultiIndex.from_tuples(
-                        [("doc1", "word1"), ("doc1", "word2"), ("doc2", "word1")]
-                    ),
+                    columns=["a", "b", "c"],
                     dtype="Sparse",
                 )
             )
@@ -91,7 +89,7 @@ class TestTypes(PandasTestCase):
             self.fail("Failed although input type is correct.")
 
     def test_several_possible_types_correct_type(self):
-        @_types.InputSeries([_types.DocumentTermDF, _types.VectorSeries])
+        @_types.InputSeries([_types.MatrixDF, _types.VectorSeries])
         def f(x):
             pass
 
@@ -99,9 +97,7 @@ class TestTypes(PandasTestCase):
             f(
                 pd.DataFrame(
                     [[1, 2, 3]],
-                    columns=pd.MultiIndex.from_tuples(
-                        [("doc1", "word1"), ("doc1", "word2"), ("doc2", "word1")]
-                    ),
+                    columns=["a", "b", "c"],
                     dtype="Sparse",
                 )
             )
@@ -112,7 +108,7 @@ class TestTypes(PandasTestCase):
             self.fail("Failed although input type is correct.")
 
     def test_several_possible_types_wrong_type(self):
-        @_types.InputSeries([_types.DocumentTermDF, _types.VectorSeries])
+        @_types.InputSeries([_types.MatrixDF, _types.VectorSeries])
         def f(x):
             pass
 

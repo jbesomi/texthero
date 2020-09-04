@@ -12,7 +12,7 @@ Series and defines functions to check the types.
 The goal is to be able to do something like this:
 
 @InputSeries(TokenSeries)
-def tfidf(s: TokenSeries) -> DocumentTermDF:
+def tfidf(s: TokenSeries) -> MatrixDF:
     ...
 
 The decorator (@...) makes python check whether the input is
@@ -42,8 +42,8 @@ These are the implemented types:
 - TextSeries: cells are text (i.e. strings), e.g. "Test"
 - TokenSeries: cells are lists of tokens (i.e. lists of strings), e.g. ["word1", "word2"]
 - VectorSeries: cells are vector representations of text, e.g. [0.25, 0.75]
-- DocumentTermDF: DataFrame is sparse and multiindexed in the columns with every subcolumn
-                  being an individual feature
+- MatrixDF: DataFrame is sparse and every column
+                  is an individual feature (e.g. a word)
 
 The classes are lightweight subclasses of pd.Series and serve 2 purposes:
 1. Good documentation for users through docstring.
@@ -82,17 +82,17 @@ class HeroTypes(pd.Series, pd.DataFrame):
     3. VectorSeries: Every cell is a vector representing text, i.e.
     a list of floats. For example, `pd.Series([[1.0, 2.0], [3.0]])` is a valid VectorSeries.
 
-    4. DocumentTermDF: DataFrame is sparse and multiindexed in the columns with every subcolumn
-    being an individual feature
+    4. MatrixDF: A MatrixDF is a sparse DataFrame representing a matrix.
+    Every cell value is one entry in the matrix.
     For example,
     `pd.DataFrame([[1, 2, 3], [4,5,6]], columns=pd.MultiIndex.from_tuples([("count", "hi"), ("count", "servus"), ("count", "hola")]))`
-    is a valid DocumentTermDF.
+    is a valid MatrixDF.
 
     These types of Series are supposed to make using the library
     easier and more intuitive. For example, if you see a
     function head
     ```
-    def tfidf(s: TokenSeries) -> DocumentTermDF
+    def tfidf(s: TokenSeries) -> MatrixDF
     ```
     then you know that the function takes a Pandas Series
     whose cells are lists of strings (tokens) and will
@@ -191,25 +191,26 @@ class VectorSeries(HeroTypes):
             return True, ""
 
 
-class DocumentTermDF(HeroTypes):
+class MatrixDF(HeroTypes):
     """
-    A DocumentTermDF is a sparse DataFrame that is
-    multiindexed in the columns with every subcolumn
-    being an individual feature.
+    A MatrixDF is a sparse DataFrame
+    representing a matrix (e.g. a Document Term Matrix).
+    Every cell value
+    is one entry in the matrix.
     For example,
-    `pd.DataFrame([[1, 2, 3], [4,5,6]], columns=pd.MultiIndex.from_tuples([("count", "hi"), ("count", "servus"), ("count", "hola")]))`
-    is a valid DocumentTermDF.
+    `pd.DataFrame([[1, 2, 3], [4,5,6]], columns=["word1", "word2", "word3"]))`
+    is a valid MatrixDF.
     """
 
     @staticmethod
     def check_type(df: pd.DataFrame, input_output="") -> Tuple[bool, str]:
         """
-        Check if a given Pandas Series has the properties of a DocumentTermDF.
+        Check if a given Pandas Series has the properties of a MatrixDF.
         """
 
         error_string = (
-            "should be DocumentTermDF: The input should be a DocumentTermDF, so a DataFrame"
-            " with a MultiIndex in the columns."
+            "should be MatrixDF: The input should be a MatrixDF, so a sparse DataFrame"
+            " representing a matrix, where every cell is one entry of the matrix."
             " See help(hero.HeroTypes) for more information."
         )
 
@@ -242,7 +243,7 @@ def InputSeries(allowed_hero_series_types):
 
     With several possible types:
 
-    >>> @InputSeries([DocumentTermDF, VectorSeries])
+    >>> @InputSeries([MatrixDF, VectorSeries])
     ... def g(x):
     ...     pass
     """

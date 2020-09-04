@@ -98,38 +98,30 @@ test_cases_vectorization_min_df = [
     [
         "count",
         representation.count,
-        pd.DataFrame(
-            [2, 1],
-            index=s_tokenized_output_index,
-            columns=["Test"],
-        ).astype("Sparse[int64, 0]"),
+        pd.DataFrame([2, 1], index=s_tokenized_output_index, columns=["Test"],).astype(
+            "Sparse[int64, 0]"
+        ),
     ],
     [
         "term_frequency",
         representation.term_frequency,
         pd.DataFrame(
-            [0.666667, 0.333333],
-            index=s_tokenized_output_index,
-            columns=[ "Test"],
+            [0.666667, 0.333333], index=s_tokenized_output_index, columns=["Test"],
         ).astype("Sparse[float64, nan]"),
     ],
     [
         "tfidf",
         representation.tfidf,
-        pd.DataFrame(
-            [2, 1],
-            index=s_tokenized_output_index,
-            columns= ["Test"],
-        ).astype("Sparse[float64, nan]"),
+        pd.DataFrame([2, 1], index=s_tokenized_output_index, columns=["Test"],).astype(
+            "Sparse[float64, nan]"
+        ),
     ],
 ]
 
 
 s_vector_series = pd.Series([[1.0, 0.0], [0.0, 0.0]], index=[5, 7])
 s_documenttermDF = pd.DataFrame(
-    [[1.0, 0.0], [0.0, 0.0]],
-    index=[5, 7],
-    columns=["a", "b"],
+    [[1.0, 0.0], [0.0, 0.0]], index=[5, 7], columns=["a", "b"],
 ).astype("Sparse[float64, nan]")
 
 
@@ -270,9 +262,7 @@ class AbstractRepresentationTest(PandasTestCase):
         # input so we test it separately
         result = representation.normalize(s_documenttermDF)
         correct_output = pd.DataFrame(
-            [[1.0, 0.0], [0.0, 0.0]],
-            index=[5, 7],
-            columns= ["a", "b"],
+            [[1.0, 0.0], [0.0, 0.0]], index=[5, 7], columns=["a", "b"],
         )
 
         pd.testing.assert_frame_equal(

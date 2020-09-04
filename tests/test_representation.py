@@ -120,13 +120,13 @@ test_cases_vectorization_min_df = [
 
 
 s_vector_series = pd.Series([[1.0, 0.0], [0.0, 0.0]], index=[5, 7])
-s_MatrixDF = pd.DataFrame(
+s_DataFrame = pd.DataFrame(
     [[1.0, 0.0], [0.0, 0.0]], index=[5, 7], columns=["a", "b"],
 ).astype("Sparse[float64, nan]")
 
 
 test_cases_dim_reduction_and_clustering = [
-    # format: [function_name, function, correct output for s_vector_series and s_MatrixDF input above]
+    # format: [function_name, function, correct output for s_vector_series and s_DataFrame input above]
     ["pca", representation.pca, pd.Series([[-0.5, 0.0], [0.5, 0.0]], index=[5, 7],),],
     [
         "nmf",
@@ -232,7 +232,7 @@ class AbstractRepresentationTest(PandasTestCase):
         )
 
     @parameterized.expand(test_cases_dim_reduction_and_clustering)
-    def test_dim_reduction_and_clustering_with_MatrixDF_input(
+    def test_dim_reduction_and_clustering_with_DataFrame_input(
         self, name, test_function, correct_output
     ):
         s_true = correct_output
@@ -242,11 +242,11 @@ class AbstractRepresentationTest(PandasTestCase):
             return
 
         if name == "kmeans":
-            result_s = test_function(s_MatrixDF, random_state=42, n_clusters=2)
+            result_s = test_function(s_DataFrame, random_state=42, n_clusters=2)
         elif name == "dbscan" or name == "meanshift" or name == "normalize":
-            result_s = test_function(s_MatrixDF)
+            result_s = test_function(s_DataFrame)
         else:
-            result_s = test_function(s_MatrixDF, random_state=42)
+            result_s = test_function(s_DataFrame, random_state=42)
 
         pd.testing.assert_series_equal(
             s_true,
@@ -257,10 +257,10 @@ class AbstractRepresentationTest(PandasTestCase):
             check_category_order=False,
         )
 
-    def test_normalize_MatrixDF_also_as_output(self):
-        # normalize should also return MatrixDF output for MatrixDF
+    def test_normalize_DataFrame_also_as_output(self):
+        # normalize should also return DataFrame output for DataFrame
         # input so we test it separately
-        result = representation.normalize(s_MatrixDF)
+        result = representation.normalize(s_DataFrame)
         correct_output = pd.DataFrame(
             [[1.0, 0.0], [0.0, 0.0]], index=[5, 7], columns=["a", "b"],
         )

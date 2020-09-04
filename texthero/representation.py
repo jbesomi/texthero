@@ -18,7 +18,7 @@ from texthero._types import (
     TextSeries,
     TokenSeries,
     VectorSeries,
-    MatrixDF,
+    DataFrame,
     InputSeries,
 )
 
@@ -34,7 +34,7 @@ Helper
 """
 
 
-def _check_is_valid_MatrixDF(df: Union[pd.DataFrame, pd.Series]) -> bool:
+def _check_is_valid_DataFrame(df: Union[pd.DataFrame, pd.Series]) -> bool:
     """
     Check if the given Pandas Series is a Matrix DF.
 
@@ -64,7 +64,7 @@ def count(
     min_df=1,
     max_df=1.0,
     binary=False,
-) -> MatrixDF:
+) -> DataFrame:
     """
     Represent a text-based Pandas Series using count.
 
@@ -144,7 +144,7 @@ def term_frequency(
     max_features: Optional[int] = None,
     min_df=1,
     max_df=1.0,
-) -> MatrixDF:
+) -> DataFrame:
     """
     Return a count document-term DataFrame based on the given Pandas Series
 
@@ -218,7 +218,7 @@ def term_frequency(
 @InputSeries([TokenSeries, TextSeries])
 def tfidf(
     s: Union[TokenSeries, TextSeries], max_features=None, min_df=1, max_df=1.0,
-) -> MatrixDF:
+) -> DataFrame:
     """
     Represent a text-based Pandas Series using TF-IDF.
 
@@ -315,9 +315,9 @@ Dimensionality reduction
 """
 
 
-@InputSeries([VectorSeries, MatrixDF])
+@InputSeries([VectorSeries, DataFrame])
 def pca(
-    s: Union[VectorSeries, MatrixDF], n_components=2, random_state=None
+    s: Union[VectorSeries, DataFrame], n_components=2, random_state=None
 ) -> VectorSeries:
     """
     Perform principal component analysis on the given Pandas Series.
@@ -341,12 +341,12 @@ def pca(
     represented to a matrix form.
 
     PCA cannot directly handle sparse input, so when calling pca on a
-    MatrixDF, the input has to be expanded which can lead to
+    DataFrame, the input has to be expanded which can lead to
     memory problems with big datasets.
 
     Parameters
     ----------
-    s : Pandas Series (VectorSeries) or Sparse DataFrame (MatrixDF)
+    s : Pandas Series (VectorSeries) or Sparse DataFrame (DataFrame)
 
     n_components : Int. Default is 2.
         Number of components to keep (dimensionality of output vectors).
@@ -383,7 +383,7 @@ def pca(
     """
     pca = PCA(n_components=n_components, random_state=random_state, copy=False)
 
-    if MatrixDF.check_type(s)[0]:
+    if DataFrame.check_type(s)[0]:
         values = s.values
     else:
         values = list(s)
@@ -391,9 +391,9 @@ def pca(
     return pd.Series(list(pca.fit_transform(values)), index=s.index)
 
 
-@InputSeries([VectorSeries, MatrixDF])
+@InputSeries([VectorSeries, DataFrame])
 def nmf(
-    s: Union[VectorSeries, MatrixDF], n_components=2, random_state=None
+    s: Union[VectorSeries, DataFrame], n_components=2, random_state=None
 ) -> VectorSeries:
     """
     Performs non-negative matrix factorization.
@@ -412,11 +412,11 @@ def nmf(
     document that places it correctly among the topics.
 
     NMF can directly handle sparse input, so when calling nmf on a
-    MatrixDF, the advantage of sparseness is kept.
+    DataFrame, the advantage of sparseness is kept.
 
     Parameters
     ----------
-    s : Pandas Series (VectorSeries) or Sparse DataFrame (MatrixDF)
+    s : Pandas Series (VectorSeries) or Sparse DataFrame (DataFrame)
 
     n_components : Int. Default is 2.
         Number of components to keep (dimensionality of output vectors).
@@ -456,7 +456,7 @@ def nmf(
     """
     nmf = NMF(n_components=n_components, init="random", random_state=random_state,)
 
-    if MatrixDF.check_type(s)[0]:
+    if DataFrame.check_type(s)[0]:
         s_coo = s.sparse.to_coo()
         s_for_vectorization = s_coo.astype("float64")
     else:
@@ -465,9 +465,9 @@ def nmf(
     return pd.Series(list(nmf.fit_transform(s_for_vectorization)), index=s.index)
 
 
-@InputSeries([VectorSeries, MatrixDF])
+@InputSeries([VectorSeries, DataFrame])
 def tsne(
-    s: Union[VectorSeries, MatrixDF],
+    s: Union[VectorSeries, DataFrame],
     n_components=2,
     perplexity=30.0,
     learning_rate=200.0,
@@ -489,11 +489,11 @@ def tsne(
     a way that the differences / similarities between documents are preserved.
 
     T-SNE can directly handle sparse input, so when calling tsne on a
-    MatrixDF, the advantage of sparseness is kept.
+    DataFrame, the advantage of sparseness is kept.
 
     Parameters
     ----------
-    s : Pandas Series (VectorSeries) or Sparse DataFrame (MatrixDF)
+    s : Pandas Series (VectorSeries) or Sparse DataFrame (DataFrame)
 
     n_components : int, default is 2.
         Number of components to keep (dimensionality of output vectors).
@@ -559,7 +559,7 @@ def tsne(
         n_jobs=n_jobs,
     )
 
-    if MatrixDF.check_type(s)[0]:
+    if DataFrame.check_type(s)[0]:
         s_coo = s.sparse.to_coo()
         s_for_vectorization = s_coo.astype("float64")
     else:
@@ -573,9 +573,9 @@ Clustering
 """
 
 
-@InputSeries([VectorSeries, MatrixDF])
+@InputSeries([VectorSeries, DataFrame])
 def kmeans(
-    s: Union[VectorSeries, MatrixDF],
+    s: Union[VectorSeries, DataFrame],
     n_clusters=5,
     n_init=10,
     max_iter=300,
@@ -599,11 +599,11 @@ def kmeans(
     k topics (clusters) and assign a topic to each document.
 
     Kmeans can directly handle sparse input, so when calling kmeans on a
-    MatrixDF, the advantage of sparseness is kept.
+    DataFrame, the advantage of sparseness is kept.
 
     Parameters
     ----------
-    s: Pandas Series (VectorSeries) or Sparse DataFrame (MatrixDF)
+    s: Pandas Series (VectorSeries) or Sparse DataFrame (DataFrame)
 
     n_clusters: Int, default to 5.
         The number of clusters to separate the data into.
@@ -653,7 +653,7 @@ def kmeans(
 
     """
 
-    if MatrixDF.check_type(s)[0]:
+    if DataFrame.check_type(s)[0]:
         s_coo = s.sparse.to_coo()
         s_for_vectorization = s_coo.astype("float64")
     else:
@@ -672,9 +672,9 @@ def kmeans(
     )
 
 
-@InputSeries([VectorSeries, MatrixDF])
+@InputSeries([VectorSeries, DataFrame])
 def dbscan(
-    s: Union[VectorSeries, MatrixDF],
+    s: Union[VectorSeries, DataFrame],
     eps=0.5,
     min_samples=5,
     metric="euclidean",
@@ -701,11 +701,11 @@ def dbscan(
     topics (clusters) and assign a topic to each document.
 
     DBSCAN can directly handle sparse input, so when calling dbscan on a
-    MatrixDF, the advantage of sparseness is kept.
+    DataFrame, the advantage of sparseness is kept.
 
     Parameters
     ----------
-    s: Pandas Series (VectorSeries) or Sparse DataFrame (MatrixDF)
+    s: Pandas Series (VectorSeries) or Sparse DataFrame (DataFrame)
 
     eps : float, default=0.5
         The maximum distance between two samples for one to be considered
@@ -763,7 +763,7 @@ def dbscan(
 
     """
 
-    if MatrixDF.check_type(s)[0]:
+    if DataFrame.check_type(s)[0]:
         s_coo = s.sparse.to_coo()
         s_for_vectorization = s_coo.astype("float64")
     else:
@@ -782,7 +782,7 @@ def dbscan(
     ).astype("category")
 
 
-@InputSeries([VectorSeries, MatrixDF])
+@InputSeries([VectorSeries, DataFrame])
 def meanshift(
     s: Union[pd.Series, pd.DataFrame],
     bandwidth=None,
@@ -811,12 +811,12 @@ def meanshift(
     find topics (clusters) and assign a topic to each document.
 
     Menashift cannot directly handle sparse input, so when calling meanshift on a
-    MatrixDF, the input has to be expanded which can lead to
+    DataFrame, the input has to be expanded which can lead to
     memory problems with big datasets.
 
     Parameters
     ----------
-    s: Pandas Series (VectorSeries) or Sparse DataFrame (MatrixDF)
+    s: Pandas Series (VectorSeries) or Sparse DataFrame (DataFrame)
 
     bandwidth : float, default=None
         Bandwidth used in the RBF kernel.
@@ -875,7 +875,7 @@ def meanshift(
 
     """
 
-    if MatrixDF.check_type(s)[0]:
+    if DataFrame.check_type(s)[0]:
         vectors = s.values
     else:
         vectors = list(s)
@@ -904,19 +904,19 @@ Normalization.
 """
 
 
-@InputSeries([VectorSeries, MatrixDF])
+@InputSeries([VectorSeries, DataFrame])
 def normalize(
-    s: Union[VectorSeries, MatrixDF], norm="l2"
-) -> Union[VectorSeries, MatrixDF]:
+    s: Union[VectorSeries, DataFrame], norm="l2"
+) -> Union[VectorSeries, DataFrame]:
     """
     Normalize every cell in a Pandas Series.
 
-    Input can be VectorSeries or MatrixDF. For MatrixDFs,
+    Input can be VectorSeries or DataFrame. For DataFrames,
     the sparseness is kept.
 
     Parameters
     ----------
-    s: Pandas Series (VectorSeries) or Sparse DataFrame (MatrixDF)
+    s: Pandas Series (VectorSeries) or Sparse DataFrame (DataFrame)
 
     norm: str, default to "l2"
         One of "l1", "l2", or "max". The norm that is used.
@@ -938,14 +938,14 @@ def normalize(
 
     See Also
     --------
-    MatrixDF link TODO add link to tutorial
+    DataFrame link TODO add link to tutorial
 
     `Norm on Wikipedia <https://en.wikipedia.org/wiki/Norm_(mathematics)>`_
 
     """
-    isMatrixDF = MatrixDF.check_type(s)[0]
+    isDataFrame = DataFrame.check_type(s)[0]
 
-    if isMatrixDF:
+    if isDataFrame:
         s_coo = s.sparse.to_coo()
         s_for_vectorization = s_coo.astype("float64")
     else:
@@ -955,7 +955,7 @@ def normalize(
         s_for_vectorization, norm=norm
     )  # Can handle sparse input.
 
-    if isMatrixDF:
+    if isDataFrame:
         return pd.DataFrame.sparse.from_spmatrix(result, s.index, s.columns)
     else:
         return pd.Series(list(result), index=s.index)

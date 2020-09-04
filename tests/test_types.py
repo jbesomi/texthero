@@ -78,13 +78,7 @@ class TestTypes(PandasTestCase):
             pass
 
         try:
-            f(
-                pd.DataFrame(
-                    [[1, 2, 3]],
-                    columns=["a", "b", "c"],
-                    dtype="Sparse",
-                )
-            )
+            f(pd.DataFrame([[1, 2, 3]], columns=["a", "b", "c"], dtype="Sparse",))
         except TypeError:
             self.fail("Failed although input type is correct.")
 
@@ -94,13 +88,7 @@ class TestTypes(PandasTestCase):
             pass
 
         try:
-            f(
-                pd.DataFrame(
-                    [[1, 2, 3]],
-                    columns=["a", "b", "c"],
-                    dtype="Sparse",
-                )
-            )
+            f(pd.DataFrame([[1, 2, 3]], columns=["a", "b", "c"], dtype="Sparse",))
 
             f(pd.Series([[1.0, 2.0]]))
 

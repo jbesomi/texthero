@@ -85,7 +85,7 @@ class HeroTypes(pd.Series, pd.DataFrame):
     4. MatrixDF: A MatrixDF is a sparse DataFrame representing a matrix.
     Every cell value is one entry in the matrix.
     For example,
-    `pd.DataFrame([[1, 2, 3], [4,5,6]], columns=pd.MultiIndex.from_tuples([("count", "hi"), ("count", "servus"), ("count", "hola")]))`
+    `pd.DataFrame([[1, 2, 3], [4,5,6]], columns=["word1", "word2", "word3"])`
     is a valid MatrixDF.
 
     These types of Series are supposed to make using the library
@@ -194,7 +194,7 @@ class VectorSeries(HeroTypes):
 class MatrixDF(HeroTypes):
     """
     A MatrixDF is a sparse DataFrame
-    representing a matrix (e.g. a Document Term Matrix).
+    representing a matrix (e.g. a Matrix Matrix).
     Every cell value
     is one entry in the matrix.
     For example,
@@ -214,11 +214,7 @@ class MatrixDF(HeroTypes):
             " See help(hero.HeroTypes) for more information."
         )
 
-        if not (
-            isinstance(df, pd.DataFrame)
-            and isinstance(df.columns, pd.MultiIndex)
-            and pd.api.types.is_sparse(df.dtypes[0])
-        ):
+        if not (isinstance(df, pd.DataFrame) and pd.api.types.is_sparse(df.dtypes[0])):
             return False, error_string
         else:
             return True, ""

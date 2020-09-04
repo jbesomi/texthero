@@ -134,11 +134,11 @@ def term_frequency(
     s: pd.Series, max_features: Optional[int] = None, min_df=1, max_df=1.0,
 ) -> pd.DataFrame:
     """
-    Represent a text-based Pandas Series using term frequency.
+    Return a count document-term DataFrame based on the given Pandas Series
 
-    Return a Document Term DataFrame with the
-    term frequencies of the terms for every
-    document. The output is sparse.
+    Rows of the returned DataFrame represent document whereas columns are terms.
+    The value in the cell document-term is the frequency of the term in
+    this document. The output is sparse.
     TODO add tutorial link
 
     The input Series should already be tokenized. If not, it will

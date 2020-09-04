@@ -54,13 +54,6 @@ s_tokenized_output_index = pd.Index([0, 1])
 
 s_tokenized_output_index_noncontinous = pd.Index([5, 7])
 
-
-def _get_multiindex_for_tokenized_output(first_level_name):
-    return pd.MultiIndex.from_product(
-        [[first_level_name], ["!", ".", "?", "TEST", "Test"]]
-    )
-
-
 test_cases_vectorization = [
     # format: [function_name, function, correct output for tokenized input above]
     [
@@ -69,7 +62,7 @@ test_cases_vectorization = [
         pd.DataFrame(
             [[1, 0, 0, 1, 2], [0, 2, 1, 0, 1]],
             index=s_tokenized_output_index,
-            columns=_get_multiindex_for_tokenized_output("count"),
+            columns=["!", ".", "?", "TEST", "Test"],
         ).astype("Sparse[int64, 0]"),
     ],
     [
@@ -78,7 +71,7 @@ test_cases_vectorization = [
         pd.DataFrame(
             [[0.125, 0.0, 0.0, 0.125, 0.250], [0.0, 0.25, 0.125, 0.0, 0.125]],
             index=s_tokenized_output_index,
-            columns=_get_multiindex_for_tokenized_output("term_frequency"),
+            columns=["!", ".", "?", "TEST", "Test"],
             dtype="Sparse",
         ).astype("Sparse[float64, nan]"),
     ],
@@ -94,7 +87,7 @@ test_cases_vectorization = [
                 [_tfidf(x, s_tokenized, 1) for x in ["!", ".", "?", "TEST", "Test"]],
             ],
             index=s_tokenized_output_index,
-            columns=_get_multiindex_for_tokenized_output("tfidf"),
+            columns=["!", ".", "?", "TEST", "Test"],
         ).astype("Sparse[float64, nan]"),
     ],
 ]
@@ -108,7 +101,7 @@ test_cases_vectorization_min_df = [
         pd.DataFrame(
             [2, 1],
             index=s_tokenized_output_index,
-            columns=pd.MultiIndex.from_tuples([("count", "Test")]),
+            columns=["Test"],
         ).astype("Sparse[int64, 0]"),
     ],
     [
@@ -117,7 +110,7 @@ test_cases_vectorization_min_df = [
         pd.DataFrame(
             [0.666667, 0.333333],
             index=s_tokenized_output_index,
-            columns=pd.MultiIndex.from_tuples([("term_frequency", "Test")]),
+            columns=[ "Test"],
         ).astype("Sparse[float64, nan]"),
     ],
     [
@@ -126,7 +119,7 @@ test_cases_vectorization_min_df = [
         pd.DataFrame(
             [2, 1],
             index=s_tokenized_output_index,
-            columns=pd.MultiIndex.from_tuples([("tfidf", "Test")]),
+            columns= ["Test"],
         ).astype("Sparse[float64, nan]"),
     ],
 ]
@@ -136,7 +129,7 @@ s_vector_series = pd.Series([[1.0, 0.0], [0.0, 0.0]], index=[5, 7])
 s_documenttermDF = pd.DataFrame(
     [[1.0, 0.0], [0.0, 0.0]],
     index=[5, 7],
-    columns=pd.MultiIndex.from_product([["test"], ["a", "b"]]),
+    columns=["a", "b"],
 ).astype("Sparse[float64, nan]")
 
 
@@ -279,7 +272,7 @@ class AbstractRepresentationTest(PandasTestCase):
         correct_output = pd.DataFrame(
             [[1.0, 0.0], [0.0, 0.0]],
             index=[5, 7],
-            columns=pd.MultiIndex.from_product([["test"], ["a", "b"]]),
+            columns= ["a", "b"],
         )
 
         pd.testing.assert_frame_equal(

@@ -152,7 +152,7 @@ Usually, documents about similar topics use similar terms, so their tfidf-vector
 
 ###### Integration of the calculation into an existing dataframe
 
-The only thing you _can_ but _should not_ do is store a _DocumentTermDF_ in your dataframe, as the performance is really bad. If you really want to, you can do it like this like this:
+The only thing you _can_ but _should not_ do is store a _DataFrame_ in your pandas dataframe, as the performance is really bad. If you really want to, you can do it like this like this:
  ```python
  >>> data = pd.read_csv("https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv")
  >>> data_count = data["text"].pipe(count)
@@ -262,11 +262,11 @@ of strings. For example, `pd.Series([["test"], ["token2", "token3"]])` is a vali
 3. __VectorSeries__: Every cell is a vector representing text, i.e.
 a list of floats. For example, `pd.Series([[1.0, 2.0], [3.0]])` is a valid VectorSeries. Most dimensionality reduction functions, like `pca` will take VectorSeries as an input and also return a VectorSeries.
 
-4. **DocumentTermDF**: A DataFrame where the rows are the documents and the columns are the words/terms in all the documents. The columns are multiindexed with level one
- being the content name (e.g. "tfidf"), level two being the individual features and their values.
- For example,
- `pd.DataFrame([[1, 2, 3], [4,5,6]], columns=pd.MultiIndex.from_tuples([("count", "hi"), ("count", "servus"), ("count", "hola")]))`
- is a valid RepresentationSeries.
+4. **DataFrame**: A Pandas DataFrame where the rows can be the documents and the columns can be the words/terms in all the documents. 
+This is a return type of the representation functions (count, term_frequenzy, tfidf)
+For example,
+ `pd.DataFrame([[1, 2, 3], [4,5,6]], columns=["hi", "servus", "hola"])`
+ is a valid DataFrame.
 
 To get more detailed insights into this topic, you can have a look at the typing tutorial. But in general, if you use texthero with the common pipeline:
 - cleaning the Series with functions from the preprocessing module

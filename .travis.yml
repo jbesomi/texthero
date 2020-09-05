@@ -20,7 +20,7 @@ jobs:
       env: PATH=/c/Python38:/c/Python38/Scripts:$PATH
 install: 
     - pip3 install --upgrade pip  # all three OSes agree about 'pip3'
-    - pip3 install black
+    - pip3 install black==19.10b0
     - pip3 install ".[dev]" .
 # 'python' points to Python 2.7 on macOS but points to Python 3.8 on Linux and Windows
 # 'python3' is a 'command not found' error on Windows but 'py' works on Windows only

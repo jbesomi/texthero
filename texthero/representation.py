@@ -34,7 +34,7 @@ def _check_is_valid_DocumentTermDF(df: Union[pd.DataFrame, pd.Series]) -> bool:
     Returns true if input is Document Term DF, else False.
 
     """
-    return isinstance(df, pd.DataFrame) and isinstance(df.columns, pd.MultiIndex)
+    return isinstance(df, pd.DataFrame) and not isinstance(df.columns, pd.MultiIndex)
 
 
 # Warning message for not-tokenized inputs
@@ -97,8 +97,7 @@ def count(
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
-    >>> hero.count(s) # doctest: +SKIP
-         count        
+    >>> hero.count(s) # doctest: +SKIP        
       Sentence one two
     0        1   1   0
     1        1   0   1
@@ -126,12 +125,8 @@ def count(
 
     tf_vectors_csr = tf.fit_transform(s)
 
-    multiindexed_columns = pd.MultiIndex.from_tuples(
-        [("count", word) for word in tf.get_feature_names()]
-    )
-
     return pd.DataFrame.sparse.from_spmatrix(
-        tf_vectors_csr, s.index, multiindexed_columns
+        tf_vectors_csr, s.index, tf.get_feature_names()
     )
 
 
@@ -139,11 +134,11 @@ def term_frequency(
     s: pd.Series, max_features: Optional[int] = None, min_df=1, max_df=1.0,
 ) -> pd.DataFrame:
     """
-    Represent a text-based Pandas Series using term frequency.
+    Return a count document-term DataFrame based on the given Pandas Series
 
-    Return a Document Term DataFrame with the
-    term frequencies of the terms for every
-    document. The output is sparse.
+    Rows of the returned DataFrame represent document whereas columns are terms.
+    The value in the cell document-term is the frequency of the term in
+    this document. The output is sparse.
     TODO add tutorial link
 
     The input Series should already be tokenized. If not, it will
@@ -175,8 +170,7 @@ def term_frequency(
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one hey", "Sentence two"]).pipe(hero.tokenize)
-    >>> hero.term_frequency(s) # doctest: +SKIP
-      term_frequency               
+    >>> hero.term_frequency(s) # doctest: +SKIP              
             Sentence  hey  one  two
     0            0.2  0.2  0.2  0.0
     1            0.2  0.0  0.0  0.2
@@ -204,12 +198,8 @@ def term_frequency(
     total_count_coo = np.sum(tf_vectors_coo)
     frequency_coo = np.divide(tf_vectors_coo, total_count_coo)
 
-    multiindexed_columns = pd.MultiIndex.from_tuples(
-        [("term_frequency", word) for word in tf.get_feature_names()]
-    )
-
     return pd.DataFrame.sparse.from_spmatrix(
-        frequency_coo, s.index, multiindexed_columns
+        frequency_coo, s.index, tf.get_feature_names()
     )
 
 
@@ -271,8 +261,7 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFram
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Hi Bye", "Test Bye Bye"]).pipe(hero.tokenize)
-    >>> hero.tfidf(s) # doctest: +SKIP
-      tfidf                    
+    >>> hero.tfidf(s) # doctest: +SKIP                    
         Bye        Hi      Test
     0   1.0  1.405465  0.000000
     1   2.0  0.000000  1.405465
@@ -301,12 +290,8 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFram
 
     tfidf_vectors_csr = tfidf.fit_transform(s)
 
-    multiindexed_columns = pd.MultiIndex.from_tuples(
-        [("tfidf", word) for word in tfidf.get_feature_names()]
-    )
-
     return pd.DataFrame.sparse.from_spmatrix(
-        tfidf_vectors_csr, s.index, multiindexed_columns
+        tfidf_vectors_csr, s.index, tfidf.get_feature_names()
     )
 
 

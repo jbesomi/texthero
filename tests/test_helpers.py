@@ -88,18 +88,16 @@ class TestHelpers(PandasTestCase):
 
     def test_pandas_set_item_multiIndex(self):
         df1 = pd.DataFrame(["Text 1", "Text 2"], columns=["Test"])
-        df2 = pd.DataFrame(
-            [[3, 5], [8, 4]], columns=pd.MultiIndex.from_product([["count"], [0, 1]]),
-        )
+        df2 = pd.DataFrame([[3, 5], [8, 4]], columns=["term 1", "term 2"],)
 
-        df1["here"] = df2
+        df1["count"] = df2
 
         pd.testing.assert_frame_equal(
             df1,
             pd.DataFrame(
                 [["Text 1", 3, 5], ["Text 2", 8, 4]],
                 columns=pd.MultiIndex.from_tuples(
-                    [("Test", ""), ("here", 0), ("here", 1)]
+                    [("Test", ""), ("count", "term 1"), ("count", "term 2")]
                 ),
             ),
         )

@@ -209,7 +209,7 @@ def _hero__setitem__(self, key, value):
     # 1.
     if (
         isinstance(value, pd.DataFrame)
-        and isinstance(value.columns, pd.MultiIndex)
+        and len(value.columns) > 1
         and isinstance(key, str)
     ):
 
@@ -221,7 +221,7 @@ def _hero__setitem__(self, key, value):
 
         # 3.
         value.columns = pd.MultiIndex.from_tuples(
-            [(key, subcol_name) for _, subcol_name in value.columns.values]
+            [(key, subcol_name) for subcol_name in value.columns.values]
         )
 
         # 4.

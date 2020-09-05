@@ -35,15 +35,14 @@ of strings. For example, `pd.Series([["test"], ["token2", "token3"]])` is a vali
 3. **VectorSeries**: Every cell is a vector representing text, i.e.
 a list of floats. For example, `pd.Series([[1.0, 2.0], [3.0]])` is a valid VectorSeries.
 
-4. **DocumentTermDF**: A DataFrame where the rows are the documents and the columns are the words/terms in all the documents. The columns are multiindexed with level one
-being the content name (e.g. "tfidf"), level two being the individual features and their values.
+4. **DataFrame**: A Pandas DataFrame where the rows can be the documents and the columns can be the words/terms in all the documents.
 For example,
-`pd.DataFrame([[1, 2, 3], [4,5,6]], columns=pd.MultiIndex.from_tuples([("count", "hi"), ("count", "servus"), ("count", "hola")]))`
-is a valid RepresentationSeries.
+`pd.DataFrame([[1, 2, 3], [4,5,6]], columns=["hi", "servus", "hola"])`
+is a valid DataFrame.
 
 Now, if you see a function in the documentation that looks like this:
 ```python
-tfidf(s: TokenSeries) -> DocumentTermDF
+tfidf(s: TokenSeries) -> DataFrame
 ```
 
 then you know that the function takes a Pandas Series
@@ -60,9 +59,9 @@ You might call it like this:
 
 And this function:
 ```python
-pca(s: Union[VectorSeries, DocumentTermDF]) -> VectorSeries
+pca(s: Union[VectorSeries, DataFrame]) -> VectorSeries
 ```
-needs a _DocumentTermDF_ or _VectorSeries_ as input and always returns a _VectorSeries_.
+needs a _DataFrame_ or _VectorSeries_ as input and always returns a _VectorSeries_.
 
 <h2 align="center">The Types in Detail</h2>
 
@@ -96,9 +95,9 @@ dtype: object
 
 <h3 align="left">VectorSeries</h3>
 
-In a _VectorSeries_, every cell is a vector representing text. We use this when we have a low-dimensional (e.g. vectors with length <=1000), dense (so not a lot of zeroes) representation of our texts that we want to work on. For example, the dimensionality reduction functions `pca, nmf, tsne` all take a high-dimensional representation of our text (in the form of a _DocumentTermDF_ (see below) or _VectorSeries_, and return a low-dimensional representation of our text in the form of a _VectorSeries_.
+In a _VectorSeries_, every cell is a vector representing text. We use this when we have a low-dimensional (e.g. vectors with length <=1000), dense (so not a lot of zeroes) representation of our texts that we want to work on. For example, the dimensionality reduction functions `pca, nmf, tsne` all take a high-dimensional representation of our text (in the form of a _DataFrame_ (see below) or _VectorSeries_, and return a low-dimensional representation of our text in the form of a _VectorSeries_.
 
-Example of a function that takes as input a _DocumentTermDF_ or _VectorSeries_ and returns a _VectorSeries_:
+Example of a function that takes as input a _DataFrame_ or _VectorSeries_ and returns a _VectorSeries_:
 ```python
 >>> s = pd.Series(["text first document", "text second document"]).pipe(hero.tokenize).pipe(hero.term_frequency)
 >>> hero.pca(s)
@@ -107,20 +106,18 @@ Example of a function that takes as input a _DocumentTermDF_ or _VectorSeries_ a
 dtype: object
 ```
 
-<h3 align="left">DocumentTermDF</h3>
+<h3 align="left">DataFrame</h3>
 
-As you can see, the `DocumentTermDF` type is a little more complex than the others. Let's have a closer look to see what it is and why, where and how it is used!
+As you can see, the `DataFrame` type is a little more complex than the others. Let's have a closer look to see what it is and why, where and how it is used!
 
 <h4 align="left">What is it?</h4>
 
-A _DocumentTermDF_ is a Pandas implementation of a [Document Term Matrix](https://en.wikipedia.org/wiki/Document-term_matrix), so the rows are the documents and the columns are the words/terms in all the documents. A _DocumentTermDF_ has multiindexed columns with level one
-being the content name (e.g. "tfidf"), and level two being the terms. It could look like this:
+A _DataFrame_ can be a Pandas implementation of a [Document Term Matrix](https://en.wikipedia.org/wiki/Document-term_matrix), so the rows are the documents and the columns are the words/terms in all the documents. Other representations are Topic-Term matrices or Document-Topic matrices. In the Topic modeling tutorial you can find a more detailed introcution into those. 
 
 ```python
 >>> s = pd.Series(["Sentence one one", "Sentence two"])
 >>> t = s.pipe(hero.tokenize).pipe(hero.count)  # first tokenize Series, then calculate word count
->>> t
-     count        
+>>> t     
   Sentence one two
 0        1   2   0
 1        1   0   1
@@ -136,7 +133,7 @@ count  Sentence    Sparse[int64, 0]
        one         Sparse[int64, 0]
        two         Sparse[int64, 0]
 ``` 
-That's precisely the reason we use this: Pandas internally does not store the zeros we get when e.g. calculating `hero.count`; so we don't see that the word "two" has zero occurrences in the first sentence, it's not stored. This is a massive advantage when dealing with *big data*: In a _DocumentTermDF_, we only store the data that's relevant for each document to save lots and lots of time and space!
+That's precisely the reason we use this: Pandas internally does not store the zeros we get when e.g. calculating `hero.count`; so we don't see that the word "two" has zero occurrences in the first sentence, it's not stored. This is a massive advantage when dealing with *big data*: In a _DataFrame_, we only store the data that's relevant for each document to save lots and lots of time and space!
 
 Let's look at an example with some more data.
 ```python
@@ -145,13 +142,13 @@ Let's look at an example with some more data.
 >>> data_count.sparse.density
 0.012...
 ```
-We can see that only around 1.2% of our _DocumentTermDF_ `data_count` is filled, so using the sparse DataFrame is saving us a lot of space.
+We can see that only around 1.2% of our _DataFrame_ `data_count` is filled, so using the sparse DataFrame is saving us a lot of space.
 
 <h4 align="left">When and how is it used? Do I have to work with multiindexes?!</h4>
 
-The _DocumentTermDF_ is mostly used internally for performance reasons. For example, as you can see above, the default output from `hero.count` is such a DataFrame, but if you apply e.g. `hero.pca` afterwards, you don't even notice the _DocumentTermDF_: `s.pipe(hero.count).pipe(hero.normalize).pipe(hero.pca)` works just fine; everything is seamlessly integrated in the library.
+The _DataFrame_ is mostly used internally for performance reasons. For example, as you can see above, the default output from `hero.count` is such a Pandas DataFrame, but if you apply e.g. `hero.pca` afterwards, you don't even notice the _DataFrame_: `s.pipe(hero.count).pipe(hero.normalize).pipe(hero.pca)` works just fine; everything is seamlessly integrated in the library.
 
-The only thing you _can_ but _should not_ do is store a _DocumentTermDF_ in your dataframe, as the performance is really bad. If you really want to, you can do it like this like this:
+The only thing you _can_ but _should not_ do is store a _DataFrame_ in your dataframe, as the performance is really bad. If you really want to, you can do it like this like this:
 ```python
 >>> data = pd.read_csv("https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv")
 >>> data_count = data["text"].pipe(count)

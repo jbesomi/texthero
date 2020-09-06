@@ -375,7 +375,7 @@ def show_dataframe(
                 RuntimeWarning,
             )
 
-        _display_df_notebook(df)
+        return _display_df_notebook(df)
 
     else:
         _display_df_browser(

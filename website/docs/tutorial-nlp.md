@@ -19,7 +19,7 @@ Let's begin by loading an interesting dataset and having a first look.
 ```
 ![](/img/tutorial-nlp-S1.png)
 
-As you can see, we are working with a dataset that's about superheroes! It features each hero's name, a texth about their history, and a text describing their superpowers. Of course, all of these can be missing (i.e. "NaN"). We will now try to generate some insights with each of the Texthero NLP functions.
+As you can see, we are working with a dataset that's about superheroes! It features each hero's name, a text about their history, and a text describing their superpowers. Of course, all of these can be missing (i.e. "NaN"). We will now try to generate some insights with each of the Texthero NLP functions.
 
 ## Count Sentences - Who is the most well-known superhero?
 First of all, we want to know which superhero is the most important. We use the naive approach of counting the number of sentences in their history. The idea is that more well-known superheroes have a richer backstory and writers put more effort into their history.

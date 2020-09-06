@@ -87,7 +87,7 @@ def flatten(
         # are present in the Sparse Representation Series
         # "reappear" correctly.
 
-    s = pd.Series(s.values.tolist(), index=s.index)
+    s = pd.Series(list(s.values), index=s.index)
 
     return s
 
@@ -480,7 +480,7 @@ def pca(s, n_components=2, random_state=None) -> pd.Series:
 
     """
     pca = PCA(n_components=n_components, random_state=random_state, copy=False)
-    return pd.Series(pca.fit_transform(list(s)).tolist(), index=s.index)
+    return pd.Series(list(pca.fit_transform(list(s))), index=s.index)
 
 
 def nmf(s, n_components=2, random_state=None) -> pd.Series:
@@ -542,7 +542,7 @@ def nmf(s, n_components=2, random_state=None) -> pd.Series:
 
     """
     nmf = NMF(n_components=n_components, init="random", random_state=random_state,)
-    return pd.Series(nmf.fit_transform(list(s)).tolist(), index=s.index)
+    return pd.Series(list(nmf.fit_transform(list(s))), index=s.index)
 
 
 def tsne(
@@ -635,7 +635,7 @@ def tsne(
         random_state=random_state,
         n_jobs=n_jobs,
     )
-    return pd.Series(tsne.fit_transform(list(s)).tolist(), index=s.index)
+    return pd.Series(list(tsne.fit_transform(list(s))), index=s.index)
 
 
 """

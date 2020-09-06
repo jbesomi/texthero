@@ -376,9 +376,9 @@ def show_dataframe(
                 RuntimeWarning,
             )
 
-        return IPython.display.display(IPython.display.HTML(
-            visualization_server.data_to_html(df), raw=True
-        ))
+        return IPython.display.display(
+            IPython.display.HTML(visualization_server.data_to_html(df), raw=True)
+        )
 
     else:
         _display_df_browser(

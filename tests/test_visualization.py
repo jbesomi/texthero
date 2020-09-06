@@ -79,3 +79,11 @@ class TestVisualization(PandasTestCase):
     def test_wordcloud(self):
         s = pd.Series("one two three")
         self.assertEqual(visualization.wordcloud(s), None)
+
+    """
+    Test show_dataframe.
+    """
+
+    def test_show_dataframe(self):
+        df = pd.DataFrame([["Test", 0.5], ["ja", 0.3]])
+        self.assertIsNotNone(visualization.show_dataframe(df, return_HTML=True))

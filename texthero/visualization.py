@@ -377,7 +377,7 @@ def show_dataframe(
             )
 
         return IPython.display.display(
-            IPython.display.HTML(visualization_server.data_to_html(df), raw=True)
+            IPython.display.HTML(visualization_server.data_to_html(df))
         )
 
     else:

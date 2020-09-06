@@ -365,6 +365,7 @@ def show_dataframe(
         # (Not a safe check.)
         try:
             __IPYTHON__
+            from IPython.display import HTML
         except:
             warnings.warn(
                 "You do not appear do be inside"
@@ -375,7 +376,7 @@ def show_dataframe(
                 RuntimeWarning,
             )
 
-        return _display_df_notebook(df)
+        return HTML(_display_df_notebook(df))
 
     else:
         _display_df_browser(

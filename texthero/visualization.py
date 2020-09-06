@@ -376,7 +376,9 @@ def show_dataframe(
                 RuntimeWarning,
             )
 
-        return HTML(_display_df_notebook(df))
+        return HTML(
+            visualization_server.data_to_html(df)
+        )
 
     else:
         _display_df_browser(

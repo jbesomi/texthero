@@ -83,29 +83,6 @@ def data_to_html(df):
     return template.render(df_json=df_json)
 
 
-def _display_df_notebook(df):
-    """
-    Display visualization of DataFrame `df`
-    in IPython notebook via the HTML display hook.
-
-    Returns the IPython HTML rich display of the visualization.
-
-    """
-    # import here, in case users don't have requirements installed
-    try:
-        from IPython.display import HTML
-    except:
-        raise ValueError(
-            "You do not appear do be inside"
-            " a Jupyter Notebook. Set"
-            " notebook=False to show the visualization."
-        )
-
-    html = data_to_html(df)
-
-    return HTML(html)
-
-
 def _display_df_browser(
     df, ip="127.0.0.1", port=8888,
 ):

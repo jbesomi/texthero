@@ -79,3 +79,14 @@ class TestVisualization(PandasTestCase):
     def test_wordcloud(self):
         s = pd.Series("one two three")
         self.assertEqual(visualization.wordcloud(s), None)
+
+    """
+    Test visualization of describe function
+    """
+
+    def test_visualisation_describe(self):
+        df = pd.DataFrame(
+            [["one two three", "here"], ["one two three", "here"]],
+            columns=["text", "topic"],
+        )
+        self.assertEqual(visualization.visualize_describe(df), None)

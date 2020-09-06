@@ -2,20 +2,24 @@
 Visualize insights and statistics of a text-based Pandas DataFrame.
 """
 
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import os
 import pandas as pd
 import numpy as np
 import plotly.express as px
+import warnings
 
 from wordcloud import WordCloud
 
 from texthero import preprocessing
 from texthero._types import TextSeries, InputSeries
-import string
 
 from matplotlib.colors import LinearSegmentedColormap as lsg
 import matplotlib.pyplot as plt
 
 from collections import Counter
+import string
 
 
 def scatterplot(
@@ -304,3 +308,123 @@ def top_words(s: TextSeries, normalize=False) -> pd.Series:
         .explode()  # one word for each line
         .value_counts(normalize=normalize)
     )
+
+
+def visualize_describe(df, text_col_name="text", labels_col_name="topic"):
+
+    s = df[text_col_name]
+    s_labels = df[labels_col_name]
+
+    # Gather data (most from hero.describe, just
+    # the document lengths histogram is calculated here).
+    s_tokenized = preprocessing.tokenize(s)
+    has_content_mask = preprocessing.has_content(s)
+    s_document_lengths = s_tokenized[has_content_mask].map(lambda x: len(x))
+
+    document_lengths_histogram = np.histogram(s_document_lengths.values, bins=20)
+
+    document_lengths_histogram_df = pd.DataFrame(
+        {
+            "Document Length": np.insert(document_lengths_histogram[0], 0, 0),
+            "Number of Documents": document_lengths_histogram[1],
+        }
+    )
+
+    description = preprocessing.describe(s, s_labels)
+
+    # Initialize Figure
+    fig = make_subplots(
+        rows=2,
+        cols=2,
+        specs=[
+            [{"type": "sankey"}, {"type": "table"}],
+            [{"type": "scatter"}, {"type": "pie"}],
+        ],
+        column_widths=[0.7, 0.3],
+    )
+
+    # Create pie chart of label distribution if it was calculated.
+    if "label distribution" in description.index:
+        label_distribution_pie_chart_df = description.loc["label distribution"]
+        label_distribution_pie_chart_fig = go.Pie(
+            labels=label_distribution_pie_chart_df.index.tolist(),
+            values=label_distribution_pie_chart_df.values.flatten().tolist(),
+            title="Label Distributions",
+        )
+
+    # Create histogram of document lengths
+    document_lengths_fig = go.Scatter(
+        x=document_lengths_histogram_df["Number of Documents"],
+        y=document_lengths_histogram_df["Document Length"],
+        fill="tozeroy",
+        name="Document Length Histogram",
+        showlegend=False,
+    )
+
+    # Create bar charts for documents / unique / missing
+    number_of_duplicates = (
+        description.loc["number of documents"].values[0][0]
+        - description.loc["number of unique documents"].values[0][0]
+        - description.loc["number of missing documents"].values[0][0]
+    )
+
+    schart = go.Sankey(
+        node=dict(
+            pad=15,
+            thickness=20,
+            label=[
+                "Total Number of Documents",
+                "Missing Documents",
+                "Unique Documents",
+                "Duplicate Documents",
+            ],
+            color=[
+                "rgba(122,122,255,0.8)",
+                "rgba(255,153,51,0.8)",
+                "rgba(141,211,199,0.8)",
+                "rgba(235,83,83,0.8)",
+            ],
+        ),
+        link=dict(
+            # indices correspond to labels, eg A1, A2, A2, B1, ...
+            source=[0, 0, 0],
+            target=[2, 1, 3],
+            color=[
+                "rgba(179,226,205,0.6)",
+                "rgba(250,201,152,0.6)",
+                "rgba(255,134,134,0.6)",
+            ],
+            value=[
+                description.loc["number of unique documents"].values[0][0],
+                number_of_duplicates,
+                description.loc["number of missing documents"].values[0][0],
+            ],
+        ),
+    )
+
+    # Create Table to show the 10 most common words (with and without stopwords)
+    table = go.Table(
+        header=dict(values=["Top Words with Stopwords", "Top Words without Stopwords"]),
+        cells=dict(
+            values=[
+                description.loc["most common words"].values[0][0],
+                description.loc["most common words excluding stopwords"].values[0][0],
+            ]
+        ),
+    )
+
+    # Combine figures.
+    fig.add_trace(label_distribution_pie_chart_fig, row=2, col=2)
+    fig.add_trace(document_lengths_fig, row=2, col=1)
+
+    fig.add_trace(schart, row=1, col=1)
+
+    fig.add_trace(table, row=1, col=2)
+
+    # Style and show figure.
+    fig.update_layout(plot_bgcolor="rgb(255,255,255)", barmode="stack")
+    fig.update_xaxes(title_text="Document Length", row=2, col=1)
+    fig.update_yaxes(title_text="Number of Documents", row=2, col=1)
+    fig.update_layout(legend=dict(yanchor="bottom", y=0, x=1.1, xanchor="right",))
+
+    fig.show()

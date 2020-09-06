@@ -374,9 +374,10 @@ def visualize_describe(df, text_col_name="text", labels_col_name="topic"):
             thickness=20,
             label=[
                 "Total Number of Documents",
-                "Missing Documents",
-                "Unique Documents",
                 "Duplicate Documents",
+                "Unique Documents",
+                "Missing Documents",
+
             ],
             color=[
                 "rgba(122,122,255,0.8)",

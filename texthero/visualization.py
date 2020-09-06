@@ -365,7 +365,7 @@ def show_dataframe(
         # (Not a safe check.)
         try:
             __IPYTHON__
-            from IPython.display import HTML
+            import IPython
         except:
             warnings.warn(
                 "You do not appear do be inside"
@@ -376,8 +376,8 @@ def show_dataframe(
                 RuntimeWarning,
             )
 
-        return HTML(
-            visualization_server.data_to_html(df)
+        return IPython.display.display_html(
+            visualization_server.data_to_html(df), raw=True
         )
 
     else:

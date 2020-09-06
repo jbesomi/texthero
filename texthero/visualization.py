@@ -12,7 +12,7 @@ from wordcloud import WordCloud
 
 from texthero import preprocessing
 from texthero._types import TextSeries, InputSeries
-from texthero.visualization_server import _display_df_notebook, _display_df_browser
+from texthero.visualization_server import _display_df_browser
 from texthero import visualization_server
 
 from matplotlib.colors import LinearSegmentedColormap as lsg

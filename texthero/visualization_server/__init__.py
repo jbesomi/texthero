@@ -4,6 +4,6 @@ run interactively.
 """
 
 from ._display import *
-from ._display import _display_df_browser, _display_df_notebook
+from ._display import _display_df_browser
 
 from ._server import *

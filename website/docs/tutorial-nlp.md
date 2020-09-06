@@ -17,7 +17,7 @@ Let's begin by loading an interesting dataset and having a first look.
 >>> df = df[["name", "history_text", "powers_text"]]
 >>> df.head(3)
 ```
-![](./assets/tutorial-nlp-S1.png)
+![](/img/tutorial-nlp-S1.png)
 
 As you can see, we are working with a dataset that's about superheroes! It features each hero's name, a texth about their history, and a text describing their superpowers. Of course, all of these can be missing (i.e. "NaN"). We will now try to generate some insights with each of the Texthero NLP functions.
 
@@ -33,7 +33,7 @@ Of course, we use Texthero's `count_sentences` function.
 >>> df["history_length"] = df["history_text"].pipe(hero.count_sentences)
 >>> df.head(3)
 ```
-![](./assets/tutorial-nlp-S2.png)
+![](/img/tutorial-nlp-S2.png)
 
 We now have the number of sentences of the histories. Let's see whose is the longest. We can use Pandas built-in sorting function for that.
 
@@ -42,7 +42,7 @@ We now have the number of sentences of the histories. Let's see whose is the lon
 >>> df.sort_values("history_length", ascending=False, inplace=True)
 >>> df.head(5)
 ```
-![](./assets/tutorial-nlp-S3.png)
+![](/img/tutorial-nlp-S3.png)
 
 Looks like Sonic has quite the history! We can definitely see that the more well-known heroes are now at the top.
 
@@ -58,7 +58,7 @@ We'll now try to find alternative names for our superheroes. For that, we'll use
 >>> df["noun chunks"] = df["powers_text"].pipe(hero.noun_chunks)
 >>> df.head(3)[["name", "powers_text", "noun chunks"]]
 ```
-![](./assets/tutorial-nlp-S4.png)
+![](/img/tutorial-nlp-S4.png)
 
 To get alternative names, we now loop through every row in the `noun chunks` field and extract the first noun chunk with length 3 that starts with "a" or "the" - the hope is to extract stuff like "the green mutant" for Hulk. In pandas, this is really easy: We write a function that works on one list of noun chunks (i.e. one cell) and then use `apply` to apply that function to a whole column.
 
@@ -91,7 +91,7 @@ Let's have a look at some selected alternative names (of course this does not wo
 >>> # Finally, look at the interesting rows.
 >>> df[interesting_rows][["name", "alternative name", "powers_text", "noun chunks"]]
 ```
-![](./assets/tutorial-nlp-S5.png)
+![](/img/tutorial-nlp-S5.png)
 
 Looks like we got some good results for those superheroes!
 
@@ -104,7 +104,7 @@ In the `powers_text` column, we only get a text describing our heroes' powers. I
 >>> df["pos tag"] = df["powers_text"].pipe(hero.pos_tag)
 >>> df.head(3)[["name", "powers_text", "pos tag"]]
 ```
-![](./assets/tutorial-nlp-S6.png)
+![](/img/tutorial-nlp-S6.png)
 
 Just like with the noun chunks, we now extract the adjectives by writing a function that extracts them from a list of POS-tags and applying that function to the whole column.
 
@@ -121,7 +121,7 @@ Again, just apply:
 >>> # Look at the interesting rows we defined above again.
 >>> df[interesting_rows][["name", "pos tag", "powers"]]
 ```
-![](./assets/tutorial-nlp-S7.png)
+![](/img/tutorial-nlp-S7.png)
 
 
 ## Named Entities - Where do our superheroes live?
@@ -133,7 +133,7 @@ Having found out so much about our superheroes, we're now interested in where th
 >>> df["named entities"] = df["history_text"].pipe(hero.named_entities)
 >>> df.head(3)[["name", "history_text", "named entities"]]
 ```
-![](./assets/tutorial-nlp-S8.png)
+![](/img/tutorial-nlp-S8.png)
 
 Here's the function to extract the most common geographical entity:
 
@@ -160,7 +160,7 @@ Let's apply the function and take a look at a few results.
 >>> df["location"] = df["named entities"].apply(location_from_named_entities)
 >>> df[["name", "location", "named entities"]].head(5)
 ```
-![](./assets/tutorial-nlp-S9.png)
+![](/img/tutorial-nlp-S9.png)
 
 We get some good and some not-so-good results. There's certainly a lot more fun that can be had with this dataset!
 

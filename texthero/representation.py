@@ -27,7 +27,7 @@ Helper
 """
 
 
-def _check_is_valid_DocumentTermDF(df: Union[pd.DataFrame, pd.Series]) -> bool:
+def _check_is_valid_DataFrame(df: Union[pd.DataFrame, pd.Series]) -> bool:
     """
     Check if the given Pandas Series is a Document Term DF.
 
@@ -304,7 +304,7 @@ def pca(
     input_matrix: Union[pd.Series, pd.DataFrame], n_components=2, random_state=None
 ) -> pd.Series:
     """
-    Perform principal component analysis on the given Pandas Series.
+    Perform principal component analysis on the given input.
 
     Principal Component Analysis (PCA) is a statistical method that is used
     to reveal where the variance in a dataset comes from. For textual data,
@@ -367,7 +367,7 @@ def pca(
     """
     pca = PCA(n_components=n_components, random_state=random_state, copy=False)
 
-    if _check_is_valid_DocumentTermDF(input_matrix):
+    if _check_is_valid_DataFrame(input_matrix):
         values = input_matrix.values
     else:
         values = list(input_matrix)
@@ -439,7 +439,7 @@ def nmf(
     """
     nmf = NMF(n_components=n_components, init="random", random_state=random_state,)
 
-    if _check_is_valid_DocumentTermDF(input_matrix):
+    if _check_is_valid_DataFrame(input_matrix):
         input_matrix_coo = input_matrix.sparse.to_coo()
         input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
@@ -544,7 +544,7 @@ def tsne(
         n_jobs=n_jobs,
     )
 
-    if _check_is_valid_DocumentTermDF(input_matrix):
+    if _check_is_valid_DataFrame(input_matrix):
         input_matrix_coo = input_matrix.sparse.to_coo()
         input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
@@ -641,7 +641,7 @@ def kmeans(
 
     """
 
-    if _check_is_valid_DocumentTermDF(input_matrix):
+    if _check_is_valid_DataFrame(input_matrix):
         input_matrix_coo = input_matrix.sparse.to_coo()
         input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
@@ -751,7 +751,7 @@ def dbscan(
 
     """
 
-    if _check_is_valid_DocumentTermDF(input_matrix):
+    if _check_is_valid_DataFrame(input_matrix):
         input_matrix_coo = input_matrix.sparse.to_coo()
         input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
@@ -862,7 +862,7 @@ def meanshift(
 
     """
 
-    if _check_is_valid_DocumentTermDF(input_matrix):
+    if _check_is_valid_DataFrame(input_matrix):
         vectors = input_matrix.values
     else:
         vectors = list(input_matrix)
@@ -927,7 +927,7 @@ def normalize(input_matrix: Union[pd.DataFrame, pd.Series], norm="l2") -> pd.Ser
     `Norm on Wikipedia <https://en.wikipedia.org/wiki/Norm_(mathematics)>`_
 
     """
-    isDocumentTermDF = _check_is_valid_DocumentTermDF(input_matrix)
+    isDocumentTermDF = _check_is_valid_DataFrame(input_matrix)
 
     if isDocumentTermDF:
         input_matrix_coo = input_matrix.sparse.to_coo()

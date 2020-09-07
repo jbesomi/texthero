@@ -134,7 +134,7 @@ def term_frequency(
     s: pd.Series, max_features: Optional[int] = None, min_df=1, max_df=1.0,
 ) -> pd.DataFrame:
     """
-    Return a count document-term DataFrame based on the given Pandas Series
+    Return a Term Frequenzy document-term DataFrame based on the given Pandas Series
 
     Rows of the returned DataFrame represent document whereas columns are terms.
     The value in the cell document-term is the frequency of the term in
@@ -330,7 +330,7 @@ def pca(
 
     Parameters
     ----------
-    input_matrix : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix : Pandas Series (VectorSeries) or DataFrame (DocumentTermDF)
 
     n_components : Int. Default is 2.
         Number of components to keep (dimensionality of output vectors).
@@ -399,7 +399,7 @@ def nmf(
 
     Parameters
     ----------
-    input_matrix : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix : Pandas Series (VectorSeries) or DataFrame (DocumentTermDF)
 
     n_components : Int. Default is 2.
         Number of components to keep (dimensionality of output vectors).
@@ -445,7 +445,10 @@ def nmf(
     else:
         input_matrix_for_vectorization = list(input_matrix)
 
-    return pd.Series(list(nmf.fit_transform(input_matrix_for_vectorization)), index=input_matrix.index)
+    return pd.Series(
+        list(nmf.fit_transform(input_matrix_for_vectorization)),
+        index=input_matrix.index,
+    )
 
 
 def tsne(
@@ -475,7 +478,7 @@ def tsne(
 
     Parameters
     ----------
-    input_matrix : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix : Pandas Series (VectorSeries) or DataFrame (DocumentTermDF)
 
     n_components : int, default is 2.
         Number of components to keep (dimensionality of output vectors).
@@ -545,9 +548,12 @@ def tsne(
         input_matrix_coo = input_matrix.sparse.to_coo()
         input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
-        s_for_vectorization = list(input_matrix)
+        input_matrix_for_vectorization = list(input_matrix)
 
-    return pd.Series(list(tsne.fit_transform(input_matrix_for_vectorization)), index=input_matrix.index)
+    return pd.Series(
+        list(tsne.fit_transform(input_matrix_for_vectorization)),
+        index=input_matrix.index,
+    )
 
 
 """
@@ -584,7 +590,7 @@ def kmeans(
 
     Parameters
     ----------
-    input_matrix: Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix: Pandas Series (VectorSeries) or DataFrame (DocumentTermDF)
 
     n_clusters: Int, default to 5.
         The number of clusters to separate the data into.
@@ -616,7 +622,8 @@ def kmeans(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, fun, guitar"])
+    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra",
+    ...                "football, fun, sports", "music, fun, guitar"])
     >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency)
     >>> hero.kmeans(s, n_clusters=2, random_state=42)
     0    1
@@ -638,7 +645,7 @@ def kmeans(
         input_matrix_coo = input_matrix.sparse.to_coo()
         input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
-        s_for_vectorization = list(input_matrix)
+        input_matrix_for_vectorization = list(input_matrix)
 
     kmeans = KMeans(
         n_clusters=n_clusters,
@@ -647,10 +654,10 @@ def kmeans(
         random_state=random_state,
         copy_x=True,
         algorithm=algorithm,
-    ).fit(s_for_vectorization)
-    return pd.Series(kmeans.predict(s_for_vectorization), index=input_matrix.index).astype(
-        "category"
-    )
+    ).fit(input_matrix_for_vectorization)
+    return pd.Series(
+        kmeans.predict(input_matrix_for_vectorization), index=input_matrix.index
+    ).astype("category")
 
 
 def dbscan(
@@ -685,7 +692,7 @@ def dbscan(
 
     Parameters
     ----------
-    input_matrix: Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix: Pandas Series (VectorSeries) or DataFrame (DocumentTermDF)
 
     eps : float, default=0.5
         The maximum distance between two samples for one to be considered
@@ -724,7 +731,8 @@ def dbscan(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, enjoy, guitar"])
+    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", 
+    ...                "football, fun, sports", "music, enjoy, guitar"])
     >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
     >>> hero.dbscan(s, min_samples=1, eps=4)
     0    0
@@ -795,7 +803,7 @@ def meanshift(
 
     Parameters
     ----------
-    input_matrix: Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix: Pandas Series (VectorSeries) or DataFrame (DocumentTermDF)
 
     bandwidth : float, default=None
         Bandwidth used in the RBF kernel.
@@ -892,7 +900,7 @@ def normalize(input_matrix: Union[pd.DataFrame, pd.Series], norm="l2") -> pd.Ser
 
     Parameters
     ----------
-    input_matrix: Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix: Pandas Series (VectorSeries) or DataFrame (DocumentTermDF)
 
     norm: str, default to "l2"
         One of "l1", "l2", or "max". The norm that is used.
@@ -932,6 +940,8 @@ def normalize(input_matrix: Union[pd.DataFrame, pd.Series], norm="l2") -> pd.Ser
     )  # Can handle sparse input.
 
     if isDocumentTermDF:
-        return pd.DataFrame.sparse.from_spmatrix(result, input_matrix.index, input_matrix.columns)
+        return pd.DataFrame.sparse.from_spmatrix(
+            result, input_matrix.index, input_matrix.columns
+        )
     else:
         return pd.Series(list(result), index=input_matrix.index)

@@ -60,9 +60,9 @@ def count(
     """
     Represent a text-based Pandas Series using count.
 
-    Return a Document Term DataFrame with the
-    number of occurences of a document's words for every
-    document.
+    Rows of the returned DataFrame represent document whereas columns are terms.
+    The value in the cell document-term is the number of the term in
+    this document. The output is sparse.
     TODO add tutorial link
 
     The input Series should already be tokenized. If not, it will
@@ -134,7 +134,7 @@ def term_frequency(
     s: pd.Series, max_features: Optional[int] = None, min_df=1, max_df=1.0,
 ) -> pd.DataFrame:
     """
-    Return a Term Frequenzy document-term DataFrame based on the given Pandas Series
+    Represent a text-based Pandas Series using Term Frequency.
 
     Rows of the returned DataFrame represent document whereas columns are terms.
     The value in the cell document-term is the frequency of the term in
@@ -206,6 +206,10 @@ def term_frequency(
 def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFrame:
     """
     Represent a text-based Pandas Series using TF-IDF.
+
+    Rows of the returned DataFrame represent document whereas columns are terms.
+    The value in the cell document-term is the tfidf-value of the term in
+    this document. The output is sparse.
 
     *Term Frequency - Inverse Document Frequency (TF-IDF)* is a formula to
     calculate the _relative importance_ of the words in a document, taking

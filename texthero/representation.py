@@ -301,7 +301,7 @@ Dimensionality reduction
 
 
 def pca(
-    s: Union[pd.Series, pd.DataFrame], n_components=2, random_state=None
+    input_matrix: Union[pd.Series, pd.DataFrame], n_components=2, random_state=None
 ) -> pd.Series:
     """
     Perform principal component analysis on the given Pandas Series.
@@ -330,7 +330,7 @@ def pca(
 
     Parameters
     ----------
-    s : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
 
     n_components : Int. Default is 2.
         Number of components to keep (dimensionality of output vectors).
@@ -367,16 +367,16 @@ def pca(
     """
     pca = PCA(n_components=n_components, random_state=random_state, copy=False)
 
-    if _check_is_valid_DocumentTermDF(s):
-        values = s.values
+    if _check_is_valid_DocumentTermDF(input_matrix):
+        values = input_matrix.values
     else:
-        values = list(s)
+        values = list(input_matrix)
 
-    return pd.Series(list(pca.fit_transform(values)), index=s.index)
+    return pd.Series(list(pca.fit_transform(values)), index=input_matrix.index)
 
 
 def nmf(
-    s: Union[pd.Series, pd.DataFrame], n_components=2, random_state=None
+    input_matrix: Union[pd.Series, pd.DataFrame], n_components=2, random_state=None
 ) -> pd.Series:
     """
     Performs non-negative matrix factorization.
@@ -399,7 +399,7 @@ def nmf(
 
     Parameters
     ----------
-    s : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
 
     n_components : Int. Default is 2.
         Number of components to keep (dimensionality of output vectors).
@@ -439,17 +439,17 @@ def nmf(
     """
     nmf = NMF(n_components=n_components, init="random", random_state=random_state,)
 
-    if _check_is_valid_DocumentTermDF(s):
-        s_coo = s.sparse.to_coo()
-        s_for_vectorization = s_coo.astype("float64")
+    if _check_is_valid_DocumentTermDF(input_matrix):
+        input_matrix_coo = input_matrix.sparse.to_coo()
+        input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
-        s_for_vectorization = list(s)
+        input_matrix_for_vectorization = list(input_matrix)
 
-    return pd.Series(list(nmf.fit_transform(s_for_vectorization)), index=s.index)
+    return pd.Series(list(nmf.fit_transform(input_matrix_for_vectorization)), index=input_matrix.index)
 
 
 def tsne(
-    s: Union[pd.Series, pd.DataFrame],
+    input_matrix: Union[pd.Series, pd.DataFrame],
     n_components=2,
     perplexity=30.0,
     learning_rate=200.0,
@@ -475,7 +475,7 @@ def tsne(
 
     Parameters
     ----------
-    s : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
 
     n_components : int, default is 2.
         Number of components to keep (dimensionality of output vectors).
@@ -541,13 +541,13 @@ def tsne(
         n_jobs=n_jobs,
     )
 
-    if _check_is_valid_DocumentTermDF(s):
-        s_coo = s.sparse.to_coo()
-        s_for_vectorization = s_coo.astype("float64")
+    if _check_is_valid_DocumentTermDF(input_matrix):
+        input_matrix_coo = input_matrix.sparse.to_coo()
+        input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
-        s_for_vectorization = list(s)
+        s_for_vectorization = list(input_matrix)
 
-    return pd.Series(list(tsne.fit_transform(s_for_vectorization)), index=s.index)
+    return pd.Series(list(tsne.fit_transform(input_matrix_for_vectorization)), index=input_matrix.index)
 
 
 """
@@ -556,7 +556,7 @@ Clustering
 
 
 def kmeans(
-    s: Union[pd.Series, pd.DataFrame],
+    input_matrix: Union[pd.Series, pd.DataFrame],
     n_clusters=5,
     n_init=10,
     max_iter=300,
@@ -584,7 +584,7 @@ def kmeans(
 
     Parameters
     ----------
-    s: Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix: Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
 
     n_clusters: Int, default to 5.
         The number of clusters to separate the data into.
@@ -634,11 +634,11 @@ def kmeans(
 
     """
 
-    if _check_is_valid_DocumentTermDF(s):
-        s_coo = s.sparse.to_coo()
-        s_for_vectorization = s_coo.astype("float64")
+    if _check_is_valid_DocumentTermDF(input_matrix):
+        input_matrix_coo = input_matrix.sparse.to_coo()
+        input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
-        s_for_vectorization = list(s)
+        s_for_vectorization = list(input_matrix)
 
     kmeans = KMeans(
         n_clusters=n_clusters,
@@ -648,13 +648,13 @@ def kmeans(
         copy_x=True,
         algorithm=algorithm,
     ).fit(s_for_vectorization)
-    return pd.Series(kmeans.predict(s_for_vectorization), index=s.index).astype(
+    return pd.Series(kmeans.predict(s_for_vectorization), index=input_matrix.index).astype(
         "category"
     )
 
 
 def dbscan(
-    s: Union[pd.Series, pd.DataFrame],
+    input_matrix: Union[pd.Series, pd.DataFrame],
     eps=0.5,
     min_samples=5,
     metric="euclidean",
@@ -685,7 +685,7 @@ def dbscan(
 
     Parameters
     ----------
-    s: Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix: Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
 
     eps : float, default=0.5
         The maximum distance between two samples for one to be considered
@@ -743,11 +743,11 @@ def dbscan(
 
     """
 
-    if _check_is_valid_DocumentTermDF(s):
-        s_coo = s.sparse.to_coo()
-        s_for_vectorization = s_coo.astype("float64")
+    if _check_is_valid_DocumentTermDF(input_matrix):
+        input_matrix_coo = input_matrix.sparse.to_coo()
+        input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
-        s_for_vectorization = list(s)
+        input_matrix_for_vectorization = list(input_matrix)
 
     return pd.Series(
         DBSCAN(
@@ -757,13 +757,13 @@ def dbscan(
             metric_params=metric_params,
             leaf_size=leaf_size,
             n_jobs=n_jobs,
-        ).fit_predict(s_for_vectorization),
-        index=s.index,
+        ).fit_predict(input_matrix_for_vectorization),
+        index=input_matrix.index,
     ).astype("category")
 
 
 def meanshift(
-    s: Union[pd.Series, pd.DataFrame],
+    input_matrix: Union[pd.Series, pd.DataFrame],
     bandwidth=None,
     bin_seeding=False,
     min_bin_freq=1,
@@ -795,7 +795,7 @@ def meanshift(
 
     Parameters
     ----------
-    s: Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix: Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
 
     bandwidth : float, default=None
         Bandwidth used in the RBF kernel.
@@ -854,10 +854,10 @@ def meanshift(
 
     """
 
-    if _check_is_valid_DocumentTermDF(s):
-        vectors = s.values
+    if _check_is_valid_DocumentTermDF(input_matrix):
+        vectors = input_matrix.values
     else:
-        vectors = list(s)
+        vectors = list(input_matrix)
 
     return pd.Series(
         MeanShift(
@@ -868,7 +868,7 @@ def meanshift(
             n_jobs=n_jobs,
             max_iter=max_iter,
         ).fit_predict(vectors),
-        index=s.index,
+        index=input_matrix.index,
     ).astype("category")
 
 
@@ -883,7 +883,7 @@ Normalization.
 """
 
 
-def normalize(s: Union[pd.DataFrame, pd.Series], norm="l2") -> pd.Series:
+def normalize(input_matrix: Union[pd.DataFrame, pd.Series], norm="l2") -> pd.Series:
     """
     Normalize every cell in a Pandas Series.
 
@@ -892,7 +892,7 @@ def normalize(s: Union[pd.DataFrame, pd.Series], norm="l2") -> pd.Series:
 
     Parameters
     ----------
-    s: Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix: Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
 
     norm: str, default to "l2"
         One of "l1", "l2", or "max". The norm that is used.
@@ -919,19 +919,19 @@ def normalize(s: Union[pd.DataFrame, pd.Series], norm="l2") -> pd.Series:
     `Norm on Wikipedia <https://en.wikipedia.org/wiki/Norm_(mathematics)>`_
 
     """
-    isDocumentTermDF = _check_is_valid_DocumentTermDF(s)
+    isDocumentTermDF = _check_is_valid_DocumentTermDF(input_matrix)
 
     if isDocumentTermDF:
-        s_coo = s.sparse.to_coo()
-        s_for_vectorization = s_coo.astype("float64")
+        input_matrix_coo = input_matrix.sparse.to_coo()
+        input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
-        s_for_vectorization = list(s)
+        input_matrix_for_vectorization = list(input_matrix)
 
     result = sklearn_normalize(
-        s_for_vectorization, norm=norm
+        input_matrix_for_vectorization, norm=norm
     )  # Can handle sparse input.
 
     if isDocumentTermDF:
-        return pd.DataFrame.sparse.from_spmatrix(result, s.index, s.columns)
+        return pd.DataFrame.sparse.from_spmatrix(result, input_matrix.index, input_matrix.columns)
     else:
-        return pd.Series(list(result), index=s.index)
+        return pd.Series(list(result), index=input_matrix.index)

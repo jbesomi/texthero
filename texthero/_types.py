@@ -120,7 +120,11 @@ class TextSeries(HeroSeries):
             " See help(hero.HeroSeries) for more information."
         )
 
-        if not isinstance(s.iloc[0], str) or s.index.nlevels != 1:
+        try:
+            first_non_nan_value = s.loc[s.first_valid_index()]
+            if not isinstance(first_non_nan_value, str) or s.index.nlevels != 1:
+                raise TypeError(error_string)
+        except KeyError:  # Only NaNs in Series -> same warning applies
             raise TypeError(error_string)
 
 
@@ -146,7 +150,11 @@ class TokenSeries(HeroSeries):
                 cell, (list, tuple)
             )
 
-        if not is_list_of_strings(s.iloc[0]) or s.index.nlevels != 1:
+        try:
+            first_non_nan_value = s.loc[s.first_valid_index()]
+            if not is_list_of_strings(first_non_nan_value) or s.index.nlevels != 1:
+                raise TypeError(error_string)
+        except KeyError:  # Only NaNs in Series -> same warning applies
             raise TypeError(error_string)
 
 
@@ -179,7 +187,11 @@ class VectorSeries(HeroSeries):
         def is_list_of_numbers(cell):
             return all(is_numeric(x) for x in cell) and isinstance(cell, (list, tuple))
 
-        if not is_list_of_numbers(s.iloc[0]) or s.index.nlevels != 1:
+        try:
+            first_non_nan_value = s.loc[s.first_valid_index()]
+            if not is_list_of_numbers(first_non_nan_value) or s.index.nlevels != 1:
+                raise TypeError(error_string)
+        except KeyError:  # Only NaNs in Series -> same warning applies
             raise TypeError(error_string)
 
 

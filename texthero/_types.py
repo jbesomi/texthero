@@ -226,6 +226,8 @@ def InputSeries(allowed_hero_series_type):
     """
 
     def decorator(func):
+        func.allowed_hero_series_type = allowed_hero_series_type
+
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             s = args[0]  # The first input argument will be checked.

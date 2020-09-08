@@ -1,10 +1,14 @@
 import pandas as pd
 from texthero import nlp, visualization, preprocessing, representation
+import texthero as hero
 
 from . import PandasTestCase
 import unittest
 import string
 from parameterized import parameterized
+import importlib
+import inspect
+import numpy as np
 
 
 # Define valid inputs for different functions.
@@ -12,6 +16,13 @@ s_text = pd.Series(["Test"], index=[5])
 s_tokenized_lists = pd.Series([["Test", "Test2"], ["Test3"]], index=[5, 6])
 s_numeric = pd.Series([5.0], index=[5])
 s_numeric_lists = pd.Series([[5.0, 5.0], [6.0, 6.0]], index=[5, 6])
+
+# Define the valid input for each HeroSeries type
+valid_inputs = {
+    "TokenSeries": s_tokenized_lists,
+    "TextSeries": s_text,
+    "VectorSeries": s_numeric_lists,
+}
 
 # Define all test cases. Every test case is a list
 # of [name of test case, function to test, tuple of valid input for the function].
@@ -23,36 +34,39 @@ s_numeric_lists = pd.Series([[5.0, 5.0], [6.0, 6.0]], index=[5, 6])
 # The names will be expanded automatically, so e.g. "named_entities"
 # creates test cases test_correct_index_named_entities and test_incorrect_index_named_entities.
 
+# Specify test case expections for each module (functions that
+# has multiple arguments, doesn't accpet HeroSeries, etc.)
 test_cases_nlp = [
-    ["named_entities", nlp.named_entities, (s_text,)],
-    ["noun_chunks", nlp.noun_chunks, (s_text,)],
+    # ["named_entities", nlp.named_entities, (s_text,)],
+    # ["noun_chunks", nlp.noun_chunks, (s_text,)],
 ]
 
 test_cases_preprocessing = [
-    ["fillna", preprocessing.fillna, (s_text,)],
-    ["lowercase", preprocessing.lowercase, (s_text,)],
+    # ["fillna", preprocessing.fillna, (s_text,)],
+    # ["lowercase", preprocessing.lowercase, (s_text,)],
     ["replace_digits", preprocessing.replace_digits, (s_text, "")],
-    ["remove_digits", preprocessing.remove_digits, (s_text,)],
+    # ["remove_digits", preprocessing.remove_digits, (s_text,)],
     ["replace_punctuation", preprocessing.replace_punctuation, (s_text, "")],
-    ["remove_punctuation", preprocessing.remove_punctuation, (s_text,)],
-    ["remove_diacritics", preprocessing.remove_diacritics, (s_text,)],
-    ["remove_whitespace", preprocessing.remove_whitespace, (s_text,)],
+    # ["remove_punctuation", preprocessing.remove_punctuation, (s_text,)],
+    # ["remove_diacritics", preprocessing.remove_diacritics, (s_text,)],
+    # ["remove_whitespace", preprocessing.remove_whitespace, (s_text,)],
     ["replace_stopwords", preprocessing.replace_stopwords, (s_text, "")],
-    ["remove_stopwords", preprocessing.remove_stopwords, (s_text,)],
-    ["stem", preprocessing.stem, (s_text,)],
-    ["clean", preprocessing.clean, (s_text,)],
-    ["remove_round_brackets", preprocessing.remove_round_brackets, (s_text,)],
-    ["remove_curly_brackets", preprocessing.remove_curly_brackets, (s_text,)],
-    ["remove_square_brackets", preprocessing.remove_square_brackets, (s_text,)],
-    ["remove_angle_brackets", preprocessing.remove_angle_brackets, (s_text,)],
-    ["remove_brackets", preprocessing.remove_brackets, (s_text,)],
-    ["remove_html_tags", preprocessing.remove_html_tags, (s_text,)],
-    ["tokenize", preprocessing.tokenize, (s_text,)],
-    ["phrases", preprocessing.phrases, (s_tokenized_lists,)],
+    # ["remove_stopwords", preprocessing.remove_stopwords, (s_text,)],
+    # ["stem", preprocessing.stem, (s_text,)],
+    # ["clean", preprocessing.clean, (s_text,)],
+    # ["remove_round_brackets", preprocessing.remove_round_brackets, (s_text,)],
+    # ["remove_curly_brackets", preprocessing.remove_curly_brackets, (s_text,)],
+    # ["remove_square_brackets", preprocessing.remove_square_brackets, (s_text,)],
+    # ["remove_angle_brackets", preprocessing.remove_angle_brackets, (s_text,)],
+    # ["remove_brackets", preprocessing.remove_brackets, (s_text,)],
+    # ["remove_html_tags", preprocessing.remove_html_tags, (s_text,)],
+    # ["tokenize", preprocessing.tokenize, (s_text,)],
+    # ["phrases", preprocessing.phrases, (s_tokenized_lists,)],
     ["replace_urls", preprocessing.replace_urls, (s_text, "")],
-    ["remove_urls", preprocessing.remove_urls, (s_text,)],
+    # ["remove_urls", preprocessing.remove_urls, (s_text,)],
     ["replace_tags", preprocessing.replace_tags, (s_text, "")],
-    ["remove_tags", preprocessing.remove_tags, (s_text,)],
+    # ["remove_tags", preprocessing.remove_tags, (s_text,)],
+    ["replace_hashtags", preprocessing.replace_hashtags, (s_text, "")],
 ]
 
 test_cases_representation = [
@@ -81,12 +95,67 @@ test_cases_representation = [
 
 test_cases_visualization = []
 
-test_cases = (
+# test_cases = (
+# test_cases_nlp
+# + test_cases_preprocessing
+# + test_cases_representation
+# + test_cases_visualization
+# )
+
+
+test_cases = []
+
+# Exceptions for test cases in case they need specific inputs
+test_case_exceptions = {}
+for case in (
     test_cases_nlp
     + test_cases_preprocessing
     + test_cases_representation
     + test_cases_visualization
+):
+    test_case_exceptions[case[0]] = case
+
+
+# Put functions into white list if you want to omit them
+# func_white_list = {
+# 'scatterplot',
+# 'wordcloud',
+# 'top_words'
+# }
+func_white_list = set(
+    [s for s in inspect.getmembers(visualization, inspect.isfunction)]
 )
+
+# Find all functions under texthero
+func_strs = [
+    s[0]
+    for s in inspect.getmembers(hero, inspect.isfunction)
+    if s not in func_white_list
+]
+
+for func_str in func_strs:
+    if func_str in test_case_exceptions:
+        test_cases.append(test_case_exceptions[func_str])
+    else:
+        func = getattr(hero, func_str)
+        # Functions accept HeroSeries
+        if (
+            hasattr(func, "allowed_hero_series_type")
+            and func.allowed_hero_series_type.__name__ in valid_inputs
+        ):
+            test_cases.append(
+                [
+                    func_str,
+                    func,
+                    (valid_inputs[func.allowed_hero_series_type.__name__],),
+                ]
+            )
+
+
+# pkg_strs = [s for s in dir(lang) if not s.startswith("__")]
+# for pkg_str in pkg_strs:
+# lang_pkg = importlib.import_module(f'texthero.lang.{pkg_str}')
+# print(lang_pkg)
 
 
 class AbstractIndexTest(PandasTestCase):

@@ -16,3 +16,6 @@ from . import nlp
 from .nlp import *
 
 from . import stopwords
+
+from . import lang
+from .lang import *

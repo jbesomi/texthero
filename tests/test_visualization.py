@@ -1,6 +1,7 @@
 import string
 
 import pandas as pd
+import plotly
 import doctest
 
 from texthero import visualization
@@ -89,4 +90,9 @@ class TestVisualization(PandasTestCase):
             [["one two three", "here"], ["one two three", "here"]],
             columns=["text", "topic"],
         )
-        self.assertEqual(visualization.visualize_describe(df), None)
+        self.assertIsInstance(
+            visualization.visualize_describe(
+                df["text"], df["topic"], return_figure=True
+            ),
+            plotly.graph_objs._figure.Figure,
+        )

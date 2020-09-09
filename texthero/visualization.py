@@ -310,10 +310,38 @@ def top_words(s: TextSeries, normalize=False) -> pd.Series:
     )
 
 
-def visualize_describe(df, text_col_name="text", labels_col_name="topic"):
+def visualize_describe(s: TextSeries, s_labels: pd.Series = None, return_figure=False):
+    """
+    Visualize statistics about a given TextSeries, and
+    optionally a given Series with labels/classes.
 
-    s = df[text_col_name]
-    s_labels = df[labels_col_name]
+    This function visualizes the output of
+    :meth:`texthero.preprocessing.describe`.
+
+    Parameters
+    ----------
+    s: TextSeries
+        The Series that should be described.
+
+    s_labels : pd.Series
+        A Series with the labels / classes / topics
+        of the texts in the first argument.
+
+    return_figure : bool, default to False
+        Whether to return the figure instead of showing it.
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> df = pd.read_csv("https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/bbcsport.csv") # doctest: +SKIP
+    >>> df.head(2) # doctest: +SKIP
+                                                    text      topic
+    0  Claxton hunting first major medal\n\nBritish h...  athletics
+    1  O'Sullivan could run in Worlds\n\nSonia O'Sull...  athletics
+    >>> # Describe both the text and the labels
+    >>> hero.visualize_describe(df["text"], df["topic"]) # doctest: +SKIP
+    """
 
     # Gather data (most from hero.describe, just
     # the document lengths histogram is calculated here).
@@ -351,6 +379,8 @@ def visualize_describe(df, text_col_name="text", labels_col_name="topic"):
             values=label_distribution_pie_chart_df.values.flatten().tolist(),
             title="Label Distributions",
         )
+    else:
+        label_distribution_pie_chart_fig = None
 
     # Create histogram of document lengths
     document_lengths_fig = go.Scatter(
@@ -361,12 +391,25 @@ def visualize_describe(df, text_col_name="text", labels_col_name="topic"):
         showlegend=False,
     )
 
+    if s_labels is not None:  # labels given -> description output is multiindexed
+        n_total_docs = description.loc["number of documents"].values[0][0]
+        n_unique_docs = description.loc["number of unique documents"].values[0][0]
+        n_missing_docs = description.loc["number of missing documents"].values[0][0]
+        most_common_words = description.loc["most common words"].values[0][0]
+        most_common_words_excluding_stopwords = description.loc[
+            "most common words excluding stopwords"
+        ].values[0][0]
+    else:
+        n_total_docs = description.loc["number of documents"].values[0]
+        n_unique_docs = description.loc["number of unique documents"].values[0]
+        n_missing_docs = description.loc["number of missing documents"].values[0]
+        most_common_words = description.loc["most common words"].values[0]
+        most_common_words_excluding_stopwords = description.loc[
+            "most common words excluding stopwords"
+        ].values[0]
+
     # Create bar charts for documents / unique / missing
-    number_of_duplicates = (
-        description.loc["number of documents"].values[0][0]
-        - description.loc["number of unique documents"].values[0][0]
-        - description.loc["number of missing documents"].values[0][0]
-    )
+    n_duplicate_docs = n_total_docs - n_unique_docs - n_missing_docs
 
     schart = go.Sankey(
         node=dict(
@@ -394,27 +437,20 @@ def visualize_describe(df, text_col_name="text", labels_col_name="topic"):
                 "rgba(250,201,152,0.6)",
                 "rgba(255,134,134,0.6)",
             ],
-            value=[
-                description.loc["number of unique documents"].values[0][0],
-                number_of_duplicates,
-                description.loc["number of missing documents"].values[0][0],
-            ],
+            value=[n_unique_docs, n_duplicate_docs, n_missing_docs,],
         ),
     )
 
     # Create Table to show the 10 most common words (with and without stopwords)
     table = go.Table(
         header=dict(values=["Top Words with Stopwords", "Top Words without Stopwords"]),
-        cells=dict(
-            values=[
-                description.loc["most common words"].values[0][0],
-                description.loc["most common words excluding stopwords"].values[0][0],
-            ]
-        ),
+        cells=dict(values=[most_common_words, most_common_words_excluding_stopwords,]),
     )
 
     # Combine figures.
-    fig.add_trace(label_distribution_pie_chart_fig, row=2, col=2)
+    if label_distribution_pie_chart_fig is not None:
+        fig.add_trace(label_distribution_pie_chart_fig, row=2, col=2)
+
     fig.add_trace(document_lengths_fig, row=2, col=1)
 
     fig.add_trace(schart, row=1, col=1)
@@ -427,4 +463,7 @@ def visualize_describe(df, text_col_name="text", labels_col_name="topic"):
     fig.update_yaxes(title_text="Number of Documents", row=2, col=1)
     fig.update_layout(legend=dict(yanchor="bottom", y=0, x=1.1, xanchor="right",))
 
-    fig.show()
+    if return_figure:
+        return fig
+    else:
+        fig.show()

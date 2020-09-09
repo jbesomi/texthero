@@ -11,61 +11,52 @@ import inspect
 import numpy as np
 
 
-# Define valid inputs for different functions.
+"""
+This file intends to test each function whether the input Series's index is the same as
+the output Series.
+
+This will go through all functions under texthero, and automatically 
+generate test cases, according to the HeroSeries type they accept, e.g. TokenSeries, TextSeries, etc.
+
+Normally, functions receives and returns a Series is okay for auto-testing.
+However there might be exceptions that you want to specify a test case manually, or omit a function
+for testing. For example, 
+- Functions that needs multiple arguments (preprocessing.replace_stopwords)
+- Functions that returns Series with different index (representation.tfidf)
+- Functions that doesn't give Series as output (mostly in visualization)
+
+In those cases, you can add your custom test case into test_cases variable, in the form 
+of [name_of_test_case, function_to_test, tuple_of_valid_input_for_the_function]. 
+If you want to omit some functions, add their string name to func_white_list variable.
+
+The tests will be run by AbstractIndexTest below through the @parameterized
+decorator.
+The names will be expanded automatically, so e.g. "named_entities"
+creates test cases test_correct_index_named_entities and test_incorrect_index_named_entities.
+"""
+
+# Define the valid input for each HeroSeries type
 s_text = pd.Series(["Test"], index=[5])
 s_tokenized_lists = pd.Series([["Test", "Test2"], ["Test3"]], index=[5, 6])
 s_numeric = pd.Series([5.0], index=[5])
 s_numeric_lists = pd.Series([[5.0, 5.0], [6.0, 6.0]], index=[5, 6])
 
-# Define the valid input for each HeroSeries type
 valid_inputs = {
     "TokenSeries": s_tokenized_lists,
     "TextSeries": s_text,
     "VectorSeries": s_numeric_lists,
 }
 
-# Define all test cases. Every test case is a list
-# of [name of test case, function to test, tuple of valid input for the function].
-# First argument of valid input has to be the Pandas Series where we
-# want to keep the index. If this is different for a function, a separate
-# test case has to implemented in the class below.
-# The tests will be run by AbstractIndexTest below through the @parameterized
-# decorator.
-# The names will be expanded automatically, so e.g. "named_entities"
-# creates test cases test_correct_index_named_entities and test_incorrect_index_named_entities.
-
 # Specify test case expections for each module (functions that
 # has multiple arguments, doesn't accpet HeroSeries, etc.)
-test_cases_nlp = [
-    # ["named_entities", nlp.named_entities, (s_text,)],
-    # ["noun_chunks", nlp.noun_chunks, (s_text,)],
-]
+test_cases_nlp = []
 
 test_cases_preprocessing = [
-    # ["fillna", preprocessing.fillna, (s_text,)],
-    # ["lowercase", preprocessing.lowercase, (s_text,)],
     ["replace_digits", preprocessing.replace_digits, (s_text, "")],
-    # ["remove_digits", preprocessing.remove_digits, (s_text,)],
     ["replace_punctuation", preprocessing.replace_punctuation, (s_text, "")],
-    # ["remove_punctuation", preprocessing.remove_punctuation, (s_text,)],
-    # ["remove_diacritics", preprocessing.remove_diacritics, (s_text,)],
-    # ["remove_whitespace", preprocessing.remove_whitespace, (s_text,)],
     ["replace_stopwords", preprocessing.replace_stopwords, (s_text, "")],
-    # ["remove_stopwords", preprocessing.remove_stopwords, (s_text,)],
-    # ["stem", preprocessing.stem, (s_text,)],
-    # ["clean", preprocessing.clean, (s_text,)],
-    # ["remove_round_brackets", preprocessing.remove_round_brackets, (s_text,)],
-    # ["remove_curly_brackets", preprocessing.remove_curly_brackets, (s_text,)],
-    # ["remove_square_brackets", preprocessing.remove_square_brackets, (s_text,)],
-    # ["remove_angle_brackets", preprocessing.remove_angle_brackets, (s_text,)],
-    # ["remove_brackets", preprocessing.remove_brackets, (s_text,)],
-    # ["remove_html_tags", preprocessing.remove_html_tags, (s_text,)],
-    # ["tokenize", preprocessing.tokenize, (s_text,)],
-    # ["phrases", preprocessing.phrases, (s_tokenized_lists,)],
     ["replace_urls", preprocessing.replace_urls, (s_text, "")],
-    # ["remove_urls", preprocessing.remove_urls, (s_text,)],
     ["replace_tags", preprocessing.replace_tags, (s_text, "")],
-    # ["remove_tags", preprocessing.remove_tags, (s_text,)],
     ["replace_hashtags", preprocessing.replace_hashtags, (s_text, "")],
 ]
 
@@ -95,17 +86,7 @@ test_cases_representation = [
 
 test_cases_visualization = []
 
-# test_cases = (
-# test_cases_nlp
-# + test_cases_preprocessing
-# + test_cases_representation
-# + test_cases_visualization
-# )
-
-
-test_cases = []
-
-# Exceptions for test cases in case they need specific inputs
+# Exceptions for custom test cases, a dictionary of {func_str: test_case}
 test_case_exceptions = {}
 for case in (
     test_cases_nlp
@@ -116,7 +97,7 @@ for case in (
     test_case_exceptions[case[0]] = case
 
 
-# Put functions into white list if you want to omit them
+# Put functions' name into white list if you want to omit them
 # func_white_list = {
 # 'scatterplot',
 # 'wordcloud',
@@ -125,6 +106,8 @@ for case in (
 func_white_list = set(
     [s for s in inspect.getmembers(visualization, inspect.isfunction)]
 )
+
+test_cases = []
 
 # Find all functions under texthero
 func_strs = [
@@ -150,12 +133,6 @@ for func_str in func_strs:
                     (valid_inputs[func.allowed_hero_series_type.__name__],),
                 ]
             )
-
-
-# pkg_strs = [s for s in dir(lang) if not s.startswith("__")]
-# for pkg_str in pkg_strs:
-# lang_pkg = importlib.import_module(f'texthero.lang.{pkg_str}')
-# print(lang_pkg)
 
 
 class AbstractIndexTest(PandasTestCase):

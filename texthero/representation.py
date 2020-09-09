@@ -40,7 +40,7 @@ def _check_is_valid_DataFrame(df: Union[pd.DataFrame, pd.Series]) -> bool:
 
 # Warning message for not-tokenized inputs
 _not_tokenized_warning_message = (
-    "It seems like the given Pandas Series s is not tokenized. This" 
+    "It seems like the given Pandas Series s is not tokenized. This"
     " function will tokenize it automatically using hero.tokenize(s)"
     " first. You should consider tokenizing it yourself first with"
     " hero.tokenize(s) in the future."

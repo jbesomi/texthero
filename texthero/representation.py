@@ -392,7 +392,7 @@ def nmf(
     input_matrix: Union[pd.Series, pd.DataFrame], n_components=2, random_state=None
 ) -> pd.Series:
     """
-    Performs non-negative matrix factorization.
+    Performs non-negative matrix factorization on the given input.
 
     Non-Negative Matrix Factorization (NMF) is often used in
     natural language processing to find clusters of similar
@@ -477,7 +477,8 @@ def tsne(
     n_jobs=-1,
 ) -> pd.Series:
     """
-    Performs TSNE on the given pandas series.
+    Performs t-Distributed Stochastic Neighbor Embedding on the given
+    input.
 
     t-distributed Stochastic Neighbor Embedding (t-SNE) is
     a machine learning algorithm used to visualize high-dimensional data
@@ -589,7 +590,7 @@ def kmeans(
     algorithm="auto",
 ):
     """
-    Performs K-means clustering algorithm.
+    Performs K-means clustering algorithm on the given input.
 
     K-means clustering is used in natural language processing
     to separate texts into k clusters (groups) 
@@ -695,7 +696,7 @@ def dbscan(
     n_jobs=-1,
 ):
     """
-    Perform DBSCAN clustering.
+    Perform DBSCAN clustering on the given input.
 
     Density-based spatial clustering of applications with noise (DBSCAN)
     is used in natural language processing
@@ -810,7 +811,7 @@ def meanshift(
     max_iter=300,
 ):
     """
-    Perform mean shift clustering.
+    Perform mean shift clustering on the given input.
 
     Mean shift clustering
     is used in natural language processing

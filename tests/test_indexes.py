@@ -98,11 +98,6 @@ for case in (
 
 
 # Put functions' name into white list if you want to omit them
-# func_white_list = {
-# 'scatterplot',
-# 'wordcloud',
-# 'top_words'
-# }
 func_white_list = set(
     [s for s in inspect.getmembers(visualization, inspect.isfunction)]
 )

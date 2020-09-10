@@ -18,20 +18,20 @@ the output Series.
 This will go through all functions under texthero, and automatically 
 generate test cases, according to the HeroSeries type they accept, e.g. TokenSeries, TextSeries, etc.
 
-Normally, functions receives and returns a Series is okay for auto-testing.
+Normally, functions receives HeroSeries and returns Series is okay for auto-testing.
 However there might be exceptions that you want to specify a test case manually, or omit a function
 for testing. For example, 
 - Functions that needs multiple arguments (preprocessing.replace_stopwords)
 - Functions that returns Series with different index (representation.tfidf)
 - Functions that doesn't give Series as output (mostly in visualization)
+- Functions that doesn't take HeroSeries (yet)
 
-In those cases, you can add your custom test case into test_cases variable, in the form 
-of [name_of_test_case, function_to_test, tuple_of_valid_input_for_the_function]. 
+In those cases, you can add your custom test case so as to override the default one, 
+in the form of [name_of_test_case, function_to_test, tuple_of_valid_input_for_the_function]. 
 If you want to omit some functions, add their string name to func_white_list variable.
 
 The tests will be run by AbstractIndexTest below through the @parameterized
-decorator.
-The names will be expanded automatically, so e.g. "named_entities"
+decorator. The names will be expanded automatically, so e.g. "named_entities"
 creates test cases test_correct_index_named_entities and test_incorrect_index_named_entities.
 """
 
@@ -47,7 +47,7 @@ valid_inputs = {
     "VectorSeries": s_numeric_lists,
 }
 
-# Specify test case expections for each module (functions that
+# Specify your custom test cases here (functions that
 # has multiple arguments, doesn't accpet HeroSeries, etc.)
 test_cases_nlp = []
 
@@ -86,15 +86,15 @@ test_cases_representation = [
 
 test_cases_visualization = []
 
-# Exceptions for custom test cases, a dictionary of {func_str: test_case}
-test_case_exceptions = {}
+# Custom test cases, a dictionary of {func_str: test_case}
+test_case_custom = {}
 for case in (
     test_cases_nlp
     + test_cases_preprocessing
     + test_cases_representation
     + test_cases_visualization
 ):
-    test_case_exceptions[case[0]] = case
+    test_case_custom[case[0]] = case
 
 
 # Put functions' name into white list if you want to omit them
@@ -117,9 +117,11 @@ func_strs = [
 ]
 
 for func_str in func_strs:
-    if func_str in test_case_exceptions:
-        test_cases.append(test_case_exceptions[func_str])
+    # Use a custom test case
+    if func_str in test_case_custom:
+        test_cases.append(test_case_custom[func_str])
     else:
+        # Generate one by default
         func = getattr(hero, func_str)
         # Functions accept HeroSeries
         if (

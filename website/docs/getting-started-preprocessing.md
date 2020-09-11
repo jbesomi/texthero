@@ -4,7 +4,7 @@ id: getting-started-preprocessing
 
 ## Getting started with <span style="color: #ff8c42">pre-processing</span>
 
-Pre-processing is a fundamental step in text analysis. Being consistent and methodical in pre-processing operations is a necessary condition for the success of text-based analysis.
+Pre-processing is a fundamental step in text analysis. Consistent, methodical and reproducible pre-processing operations are a necessary pre-requisite for success of any type of text-based analysis.
 
 ## Overview
 
@@ -12,58 +12,92 @@ Pre-processing is a fundamental step in text analysis. Being consistent and meth
 
 ## Intro
 
-When we (as humans) read text from a book or a newspaper, the _input_ that our brain gets to allow us to understand that text is in the form of individual letters, that are then combined into words, sentences, paragraphs, etc... you get it!
-The problem with having a machine reading text is simple: the machine doesn't know how to read letters, words, paragraphs, etc.
-The machine however knows how to read numerical vectors and text has good properties that easily allow its conversion into a numerical representation. There are several sophisticated methods to make this conversion but, in order to perform well, all of them require that the text given as input is as clean and simple as possible, in other words **pre-processed**.
-Clean and simple basically means eliminating any unnecessary information (e.g. the machine does not need to know about punctuation, page numbers or spacing) and solving as many ambiguities as possibe (so that, for instance, the verb "run" and its forms "ran", "runs", "running" will all refer to the same concept).
+When we (as humans) read text from a book or a newspaper, the _input_ that our brain gets to understand that text is in the form of individual letters, that are then combined into words, sentences, paragraphs, etc.
+The problem with having a machine reading text is simple: the machine doesn't know how to read letters, words or paragraphs. The machine knows instead how to read _numerical vectors_. 
+Text data has good properties that allow its conversion into a numerical representation. There are several sophisticated methods to make this conversion but, in order to perform well, all of them require the input text in a form that is as clean and simple as possible, in other words **pre-processed**.
+Pre-processing text basically means eliminating any unnecessary information (e.g. the machine does not need to know about punctuation, page numbers or spacing between paragraphs) and solving as many ambiguities as possibe (so that, for instance, the verb "run" and its forms "ran", "runs", "running" will all refer to the same concept).
 
 How useful is this step?
-Have you ever heard the story that Data Scientists typically spend ~80% of their time to obtain a proper dataset and the remaining ~20% for actually using it? Well, for text is kind of the same thing. Pre-processing is a **fundamental step** in text analysis and it usually takes some time to be properly implemented.
+Have you ever heard the story that Data Scientists typically spend ~80% of their time to obtain a proper dataset and the remaining ~20% to actually analyze it? Well, for text is kind of the same thing. Pre-processing is a **fundamental step** in text analysis and it usually takes some time to be properly and unambiguously implemented.
 
-In text hero it only takes one command:
+With text hero it only takes one command!
 To clean text data in a reliable way all we have to do is:
-#Note for this section we use the same dataset as in **Getting Started**
 
 ```python
 df['clean_text'] = hero.clean(df['text'])
 ```
-or ...
-[Pipeline explanation]
+
+> NOTE. In this section we use the same [BBC Sport Dataset](http://mlg.ucd.ie/datasets/bbc.html) as in **Getting Started**. To load the `bbc sport` dataset in a Pandas DataFrame run:
+```python
+df = pd.read_csv(
+   "https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv"
+)
+```
 
 ## Clean
 
 Texthero clean method allows a rapid implementation of key cleaning steps that are:
-- Derived from survey of relevant academic literature #cite
-- Validated by a group of NLP enthusiasts with experience in applying these methods in different contexts #background
-- Accepted by the NLP community as inescapable and standard
+
+- Derived from review of relevant academic literature (#include citations)
+- Validated by a group of NLP enthusiasts with applied experience in different contexts
+- Accepted by the NLP community as standard and inescapable
 
 The default steps do the following:
 
-#[TABLE]
+| Step                 | Description                                            |
+|----------------------|--------------------------------------------------------|
+|`fillna()`            |Replace missing values with empty spaces                |
+|`lowercase()`         |Lowercase all text to make the analysis case-insensitive|
+|`remove_digits()`     |Remove numbers                                          |
+|`remove_punctuation()`|Remove punctuation symbols (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~) |
+|`remove_diacritics()` |Remove accents
+|`remove_stopwords()`  |Remove the most common words ("i", "me", "myself", "we", "our", etc.) |
+                   
+|`remove_whitespace()` |Remove spaces between words|
 
-in just one command:
+
+
+in just one command!
 
 ```python
 df['clean_text'] = hero.clean(df['text'])
 ```
+
 ## Custom Pipeline
 
-Sometimes, project specificities might require different approach to pre-processing. For instance, you might decide that digits are important to your analyses if you are analyzing movies and one of them is "007-James Bond" or if you think that stopwords contain relevant information for your analysis setting.
-If this is the case, you can easily edit the pre-processing pipeline by:
-```python
+Sometimes, project specificities might require different approach to pre-processing. For instance, you might decide that digits are important to your analyses if you are analyzing movies and one of them is "007-James Bond". Or, you might decide that in your specific setting stopwords contain relevant information (e.g. if your data is about music bands and contains "The Who" or "Take That").
+If this is the case, you can easily customize the pre-processing pipeline by implementing only specifics cleaning steps:
 
-```#Comment/explain what it does
+```python
+from texthero import preprocessing
+
+custom_pipeline = [preprocessing.fillna,
+                   preprocessing.lowercase,
+                   preprocessing.remove_punctuation
+                   preprocessing.remove_whitespace]
+df['clean_text'] = hero.clean(df['text'], custom_pipeline)
+```
+
+or alternatively
+
+```python
+df['clean_text'] = df['clean_text'].pipe(hero.clean, custom_pipeline)
+```
+
+In the above example we want to pre-process the text despite keeping accents, digits and stop words.
+
+##### Preprocessing API
+
+Check-out the complete [preprocessing API](/docs/api-preprocessing) to discover how to customize the preprocessing steps according to your specific needs.
+
 
 If you are interested in learning more about text cleaning, check out these resources:
-#Links list
+(#Links list)
 
 
 
 
 
-## Customize it 
-
-Let's see how texthero STANDARDIZE this step...
 
 
 ### Stemming

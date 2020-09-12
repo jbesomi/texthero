@@ -52,7 +52,7 @@ def count(
     """
     Represent a text-based Pandas Series using count.
 
-    Rows of the returned DataFrame represent document whereas 
+    Rows of the returned DataFrame represent documents whereas 
     columns are terms. The value in the cell document-term is
     the number of the term in this document. The output is sparse.
     TODO add tutorial link
@@ -64,7 +64,7 @@ def count(
     ----------
     s : Pandas Series (tokenized)
 
-    max_features : int, optional, default to None.
+    max_features : int, optional, default=None.
         Maximum number of features to keep. Will keep all features if 
         set to None.
 
@@ -88,13 +88,11 @@ def count(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(
-    ...                                    hero.tokenize
-    ...                                                )
-    >>> hero.count(s) # doctest: +SKIP        
-      Sentence one two
-    0        1   1   0
-    1        1   0   1
+    >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
+    >>> hero.count(s)
+       Sentence  one  two
+    0         1    1    0
+    1         1    0    1
    
     See Also
     --------
@@ -130,7 +128,7 @@ def term_frequency(
     """
     Represent a text-based Pandas Series using Term Frequency.
 
-    Rows of the returned DataFrame represent document whereas columns are 
+    Rows of the returned DataFrame represent documents whereas columns are
     terms. The value in the cell document-term is the frequency of the
     term in this document. The output is sparse.
     TODO add tutorial link
@@ -142,7 +140,7 @@ def term_frequency(
     ----------
     s : Pandas Series (tokenized)
 
-    max_features : int, optional, default to None.
+    max_features : int, optional, default=None.
         Maximum number of features to keep. Will keep all features if
         set to None.
 
@@ -163,9 +161,7 @@ def term_frequency(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Sentence one hey", "Sentence two"]).pipe(
-    ...                                             hero.tokenize
-    ...                                                     )
+    >>> s = pd.Series(["Sentence one hey", "Sentence two"]).pipe(hero.tokenize)
     >>> hero.term_frequency(s) # doctest: +SKIP              
             Sentence  hey  one  two
     0            0.2  0.2  0.2  0.0
@@ -203,7 +199,7 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFram
     """
     Represent a text-based Pandas Series using TF-IDF.
 
-    Rows of the returned DataFrame represent document whereas columns are
+    Rows of the returned DataFrame represent documents whereas columns are
     terms. The value in the cell document-term is the tfidf-value of the
     term in this document. The output is sparse.
 
@@ -229,10 +225,6 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFram
     normalize the output in any way, so the result is exactly what you 
     get applying the formula described above.
 
-    Return a Document Term DataFrame with the
-    tfidf of every word in the document. The output is sparse.
-    TODO add tutorial link
-
     The input Series should already be tokenized. If not, it will
     be tokenized before tfidf is calculated.
 
@@ -240,7 +232,7 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFram
     ----------
     s : Pandas Series (tokenized)
 
-    max_features : int, optional, default to None.
+    max_features : int, optional, default=None.
         If not None, only the max_features most frequent tokens are used.
 
     min_df : float in range [0.0, 1.0] or int, default=1
@@ -333,7 +325,7 @@ def pca(
     ----------
     input_matrix : Pandas Series (VectorSeries) or DataFrame
 
-    n_components : Int. Default is 2.
+    n_components : Int. default=2.
         Number of components to keep (dimensionality of output vectors).
         If n_components is not set or None, all components are kept.
 
@@ -405,7 +397,7 @@ def nmf(
     ----------
     input_matrix : Pandas Series (VectorSeries) or DataFrame
 
-    n_components : Int. Default is 2.
+    n_components : Int. default=2.
         Number of components to keep (dimensionality of output vectors).
         If n_components is not set or None, all components are kept.
 
@@ -489,7 +481,7 @@ def tsne(
     ----------
     input_matrix : Pandas Series (VectorSeries) or DataFrame
 
-    n_components : int, default is 2.
+    n_components : int, default=2.
         Number of components to keep (dimensionality of output vectors).
         If n_components is not set or None, all components are kept.
 
@@ -603,7 +595,7 @@ def kmeans(
     ----------
     input_matrix: Pandas Series (VectorSeries) or DataFrame
 
-    n_clusters: Int, default to 5.
+    n_clusters: Int, default=5.
         The number of clusters to separate the data into.
 
     n_init : int, default=10
@@ -926,7 +918,7 @@ def normalize(input_matrix: Union[pd.DataFrame, pd.Series], norm="l2") -> pd.Ser
     ----------
     input_matrix: Pandas Series (VectorSeries) or DataFrame
 
-    norm: str, default to "l2"
+    norm: str, default="l2"
         One of "l1", "l2", or "max". The norm that is used.
 
     Examples

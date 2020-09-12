@@ -246,6 +246,7 @@ def InputSeries(allowed_hero_series_types):
     >>> f(pd.Series([["I", "am", "tokenized"]]))
     >>> # passes
     With several possible types:
+
     >>> @InputSeries([DataFrame, VectorSeries])
     ... def g(x):
     ...     pass

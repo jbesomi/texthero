@@ -7,7 +7,6 @@ import pandas as pd
 import en_core_web_sm
 
 from texthero._types import TextSeries, InputSeries
-from texthero import stopwords as _stopwords
 
 
 @InputSeries(TextSeries)

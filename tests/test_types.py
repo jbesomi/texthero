@@ -111,3 +111,23 @@ class TestTypes(PandasTestCase):
             f(pd.Series([np.nan, pd.NA, [0, 1, 2]]))
         except TypeError:
             self.fail("Failed although input type is correct.")
+
+    def test_several_possible_types_correct_type(self):
+        @_types.InputSeries([_types.DataFrame, _types.VectorSeries])
+        def f(x):
+            pass
+
+        try:
+            f(pd.DataFrame([[1, 2, 3]], columns=["a", "b", "c"], dtype="Sparse",))
+
+            f(pd.Series([[1.0, 2.0]]))
+
+        except TypeError:
+            self.fail("Failed although input type is correct.")
+
+    def test_several_possible_types_wrong_type(self):
+        @_types.InputSeries([_types.DataFrame, _types.VectorSeries])
+        def f(x):
+            pass
+
+        self.assertRaises(TypeError, f, pd.Series([["token", "ized"]]))

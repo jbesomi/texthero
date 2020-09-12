@@ -119,14 +119,14 @@ test_cases_vectorization_min_df = [
 ]
 
 
-s_vector_series = pd.Series([[1.0, 0.0], [0.0, 0.0]], index=[5, 7])
-s_DataFrame = pd.DataFrame(
+vector_s = pd.Series([[1.0, 0.0], [0.0, 0.0]], index=[5, 7])
+df = pd.DataFrame(
     [[1.0, 0.0], [0.0, 0.0]], index=[5, 7], columns=["a", "b"],
 ).astype("Sparse[float64, nan]")
 
 
 test_cases_dim_reduction_and_clustering = [
-    # format: [function_name, function, correct output for s_vector_series and s_DataFrame input above]
+    # format: [function_name, function, correct output for s_vector_series and df input above]
     ["pca", representation.pca, pd.Series([[-0.5, 0.0], [0.5, 0.0]], index=[5, 7],),],
     [
         "nmf",
@@ -242,11 +242,11 @@ class AbstractRepresentationTest(PandasTestCase):
             return
 
         if name == "kmeans":
-            result_s = test_function(s_DataFrame, random_state=42, n_clusters=2)
+            result_s = test_function(df, random_state=42, n_clusters=2)
         elif name == "dbscan" or name == "meanshift" or name == "normalize":
-            result_s = test_function(s_DataFrame)
+            result_s = test_function(df)
         else:
-            result_s = test_function(s_DataFrame, random_state=42)
+            result_s = test_function(df, random_state=42)
 
         pd.testing.assert_series_equal(
             s_true,
@@ -260,7 +260,7 @@ class AbstractRepresentationTest(PandasTestCase):
     def test_normalize_DataFrame_also_as_output(self):
         # normalize should also return DataFrame output for DataFrame
         # input so we test it separately
-        result = representation.normalize(s_DataFrame)
+        result = representation.normalize(df)
         correct_output = pd.DataFrame(
             [[1.0, 0.0], [0.0, 0.0]], index=[5, 7], columns=["a", "b"],
         )

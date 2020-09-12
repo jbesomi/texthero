@@ -977,29 +977,32 @@ def lda(
     n_jobs=-1,
 ) -> pd.Series:
     """
-    Performs Latent Dirichlet Allocation on the given pandas series.
+    Performs Latent Dirichlet Allocation on the given Pandas Series
+    or DataFrame.
 
     Latent Dirichlet Allocation (LDA) is a topic modeling algorithm 
     based on Dirichlet distribution. In natural language processing
-    LDA is often used to categorise documents into diffenrent topics
+    LDA is often used to categorize documents into different topics
     and generate top words from these topics. In this process LDA is
     used in combination with algorithms which generate document-term-
-    matrixes, like :meth:`count` or :meth:`tfidf`
+    matrices, like :meth:`count`, :meth:`tfidf` or :meth:`term_frequency`.
 
-    LDA can directly handle sparse input, so when calling truncatedSVD on a
-    DocumentTermDF, the advantage of sparseness is kept.
+    LDA can directly handle sparse input, so when calling LDA on a
+    sparse DataFrame, the advantage of sparseness is kept.
 
     Parameters
     ----------
-    s : pd.Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    s : pd.Series (VectorSeries) or Sparse pd.DataFrame
 
-    n_components : int, default is 2.
+    n_components : int, default is 10.
         Number of components to keep (dimensionality of output vectors).
         When using truncatedSVD for Topic Modelling, this needs to be
         the number of topics.
 
     max_iter : int, optional (default: 10)
-        The maximum number of iterations.
+        The maximum number of iterations. In each interation,
+        the algorithm gets closer to convergence. Set this higher
+        for potentially better results, but also longer runtime.
 
     random_state : int, default=None
         Determines the random number generator. Pass an int for reproducible
@@ -1007,8 +1010,8 @@ def lda(
 
     Returns
     -------
-    Pandas Series with the vector calculated by LDA for the document in every
-    cell.
+    Pandas Series (VectorSeries) with the vector calculated by LDA
+    for the document in every cell.
 
     Examples
     --------

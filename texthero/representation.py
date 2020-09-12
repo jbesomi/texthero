@@ -1,5 +1,6 @@
 """
-Map words into vectors using different algorithms such as TF-IDF, word2vec or GloVe.
+Map words into vectors using different algorithms such as 
+TF-IDF, word2vec or GloVe.
 """
 
 import pandas as pd
@@ -27,21 +28,12 @@ Helper
 """
 
 
-def _check_is_valid_DocumentTermDF(df: Union[pd.DataFrame, pd.Series]) -> bool:
-    """
-    Check if the given Pandas Series is a Document Term DF.
-
-    Returns true if input is Document Term DF, else False.
-
-    """
-    return isinstance(df, pd.DataFrame) and not isinstance(df.columns, pd.MultiIndex)
-
-
 # Warning message for not-tokenized inputs
 _not_tokenized_warning_message = (
-    "It seems like the given Pandas Series s is not tokenized. This function will"
-    " tokenize it automatically using hero.tokenize(s) first. You should consider"
-    " tokenizing it yourself first with hero.tokenize(s) in the future."
+    "It seems like the given Pandas Series s is not tokenized. This"
+    " function will tokenize it automatically using hero.tokenize(s)"
+    " first. You should consider tokenizing it yourself first with"
+    " hero.tokenize(s) in the future."
 )
 
 
@@ -60,9 +52,9 @@ def count(
     """
     Represent a text-based Pandas Series using count.
 
-    Return a Document Term DataFrame with the
-    number of occurences of a document's words for every
-    document.
+    Rows of the returned DataFrame represent documents whereas 
+    columns are terms. The value in the cell document-term is
+    the number of the term in this document. The output is sparse.
     TODO add tutorial link
 
     The input Series should already be tokenized. If not, it will
@@ -72,22 +64,22 @@ def count(
     ----------
     s : Pandas Series (tokenized)
 
-    max_features : int, optional, default to None.
-        Maximum number of features to keep. Will keep all features if set to
-        None.
+    max_features : int, optional, default=None.
+        Maximum number of features to keep. Will keep all features if 
+        set to None.
 
     min_df : float in range [0.0, 1.0] or int, default=1
         When building the vocabulary ignore terms that have a document
         frequency (number of documents they appear in) strictly 
         lower than the given threshold.
-        If float, the parameter represents a proportion of documents, integer
-        absolute counts.
+        If float, the parameter represents a proportion of documents,
+        integer absolute counts.
 
     max_df : float in range [0.0, 1.0] or int, default=1.0
-        Ignore terms that have a document frequency (number of documents they
-        appear in) frequency strictly higher than the given threshold.
-        If float, the parameter represents a proportion of documents, integer
-        absolute counts.
+        Ignore terms that have a document frequency (number of documents
+        they appear in) frequency strictly higher than the given 
+        threshold. If float, the parameter represents a proportion of 
+        documents, integer absolute counts.
 
     binary : bool, default=False
         If True, all non zero counts are set to 1.
@@ -97,15 +89,15 @@ def count(
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
-    >>> hero.count(s) # doctest: +SKIP        
-      Sentence one two
-    0        1   1   0
-    1        1   0   1
+    >>> hero.count(s) # doctest: +SKIP
+       Sentence  one  two
+    0         1    1    0
+    1         1    0    1
    
     See Also
     --------
 
-    Document Term DataFrame: TODO add tutorial link
+    TODO add tutorial link
     """
     # TODO. Can be rewritten without sklearn.
 
@@ -134,11 +126,11 @@ def term_frequency(
     s: pd.Series, max_features: Optional[int] = None, min_df=1, max_df=1.0,
 ) -> pd.DataFrame:
     """
-    Return a count document-term DataFrame based on the given Pandas Series
+    Represent a text-based Pandas Series using Term Frequency.
 
-    Rows of the returned DataFrame represent document whereas columns are terms.
-    The value in the cell document-term is the frequency of the term in
-    this document. The output is sparse.
+    Rows of the returned DataFrame represent documents whereas columns are
+    terms. The value in the cell document-term is the frequency of the
+    term in this document. The output is sparse.
     TODO add tutorial link
 
     The input Series should already be tokenized. If not, it will
@@ -148,22 +140,22 @@ def term_frequency(
     ----------
     s : Pandas Series (tokenized)
 
-    max_features : int, optional, default to None.
-        Maximum number of features to keep. Will keep all features if set to
-        None.
+    max_features : int, optional, default=None.
+        Maximum number of features to keep. Will keep all features if
+        set to None.
 
     min_df : float in range [0.0, 1.0] or int, default=1
         When building the vocabulary ignore terms that have a document
         frequency (number of documents they appear in) strictly 
         lower than the given threshold.
-        If float, the parameter represents a proportion of documents, integer
-        absolute counts.
+        If float, the parameter represents a proportion of documents,
+        integer absolute counts.
 
     max_df : float in range [0.0, 1.0] or int, default=1.0
-        Ignore terms that have a document frequency (number of documents they
-        appear in) frequency strictly higher than the given threshold.
-        If float, the parameter represents a proportion of documents, integer
-        absolute counts.
+        Ignore terms that have a document frequency (number of documents 
+        they appear in) frequency strictly higher than the given 
+        threshold. If float, the parameter represents a proportion of 
+        documents, integer absolute counts.
 
     Examples
     --------
@@ -177,7 +169,7 @@ def term_frequency(
 
     See Also
     --------
-    Document Term DataFrame: TODO add tutorial link
+    TODO add tutorial link
     """
     # Check if input is tokenized. Else, print warning and tokenize.
     if not isinstance(s.iloc[0], list):
@@ -207,13 +199,18 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFram
     """
     Represent a text-based Pandas Series using TF-IDF.
 
+    Rows of the returned DataFrame represent documents whereas columns are
+    terms. The value in the cell document-term is the tfidf-value of the
+    term in this document. The output is sparse.
+
     *Term Frequency - Inverse Document Frequency (TF-IDF)* is a formula to
     calculate the _relative importance_ of the words in a document, taking
-    into account the words' occurences in other documents. It consists of two
-    parts:
+    into account the words' occurences in other documents. It consists of
+    two parts:
 
-    The *term frequency (tf)* tells us how frequently a term is present in a
-    document, so tf(document d, term t) = number of times t appears in d.
+    The *term frequency (tf)* tells us how frequently a term is present
+    in a document, so tf(document d, term t) = number of times t appears
+    in d.
 
     The *inverse document frequency (idf)* measures how _important_ or
     _characteristic_ a term is among the whole corpus (i.e. among all
@@ -222,15 +219,11 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFram
 
     Finally, tf-idf(document d, term t) = tf(d, t) * idf(t).
 
-    Different from the `sklearn-implementation of 
-    tfidf <https://scikit-learn.org/stable/modules/generated/sklearn.feature_
-    extraction.text.TfidfVectorizer.html>`, this function does *not* normalize
-    the output in any way, so the result is exactly what you get applying the
-    formula described above.
-
-    Return a Document Term DataFrame with the
-    tfidf of every word in the document. The output is sparse.
-    TODO add tutorial link
+    Different from the `sklearn-implementation of tfidf
+    <https://scikit-learn.org/stable/modules/generated/sklearn.feature_
+    extraction.text.TfidfVectorizer.html>`, this function does *not* 
+    normalize the output in any way, so the result is exactly what you 
+    get applying the formula described above.
 
     The input Series should already be tokenized. If not, it will
     be tokenized before tfidf is calculated.
@@ -239,22 +232,22 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFram
     ----------
     s : Pandas Series (tokenized)
 
-    max_features : int, optional, default to None.
+    max_features : int, optional, default=None.
         If not None, only the max_features most frequent tokens are used.
 
     min_df : float in range [0.0, 1.0] or int, default=1
         When building the vocabulary ignore terms that have a document
         frequency (number of documents they appear in) strictly 
         lower than the given threshold.
-        If float, the parameter represents a proportion of documents, integer
-        absolute counts.
+        If float, the parameter represents a proportion of documents, 
+        integer absolute counts.
 
     max_df : float in range [0.0, 1.0] or int, default=1.0
         Ignore terms that have a document frequency (number of documents they
         appear in) frequency strictly higher than the given threshold.
-        This arguments basically permits to remove corpus-specific stop words.
-        If float, the parameter represents a proportion of documents, integer
-        absolute counts.
+        This arguments basically permits to remove corpus-specific stop 
+        words. If float, the parameter represents a proportion of documents,
+        integer absolute counts.
 
     Examples
     --------
@@ -270,7 +263,7 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFram
     --------
     `TF-IDF on Wikipedia <https://en.wikipedia.org/wiki/Tf-idf>`_
 
-    Document Term DataFrame: TODO add tutorial link
+    TODO add tutorial link
     """
 
     # Check if input is tokenized. Else, print warning and tokenize.
@@ -301,49 +294,50 @@ Dimensionality reduction
 
 
 def pca(
-    s: Union[pd.Series, pd.DataFrame], n_components=2, random_state=None
+    input_matrix: Union[pd.Series, pd.DataFrame], n_components=2, random_state=None
 ) -> pd.Series:
     """
-    Perform principal component analysis on the given Pandas Series.
+    Perform principal component analysis on the given input.
 
-    Principal Component Analysis (PCA) is a statistical method that is used
-    to reveal where the variance in a dataset comes from. For textual data,
-    one could for example first represent a Series of documents using
-    :meth:`texthero.representation.tfidf` to get a vector representation of
-    each document. Then, PCA can generate new vectors from the tfidf
-    representation that showcase the differences among the documents most
-    strongly in fewer dimensions.
+    Principal Component Analysis (PCA) is a statistical method that is
+    used to reveal where the variance in a dataset comes from. For 
+    textual data, one could for example first represent a Series of 
+    documents using :meth:`texthero.representation.tfidf` to get a vector
+    representation of each document. Then, PCA can generate new vectors 
+    from the tfidf representation that showcase the differences among
+    the documents most strongly in fewer dimensions.
 
     For example, the tfidf vectors will have length 100 if hero.tfidf was
-    called on a large corpus with max_features=100. Visualizing 100 dimensions
-    is hard! Using PCA with n_components=3, every document will now get a
-    vector of length 3, and the vectors will be chosen so that the document
-    differences are easily visible. The corpus can now be visualized in 3D and
-    we can get a good first view of the data!
+    called on a large corpus with max_features=100. Visualizing 100 
+    dimensions is hard! Using PCA with n_components=3, every document will
+    now get a vector of length 3, and the vectors will be chosen so that
+    the document differences are easily visible. The corpus can now be 
+    visualized in 3D and we can get a good first view of the data!
 
     In general, *pca* should be called after the text has already been
     represented to a matrix form.
 
     PCA cannot directly handle sparse input, so when calling pca on a
-    DocumentTermDF, the input has to be expanded which can lead to
+    sparse DataFrame, the input has to be expanded which can lead to
     memory problems with big datasets.
 
     Parameters
     ----------
-    s : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix : Pandas Series (VectorSeries) or DataFrame
 
-    n_components : Int. Default is 2.
+    n_components : Int. default=2.
         Number of components to keep (dimensionality of output vectors).
         If n_components is not set or None, all components are kept.
 
     random_state : int, default=None
-        Pass an int for reproducible results across multiple function calls.
+        Pass an int for reproducible results across multiple function 
+        calls.
 
 
     Returns
     -------
-    Pandas Series with the vector calculated by PCA for the document in every
-    cell.
+    Pandas Series with the vector calculated by PCA for the document in
+    every cell.
 
     Examples
     --------
@@ -362,24 +356,25 @@ def pca(
 
     See also
     --------
-    `PCA on Wikipedia <https://en.wikipedia.org/wiki/Principal_component_analysis>`_
+    `PCA on Wikipedia 
+    <https://en.wikipedia.org/wiki/Principal_component_analysis>`_
 
     """
     pca = PCA(n_components=n_components, random_state=random_state, copy=False)
 
-    if _check_is_valid_DocumentTermDF(s):
-        values = s.values
+    if isinstance(input_matrix, pd.DataFrame):
+        values = input_matrix.values
     else:
-        values = list(s)
+        values = list(input_matrix)
 
-    return pd.Series(list(pca.fit_transform(values)), index=s.index)
+    return pd.Series(list(pca.fit_transform(values)), index=input_matrix.index)
 
 
 def nmf(
-    s: Union[pd.Series, pd.DataFrame], n_components=2, random_state=None
+    input_matrix: Union[pd.Series, pd.DataFrame], n_components=2, random_state=None
 ) -> pd.Series:
     """
-    Performs non-negative matrix factorization.
+    Performs non-negative matrix factorization on the given input.
 
     Non-Negative Matrix Factorization (NMF) is often used in
     natural language processing to find clusters of similar
@@ -389,19 +384,20 @@ def nmf(
 
     Given a document-term matrix (so in
     texthero usually a Series after applying
-    :meth:`texthero.representation.tfidf` or some other first representation
-    function that assigns a scalar (a weight) to each word), NMF will find
-    n_components many topics (clusters) and calculate a vector for each
-    document that places it correctly among the topics.
+    :meth:`texthero.representation.tfidf` or some other first 
+    representation function that assigns a scalar (a weight) to each 
+    word), NMF will find n_components many topics (clusters) and
+    calculate a vector for each document that places it correctly among
+    the topics.
 
     NMF can directly handle sparse input, so when calling nmf on a
-    DocumentTermDF, the advantage of sparseness is kept.
+    sparse DataFrame, the advantage of sparseness is kept.
 
     Parameters
     ----------
-    s : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix : Pandas Series (VectorSeries) or DataFrame
 
-    n_components : Int. Default is 2.
+    n_components : Int. default=2.
         Number of components to keep (dimensionality of output vectors).
         If n_components is not set or None, all components are kept.
 
@@ -410,16 +406,18 @@ def nmf(
 
     Returns
     -------
-    Pandas Series with the vector calculated by NMF for the document in every
-    cell.
+    Pandas Series with the vector calculated by NMF for the document in 
+    every cell.
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Football, Sports, Soccer", "Music, Violin, Orchestra",
-    ...                "Football, Music"])
-    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency)
+    >>> s = pd.Series(["Football, Sports, Soccer", 
+    ...               "Music, Violin, Orchestra", "Football, Music"])
+    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(
+    ...                                         hero.term_frequency
+    ...                                                 )
     >>> hero.nmf(s) # doctest: +SKIP
     0                    [0.9080190347553924, 0.0]
     1                     [0.0, 0.771931061231598]
@@ -439,17 +437,20 @@ def nmf(
     """
     nmf = NMF(n_components=n_components, init="random", random_state=random_state,)
 
-    if _check_is_valid_DocumentTermDF(s):
-        s_coo = s.sparse.to_coo()
-        s_for_vectorization = s_coo.astype("float64")
+    if isinstance(input_matrix, pd.DataFrame):
+        input_matrix_coo = input_matrix.sparse.to_coo()
+        input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
-        s_for_vectorization = list(s)
+        input_matrix_for_vectorization = list(input_matrix)
 
-    return pd.Series(list(nmf.fit_transform(s_for_vectorization)), index=s.index)
+    return pd.Series(
+        list(nmf.fit_transform(input_matrix_for_vectorization)),
+        index=input_matrix.index,
+    )
 
 
 def tsne(
-    s: Union[pd.Series, pd.DataFrame],
+    input_matrix: Union[pd.Series, pd.DataFrame],
     n_components=2,
     perplexity=30.0,
     learning_rate=200.0,
@@ -458,26 +459,29 @@ def tsne(
     n_jobs=-1,
 ) -> pd.Series:
     """
-    Performs TSNE on the given pandas series.
+    Performs t-Distributed Stochastic Neighbor Embedding on the given
+    input.
 
     t-distributed Stochastic Neighbor Embedding (t-SNE) is
-    a machine learning algorithm used to visualize high-dimensional data in
-    fewer dimensions. In natural language processing, the high-dimensional data
-    is usually a document-term matrix (so in texthero usually a Series after
-    applying :meth:`texthero.representation.tfidf` or some other first
+    a machine learning algorithm used to visualize high-dimensional data
+    in fewer dimensions. In natural language processing, the
+    high-dimensional data is usually a document-term matrix (so in 
+    texthero usually a Series after applying
+    :meth:`texthero.representation.tfidf` or some other first
     representation function that assigns a scalar (a weight) to each word)
-    that is hard to visualize as there might be many terms. With t-SNE, every
-    document gets a new, low-dimensional (n_components entries) vector in such
-    a way that the differences / similarities between documents are preserved.
+    that is hard to visualize as there might be many terms. With t-SNE,
+    every document gets a new, low-dimensional (n_components entries)
+    vector in such a way that the differences / similarities between
+    documents are preserved.
 
     T-SNE can directly handle sparse input, so when calling tsne on a
-    DocumentTermDF, the advantage of sparseness is kept.
+    sparse DataFrame, the advantage of sparseness is kept.
 
     Parameters
     ----------
-    s : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix : Pandas Series (VectorSeries) or DataFrame
 
-    n_components : int, default is 2.
+    n_components : int, default=2.
         Number of components to keep (dimensionality of output vectors).
         If n_components is not set or None, all components are kept.
 
@@ -489,20 +493,21 @@ def tsne(
         different results.
 
     learning_rate : float, optional (default: 200.0)
-        The learning rate for t-SNE is usually in the range [10.0, 1000.0]. If
-        the learning rate is too high, the data may look like a 'ball' with any
-        point approximately equidistant from its nearest neighbours. If the
-        learning rate is too low, most points may look compressed in a dense
-        cloud with few outliers. If the cost function gets stuck in a bad local
-        minimum increasing the learning rate may help.
+        The learning rate for t-SNE is usually in the range 
+        [10.0, 1000.0]. If the learning rate is too high, the data may
+        look like a 'ball' with any point approximately equidistant from
+        its nearest neighbours. If the learning rate is too low, most
+        points may look compressed in a dense cloud with few outliers. If
+        the cost function gets stuck in a bad local minimum increasing the
+        learning rate may help.
 
     n_iter : int, optional (default: 1000)
         Maximum number of iterations for the optimization. Should be at
         least 250.
 
     random_state : int, default=None
-        Determines the random number generator. Pass an int for reproducible
-        results across multiple function calls.
+        Determines the random number generator. Pass an int for
+        reproducible results across multiple function calls.
 
     n_jobs : int, optional, default=-1
         The number of parallel jobs to run for neighbors search.
@@ -510,15 +515,15 @@ def tsne(
 
     Returns
     -------
-    Pandas Series with the vector calculated by t-SNE for the document in every
-    cell.
+    Pandas Series with the vector calculated by t-SNE for the document in
+    every cell.
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Football, Sports, Soccer", "Music, Violin, Orchestra",
-    ...                "Football, Music"])
+    >>> s = pd.Series(["Football, Sports, Soccer",
+    ...              "Music, Violin, Orchestra",  "Football, Music"])
     >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency)
     >>> hero.tsne(s, random_state=42) # doctest: +SKIP
     0      [-18.833383560180664, -276.800537109375]
@@ -541,13 +546,16 @@ def tsne(
         n_jobs=n_jobs,
     )
 
-    if _check_is_valid_DocumentTermDF(s):
-        s_coo = s.sparse.to_coo()
-        s_for_vectorization = s_coo.astype("float64")
+    if isinstance(input_matrix, pd.DataFrame):
+        input_matrix_coo = input_matrix.sparse.to_coo()
+        input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
-        s_for_vectorization = list(s)
+        input_matrix_for_vectorization = list(input_matrix)
 
-    return pd.Series(list(tsne.fit_transform(s_for_vectorization)), index=s.index)
+    return pd.Series(
+        list(tsne.fit_transform(input_matrix_for_vectorization)),
+        index=input_matrix.index,
+    )
 
 
 """
@@ -556,7 +564,7 @@ Clustering
 
 
 def kmeans(
-    s: Union[pd.Series, pd.DataFrame],
+    input_matrix: Union[pd.Series, pd.DataFrame],
     n_clusters=5,
     n_init=10,
     max_iter=300,
@@ -564,7 +572,7 @@ def kmeans(
     algorithm="auto",
 ):
     """
-    Performs K-means clustering algorithm.
+    Performs K-means clustering algorithm on the given input.
 
     K-means clustering is used in natural language processing
     to separate texts into k clusters (groups) 
@@ -575,18 +583,19 @@ def kmeans(
 
     Given a document-term matrix (so in
     texthero usually a Series after applying
-    :meth:`texthero.representation.tfidf` or some other first representation
-    function that assigns a scalar (a weight) to each word), K-means will find
-    k topics (clusters) and assign a topic to each document.
+    :meth:`texthero.representation.tfidf` or some other first 
+    representation function that assigns a scalar (a weight) to each
+    word), K-means will find k topics (clusters) and assign a topic to 
+    each document.
 
     Kmeans can directly handle sparse input, so when calling kmeans on a
-    DocumentTermDF, the advantage of sparseness is kept.
+    sparse DataFrame, the advantage of sparseness is kept.
 
     Parameters
     ----------
-    s: Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix: Pandas Series (VectorSeries) or DataFrame
 
-    n_clusters: Int, default to 5.
+    n_clusters: Int, default=5.
         The number of clusters to separate the data into.
 
     n_init : int, default=10
@@ -599,25 +608,30 @@ def kmeans(
         single run.
 
     random_state : int, default=None
-        Determines random number generation for centroid initialization. Use
-        an int to make the randomness deterministic.
+        Determines random number generation for centroid initialization.
+        Use an int to make the randomness deterministic.
 
     algorithm : {"auto", "full", "elkan"}, default="auto"
-        K-means algorithm to use. The classical EM-style algorithm is "full".
-        The "elkan" variation is more efficient on data with well-defined
-        clusters, by using the triangle inequality. However it's more memory
-        intensive.
+        K-means algorithm to use. The classical EM-style algorithm is
+        "full". The "elkan" variation is more efficient on data with 
+        well-defined clusters, by using the triangle inequality. However
+        it's more memory intensive.
 
     Returns
     -------
-    Pandas Series with the cluster the document was assigned to in each cell.
+    Pandas Series with the cluster the document was assigned to in each 
+    cell.
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, fun, guitar"])
-    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency)
+    >>> s = pd.Series(["Football, Sports, Soccer", 
+    ...                 "music, violin, orchestra",
+    ...                "football, fun, sports", "music, fun, guitar"])
+    >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(
+    ...                                         hero.term_frequency
+    ...                                             )
     >>> hero.kmeans(s, n_clusters=2, random_state=42)
     0    1
     1    0
@@ -630,15 +644,16 @@ def kmeans(
 
     See also
     --------
-    `kmeans on Wikipedia <https://en.wikipedia.org/wiki/K-means_clustering>`_
+    `kmeans on Wikipedia 
+    <https://en.wikipedia.org/wiki/K-means_clustering>`_
 
     """
 
-    if _check_is_valid_DocumentTermDF(s):
-        s_coo = s.sparse.to_coo()
-        s_for_vectorization = s_coo.astype("float64")
+    if isinstance(input_matrix, pd.DataFrame):
+        input_matrix_coo = input_matrix.sparse.to_coo()
+        input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
-        s_for_vectorization = list(s)
+        input_matrix_for_vectorization = list(input_matrix)
 
     kmeans = KMeans(
         n_clusters=n_clusters,
@@ -647,14 +662,14 @@ def kmeans(
         random_state=random_state,
         copy_x=True,
         algorithm=algorithm,
-    ).fit(s_for_vectorization)
-    return pd.Series(kmeans.predict(s_for_vectorization), index=s.index).astype(
-        "category"
-    )
+    ).fit(input_matrix_for_vectorization)
+    return pd.Series(
+        kmeans.predict(input_matrix_for_vectorization), index=input_matrix.index
+    ).astype("category")
 
 
 def dbscan(
-    s: Union[pd.Series, pd.DataFrame],
+    input_matrix: Union[pd.Series, pd.DataFrame],
     eps=0.5,
     min_samples=5,
     metric="euclidean",
@@ -663,7 +678,7 @@ def dbscan(
     n_jobs=-1,
 ):
     """
-    Perform DBSCAN clustering.
+    Perform DBSCAN clustering on the given input.
 
     Density-based spatial clustering of applications with noise (DBSCAN)
     is used in natural language processing
@@ -676,31 +691,34 @@ def dbscan(
 
     Given a document-term matrix (so in
     texthero usually a Series after applying
-    :meth:`texthero.representation.tfidf` or some other first representation
-    function that assigns a scalar (a weight) to each word), DBSCAN will find
-    topics (clusters) and assign a topic to each document.
+    :meth:`texthero.representation.tfidf` or some other first
+    representation function that assigns a scalar (a weight) to each 
+    word), DBSCAN will find topics (clusters) and assign a topic to 
+    each document.
 
     DBSCAN can directly handle sparse input, so when calling dbscan on a
-    DocumentTermDF, the advantage of sparseness is kept.
+    sparse DataFrame, the advantage of sparseness is kept.
 
     Parameters
     ----------
-    s: Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix: Pandas Series (VectorSeries) or DataFrame
 
     eps : float, default=0.5
         The maximum distance between two samples for one to be considered
         as in the neighborhood of the other. This is not a maximum bound
         on the distances of points within a cluster. This is the most
-        important DBSCAN parameter to choose appropriately for your data set
-        and distance function.
+        important DBSCAN parameter to choose appropriately for your data 
+        set and distance function.
 
     min_samples : int, default=5
-        The number of samples (or total weight) in a neighborhood for a point
-        to be considered as a core point. This includes the point itself.
+        The number of samples (or total weight) in a neighborhood for a 
+        point to be considered as a core point. This includes the point
+        itself.
 
     metric : string, or callable, default='euclidean'
         The metric to use when calculating distance between instances in a
-        feature array. Use `sorted(sklearn.neighbors.VALID_METRICS['brute'])`
+        feature array. Use 
+        `sorted(sklearn.neighbors.VALID_METRICS['brute'])`
         to see valid options.
 
     metric_params : dict, default=None
@@ -718,13 +736,16 @@ def dbscan(
 
     Returns
     -------
-    Pandas Series with the cluster the document was assigned to in each cell.
+    Pandas Series with the cluster the document was assigned to in each
+    cell.
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, enjoy, guitar"])
+    >>> s = pd.Series(["Football, Sports, Soccer", 
+    ...                "music, violin, orchestra", 
+    ...                "football, fun, sports", "music, enjoy, guitar"])
     >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
     >>> hero.dbscan(s, min_samples=1, eps=4)
     0    0
@@ -743,11 +764,11 @@ def dbscan(
 
     """
 
-    if _check_is_valid_DocumentTermDF(s):
-        s_coo = s.sparse.to_coo()
-        s_for_vectorization = s_coo.astype("float64")
+    if isinstance(input_matrix, pd.DataFrame):
+        input_matrix_coo = input_matrix.sparse.to_coo()
+        input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
-        s_for_vectorization = list(s)
+        input_matrix_for_vectorization = list(input_matrix)
 
     return pd.Series(
         DBSCAN(
@@ -757,13 +778,13 @@ def dbscan(
             metric_params=metric_params,
             leaf_size=leaf_size,
             n_jobs=n_jobs,
-        ).fit_predict(s_for_vectorization),
-        index=s.index,
+        ).fit_predict(input_matrix_for_vectorization),
+        index=input_matrix.index,
     ).astype("category")
 
 
 def meanshift(
-    s: Union[pd.Series, pd.DataFrame],
+    input_matrix: Union[pd.Series, pd.DataFrame],
     bandwidth=None,
     bin_seeding=False,
     min_bin_freq=1,
@@ -772,7 +793,7 @@ def meanshift(
     max_iter=300,
 ):
     """
-    Perform mean shift clustering.
+    Perform mean shift clustering on the given input.
 
     Mean shift clustering
     is used in natural language processing
@@ -785,41 +806,42 @@ def meanshift(
 
     Given a document-term matrix (so in
     texthero usually a Series after applying
-    :meth:`texthero.representation.tfidf` or some other first representation
-    function that assigns a scalar (a weight) to each word), mean shift will
-    find topics (clusters) and assign a topic to each document.
+    :meth:`texthero.representation.tfidf` or some other first
+    representation function that assigns a scalar (a weight) to each
+    word), mean shift will find topics (clusters) and assign a topic
+    to each document.
 
-    Menashift cannot directly handle sparse input, so when calling meanshift on a
-    DocumentTermDF, the input has to be expanded which can lead to
-    memory problems with big datasets.
+    Menashift cannot directly handle sparse input, so when calling
+    meanshift on a sparse DataFrame, the input has to be expanded
+    which can lead to memory problems with big datasets.
 
     Parameters
     ----------
-    s: Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix: Pandas Series (VectorSeries) or DataFrame
 
     bandwidth : float, default=None
         Bandwidth used in the RBF kernel.
 
         If not given, the bandwidth is estimated.
         Estimating takes time at least quadratic in the number of samples
-        (i.e. documents). For large datasets, it’s wise to set the bandwidth
-        to a small value.
+        (i.e. documents). For large datasets, it’s wise to set the 
+        bandwidth to a small value.
 
     bin_seeding : bool, default=False
         If true, initial kernel locations are not locations of all
         points, but rather the location of the discretized version of
         points, where points are binned onto a grid whose coarseness
-        corresponds to the bandwidth. Setting this option to True will speed
-        up the algorithm because fewer seeds will be initialized.
+        corresponds to the bandwidth. Setting this option to True will 
+        speed up the algorithm because fewer seeds will be initialized.
 
     min_bin_freq : int, default=1
        To speed up the algorithm, accept only those bins with at least
        min_bin_freq points as seeds.
 
     cluster_all : bool, default=True
-        If true, then all points are clustered, even those orphans that are
-        not within any kernel. Orphans are assigned to the nearest kernel.
-        If false, then orphans are given cluster label -1.
+        If true, then all points are clustered, even those orphans that
+        are not within any kernel. Orphans are assigned to the nearest
+        kernel. If false, then orphans are given cluster label -1.
 
     n_jobs : int, default=-1
         The number of jobs to use for the computation.
@@ -827,11 +849,13 @@ def meanshift(
 
     max_iter : int, default=300
         Maximum number of iterations, per seed point before the clustering
-        operation terminates (for that seed point), if has not converged yet.
+        operation terminates (for that seed point), if has not converged
+        yet.
 
     Returns
     -------
-    Pandas Series with the cluster the document was assigned to in each cell.
+    Pandas Series with the cluster the document was assigned to in each
+    cell.
 
     Examples
     --------
@@ -854,10 +878,10 @@ def meanshift(
 
     """
 
-    if _check_is_valid_DocumentTermDF(s):
-        vectors = s.values
+    if isinstance(input_matrix, pd.DataFrame):
+        vectors = input_matrix.values
     else:
-        vectors = list(s)
+        vectors = list(input_matrix)
 
     return pd.Series(
         MeanShift(
@@ -868,7 +892,7 @@ def meanshift(
             n_jobs=n_jobs,
             max_iter=max_iter,
         ).fit_predict(vectors),
-        index=s.index,
+        index=input_matrix.index,
     ).astype("category")
 
 
@@ -883,28 +907,28 @@ Normalization.
 """
 
 
-def normalize(s: Union[pd.DataFrame, pd.Series], norm="l2") -> pd.Series:
+def normalize(input_matrix: Union[pd.DataFrame, pd.Series], norm="l2") -> pd.Series:
     """
     Normalize every cell in a Pandas Series.
 
-    Input can be VectorSeries or DocumentTermDF. For DocumentTermDFs,
+    Input can be VectorSeries or DataFrames. For sparse DataFrames,
     the sparseness is kept.
 
     Parameters
     ----------
-    s: Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix: Pandas Series (VectorSeries) or DataFrame
 
-    norm: str, default to "l2"
+    norm: str, default="l2"
         One of "l1", "l2", or "max". The norm that is used.
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> col = pd.MultiIndex.from_tuples([(0, "a"), (0, "b"), (1, "c"), (1, "d")])
-    >>> s = pd.DataFrame([[1, 2, 3, 4],[4, 2, 7, 5],[2, 2, 3, 5],[1, 2, 9, 8]], columns=col).astype("Sparse")
-    >>> hero.normalize(s, norm="max") # doctest: +SKIP
-              0               1          
+    >>> col = ["a","b","c", "d"]
+    >>> s = pd.DataFrame([[1, 2, 3, 4],[4, 2, 7, 5],[2, 2, 3, 5],[1, 2, 9, 8]], 
+    ...                   columns=col).astype("Sparse")
+    >>> hero.normalize(s, norm="max") # doctest: +SKIP      
               a         b     c         d
     0  0.250000  0.500000  0.75  1.000000
     1  0.571429  0.285714  1.00  0.714286
@@ -916,22 +940,25 @@ def normalize(s: Union[pd.DataFrame, pd.Series], norm="l2") -> pd.Series:
     --------
     Representation Series link TODO add link to tutorial
 
-    `Norm on Wikipedia <https://en.wikipedia.org/wiki/Norm_(mathematics)>`_
+    `Norm on Wikipedia
+    <https://en.wikipedia.org/wiki/Norm_(mathematics)>`_
 
     """
-    isDocumentTermDF = _check_is_valid_DocumentTermDF(s)
+    isDataFrame = isinstance(input_matrix, pd.DataFrame)
 
-    if isDocumentTermDF:
-        s_coo = s.sparse.to_coo()
-        s_for_vectorization = s_coo.astype("float64")
+    if isDataFrame:
+        input_matrix_coo = input_matrix.sparse.to_coo()
+        input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
-        s_for_vectorization = list(s)
+        input_matrix_for_vectorization = list(input_matrix)
 
     result = sklearn_normalize(
-        s_for_vectorization, norm=norm
+        input_matrix_for_vectorization, norm=norm
     )  # Can handle sparse input.
 
-    if isDocumentTermDF:
-        return pd.DataFrame.sparse.from_spmatrix(result, s.index, s.columns)
+    if isDataFrame:
+        return pd.DataFrame.sparse.from_spmatrix(
+            result, input_matrix.index, input_matrix.columns
+        )
     else:
-        return pd.Series(list(result), index=s.index)
+        return pd.Series(list(result), index=input_matrix.index)

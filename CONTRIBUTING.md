@@ -178,6 +178,8 @@ pip install -e '.[dev]'
 
 - Some of the [dev-dependencies](https://github.com/jbesomi/texthero/blob/6e6b8f70432979a81a09d48826fc907adc67cba7/setup.cfg#L43) will be used by any contributor of TextHero to execute the [tests.sh](./scripts/tests.sh) locally.
 
+- execute `pre-commit install` inside your project folder in order to enable git pre commit hook. This will format your code automatically before staging them
+
 ## **IMPORTANT NOTE**
 
 - Some of the [dev-dependencies](https://github.com/jbesomi/texthero/blob/6e6b8f70432979a81a09d48826fc907adc67cba7/setup.cfg#L43) are necessary **IF** the contributor wants to update the website or run the website locally but please remember that one **shouldn't be sending these kind of changes as a Pull Request**.

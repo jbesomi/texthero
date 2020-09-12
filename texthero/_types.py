@@ -124,9 +124,11 @@ class TextSeries(HeroTypes):
         try:
             first_non_nan_value = s.loc[s.first_valid_index()]
             if not isinstance(first_non_nan_value, str) or s.index.nlevels != 1:
-                raise TypeError(error_string)
+                return False, error_string
         except KeyError:  # Only NaNs in Series -> same warning applies
-            raise TypeError(error_string)
+            return False, error_string
+
+        return True, ""
 
 
 class TokenSeries(HeroTypes):
@@ -154,9 +156,11 @@ class TokenSeries(HeroTypes):
         try:
             first_non_nan_value = s.loc[s.first_valid_index()]
             if not is_list_of_strings(first_non_nan_value) or s.index.nlevels != 1:
-                raise TypeError(error_string)
+                return False, error_string
         except KeyError:  # Only NaNs in Series -> same warning applies
-            raise TypeError(error_string)
+            return False, error_string
+
+        return True, ""
 
 
 class VectorSeries(HeroTypes):
@@ -191,9 +195,11 @@ class VectorSeries(HeroTypes):
         try:
             first_non_nan_value = s.loc[s.first_valid_index()]
             if not is_list_of_numbers(first_non_nan_value) or s.index.nlevels != 1:
-                raise TypeError(error_string)
+                return False, error_string
         except KeyError:  # Only NaNs in Series -> same warning applies
-            raise TypeError(error_string)
+            return False, error_string
+
+        return True, ""
 
 
 class DataFrame(HeroTypes):
@@ -228,7 +234,6 @@ def InputSeries(allowed_hero_series_types):
     """
     Check if first argument of function has / fulfills
     type allowed_hero_series_type
-
     Examples
     --------
     >>> from texthero._types import *
@@ -240,9 +245,7 @@ def InputSeries(allowed_hero_series_types):
     >>> # throws a type error with a nice explaination
     >>> f(pd.Series([["I", "am", "tokenized"]]))
     >>> # passes
-
     With several possible types:
-
     >>> @InputSeries([DataFrame, VectorSeries])
     ... def g(x):
     ...     pass

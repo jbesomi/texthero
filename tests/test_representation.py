@@ -120,9 +120,9 @@ test_cases_vectorization_min_df = [
 
 
 vector_s = pd.Series([[1.0, 0.0], [0.0, 0.0]], index=[5, 7])
-df = pd.DataFrame(
-    [[1.0, 0.0], [0.0, 0.0]], index=[5, 7], columns=["a", "b"],
-).astype("Sparse[float64, nan]")
+df = pd.DataFrame([[1.0, 0.0], [0.0, 0.0]], index=[5, 7], columns=["a", "b"],).astype(
+    "Sparse[float64, nan]"
+)
 
 
 test_cases_dim_reduction_and_clustering = [

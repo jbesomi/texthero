@@ -123,7 +123,7 @@ class TextSeries(HeroTypes):
 
         try:
             first_non_nan_value = s.loc[s.first_valid_index()]
-            if not isinstance(first_non_nan_value, str) or s.index.nlevels != 1:
+            if not isinstance(first_non_nan_value, str):
                 return False, error_string
         except KeyError:  # Only NaNs in Series -> same warning applies
             return False, error_string
@@ -155,7 +155,7 @@ class TokenSeries(HeroTypes):
 
         try:
             first_non_nan_value = s.loc[s.first_valid_index()]
-            if not is_list_of_strings(first_non_nan_value) or s.index.nlevels != 1:
+            if not is_list_of_strings(first_non_nan_value):
                 return False, error_string
         except KeyError:  # Only NaNs in Series -> same warning applies
             return False, error_string
@@ -194,7 +194,7 @@ class VectorSeries(HeroTypes):
 
         try:
             first_non_nan_value = s.loc[s.first_valid_index()]
-            if not is_list_of_numbers(first_non_nan_value) or s.index.nlevels != 1:
+            if not is_list_of_numbers(first_non_nan_value):
                 return False, error_string
         except KeyError:  # Only NaNs in Series -> same warning applies
             return False, error_string

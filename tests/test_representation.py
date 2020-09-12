@@ -50,9 +50,9 @@ s_tokenized_with_noncontinuous_index = pd.Series(
     [["Test", "Test", "TEST", "!"], ["Test", "?", ".", "."]], index=[5, 7]
 )
 
-s_tokenized_output_index = pd.Index([0, 1])
+tokenized_output_index = pd.Index([0, 1])
 
-s_tokenized_output_index_noncontinous = pd.Index([5, 7])
+tokenized_output_noncontinous_index = pd.Index([5, 7])
 
 test_cases_vectorization = [
     # format: [function_name, function, correct output for tokenized input above]
@@ -61,7 +61,7 @@ test_cases_vectorization = [
         representation.count,
         pd.DataFrame(
             [[1, 0, 0, 1, 2], [0, 2, 1, 0, 1]],
-            index=s_tokenized_output_index,
+            index=tokenized_output_index,
             columns=["!", ".", "?", "TEST", "Test"],
         ).astype("Sparse[int64, 0]"),
     ],
@@ -70,7 +70,7 @@ test_cases_vectorization = [
         representation.term_frequency,
         pd.DataFrame(
             [[0.125, 0.0, 0.0, 0.125, 0.250], [0.0, 0.25, 0.125, 0.0, 0.125]],
-            index=s_tokenized_output_index,
+            index=tokenized_output_index,
             columns=["!", ".", "?", "TEST", "Test"],
             dtype="Sparse",
         ).astype("Sparse[float64, nan]"),
@@ -86,7 +86,7 @@ test_cases_vectorization = [
                 ],
                 [_tfidf(x, s_tokenized, 1) for x in ["!", ".", "?", "TEST", "Test"]],
             ],
-            index=s_tokenized_output_index,
+            index=tokenized_output_index,
             columns=["!", ".", "?", "TEST", "Test"],
         ).astype("Sparse[float64, nan]"),
     ],
@@ -98,7 +98,7 @@ test_cases_vectorization_min_df = [
     [
         "count",
         representation.count,
-        pd.DataFrame([2, 1], index=s_tokenized_output_index, columns=["Test"],).astype(
+        pd.DataFrame([2, 1], index=tokenized_output_index, columns=["Test"],).astype(
             "Sparse[int64, 0]"
         ),
     ],
@@ -106,27 +106,27 @@ test_cases_vectorization_min_df = [
         "term_frequency",
         representation.term_frequency,
         pd.DataFrame(
-            [0.666667, 0.333333], index=s_tokenized_output_index, columns=["Test"],
+            [0.666667, 0.333333], index=tokenized_output_index, columns=["Test"],
         ).astype("Sparse[float64, nan]"),
     ],
     [
         "tfidf",
         representation.tfidf,
-        pd.DataFrame([2, 1], index=s_tokenized_output_index, columns=["Test"],).astype(
+        pd.DataFrame([2, 1], index=tokenized_output_index, columns=["Test"],).astype(
             "Sparse[float64, nan]"
         ),
     ],
 ]
 
 
-s_vector_series = pd.Series([[1.0, 0.0], [0.0, 0.0]], index=[5, 7])
-s_MatrixDF = pd.DataFrame(
+vector_s = pd.Series([[1.0, 0.0], [0.0, 0.0]], index=[5, 7])
+document_term_df = pd.DataFrame(
     [[1.0, 0.0], [0.0, 0.0]], index=[5, 7], columns=["a", "b"],
 ).astype("Sparse[float64, nan]")
 
 
 test_cases_dim_reduction_and_clustering = [
-    # format: [function_name, function, correct output for s_vector_series and s_MatrixDF input above]
+    # format: [function_name, function, correct output for s_vector_series and s_documenttermDF input above]
     ["pca", representation.pca, pd.Series([[-0.5, 0.0], [0.5, 0.0]], index=[5, 7],),],
     [
         "nmf",
@@ -184,7 +184,7 @@ class AbstractRepresentationTest(PandasTestCase):
     ):
         result_s = test_function(s_tokenized_with_noncontinuous_index)
         pd.testing.assert_index_equal(
-            s_tokenized_output_index_noncontinous, result_s.index
+            tokenized_output_noncontinous_index, result_s.index
         )
 
     @parameterized.expand(test_cases_vectorization_min_df)
@@ -216,11 +216,11 @@ class AbstractRepresentationTest(PandasTestCase):
         s_true = correct_output
 
         if name == "kmeans":
-            result_s = test_function(s_vector_series, random_state=42, n_clusters=2)
+            result_s = test_function(vector_s, random_state=42, n_clusters=2)
         elif name == "dbscan" or name == "meanshift" or name == "normalize":
-            result_s = test_function(s_vector_series)
+            result_s = test_function(vector_s)
         else:
-            result_s = test_function(s_vector_series, random_state=42)
+            result_s = test_function(vector_s, random_state=42)
 
         pd.testing.assert_series_equal(
             s_true,
@@ -232,7 +232,7 @@ class AbstractRepresentationTest(PandasTestCase):
         )
 
     @parameterized.expand(test_cases_dim_reduction_and_clustering)
-    def test_dim_reduction_and_clustering_with_MatrixDF_input(
+    def test_dim_reduction_and_clustering_with_documenttermDF_input(
         self, name, test_function, correct_output
     ):
         s_true = correct_output
@@ -242,11 +242,11 @@ class AbstractRepresentationTest(PandasTestCase):
             return
 
         if name == "kmeans":
-            result_s = test_function(s_MatrixDF, random_state=42, n_clusters=2)
-        elif name == "dbscan" or name == "meanshift" or name == "normalize":
-            result_s = test_function(s_MatrixDF)
+            result_s = test_function(document_term_df, random_state=42, n_clusters=2)
+        elif name == "dbscan" or name == "meanshift":
+            result_s = test_function(document_term_df)
         else:
-            result_s = test_function(s_MatrixDF, random_state=42)
+            result_s = test_function(document_term_df, random_state=42)
 
         pd.testing.assert_series_equal(
             s_true,
@@ -257,10 +257,10 @@ class AbstractRepresentationTest(PandasTestCase):
             check_category_order=False,
         )
 
-    def test_normalize_MatrixDF_also_as_output(self):
-        # normalize should also return MatrixDF output for MatrixDF
+    def test_normalize_document_term_df_also_as_output(self):
+        # normalize should also return DocumentTermDF output for DocumentTermDF
         # input so we test it separately
-        result = representation.normalize(s_MatrixDF)
+        result = representation.normalize(document_term_df)
         correct_output = pd.DataFrame(
             [[1.0, 0.0], [0.0, 0.0]], index=[5, 7], columns=["a", "b"],
         )

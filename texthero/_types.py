@@ -122,10 +122,12 @@ class TextSeries(HeroTypes):
             " See help(hero.HeroTypes) for more information."
         )
 
-        if not (isinstance(s, pd.Series) and isinstance(s.iloc[0], str)):
-            return False, error_string
-        else:
-            return True, ""
+        try:
+            first_non_nan_value = s.loc[s.first_valid_index()]
+            if not isinstance(first_non_nan_value, str) or s.index.nlevels != 1:
+                raise TypeError(error_string)
+        except KeyError:  # Only NaNs in Series -> same warning applies
+            raise TypeError(error_string)
 
 
 class TokenSeries(HeroTypes):
@@ -150,10 +152,12 @@ class TokenSeries(HeroTypes):
                 cell, (list, tuple)
             )
 
-        if not (isinstance(s, pd.Series) and is_list_of_strings(s.iloc[0])):
-            return False, error_string
-        else:
-            return True, ""
+        try:
+            first_non_nan_value = s.loc[s.first_valid_index()]
+            if not is_list_of_strings(first_non_nan_value) or s.index.nlevels != 1:
+                raise TypeError(error_string)
+        except KeyError:  # Only NaNs in Series -> same warning applies
+            raise TypeError(error_string)
 
 
 class VectorSeries(HeroTypes):
@@ -185,10 +189,12 @@ class VectorSeries(HeroTypes):
         def is_list_of_numbers(cell):
             return isinstance(cell, (list, tuple)) and all(is_numeric(x) for x in cell)
 
-        if not (isinstance(s, pd.Series) and is_list_of_numbers(s.iloc[0])):
-            return False, error_string
-        else:
-            return True, ""
+        try:
+            first_non_nan_value = s.loc[s.first_valid_index()]
+            if not is_list_of_numbers(first_non_nan_value) or s.index.nlevels != 1:
+                raise TypeError(error_string)
+        except KeyError:  # Only NaNs in Series -> same warning applies
+            raise TypeError(error_string)
 
 
 class MatrixDF(HeroTypes):

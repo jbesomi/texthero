@@ -89,7 +89,7 @@ def count(
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
-    >>> hero.count(s)
+    >>> hero.count(s) # doctest: +SKIP
        Sentence  one  two
     0         1    1    0
     1         1    0    1

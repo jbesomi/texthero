@@ -72,8 +72,8 @@ class TestTypes(PandasTestCase):
         except TypeError:
             self.fail("Failed although input type is correct.")
 
-    def test_inputseries_correct_type_MatrixDF(self):
-        @_types.InputSeries(_types.MatrixDF)
+    def test_inputseries_correct_type_DataFrame(self):
+        @_types.InputSeries(_types.DataFrame)
         def f(s):
             pass
 

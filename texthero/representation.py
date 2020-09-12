@@ -19,7 +19,7 @@ from texthero._types import (
     TextSeries,
     TokenSeries,
     VectorSeries,
-    MatrixDF,
+    DataFrame,
     InputSeries,
 )
 
@@ -571,7 +571,7 @@ Clustering
 """
 
 
-@InputSeries([VectorSeries, MatrixDF])
+@InputSeries([VectorSeries, DataFrame])
 def kmeans(
     input_matrix: Union[pd.Series, pd.DataFrame],
     n_clusters=5,
@@ -677,7 +677,7 @@ def kmeans(
     ).astype("category")
 
 
-@InputSeries([VectorSeries, MatrixDF])
+@InputSeries([VectorSeries, DataFrame])
 def dbscan(
     input_matrix: Union[pd.Series, pd.DataFrame],
     eps=0.5,
@@ -793,7 +793,7 @@ def dbscan(
     ).astype("category")
 
 
-@InputSeries([VectorSeries, MatrixDF])
+@InputSeries([VectorSeries, DataFrame])
 def meanshift(
     input_matrix: Union[pd.Series, pd.DataFrame],
     bandwidth=None,
@@ -949,7 +949,7 @@ def normalize(input_matrix: Union[pd.DataFrame, pd.Series], norm="l2") -> pd.Ser
 
     See Also
     --------
-    MatrixDF link TODO add link to tutorial
+    DataFrame link TODO add link to tutorial
 
     `Norm on Wikipedia
     <https://en.wikipedia.org/wiki/Norm_(mathematics)>`_

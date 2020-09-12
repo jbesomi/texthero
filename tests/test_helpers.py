@@ -101,3 +101,39 @@ class TestHelpers(PandasTestCase):
                 ),
             ),
         )
+
+    def test_pandas_set_item_sparse_df1(self):
+        df1 = pd.DataFrame([[1, 2], [5, 3]], columns=["Test", "Test2"]).astype("Sparse")
+        df2 = pd.DataFrame([0, 1])
+
+        df1["here"] = df2
+
+        pd.testing.assert_frame_equal(
+            df1,
+            pd.DataFrame([[1, 2, 0], [5, 3, 1]], columns=["Test", "Test2", "here"]),
+            check_dtype=False,
+        )
+
+    def test_pandas_set_item_sparse_df2(self):
+        df1 = pd.DataFrame([[1, 2], [5, 3]], columns=["Test", "Test2"])
+        df2 = pd.DataFrame([0, 1]).astype("Sparse")
+
+        df1["here"] = df2
+
+        pd.testing.assert_frame_equal(
+            df1,
+            pd.DataFrame([[1, 2, 0], [5, 3, 1]], columns=["Test", "Test2", "here"]),
+            check_dtype=False,
+        )
+
+    def test_pandas_set_item_sparse_df1_and_df2(self):
+        df1 = pd.DataFrame([[1, 2], [5, 3]], columns=["Test", "Test2"]).astype("Sparse")
+        df2 = pd.DataFrame([0, 1]).astype("Sparse")
+
+        df1["here"] = df2
+
+        pd.testing.assert_frame_equal(
+            df1,
+            pd.DataFrame([[1, 2, 0], [5, 3, 1]], columns=["Test", "Test2", "here"]),
+            check_dtype=False,
+        )

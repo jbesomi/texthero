@@ -28,16 +28,6 @@ Helper
 """
 
 
-def _check_is_valid_DataFrame(df: Union[pd.DataFrame, pd.Series]) -> bool:
-    """
-    Check if the given Pandas Series is a DataFrame without Multicolumns.
-
-    Returns true if input is a DataFrame without Multicolumns, else False.
-
-    """
-    return isinstance(df, pd.DataFrame) and not isinstance(df.columns, pd.MultiIndex)
-
-
 # Warning message for not-tokenized inputs
 _not_tokenized_warning_message = (
     "It seems like the given Pandas Series s is not tokenized. This"
@@ -64,7 +54,7 @@ def count(
 
     Rows of the returned DataFrame represent document whereas 
     columns are terms. The value in the cell document-term is
-    the number of the term inthis document. The output is sparse.
+    the number of the term in this document. The output is sparse.
     TODO add tutorial link
 
     The input Series should already be tokenized. If not, it will
@@ -109,7 +99,7 @@ def count(
     See Also
     --------
 
-    DataFrame: TODO add tutorial link
+    TODO add tutorial link
     """
     # TODO. Can be rewritten without sklearn.
 
@@ -183,7 +173,7 @@ def term_frequency(
 
     See Also
     --------
-    DataFrame: TODO add tutorial link
+    TODO add tutorial link
     """
     # Check if input is tokenized. Else, print warning and tokenize.
     if not isinstance(s.iloc[0], list):
@@ -281,7 +271,7 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFram
     --------
     `TF-IDF on Wikipedia <https://en.wikipedia.org/wiki/Tf-idf>`_
 
-    DataFrame: TODO add tutorial link
+    TODO add tutorial link
     """
 
     # Check if input is tokenized. Else, print warning and tokenize.
@@ -380,7 +370,7 @@ def pca(
     """
     pca = PCA(n_components=n_components, random_state=random_state, copy=False)
 
-    if _check_is_valid_DataFrame(input_matrix):
+    if isinstance(input_matrix, pd.DataFrame):
         values = input_matrix.values
     else:
         values = list(input_matrix)
@@ -455,7 +445,7 @@ def nmf(
     """
     nmf = NMF(n_components=n_components, init="random", random_state=random_state,)
 
-    if _check_is_valid_DataFrame(input_matrix):
+    if isinstance(input_matrix, pd.DataFrame):
         input_matrix_coo = input_matrix.sparse.to_coo()
         input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
@@ -564,7 +554,7 @@ def tsne(
         n_jobs=n_jobs,
     )
 
-    if _check_is_valid_DataFrame(input_matrix):
+    if isinstance(input_matrix, pd.DataFrame):
         input_matrix_coo = input_matrix.sparse.to_coo()
         input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
@@ -667,7 +657,7 @@ def kmeans(
 
     """
 
-    if _check_is_valid_DataFrame(input_matrix):
+    if isinstance(input_matrix, pd.DataFrame):
         input_matrix_coo = input_matrix.sparse.to_coo()
         input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
@@ -782,7 +772,7 @@ def dbscan(
 
     """
 
-    if _check_is_valid_DataFrame(input_matrix):
+    if isinstance(input_matrix, pd.DataFrame):
         input_matrix_coo = input_matrix.sparse.to_coo()
         input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
@@ -896,7 +886,7 @@ def meanshift(
 
     """
 
-    if _check_is_valid_DataFrame(input_matrix):
+    if isinstance(input_matrix, pd.DataFrame):
         vectors = input_matrix.values
     else:
         vectors = list(input_matrix)
@@ -962,7 +952,7 @@ def normalize(input_matrix: Union[pd.DataFrame, pd.Series], norm="l2") -> pd.Ser
     <https://en.wikipedia.org/wiki/Norm_(mathematics)>`_
 
     """
-    isDataFrame = _check_is_valid_DataFrame(input_matrix)
+    isDataFrame = isinstance(input_matrix, pd.DataFrame)
 
     if isDataFrame:
         input_matrix_coo = input_matrix.sparse.to_coo()

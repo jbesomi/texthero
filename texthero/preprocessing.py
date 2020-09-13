@@ -1,5 +1,6 @@
 """
-The texthero.preprocess module allow for efficient pre-processing of text-based Pandas Series and DataFrame.
+The texthero.preprocess module allow for efficient pre-processing of 
+text-based Pandas Series and DataFrame.
 """
 
 from gensim.sklearn_api.phrases import PhrasesTransformer
@@ -11,6 +12,9 @@ import unicodedata
 import numpy as np
 import pandas as pd
 import unidecode
+
+# Ignore gensim annoying warnings
+import warnings
 from nltk.stem import PorterStemmer, SnowballStemmer
 
 from texthero import stopwords as _stopwords
@@ -18,8 +22,35 @@ from texthero._types import TokenSeries, TextSeries, InputSeries
 
 from typing import List, Callable, Union
 
-# Ignore gensim annoying warnings
-import warnings
+"""
+Define all regex pattern, which will be used in the functions below.
+They define different charateristics, on how to clean a text
+"""
+
+DIGITS_BLOCK = r"\b\d+\b"
+PUNCTUATION = rf"([{string.punctuation}])+"
+STOPWORD_TOKENIZER = r"""(?x)                          # Set flag to allow verbose regexps
+                    \w+(?:-\w+)*                              # Words with optional internal hyphens 
+                    | \s*                                     # Any space
+                    | [][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]    # Any symbol 
+                    """
+ROUND_BRACKETS = r"\([^()]*\)"
+CURLY_BRACKETS = r"\{[^{}]*\}"
+SQUARE_BRACKETS = r"\[[^\[\]]*\]"
+ANGLE_BRACKETS = r"<[^<>]*>"
+HTML_TAGS = r"""(?x)                    # Turn on free-spacing
+            <[^>]+>                             # Remove <html> tags
+            | &([a-z0-9]+|\#[0-9]{1,6}|\#x[0-9a-f]{1,6}); # Remove &nbsp;
+            """
+URLS = r"http\S+"
+TAGS = r"@[a-zA-Z0-9]+"
+HASHTAGS = r"#[a-zA-Z0-9_]+"
+
+# In regex, the metacharacter 'w' is "a-z, A-Z, 0-9, including the _ (underscore) character." We therefore remove it from the punctuation string as this is already included in \w
+punct = string.punctuation.replace("_", "")
+TOKENIZE = rf"((\w)([{punct}])(?:\B|$)|(?:^|\B)([{punct}])(\w))"  # The standart tokenisation will seperate all "regex words" '\w' from each other and also
+# puts the punctuation in its own tokens
+
 
 warnings.filterwarnings(action="ignore", category=UserWarning, module="gensim")
 
@@ -97,8 +128,7 @@ def replace_digits(s: TextSeries, symbols: str = " ", only_blocks=True) -> TextS
     """
 
     if only_blocks:
-        pattern = r"\b\d+\b"
-        return s.str.replace(pattern, symbols)
+        return s.str.replace(DIGITS_BLOCK, symbols)
     else:
         return s.str.replace(r"\d+", symbols)
 
@@ -166,7 +196,7 @@ def replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
     dtype: object
     """
 
-    return s.str.replace(rf"([{string.punctuation}])+", symbol)
+    return s.str.replace(PUNCTUATION, symbol)
 
 
 @InputSeries(TextSeries)
@@ -282,13 +312,9 @@ def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
 
     """
 
-    pattern = r"""(?x)                          # Set flag to allow verbose regexps
-      \w+(?:-\w+)*                              # Words with optional internal hyphens 
-      | \s*                                     # Any space
-      | [][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]    # Any symbol 
-    """
-
-    return "".join(t if t not in words else symbol for t in re.findall(pattern, text))
+    return "".join(
+        t if t not in words else symbol for t in re.findall(STOPWORD_TOKENIZER, text)
+    )
 
 
 @InputSeries(TextSeries)
@@ -565,7 +591,7 @@ def remove_round_brackets(s: TextSeries) -> TextSeries:
     :meth:`remove_square_brackets`
 
     """
-    return s.str.replace(r"\([^()]*\)", "")
+    return s.str.replace(ROUND_BRACKETS, "")
 
 
 @InputSeries(TextSeries)
@@ -591,7 +617,7 @@ def remove_curly_brackets(s: TextSeries) -> TextSeries:
     :meth:`remove_square_brackets`
 
     """
-    return s.str.replace(r"\{[^{}]*\}", "")
+    return s.str.replace(CURLY_BRACKETS, "")
 
 
 @InputSeries(TextSeries)
@@ -618,7 +644,7 @@ def remove_square_brackets(s: TextSeries) -> TextSeries:
 
 
     """
-    return s.str.replace(r"\[[^\[\]]*\]", "")
+    return s.str.replace(SQUARE_BRACKETS, "")
 
 
 @InputSeries(TextSeries)
@@ -644,7 +670,7 @@ def remove_angle_brackets(s: TextSeries) -> TextSeries:
     :meth:`remove_square_brackets`
 
     """
-    return s.str.replace(r"<[^<>]*>", "")
+    return s.str.replace(ANGLE_BRACKETS, "")
 
 
 @InputSeries(TextSeries)
@@ -700,12 +726,7 @@ def remove_html_tags(s: TextSeries) -> TextSeries:
 
     """
 
-    pattern = r"""(?x)                              # Turn on free-spacing
-      <[^>]+>                                       # Remove <html> tags
-      | &([a-z0-9]+|\#[0-9]{1,6}|\#x[0-9a-f]{1,6}); # Remove &nbsp;
-      """
-
-    return s.str.replace(pattern, "")
+    return s.str.replace(HTML_TAGS, "")
 
 
 @InputSeries(TextSeries)
@@ -730,14 +751,7 @@ def tokenize(s: TextSeries) -> TokenSeries:
 
     """
 
-    punct = string.punctuation.replace("_", "")
-    # In regex, the metacharacter 'w' is "a-z, A-Z, 0-9, including the _ (underscore)
-    # character." We therefore remove it from the punctuation string as this is already
-    # included in \w.
-
-    pattern = rf"((\w)([{punct}])(?:\B|$)|(?:^|\B)([{punct}])(\w))"
-
-    return s.str.replace(pattern, r"\2 \3 \4 \5").str.split()
+    return s.str.replace(TOKENIZE, r"\2 \3 \4 \5").str.split()
 
 
 # Warning message for not-tokenized inputs
@@ -830,9 +844,7 @@ def replace_urls(s: TextSeries, symbol: str) -> TextSeries:
 
     """
 
-    pattern = r"http\S+"
-
-    return s.str.replace(pattern, symbol)
+    return s.str.replace(URLS, symbol)
 
 
 @InputSeries(TextSeries)
@@ -884,8 +896,7 @@ def replace_tags(s: TextSeries, symbol: str) -> TextSeries:
 
     """
 
-    pattern = r"@[a-zA-Z0-9]+"
-    return s.str.replace(pattern, symbol)
+    return s.str.replace(TAGS, symbol)
 
 
 @InputSeries(TextSeries)
@@ -937,8 +948,7 @@ def replace_hashtags(s: TextSeries, symbol: str) -> TextSeries:
     dtype: object
 
     """
-    pattern = r"#[a-zA-Z0-9_]+"
-    return s.str.replace(pattern, symbol)
+    return s.str.replace(HASHTAGS, symbol)
 
 
 @InputSeries(TextSeries)

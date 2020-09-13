@@ -115,6 +115,22 @@ class TestPreprocessing(PandasTestCase):
         self.assertEqual(preprocessing.clean(s, pipeline=pipeline), s_true)
 
     """
+    Test clean
+    """
+
+    def test_clean(self):
+        s = pd.Series(
+            ["This serös 42 should bE CLeaned.! I am a stopword    \n", np.NAN]
+        )
+        s_true = pd.Series(
+            ["This serös 42 should bE CLeaned.! I am a stopword    \n", np.NAN]
+        )
+        self.assertEqual(
+            preprocessing.clean(s),
+            preprocessing.clean(s_true, preprocessing.get_default_pipeline()),
+        )
+
+    """
     Test stopwords.
     """
 

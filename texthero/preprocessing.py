@@ -11,7 +11,6 @@ import unicodedata
 import numpy as np
 import pandas as pd
 import unidecode
-from nltk.stem import PorterStemmer, SnowballStemmer
 
 from texthero import stopwords as _stopwords
 from texthero._types import TokenSeries, TextSeries, InputSeries

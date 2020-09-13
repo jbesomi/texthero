@@ -79,14 +79,14 @@ Texthero is there for the NLP-community. If you have an idea on how we can impro
 from sklearn if using a sklearn algorithm). If other values are used, add a small comment explaining why. Additionally, look for similar functions and use their default values.
 1. Default values are defined as follows: `x : int, optional, default=2`
 1. In docstring examples, on long `pipe`, consider enclosing the code in parenthesis like so:
-```
->>> s = (
-...     s.pipe(hero.clean)
-...      .pipe(hero.tokenize)
-...      .pipe(hero.term_frequency)
-...      .pipe(hero.flatten)
-... )
-```
+    ```
+    >>> s = (
+    ...     s.pipe(hero.clean)
+    ...      .pipe(hero.tokenize)
+    ...      .pipe(hero.term_frequency)
+    ...      .pipe(hero.flatten)
+    ... )
+    ```
 1. This is an example of a correct defined docstring:
 
 

@@ -4,6 +4,7 @@ The texthero.nlp module supports common NLP tasks such as named_entities, noun_c
 
 import spacy
 import pandas as pd
+from nltk.stem import PorterStemmer, SnowballStemmer
 
 from texthero._types import TextSeries, InputSeries
 
@@ -215,3 +216,59 @@ def pos_tag(s: TextSeries) -> pd.Series:
         )
 
     return pd.Series(pos_tags, index=s.index)
+
+
+@InputSeries(TextSeries)
+def stem(s: TextSeries, stem="snowball", language="english") -> TextSeries:
+    r"""
+    Stem series using either `porter` or `snowball` NLTK stemmers.
+
+    The act of stemming means removing the end of a words with an heuristic
+    process.
+    It's useful in context where the meaning of the word is important rather
+    than his derivation. Stemming is very efficient and adapt in case the given
+    dataset is large.
+
+    Make use of two NLTK stemming algorithms known as
+    :class:`nltk.stem.SnowballStemmer` and :class:`nltk.stem.PorterStemmer`.
+    SnowballStemmer should be used when the Pandas Series contains non-English
+    text has it has multilanguage support.
+
+
+    Parameters
+    ----------
+    s : :class:`texthero._types.TextSeries`
+
+    stem : str, optional, default="snowball"
+        Stemming algorithm. It can be either 'snowball' or 'porter'
+
+    language : str, optional, default="english"
+        Supported languages: `danish`, `dutch`, `english`, `finnish`,
+        `french`, `german` , `hungarian`, `italian`, `norwegian`,
+        `portuguese`, `romanian`, `russian`, `spanish` and `swedish`.
+
+    Notes
+    -----
+    By default NLTK stemming algorithms lowercase all text.
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("I used to go \t\n running.")
+    >>> hero.stem(s)
+    0    i use to go running.
+    dtype: object
+    """
+
+    if stem == "porter":
+        stemmer = PorterStemmer()
+    elif stem == "snowball":
+        stemmer = SnowballStemmer(language)
+    else:
+        raise ValueError("stem argument must be either 'porter' of 'stemmer'")
+
+    def _stem(text):
+        return " ".join([stemmer.stem(word) for word in text])
+
+    return s.str.split().apply(_stem)

@@ -26,6 +26,7 @@ s_numeric_lists = pd.Series([[5.0, 5.0], [6.0, 6.0]], index=[5, 6])
 test_cases_nlp = [
     ["named_entities", nlp.named_entities, (s_text,)],
     ["noun_chunks", nlp.noun_chunks, (s_text,)],
+    ["stem", nlp.stem, (s_text,)],
 ]
 
 test_cases_preprocessing = [
@@ -39,7 +40,6 @@ test_cases_preprocessing = [
     ["remove_whitespace", preprocessing.remove_whitespace, (s_text,)],
     ["replace_stopwords", preprocessing.replace_stopwords, (s_text, "")],
     ["remove_stopwords", preprocessing.remove_stopwords, (s_text,)],
-    ["stem", preprocessing.stem, (s_text,)],
     ["clean", preprocessing.clean, (s_text,)],
     ["remove_round_brackets", preprocessing.remove_round_brackets, (s_text,)],
     ["remove_curly_brackets", preprocessing.remove_curly_brackets, (s_text,)],

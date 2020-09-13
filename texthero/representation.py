@@ -47,10 +47,10 @@ def flatten(
     s : Sparse Pandas Series or Pandas Series
         The multiindexed Pandas Series to flatten.
 
-    index : Pandas Index, optional, default to None
+    index : Pandas Index, optional, default=None
         The index the flattened Series should have.
 
-    fill_missing_with : Any, default to 0.0
+    fill_missing_with : Any, optional, default=0.0
         Value to fill the NaNs (missing values) with. This _does not_ mean
         that existing values that are np.nan are replaced, but rather that
         features that are not present in one document but present in others
@@ -156,24 +156,24 @@ def count(
     ----------
     s : Pandas Series (tokenized)
 
-    max_features : int, optional, default to None.
+    max_features : int, optional, default=None
         Maximum number of features to keep. Will keep all features if set to
         None.
 
-    min_df : float in range [0.0, 1.0] or int, default=1
+    min_df : float in range [0.0, 1.0] or int, optional, default=1
         When building the vocabulary ignore terms that have a document
         frequency (number of documents they appear in) strictly 
         lower than the given threshold.
         If float, the parameter represents a proportion of documents, integer
         absolute counts.
 
-    max_df : float in range [0.0, 1.0] or int, default=1.0
+    max_df : float in range [0.0, 1.0] or int, optional, default=1.0
         Ignore terms that have a document frequency (number of documents they
         appear in) frequency strictly higher than the given threshold.
         If float, the parameter represents a proportion of documents, integer
         absolute counts.
 
-    binary : bool, default=False
+    binary : bool, optional, default=False
         If True, all non zero counts are set to 1.
 
     Examples
@@ -244,18 +244,18 @@ def term_frequency(
     ----------
     s : Pandas Series (tokenized)
 
-    max_features : int, optional, default to None.
+    max_features : int, optional, default=None
         Maximum number of features to keep. Will keep all features if set to
         None.
 
-    min_df : float in range [0.0, 1.0] or int, default=1
+    min_df : float in range [0.0, 1.0] or int, optional, default=1
         When building the vocabulary ignore terms that have a document
         frequency (number of documents they appear in) strictly 
         lower than the given threshold.
         If float, the parameter represents a proportion of documents, integer
         absolute counts.
 
-    max_df : float in range [0.0, 1.0] or int, default=1.0
+    max_df : float in range [0.0, 1.0] or int, optional, default=1.0
         Ignore terms that have a document frequency (number of documents they
         appear in) frequency strictly higher than the given threshold.
         If float, the parameter represents a proportion of documents, integer
@@ -350,10 +350,10 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.Series:
     ----------
     s : Pandas Series (tokenized)
 
-    max_features : int, optional, default to None.
+    max_features : int, optional, default=None
         If not None, only the max_features most frequent tokens are used.
 
-    min_df : float in range [0.0, 1.0] or int, default=1
+    min_df : float in range [0.0, 1.0] or int, optional, default=1
         When building the vocabulary ignore terms that have a document
         frequency (number of documents they appear in) strictly 
         lower than the given threshold.
@@ -446,11 +446,13 @@ def pca(s, n_components=2, random_state=None) -> pd.Series:
     ----------
     s : Pandas Series
 
-    n_components : Int. Default is 2.
+    n_components : int or str, optional, default=2
         Number of components to keep (dimensionality of output vectors).
         If n_components is not set or None, all components are kept.
+        If set to "mle", the number of components is
+        automatically estimated.
 
-    random_state : int, default=None
+    random_state : int, optional, default=None
         Pass an int for reproducible results across multiple function calls.
 
 
@@ -479,6 +481,7 @@ def pca(s, n_components=2, random_state=None) -> pd.Series:
     `PCA on Wikipedia <https://en.wikipedia.org/wiki/Principal_component_analysis>`_
 
     """
+    # Default n_components=2 to enable users to easily plot the results.
     pca = PCA(n_components=n_components, random_state=random_state, copy=False)
     return pd.Series(list(pca.fit_transform(list(s))), index=s.index)
 
@@ -505,11 +508,11 @@ def nmf(s, n_components=2, random_state=None) -> pd.Series:
     ----------
     s : Pandas Series
 
-    n_components : Int. Default is 2.
+    n_components : int, optinal, default=2
         Number of components to keep (dimensionality of output vectors).
         If n_components is not set or None, all components are kept.
 
-    random_state : int, default=None
+    random_state : int, optional, default=None
         Pass an int for reproducible results across multiple function calls.
 
     Returns
@@ -541,6 +544,7 @@ def nmf(s, n_components=2, random_state=None) -> pd.Series:
     <https://en.wikipedia.org/wiki/Non-negative_matrix_factorization>`_
 
     """
+    # Default n_components=2 to enable users to easily plot the results.
     nmf = NMF(n_components=n_components, init="random", random_state=random_state,)
     return pd.Series(list(nmf.fit_transform(list(s))), index=s.index)
 
@@ -572,18 +576,18 @@ def tsne(
     ----------
     s : Pandas Series
 
-    n_components : int, default is 2.
+    n_components : int, optional, default=2
         Number of components to keep (dimensionality of output vectors).
         If n_components is not set or None, all components are kept.
 
-    perplexity : float, optional (default: 30)
+    perplexity : float, optional, default=30
         The perplexity is related to the number of nearest neighbors that
         is used in other manifold learning algorithms. Larger datasets
         usually require a larger perplexity. Consider selecting a value
         between 5 and 50. Different values can result in significanlty
         different results.
 
-    learning_rate : float, optional (default: 200.0)
+    learning_rate : float, optional, default=200.0
         The learning rate for t-SNE is usually in the range [10.0, 1000.0]. If
         the learning rate is too high, the data may look like a 'ball' with any
         point approximately equidistant from its nearest neighbours. If the
@@ -591,11 +595,11 @@ def tsne(
         cloud with few outliers. If the cost function gets stuck in a bad local
         minimum increasing the learning rate may help.
 
-    n_iter : int, optional (default: 1000)
+    n_iter : int, optional, default=1000
         Maximum number of iterations for the optimization. Should be at
         least 250.
 
-    random_state : int, default=None
+    random_state : int, optional, default=None
         Determines the random number generator. Pass an int for reproducible
         results across multiple function calls.
 
@@ -627,6 +631,7 @@ def tsne(
     stochastic_neighbor_embedding>`_
 
     """
+    # Default n_components=2 to enable users to easily plot the results.
     tsne = TSNE(
         n_components=n_components,
         perplexity=perplexity,
@@ -671,23 +676,23 @@ def kmeans(
     ----------
     s: Pandas Series
 
-    n_clusters: Int, default to 5.
+    n_clusters: int, optional, default=5
         The number of clusters to separate the data into.
 
-    n_init : int, default=10
+    n_init : int, optional, default=10
         Number of time the k-means algorithm will be run with different
         centroid seeds. The final results will be the best output of
         n_init consecutive runs in terms of inertia.
 
-    max_iter : int, default=300
+    max_iter : int, optional, default=300
         Maximum number of iterations of the k-means algorithm for a
         single run.
 
-    random_state : int, default=None
+    random_state : int, optional, default=None
         Determines random number generation for centroid initialization. Use
         an int to make the randomness deterministic.
 
-    algorithm : {"auto", "full", "elkan"}, default="auto"
+    algorithm : {"auto", "full", "elkan"}, optional, default="auto"
         K-means algorithm to use. The classical EM-style algorithm is "full".
         The "elkan" variation is more efficient on data with well-defined
         clusters, by using the triangle inequality. However it's more memory
@@ -767,32 +772,32 @@ def dbscan(
     ----------
     s: Pandas Series
 
-    eps : float, default=0.5
+    eps : float, optional, default=0.5
         The maximum distance between two samples for one to be considered
         as in the neighborhood of the other. This is not a maximum bound
         on the distances of points within a cluster. This is the most
         important DBSCAN parameter to choose appropriately for your data set
         and distance function.
 
-    min_samples : int, default=5
+    min_samples : int, optional, default=5
         The number of samples (or total weight) in a neighborhood for a point
         to be considered as a core point. This includes the point itself.
 
-    metric : string, or callable, default='euclidean'
+    metric : string or callable, optional, default='euclidean'
         The metric to use when calculating distance between instances in a
         feature array. Use `sorted(sklearn.neighbors.VALID_METRICS['brute'])`
         to see valid options.
 
-    metric_params : dict, default=None
+    metric_params : dict, optional, default=None
         Additional keyword arguments for the metric function.
 
-    leaf_size : int, default=30
+    leaf_size : int, optional, default=30
         Leaf size passed to BallTree or cKDTree. This can affect the speed
         of the construction and query, as well as the memory required
         to store the tree. The optimal value depends
         on the nature of the problem.
 
-    n_jobs : int, default=-1
+    n_jobs : int, optional, default=-1
         The number of parallel jobs to run.
         ``-1`` means using all processors.
 
@@ -873,7 +878,7 @@ def meanshift(
     ----------
     s: Pandas Series
 
-    bandwidth : float, default=None
+    bandwidth : float, optional, default=None
         Bandwidth used in the RBF kernel.
 
         If not given, the bandwidth is estimated.
@@ -881,27 +886,27 @@ def meanshift(
         (i.e. documents). For large datasets, it’s wise to set the bandwidth
         to a small value.
 
-    bin_seeding : bool, default=False
+    bin_seeding : bool, optional, default=False
         If true, initial kernel locations are not locations of all
         points, but rather the location of the discretized version of
         points, where points are binned onto a grid whose coarseness
         corresponds to the bandwidth. Setting this option to True will speed
         up the algorithm because fewer seeds will be initialized.
 
-    min_bin_freq : int, default=1
+    min_bin_freq : int, optional, default=1
        To speed up the algorithm, accept only those bins with at least
        min_bin_freq points as seeds.
 
-    cluster_all : bool, default=True
+    cluster_all : bool, optional, default=True
         If true, then all points are clustered, even those orphans that are
         not within any kernel. Orphans are assigned to the nearest kernel.
         If false, then orphans are given cluster label -1.
 
-    n_jobs : int, default=-1
+    n_jobs : int, optional, default=-1
         The number of jobs to use for the computation.
         ``-1`` means using all processors
 
-    max_iter : int, default=300
+    max_iter : int, optional, default=300
         Maximum number of iterations, per seed point before the clustering
         operation terminates (for that seed point), if has not converged yet.
 
@@ -964,7 +969,7 @@ def normalize(s: pd.Series, norm="l2") -> pd.Series:
     ----------
     s: Pandas Series
 
-    norm: str, default to "l2"
+    norm: str, optional, default="l2"
         One of "l1", "l2", or "max". The norm that is used.
 
     Examples

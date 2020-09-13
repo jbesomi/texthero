@@ -80,6 +80,9 @@ Texthero is there for the NLP-community. If you have an idea on how we can impro
 >...      .pipe(hero.flatten)
 >... )
 >```
+1. Use American English instead of British English (e.g. categorize instead of categorise).
+1. For default argument values, use the defaults from the underlying library if applicable (e.g. the default arguments
+from sklearn if using an sklearn algorithm). If other values are used, please add a small comment explaining why. Additionally, look for similar functions and use their default values.
 
 ## Good first issue
 

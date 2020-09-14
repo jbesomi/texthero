@@ -20,7 +20,7 @@ document_id
  ```python
 remove_punctuation(s: TextSeries) -> TextSeries
  ```
-in the documentation. You then know that this function takes as input a _TextSeries_ and returns as output a _TextSeries_, so it can be used on a DataFrame or Series in the preprocessing phase of your work, where each document is one string.
+in the documentation. You then know that this function takes as input a _TextSeries_ and returns as output a _TextSeries_, so it can be used in the preprocessing phase of your work, where each document is one string.
 
 <h3 align="center">The four HeroSeries Types</h3>
 
@@ -114,15 +114,15 @@ dtype: object
 
 <h3 align="left">DataFrame</h3>
 
-In Natural Language Processing, we are often working with matrices that contain information about our dataset. For example, the output of the functions `tfidf`, `count`, and `term_frequency` is a [Document Term Matrix](https://en.wikipedia.org/wiki/Document-term_matrix), i.e. a matrix where each row is one document and each column is one term / word.
+In Natural Language Processing, we are often working with matrices that contain information about our dataset. For example, the output of the functions `tfidf`, `count`, and `term_frequency` is a [Document-Term Matrix](https://en.wikipedia.org/wiki/Document-term_matrix), i.e. a matrix where each row is one document and each column is one term / word.
 
 We use a Pandas DataFrame for this for two reasons:
 1. It looks nice.
 2. It can be sparse.
 
-The second reason is worth explaining in more detail: In e.g. a big Document Term Matrix, we might have 10,000 different terms, so 10,000 columns in our DataFrame. Additionally, most documents will only contain a small subset of all the terms. Thus, in each row, there will be lots of zeros in our matrix. This is why we use a [sparse matrix](https://en.wikipedia.org/wiki/Sparse_matrix): A sparse matrix only stores the non-zero fields. And Pandas DataFrames support sparse data, so Texthero users fully profit from the sparseness!
+The second reason is worth explaining in more detail: In e.g. a big Document-Term Matrix, we might have 10,000 different terms, so 10,000 columns in our DataFrame. Additionally, most documents will only contain a small subset of all the terms. Thus, in each row, there will be lots of zeros in our matrix. This is why we use a [sparse matrix](https://en.wikipedia.org/wiki/Sparse_matrix): A sparse matrix only stores the non-zero fields. And Pandas DataFrames support sparse data, so Texthero users fully profit from the sparseness!
 
-This is a massive advantage when dealing with *big data*: In a _sparse DataFrame_, we only store the data that's relevant to save lots and lots of time and space!
+This is a massive advantage when dealing with *big datasets*: In a _sparse DataFrame_, we only store the data that's relevant to save lots and lots of time and space!
 
 Let's look at an example with some more data.
 ```python

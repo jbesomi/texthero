@@ -254,7 +254,8 @@ of strings. For example, `pd.Series([["test"], ["token2", "token3"]])` is a vali
 3. __VectorSeries__: Every cell is a vector representing text, i.e.
 a list of floats. For example, `pd.Series([[1.0, 2.0], [3.0]])` is a valid VectorSeries. Most dimensionality reduction functions, like `pca` will take VectorSeries as an input and also return a VectorSeries.
 
-We also return a **DataFrame**, which basically is a Pandas DataFrame. Those DataFrames are used to store some relations. For example `count` will return a DataFrame where the rows are the documents and the columns are be the words/terms in all the documents. 
+Some functions also return a Pandas DataFrame. The DataFrame then represents a matrix. For example
+`count` will return a DataFrame where the rows are the documents and the columns are be the words/terms in all the documents. 
 This is a return type of the representation functions (count, term_frequenzy, tfidf)
 For example,
  `pd.DataFrame([[1, 2, 3], [4,5,6]], columns=["hi", "servus", "hola"])`

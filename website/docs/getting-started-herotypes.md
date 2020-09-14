@@ -16,15 +16,15 @@ document_id
 
 ```
 
- Consequently, in the Texthero's _preprocessing_ module, the functions usually take as input a Series where every cell is a string, and return as output a Series where every cell is a string. We will call this kind of Series _TextSeries_, so users know immediately what kind of Series the functions can work on. For example, you might see a function
+ Consequently, in Texthero's _preprocessing_ module, the functions usually take as input a Series where every cell is a string, and return as output a Series where every cell is a string. We will call this kind of Series _TextSeries_, so users know immediately what kind of Series the functions can work on. For example, you might see a function
  ```python
 remove_punctuation(s: TextSeries) -> TextSeries
  ```
-in the documentation. You then know that this can be used on a DataFrame or Series in the preprocessing phase of your work, where each document is one string.
+in the documentation. You then know that this function takes as input a _TextSeries_ and returns as output a _TextSeries_, so it can be used on a DataFrame or Series in the preprocessing phase of your work, where each document is one string.
 
 <h3 align="center">The four HeroSeries Types</h3>
 
-These are the four types currently supported by the library; almost all of the libraries functions takes as input and return as output one of these types:
+These are the three types currently supported by the library; almost all of the libraries functions takes as input and return as output one of these types:
 
 1. **TextSeries**: Every cell is a text, i.e. a string. For example,
 `pd.Series(["test", "test"])` is a valid TextSeries.
@@ -33,36 +33,41 @@ These are the four types currently supported by the library; almost all of the l
 of strings. For example, `pd.Series([["test"], ["token2", "token3"]])` is a valid TokenSeries.
 
 3. **VectorSeries**: Every cell is a vector representing text, i.e.
-a list of floats. For example, `pd.Series([[1.0, 2.0], [3.0]])` is a valid VectorSeries.
+a list of floats. For example, `pd.Series([[1.0, 2.0], [3.0, 4.0]])` is a valid VectorSeries.
 
-4. **DocumentTermDF**: A DataFrame where the rows are the documents and the columns are the words/terms in all the documents. The columns are multiindexed with level one
-being the content name (e.g. "tfidf"), level two being the individual features and their values.
-For example,
-`pd.DataFrame([[1, 2, 3], [4,5,6]], columns=pd.MultiIndex.from_tuples([("count", "hi"), ("count", "servus"), ("count", "hola")]))`
-is a valid RepresentationSeries.
+Additionally, sometimes Texthero functions (most that accept a
+VectorSeries as input) also accept a Pandas _DataFrame_
+as input that is representing a matrix. Every cell value
+is then one entry in the matrix. An example is
+`pd.DataFrame([[1, 2, 3], [4, 5, 6]], columns=["word1", "word2", "word3"])`.
 
 Now, if you see a function in the documentation that looks like this:
 ```python
-tfidf(s: TokenSeries) -> DocumentTermDF
+tfidf(s: TokenSeries) -> DataFrame
 ```
 
 then you know that the function takes a Pandas Series
 whose cells are lists of strings (tokens) and will
-return a Pandas DataFrame with the individual features.
+return a Pandas DataFrame representing a matrix (in this case a [_Document-Term-Matrix_](https://en.wikipedia.org/wiki/Document-term_matrix) ).
 You might call it like this:
 ```python
 >>> import texthero as hero
 >>> import pandas as pd
 >>> s = pd.Series(["Text of first document", "Text of second document"])
->>> s_tfidf = s.pipe(hero.tokenize).pipe(hero.tfidf)
+>>> df_tfidf = s.pipe(hero.tokenize).pipe(hero.tfidf)
+>>> df_tfidf
+
+   Text  document     first   of    second
+0   1.0       1.0  1.405465  1.0  0.000000
+1   1.0       1.0  0.000000  1.0  1.405465
 ```
 
 
 And this function:
 ```python
-pca(s: Union[VectorSeries, DocumentTermDF]) -> VectorSeries
+pca(s: Union[VectorSeries, DataFrame]) -> VectorSeries
 ```
-needs a _DocumentTermDF_ or _VectorSeries_ as input and always returns a _VectorSeries_.
+needs a _DataFrame_ or _VectorSeries_ as input and always returns a _VectorSeries_.
 
 <h2 align="center">The Types in Detail</h2>
 
@@ -107,55 +112,37 @@ Example of a function that takes as input a _DocumentTermDF_ or _VectorSeries_ a
 dtype: object
 ```
 
-<h3 align="left">DocumentTermDF</h3>
+<h3 align="left">DataFrame</h3>
 
-As you can see, the `DocumentTermDF` type is a little more complex than the others. Let's have a closer look to see what it is and why, where and how it is used!
+In Natural Language Processing, we are often working with matrices that contain information about our dataset. For example, the output of the functions `tfidf`, `count`, and `term_frequency` is a [Document Term Matrix](https://en.wikipedia.org/wiki/Document-term_matrix), i.e. a matrix where each row is one document and each column is one term / word.
 
-<h4 align="left">What is it?</h4>
+We use a Pandas DataFrame for this for two reasons:
+1. It looks nice.
+2. It can be sparse.
 
-A _DocumentTermDF_ is a Pandas implementation of a [Document Term Matrix](https://en.wikipedia.org/wiki/Document-term_matrix), so the rows are the documents and the columns are the words/terms in all the documents. A _DocumentTermDF_ has multiindexed columns with level one
-being the content name (e.g. "tfidf"), and level two being the terms. It could look like this:
+The second reason is worth explaining in more detail: In e.g. a big Document Term Matrix, we might have 10,000 different terms, so 10,000 columns in our DataFrame. Additionally, most documents will only contain a small subset of all the terms. Thus, in each row, there will be lots of zeros in our matrix. This is why we use a [sparse matrix](https://en.wikipedia.org/wiki/Sparse_matrix): A sparse matrix only stores the non-zero fields. And Pandas DataFrames support sparse data, so Texthero users fully profit from the sparseness!
 
-```python
->>> s = pd.Series(["Sentence one one", "Sentence two"])
->>> t = s.pipe(hero.tokenize).pipe(hero.count)  # first tokenize Series, then calculate word count
->>> t
-     count        
-  Sentence one two
-0        1   2   0
-1        1   0   1
-```
-
-
-<h4 align="left">Why is it used?</h4>
-
-Have a look at the datatypes of `t` from the last code bit:
-```python
->>> t.dtypes
-count  Sentence    Sparse[int64, 0]
-       one         Sparse[int64, 0]
-       two         Sparse[int64, 0]
-``` 
-That's precisely the reason we use this: Pandas internally does not store the zeros we get when e.g. calculating `hero.count`; so we don't see that the word "two" has zero occurrences in the first sentence, it's not stored. This is a massive advantage when dealing with *big data*: In a _DocumentTermDF_, we only store the data that's relevant for each document to save lots and lots of time and space!
+This is a massive advantage when dealing with *big data*: In a _sparse DataFrame_, we only store the data that's relevant to save lots and lots of time and space!
 
 Let's look at an example with some more data.
 ```python
 >>> data = pd.read_csv("https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv")
 >>> data_count = data["text"].pipe(count)
+>>> data_count
+     000m  00pm  04secs  05m  09secs  ...  zornotza  ztl  zuluaga  zurich  zvonareva
+0       0     0       0    0       0  ...         0    0        0       0          0
+1       0     0       0    0       0  ...         0    0        0       0          0
+2       0     0       0    0       0  ...         0    0        0       0          0
+3       0     0       0    0       0  ...         0    0        0       0          0
+4       3     0       0    0       0  ...         0    0        0       0          0
+..    ...   ...     ...  ...     ...  ...       ...  ...      ...     ...        ...
+732     0     0       0    0       0  ...         0    0        0       0          0
+733     0     0       0    0       0  ...         0    0        0       0          0
+734     0     0       0    0       0  ...         0    0        0       0          0
+735     0     0       0    0       0  ...         0    0        0       0          0
+736     0     0       0    0       0  ...         0    0        0       0          0
+
 >>> data_count.sparse.density
-0.012...
+0.010792808715706939
 ```
-We can see that only around 1.2% of our _DocumentTermDF_ `data_count` is filled, so using the sparse DataFrame is saving us a lot of space.
-
-<h4 align="left">When and how is it used? Do I have to work with multiindexes?!</h4>
-
-The _DocumentTermDF_ is mostly used internally for performance reasons. For example, as you can see above, the default output from `hero.count` is such a DataFrame, but if you apply e.g. `hero.pca` afterwards, you don't even notice the _DocumentTermDF_: `s.pipe(hero.count).pipe(hero.normalize).pipe(hero.pca)` works just fine; everything is seamlessly integrated in the library.
-
-The only thing you _can_ but _should not_ do is store a _DocumentTermDF_ in your dataframe, as the performance is really bad. If you really want to, you can do it like this like this:
-```python
->>> data = pd.read_csv("https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv")
->>> data_count = data["text"].pipe(count)
-
->>> # NOT recommended as performance is not optimal
->>> data["count"] = data_count
-```
+We can see that only around 1% of our DataFrame `data_count` is filled with non-zero values, so using the sparse DataFrame is saving us a lot of space.

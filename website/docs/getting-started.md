@@ -148,18 +148,10 @@ df_tfidf = hero.tfidf(df["tokenized_text"])
 ```
 
 Now, we have calculated a vector for each document that tells us what words are characteristic for the document.
-Usually, documents about similar topics use similar terms, so their tfidf-vectors will be similar too.
-
-###### Integration of the calculation into an existing dataframe
-
-The only thing you _can_ but _should not_ do is store a _DataFrame_ in your pandas dataframe, as the performance is really bad. If you really want to, you can do it like this like this:
- ```python
- >>> data = pd.read_csv("https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv")
- >>> data_count = data["text"].pipe(count)
-
- >>> # NOT recommended as performance is not optimal
- >>> data["count"] = data_count
- ```
+Usually, documents about similar topics use similar terms, so their tfidf-vectors will be similar too. You probably realised that we don't 
+save the output in our df with `df["tfidf"] = hero.tfidf(df["tokenized_text"])`. The reason is, that tfidf returns a DataFrame and the 
+pandas API does not support to insert a DataFrame into an existing one. At the **Quick look into hero typing** section you can have look, 
+which functions return a DataFrame.
 
 ##### Normalisation of the data
 
@@ -262,7 +254,7 @@ of strings. For example, `pd.Series([["test"], ["token2", "token3"]])` is a vali
 3. __VectorSeries__: Every cell is a vector representing text, i.e.
 a list of floats. For example, `pd.Series([[1.0, 2.0], [3.0]])` is a valid VectorSeries. Most dimensionality reduction functions, like `pca` will take VectorSeries as an input and also return a VectorSeries.
 
-4. **DataFrame**: A Pandas DataFrame where the rows can be the documents and the columns can be the words/terms in all the documents. 
+We also return a **DataFrame**, which basically is a Pandas DataFrame. Those DataFrames are used to store some relations. For example `count` will return a DataFrame where the rows are the documents and the columns are be the words/terms in all the documents. 
 This is a return type of the representation functions (count, term_frequenzy, tfidf)
 For example,
  `pd.DataFrame([[1, 2, 3], [4,5,6]], columns=["hi", "servus", "hola"])`

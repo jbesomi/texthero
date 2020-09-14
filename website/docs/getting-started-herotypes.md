@@ -101,9 +101,9 @@ dtype: object
 
 <h3 align="left">VectorSeries</h3>
 
-In a _VectorSeries_, every cell is a vector representing text. We use this when we have a low-dimensional (e.g. vectors with length <=1000), dense (so not a lot of zeroes) representation of our texts that we want to work on. For example, the dimensionality reduction functions `pca, nmf, tsne` all take a high-dimensional representation of our text (in the form of a _DocumentTermDF_ (see below) or _VectorSeries_, and return a low-dimensional representation of our text in the form of a _VectorSeries_.
+In a _VectorSeries_, every cell is a vector representing text. We use this when we have a low-dimensional (e.g. vectors with length <=1000), dense (so not a lot of zeroes) representation of our texts that we want to work on. For example, the dimensionality reduction functions `pca, nmf, tsne` all take a high-dimensional representation of our text (in the form of a _DataFrame_ (see below) or _VectorSeries_, and return a low-dimensional representation of our text in the form of a _VectorSeries_.
 
-Example of a function that takes as input a _DocumentTermDF_ or _VectorSeries_ and returns a _VectorSeries_:
+Example of a function that takes as input a _DataFrame_ or _VectorSeries_ and returns a _VectorSeries_:
 ```python
 >>> s = pd.Series(["text first document", "text second document"]).pipe(hero.tokenize).pipe(hero.term_frequency)
 >>> hero.pca(s)

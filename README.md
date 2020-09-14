@@ -48,12 +48,12 @@ Texthero is a python toolkit to work with text-based dataset quickly and effortl
 
 You can think of Texthero as a tool to help you _understand_ and work with text-based dataset. Given a tabular dataset, it's easy to _grasp the main concept_. Instead, given a text dataset, it's harder to have quick insights into the underline data. With Texthero, preprocessing text data, mapping it into vectors, and visualizing the obtained vector space takes just a couple of lines.
 
-Texthero include tools for:
-* Preprocess text data: it offers both out-of-the-box solutions but it's also flexible for custom-solutions.
+Texthero includes tools for:
+
+* Preprocessing text data: clean and tokenize texts with support for both out-of-the-box and custom solutions.
 * Natural Language Processing: keyphrases and keywords extraction, and named entity recognition.
-* Text representation: TF-IDF, term frequency, and custom word-embeddings (wip)
-* Vector space analysis: clustering (K-means, Meanshift, DBSCAN and Hierarchical), topic modeling (wip) and interpretation.
-* Text visualization: vector space visualization, place localization on maps (wip).
+* Text Representation: vectorization with TF-IDF / Term Frequency / Count, and custom word embeddings (wip)
+* Vector space analysis: dimensionality reduction (PCA, NMF, t-SNE) and clustering
 
 Texthero is free, open-source and [well documented](https://texthero.org/docs) (and that's what we love most by the way!).
 
@@ -287,13 +287,13 @@ Full documentation: [visualization](https://texthero.org/docs/api-visualization)
 
 What is pandas typing? Each category of functions, which are defined above, accepts a different type of pandas series or a pandas dataframe. Those are explained here. These types will in general improve the efficiency of the different algorithms as they are especially designed for those.
 
-For the first step you don't need to worry too much about them, because, if you use a typical texthero pipeline, the functions will have the right input and output types. The *typical* hero pipeline will:
-- first "clean" the text with any preprocessing function, e. g. `clean`,
-- then perform a NLP function to categorise the text, e. g. `tokenize` and `tfidf`
-- analyse or display the series with the representation function or the clustering functions, e. g. `kmeans`
-- do a dimensionality reduction to display them better in 2D or 3D, e. g.  `pca`
+You usually don't need to worry about them, because, if you use a typical texthero pipeline, the different types are seamlessly integrated across all modules". The typical hero pipeline will:
+* first clean the text "with preprocessing functions, e.g. `clean`, and tokenize it with `tokenize`,
+* then use `tfidf`, `term_frequency`, `count`, or other embeddings (wip) to vectorize the text,
+* then do dimensionality reduction with `pca`, `tsne` or `nmf` to reduce noise and showcase the differences between the vectors
+* and finally use clustering to find topics, and visualize the dataset.
 
-If your pipeline will differ, you might want to check out the tutorial on series types to understand which type of pandas objects you will get returned and which types will be accepted by the functions.
+If your pipeline differs, you might want to check out the tutorial on series types to understand which type of pandas objects you will get returned and which types will be accepted by the functions.
 
 <h2 align="center">FAQ</h2>
 

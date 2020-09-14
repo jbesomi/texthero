@@ -42,12 +42,18 @@ These are the implemented types:
 - TextSeries: cells are text (i.e. strings), e.g. "Test"
 - TokenSeries: cells are lists of tokens (i.e. lists of strings), e.g. ["word1", "word2"]
 - VectorSeries: cells are vector representations of text, e.g. [0.25, 0.75]
-- DataFrame: a Pandas DataFrame representing a matrix. Every cell value
-    is one entry in the matrix.
 
-The classes are lightweight subclasses of pd.Series and serve 2 purposes:
+The implemented types are lightweight subclasses of pd.Series and serve 2 purposes:
 1. Good documentation for users through docstring.
 2. Function to check if a pd.Series has the required properties.
+
+Additionally, sometimes Texthero functions (most that accept a
+VectorSeries as input) also accept a Pandas DataFrame
+as input that is representing a matrix. Every cell value
+is then one entry in the matrix. We only have a subclass
+DataFrame(HeroSeries) to easily support the type check
+with the InputSeries decorator below and
+give a good error message / documentation to users.
 
 """
 
@@ -82,10 +88,12 @@ class HeroTypes(pd.Series, pd.DataFrame):
     3. VectorSeries: Every cell is a vector representing text, i.e.
     a list of floats. For example, `pd.Series([[1.0, 2.0], [3.0]])` is a valid VectorSeries.
 
-    4. DataFrame: A Pandas DataFrame representing a matrix.
+    Additionally, some Texthero functions (most that accept
+    VectorSeries input) accept a Pandas DataFrame as input that is
+    representing a matrix.
     Every cell value is one entry in the matrix.
-    For example,
-    `pd.DataFrame([[1, 2, 3], [4,5,6]], columns=["word1", "word2", "word3"])`.
+    An example is
+    `pd.DataFrame([[1, 2, 3], [4, 5, 6]], columns=["word1", "word2", "word3"])`.
 
     These types of Series are supposed to make using the library
     easier and more intuitive. For example, if you see a

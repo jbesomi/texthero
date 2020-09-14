@@ -232,7 +232,7 @@ class AbstractRepresentationTest(PandasTestCase):
         )
 
     @parameterized.expand(test_cases_dim_reduction_and_clustering)
-    def test_dim_reduction_and_clustering_with_DataFrame_input(
+    def test_dim_reduction_and_clustering_with_dataframe_input(
         self, name, test_function, correct_output
     ):
         s_true = correct_output

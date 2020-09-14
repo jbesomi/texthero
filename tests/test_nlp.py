@@ -97,4 +97,4 @@ class TestNLP(PandasTestCase):
             ]
         )
 
-        self.assertEquals(pos_tagging, s_true)
+        self.assertEqual(pos_tagging, s_true)

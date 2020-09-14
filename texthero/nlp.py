@@ -4,8 +4,8 @@ The texthero.nlp module supports common NLP tasks such as named_entities, noun_c
 
 import spacy
 import pandas as pd
+import en_core_web_sm
 from nltk.stem import PorterStemmer, SnowballStemmer
-
 from texthero._types import TextSeries, InputSeries
 
 
@@ -54,9 +54,9 @@ def named_entities(s: TextSeries, package="spacy") -> pd.Series:
     """
     entities = []
 
-    nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser"])
-    # nlp.pipe is now 'ner'
+    nlp = en_core_web_sm.load(disable=["tagger", "parser"])
 
+    # nlp.pipe is now 'ner'
     for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
         entities.append(
             [(ent.text, ent.label_, ent.start_char, ent.end_char) for ent in doc.ents]
@@ -93,9 +93,9 @@ def noun_chunks(s: TextSeries) -> pd.Series:
 
     noun_chunks = []
 
-    nlp = spacy.load("en_core_web_sm", disable=["ner"])
-    # nlp.pipe is now "tagger", "parser"
+    nlp = en_core_web_sm.load(disable=["ner"])
 
+    # nlp.pipe is now "tagger", "parser"
     for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
         noun_chunks.append(
             [
@@ -131,7 +131,8 @@ def count_sentences(s: TextSeries) -> pd.Series:
     """
     number_of_sentences = []
 
-    nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser", "ner"])
+    nlp = en_core_web_sm.load(disable=["tagger", "parser", "ner"])
+
     nlp.add_pipe(nlp.create_pipe("sentencizer"))  # Pipe is only "sentencizer"
 
     for doc in nlp.pipe(s.values, batch_size=32):
@@ -204,9 +205,9 @@ def pos_tag(s: TextSeries) -> pd.Series:
 
     pos_tags = []
 
-    nlp = spacy.load("en_core_web_sm", disable=["parser", "ner"])
-    # nlp.pipe is now "tagger"
+    nlp = en_core_web_sm.load(disable=["parser", "ner"])
 
+    # nlp.pipe is now "tagger"
     for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
         pos_tags.append(
             [

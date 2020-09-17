@@ -18,15 +18,22 @@ the output Series.
 This will go through all functions under texthero, and automatically 
 generate test cases, according to the HeroSeries type they accept, e.g. TokenSeries, TextSeries, etc.
 
-Normally, functions receives HeroSeries and returns Series is okay for auto-testing.
-However there might be exceptions that you want to specify a test case manually, or omit a function
+Normally, if you want a function to be auto-tested, you must specify default values for all parameters 
+except the first Series param, i.e., 
+
+```
+def replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
+    ...
+```
+
+However there might be exceptions that you want to specify test cases manually, or omit some functions
 for testing. For example, 
-- Functions that needs multiple arguments (preprocessing.replace_stopwords)
+- Functions that has arguments without default value (preprocessing.replace_hashtags)
 - Functions that returns Series with different index (representation.tfidf)
-- Functions that doesn't give Series as output (mostly in visualization)
+- Functions that doesn't return Series(mostly in visualization)
 - Functions that doesn't take HeroSeries (yet)
 
-In those cases, you can add your custom test case so as to override the default one, 
+In those cases, you should add your custom test case so as to override the default one, 
 in the form of [name_of_test_case, function_to_test, tuple_of_valid_input_for_the_function]. 
 If you want to omit some functions, add their string name to func_white_list variable.
 
@@ -52,8 +59,9 @@ valid_inputs = {
 test_cases_nlp = []
 
 test_cases_preprocessing = [
-    ["replace_digits", preprocessing.replace_digits, (s_text, "")],
-    ["replace_punctuation", preprocessing.replace_punctuation, (s_text, "")],
+    # ["replace_digits", preprocessing.replace_digits, (s_text, "")],
+    # ["replace_punctuation", preprocessing.replace_punctuation, (s_text, "")],
+    # TODO: Add default params for these functions to make them auto-tested?
     ["replace_stopwords", preprocessing.replace_stopwords, (s_text, "")],
     ["replace_urls", preprocessing.replace_urls, (s_text, "")],
     ["replace_tags", preprocessing.replace_tags, (s_text, "")],
@@ -106,7 +114,7 @@ for func_str in func_strs:
     else:
         # Generate one by default
         func = getattr(hero, func_str)
-        # Functions accept HeroSeries
+        # Functions that accept HeroSeries
         if (
             hasattr(func, "allowed_hero_series_type")
             and func.allowed_hero_series_type.__name__ in valid_inputs

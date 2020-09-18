@@ -451,6 +451,8 @@ def visualize_topics(
 
     # Visualize it.
     if notebook:
-        pyLDAvis.display(figure)
+        # Import here as non-notebook users don't have this.
+        import IPython
+        return IPython.display.display(pyLDAvis.display(figure))
     else:
         pyLDAvis.show(figure)

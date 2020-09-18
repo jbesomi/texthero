@@ -1355,6 +1355,11 @@ def relevant_words_per_topic(
     - :meth:`texthero.representation.count`
     - :meth:`texthero.representation.term_frequency`.
 
+    The document-term-matrix has to include all
+    terms that are present in the documents
+    (i.e. you _cannot_ use the parameters max_df,
+    min_df, or max_features).
+
     Second input is a DocumentTopic Distribution,
     so the l1-normalized (e.g. with :meth:`hero.representation.normalize`_)
     first output of :meth:`hero.visualization.topic_matrices`_.
@@ -1376,6 +1381,10 @@ def relevant_words_per_topic(
         :meth:`texthero.representation.tfidf`,
         :meth:`texthero.representation.count`,
         :meth:`texthero.representation.term_frequency`.
+        All terms from the corpus have to be present
+        (i.e. you _cannot_ use the parameters max_df,
+        min_df, or max_features when computing
+        s_document_term).
 
     s_document_topic_distribution : pd.DataFrame
         L1-Normalized first output of
@@ -1522,6 +1531,11 @@ def relevant_words_per_document(s_document_term, n_words=10):
     - :meth:`texthero.representation.count`
     - :meth:`texthero.representation.term_frequency`.
 
+    The document-term-matrix has to include all
+    terms that are present in the documents
+    (i.e. you _cannot_ use the parameters max_df,
+    min_df, or max_features).
+
     The function assigns every document
     to its own cluster (or "topic") and then uses
     :meth:`topic_matrices`_ and
@@ -1535,7 +1549,11 @@ def relevant_words_per_document(s_document_term, n_words=10):
         Output of one of
         :meth:`texthero.representation.tfidf`
         :meth:`texthero.representation.count`
-        :meth:`texthero.representation.term_frequency`
+        :meth:`texthero.representation.term_frequency`.
+        All terms from the corpus have to be present
+        (i.e. you _cannot_ use the parameters max_df,
+        min_df, or max_features when computing
+        s_document_term).
 
     n_words: int, default to 10
         Number of words to fetch per topic, should

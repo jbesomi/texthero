@@ -17,6 +17,9 @@ from texthero._types import TokenSeries, TextSeries, InputSeries
 
 from typing import List, Callable, Union
 
+import pkg_resources
+from symspellpy import SymSpell, Verbosity
+
 # Ignore gensim annoying warnings
 import warnings
 
@@ -800,6 +803,65 @@ def remove_urls(s: TextSeries) -> TextSeries:
     """
 
     return replace_urls(s, " ")
+
+
+@InputSeries(TextSeries)
+def correct_mistakes(s: TextSeries, fix_spacing=False) -> TextSeries:
+    r""" Correct spelling mistakes
+
+    `correct_mistakes` finds all spelling mistakes from the given TextSeries 
+    and replace them with suggested words.
+
+    When `fix_spacing` is set to ´True´, word_segmentation is applied.
+
+    Parameters
+    ----------
+    s : Pandas Series
+    fix_spacing : bool
+        When set to True, word_segmentation is applied, spacing is fixed in noisy text. Only use it if your data is similar to 'thequickbrownfoxjumpsoverthelazydog' as it slows performance
+    
+    Returns
+    -------
+    Pandas Series
+
+    Examples
+    --------
+
+    >>> import pandas as pd
+    >>> import texthero as hero
+    >>> s = pd.Series(["he couldd spellit correctlly"])
+    >>> hero.correct_mistakes(s)
+    0    he could spell it correctly
+    dtype: object
+    >>> s = pd.Series(["thequickbrownfoxjumpsoverthelazydog"])
+    >>> hero.correct_mistakes(s, True)
+    0    the quick brown fox jumps over the lazy dog
+    dtype: object
+    
+    """
+    sym_spell = SymSpell(max_dictionary_edit_distance=3, prefix_length=7)
+    dictionary_path = pkg_resources.resource_filename(
+        "symspellpy", "frequency_dictionary_en_82_765.txt"
+    )
+    bigram_path = pkg_resources.resource_filename(
+        "symspellpy", "frequency_bigramdictionary_en_243_342.txt"
+    )
+
+    sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
+    sym_spell.load_bigram_dictionary(bigram_path, term_index=0, count_index=2)
+
+    if fix_spacing:
+        s = s.apply(_correct_word_spacing, args=(sym_spell,))
+
+    return s.apply(_correct_mistakes, args=(sym_spell,))
+
+
+def _correct_mistakes(text: str, sym_spell: SymSpell) -> str:
+    return sym_spell.lookup_compound(text, max_edit_distance=3)[0].term
+
+
+def _correct_word_spacing(text: str, sym_spell: SymSpell) -> str:
+    return sym_spell.word_segmentation(text, max_edit_distance=0).segmented_string
 
 
 @InputSeries(TextSeries)

@@ -120,13 +120,13 @@ test_cases_vectorization_min_df = [
 
 
 vector_s = pd.Series([[1.0, 0.0], [0.0, 0.0]], index=[5, 7])
-document_term_df = pd.DataFrame(
-    [[1.0, 0.0], [0.0, 0.0]], index=[5, 7], columns=["a", "b"],
-).astype("Sparse[float64, nan]")
+df = pd.DataFrame([[1.0, 0.0], [0.0, 0.0]], index=[5, 7], columns=["a", "b"],).astype(
+    "Sparse[float64, nan]"
+)
 
 
 test_cases_dim_reduction_and_clustering = [
-    # format: [function_name, function, correct output for s_vector_series and s_documenttermDF input above]
+    # format: [function_name, function, correct output for s_vector_series and df input above]
     ["pca", representation.pca, pd.Series([[-0.5, 0.0], [0.5, 0.0]], index=[5, 7],),],
     [
         "nmf",
@@ -232,7 +232,7 @@ class AbstractRepresentationTest(PandasTestCase):
         )
 
     @parameterized.expand(test_cases_dim_reduction_and_clustering)
-    def test_dim_reduction_and_clustering_with_documenttermDF_input(
+    def test_dim_reduction_and_clustering_with_dataframe_input(
         self, name, test_function, correct_output
     ):
         s_true = correct_output
@@ -242,11 +242,11 @@ class AbstractRepresentationTest(PandasTestCase):
             return
 
         if name == "kmeans":
-            result_s = test_function(document_term_df, random_state=42, n_clusters=2)
-        elif name == "dbscan" or name == "meanshift":
-            result_s = test_function(document_term_df)
+            result_s = test_function(df, random_state=42, n_clusters=2)
+        elif name == "dbscan" or name == "meanshift" or name == "normalize":
+            result_s = test_function(df)
         else:
-            result_s = test_function(document_term_df, random_state=42)
+            result_s = test_function(df, random_state=42)
 
         pd.testing.assert_series_equal(
             s_true,
@@ -257,10 +257,10 @@ class AbstractRepresentationTest(PandasTestCase):
             check_category_order=False,
         )
 
-    def test_normalize_document_term_df_also_as_output(self):
-        # normalize should also return DocumentTermDF output for DocumentTermDF
+    def test_normalize_DataFrame_also_as_output(self):
+        # normalize should also return DataFrame output for DataFrame
         # input so we test it separately
-        result = representation.normalize(document_term_df)
+        result = representation.normalize(df)
         correct_output = pd.DataFrame(
             [[1.0, 0.0], [0.0, 0.0]], index=[5, 7], columns=["a", "b"],
         )

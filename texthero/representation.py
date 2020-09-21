@@ -15,6 +15,13 @@ from sklearn.preprocessing import normalize as sklearn_normalize
 from scipy.sparse import coo_matrix
 
 from typing import Optional, Union, Any
+from texthero._types import (
+    TextSeries,
+    TokenSeries,
+    VectorSeries,
+    DataFrame,
+    InputSeries,
+)
 
 from texthero import preprocessing
 
@@ -42,8 +49,9 @@ Vectorization
 """
 
 
+@InputSeries([TokenSeries, TextSeries])
 def count(
-    s: pd.Series,
+    s: Union[TokenSeries, TextSeries],
     max_features: Optional[int] = None,
     min_df=1,
     max_df=1.0,
@@ -460,7 +468,7 @@ def tsne(
     n_iter=1000,
     random_state=None,
     n_jobs=-1,
-) -> pd.Series:
+) -> VectorSeries:
     """
     Performs t-Distributed Stochastic Neighbor Embedding on the given
     input.
@@ -566,6 +574,7 @@ Clustering
 """
 
 
+@InputSeries([VectorSeries, DataFrame])
 def kmeans(
     input_matrix: Union[pd.Series, pd.DataFrame],
     n_clusters=5,
@@ -573,7 +582,7 @@ def kmeans(
     max_iter=300,
     random_state=None,
     algorithm="auto",
-):
+) -> VectorSeries:
     """
     Performs K-means clustering algorithm on the given input.
 
@@ -671,6 +680,7 @@ def kmeans(
     ).astype("category")
 
 
+@InputSeries([VectorSeries, DataFrame])
 def dbscan(
     input_matrix: Union[pd.Series, pd.DataFrame],
     eps=0.5,
@@ -679,7 +689,7 @@ def dbscan(
     metric_params=None,
     leaf_size=30,
     n_jobs=-1,
-):
+) -> VectorSeries:
     """
     Perform DBSCAN clustering on the given input.
 
@@ -785,6 +795,7 @@ def dbscan(
     ).astype("category")
 
 
+@InputSeries([VectorSeries, DataFrame])
 def meanshift(
     input_matrix: Union[pd.Series, pd.DataFrame],
     bandwidth=None,
@@ -793,7 +804,7 @@ def meanshift(
     cluster_all=True,
     n_jobs=-1,
     max_iter=300,
-):
+) -> VectorSeries:
     """
     Perform mean shift clustering on the given input.
 
@@ -940,7 +951,7 @@ def normalize(input_matrix: Union[pd.DataFrame, pd.Series], norm="l2") -> pd.Ser
 
     See Also
     --------
-    Representation Series link TODO add link to tutorial
+    DataFrame link TODO add link to tutorial
 
     `Norm on Wikipedia
     <https://en.wikipedia.org/wiki/Norm_(mathematics)>`_

@@ -79,6 +79,22 @@ def named_entities(s: TextSeries, package="spacy") -> pd.Series:
 
 
 @InputSeries(TextSeries)
+def _noun_chunks(s: TextSeries, nlp) -> pd.Series:
+
+    noun_chunks = []
+
+    # nlp.pipe is now "tagger", "parser"
+    for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
+        noun_chunks.append(
+            [
+                (chunk.text, chunk.label_, chunk.start_char, chunk.end_char)
+                for chunk in doc.noun_chunks
+            ]
+        )
+
+    return pd.Series(noun_chunks, index=s.index)
+
+
 def noun_chunks(s: TextSeries) -> pd.Series:
     """
     Return noun chunks (noun phrases).
@@ -104,20 +120,9 @@ def noun_chunks(s: TextSeries) -> pd.Series:
     dtype: object
     """
 
-    noun_chunks = []
-
     nlp = en_core_web_sm.load(disable=["ner"])
 
-    # nlp.pipe is now "tagger", "parser"
-    for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
-        noun_chunks.append(
-            [
-                (chunk.text, chunk.label_, chunk.start_char, chunk.end_char)
-                for chunk in doc.noun_chunks
-            ]
-        )
-
-    return pd.Series(noun_chunks, index=s.index)
+    return parallel(s, _noun_chunks, nlp=nlp)
 
 
 def _count_sentences(s: TextSeries, nlp) -> pd.Series:

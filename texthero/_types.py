@@ -175,6 +175,7 @@ class TokenSeries(HeroTypes):
 
         return True, ""
 
+
 class ClusterSeries(HeroTypes):
     """
     A ClusterSeries has dtype "category" and every entry is a

@@ -974,7 +974,7 @@ def filter_extremes(
 
     # The remaining tokens are exactly the subcolumn names
     # in the term_frequency DocumentTermDF.
-    tokens_to_keep = set(s_term_frequency.columns.levels[1])
+    tokens_to_keep = set(s_term_frequency.columns)
 
     # Go through documents and only keep tokens in tokens_to_keep.
     # FIXME: Parallelize this after #162 is merged.

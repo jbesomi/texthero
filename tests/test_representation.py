@@ -315,7 +315,7 @@ class TestEmbeddings(PandasTestCase):
 
         # check if output is valid VectorSeries
         try:
-            _types.VectorSeries.check_series(s_return)
+            _types.VectorSeries.check_type(s_return)
         except:
             self.fail("Output is not a valid VectorSeries.")
 
@@ -335,7 +335,7 @@ class TestEmbeddings(PandasTestCase):
 
         # check if output is valid VectorSeries
         try:
-            _types.VectorSeries.check_series(s_return)
+            _types.VectorSeries.check_type(s_return)
         except:
             self.fail("Output is not a valid VectorSeries.")
 
@@ -357,7 +357,7 @@ class TestEmbeddings(PandasTestCase):
 
         # check if output is valid VectorSeries
         try:
-            _types.VectorSeries.check_series(s_return)
+            _types.VectorSeries.check_type(s_return)
         except:
             self.fail("Output is not a valid VectorSeries.")
 

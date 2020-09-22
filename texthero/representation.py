@@ -1324,9 +1324,7 @@ def topic_matrices(
     # Create s_document_topic and s_topic_term (both multiindexed)
 
     # Create s_document_topic
-    s_document_topic_columns = pd.MultiIndex.from_product(
-        [["Document Topic Matrix"], range(n_topics)]
-    )
+    s_document_topic_columns = list(range(n_topics))
 
     if issparse(document_topic_matrix):
         s_document_topic = pd.DataFrame.sparse.from_spmatrix(
@@ -1344,9 +1342,7 @@ def topic_matrices(
         )
 
     # Create s_topic_term
-    s_topic_term_columns = pd.MultiIndex.from_product(
-        [["Topic Term Matrix"], s_document_term.columns.levels[1].tolist()]
-    )
+    s_topic_term_columns = list(s_document_term.columns)
 
     if issparse(topic_term_matrix):
         s_topic_term = pd.DataFrame.sparse.from_spmatrix(
@@ -1452,7 +1448,7 @@ def relevant_words_per_topic(
     """
 
     # Define parameters for pyLDAvis.
-    vocab = s_document_term.columns.levels[1].tolist()
+    vocab = list(s_document_term.columns)
     doc_lengths = list(s_document_term.sum(axis=1))
     term_frequency = list(s_document_term.sum(axis=0))
 

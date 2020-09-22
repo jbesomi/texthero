@@ -1,6 +1,6 @@
 ---
 id: getting-started-herotypes
-title: Getting started HeroTypes
+title: Getting started - HeroTypes
 ---
 
 <h1 align="center">HeroTypes</h1>

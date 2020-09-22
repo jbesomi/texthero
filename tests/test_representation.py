@@ -105,9 +105,9 @@ test_cases_vectorization_min_df = [
     [
         "term_frequency",
         representation.term_frequency,
-        pd.DataFrame(
-            [1, 1], index=tokenized_output_index, columns=["Test"],
-        ).astype("Sparse[float64, nan]"),
+        pd.DataFrame([1, 1], index=tokenized_output_index, columns=["Test"],).astype(
+            "Sparse[float64, nan]"
+        ),
     ],
     [
         "tfidf",

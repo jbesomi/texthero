@@ -187,7 +187,7 @@ def term_frequency(
     s_term_frequency = s.pipe(
         count, max_features=max_features, min_df=min_df, max_df=max_df
     ).pipe(normalize, norm="l1")
-    
+
     return s_term_frequency
 
 

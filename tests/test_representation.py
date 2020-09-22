@@ -360,13 +360,11 @@ class AbstractRepresentationTest(PandasTestCase):
         )
 
         s_document_topic_true = pd.DataFrame(
-            [[0, 1], [1, 0], [0, 1], [1, 0]],
-            columns=[ 0,1]
+            [[0, 1], [1, 0], [0, 1], [1, 0]], columns=[0, 1]
         )
 
         s_topic_term_true = pd.DataFrame(
-            [[0.0, 3.021651], [3.021651, 0.0]],
-            columns= ["football", "music"]
+            [[0.0, 3.021651], [3.021651, 0.0]], columns=["football", "music"]
         )
 
         pd.testing.assert_frame_equal(
@@ -407,12 +405,11 @@ class AbstractRepresentationTest(PandasTestCase):
                 [0.744417, 0.255583],
                 [0.255583, 0.744417],
             ],
-            columns=[0, 1]
+            columns=[0, 1],
         )
 
         s_topic_term_true = pd.DataFrame(
-            [[2.249368, 0.772283], [0.772283, 2.249369]],
-            columns=["football","music"],
+            [[2.249368, 0.772283], [0.772283, 2.249369]], columns=["football", "music"],
         )
 
         pd.testing.assert_frame_equal(

@@ -917,7 +917,10 @@ Topic modelling
 
 
 def truncatedSVD(
-    input_matrix: Union[pd.Series, pd.DataFrame], n_components=2, n_iter=5, random_state=None,
+    input_matrix: Union[pd.Series, pd.DataFrame],
+    n_components=2,
+    n_iter=5,
+    random_state=None,
 ) -> pd.Series:
     """
     Perform TruncatedSVD on the given pandas Series.
@@ -978,7 +981,6 @@ def truncatedSVD(
         n_components=n_components, n_iter=n_iter, random_state=random_state
     )
 
-
     if isinstance(input_matrix, pd.DataFrame):
         input_matrix_coo = input_matrix.sparse.to_coo()
         input_matrix_for_vectorization = input_matrix_coo.astype("float64")
@@ -986,7 +988,8 @@ def truncatedSVD(
         input_matrix_for_vectorization = list(input_matrix)
 
     result = pd.Series(
-        list(truncatedSVD.fit_transform(input_matrix_for_vectorization)), index=input_matrix.index
+        list(truncatedSVD.fit_transform(input_matrix_for_vectorization)),
+        index=input_matrix.index,
     )
 
     return result
@@ -1065,7 +1068,10 @@ def lda(
     else:
         input_matrix_for_vectorization = list(s)
 
-    result = pd.Series(list(lda.fit_transform(input_matrix_for_vectorization)), index=input_matrix.index)
+    result = pd.Series(
+        list(lda.fit_transform(input_matrix_for_vectorization)),
+        index=input_matrix.index,
+    )
 
     return result
 

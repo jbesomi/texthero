@@ -199,7 +199,9 @@ class VectorSeries(HeroTypes):
                 return True
 
         def is_list_of_numbers(cell):
-            return isinstance(cell, (list, tuple, np.ndarray)) and all(is_numeric(x) for x in cell)
+            return isinstance(cell, (list, tuple, np.ndarray)) and all(
+                is_numeric(x) for x in cell
+            )
 
         try:
             first_non_nan_value = s.loc[s.first_valid_index()]

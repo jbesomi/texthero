@@ -252,6 +252,11 @@ def pos_tag(s: TextSeries) -> pd.Series:
 
     return pd.Series(pos_tags, index=s.index)
 
+def _stem(s, stemmer):
+    def _stem_algorithm(text):
+        return " ".join([stemmer.stem(word) for word in text])
+
+    return s.str.split().apply(_stem_algorithm)
 
 @InputSeries(TextSeries)
 def stem(s: TextSeries, stem="snowball", language="english") -> TextSeries:
@@ -303,7 +308,4 @@ def stem(s: TextSeries, stem="snowball", language="english") -> TextSeries:
     else:
         raise ValueError("stem argument must be either 'porter' of 'stemmer'")
 
-    def _stem(text):
-        return " ".join([stemmer.stem(word) for word in text])
-
-    return s.str.split().apply(_stem)
+    return parallel(s, _stem, stemmer=stemmer)

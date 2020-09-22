@@ -684,7 +684,7 @@ def kmeans(
 
 @InputSeries([VectorSeries, DataFrame])
 def dbscan(
-    s,
+    input_matrix,
     eps=0.5,
     min_samples=5,
     metric="euclidean",
@@ -917,7 +917,7 @@ Topic modelling
 
 
 def truncatedSVD(
-    s: Union[pd.Series, pd.DataFrame], n_components=2, n_iter=5, random_state=None,
+    input_matrix: Union[pd.Series, pd.DataFrame], n_components=2, n_iter=5, random_state=None,
 ) -> pd.Series:
     """
     Perform TruncatedSVD on the given pandas Series.
@@ -936,7 +936,7 @@ def truncatedSVD(
 
     Parameters
     ----------
-    s : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
+    input_matrix : Pandas Series (VectorSeries) or MultiIndex Sparse DataFrame (DocumentTermDF)
 
     n_components : int, default is 2.
         Number of components to keep (dimensionality of output vectors).
@@ -978,21 +978,22 @@ def truncatedSVD(
         n_components=n_components, n_iter=n_iter, random_state=random_state
     )
 
-    if _check_is_valid_DocumentTermDF(s):
-        s_coo = s.sparse.to_coo()
-        s_for_vectorization = s_coo.astype("float64")
+
+    if isinstance(input_matrix, pd.DataFrame):
+        input_matrix_coo = input_matrix.sparse.to_coo()
+        input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
-        s_for_vectorization = list(s)
+        input_matrix_for_vectorization = list(input_matrix)
 
     result = pd.Series(
-        list(truncatedSVD.fit_transform(s_for_vectorization)), index=s.index
+        list(truncatedSVD.fit_transform(input_matrix_for_vectorization)), index=input_matrix.index
     )
 
     return result
 
 
 def lda(
-    s: Union[pd.Series, pd.DataFrame],
+    input_matrix: Union[pd.Series, pd.DataFrame],
     n_components=10,
     max_iter=10,
     random_state=None,
@@ -1014,7 +1015,7 @@ def lda(
 
     Parameters
     ----------
-    s : pd.Series (VectorSeries) or Sparse pd.DataFrame
+    input_matrix : pd.Series (VectorSeries) or Sparse pd.DataFrame
 
     n_components : int, default is 10.
         Number of components to keep (dimensionality of output vectors).
@@ -1058,13 +1059,13 @@ def lda(
         n_components=n_components, max_iter=max_iter, random_state=random_state
     )
 
-    if _check_is_valid_DocumentTermDF(s):
-        s_coo = s.sparse.to_coo()
-        s_for_vectorization = s_coo.astype("float64")
+    if isinstance(input_matrix, pd.DataFrame):
+        input_matrix_coo = input_matrix.sparse.to_coo()
+        input_matrix_for_vectorization = input_matrix_coo.astype("float64")
     else:
-        s_for_vectorization = list(s)
+        input_matrix_for_vectorization = list(s)
 
-    result = pd.Series(list(lda.fit_transform(s_for_vectorization)), index=s.index)
+    result = pd.Series(list(lda.fit_transform(input_matrix_for_vectorization)), index=input_matrix.index)
 
     return result
 

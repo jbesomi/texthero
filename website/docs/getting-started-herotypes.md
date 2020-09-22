@@ -127,20 +127,20 @@ This is a massive advantage when dealing with *big datasets*: In a _sparse DataF
 Let's look at an example with some more data.
 ```python
 >>> data = pd.read_csv("https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv")
->>> data_count = data["text"].pipe(count)
+>>> data_count = data["text"].pipe(hero.count)
 >>> data_count
-     000m  00pm  04secs  05m  09secs  ...  zornotza  ztl  zuluaga  zurich  zvonareva
-0       0     0       0    0       0  ...         0    0        0       0          0
-1       0     0       0    0       0  ...         0    0        0       0          0
-2       0     0       0    0       0  ...         0    0        0       0          0
-3       0     0       0    0       0  ...         0    0        0       0          0
-4       3     0       0    0       0  ...         0    0        0       0          0
-..    ...   ...     ...  ...     ...  ...       ...  ...      ...     ...        ...
-732     0     0       0    0       0  ...         0    0        0       0          0
-733     0     0       0    0       0  ...         0    0        0       0          0
-734     0     0       0    0       0  ...         0    0        0       0          0
-735     0     0       0    0       0  ...         0    0        0       0          0
-736     0     0       0    0       0  ...         0    0        0       0          0
+     !   "  "'  ",  #  $  %  ...  £62m  £6m  £70m  £7m  £7million  £80,000  £8m
+0    0   5   0   0  0  0  0  ...     0    0     0    0          0        0    0
+1    0   0   0   0  0  0  0  ...     0    0     0    0          0        0    0
+2    0  14   0   0  0  0  0  ...     0    0     0    0          0        0    0
+3    0  10   0   0  0  0  0  ...     0    0     0    0          0        0    0
+4    0   4   0   0  0  0  0  ...     0    0     0    0          0        0    0
+..  ..  ..  ..  .. .. .. ..  ...   ...  ...   ...  ...        ...      ...  ...
+732  0   2   0   0  0  0  2  ...     0    0     0    0          0        0    0
+733  0   6   0   0  0  0  0  ...     0    0     0    0          0        0    0
+734  0   5   0   0  0  0  0  ...     0    0     0    0          0        0    0
+735  0  14   0   0  0  0  0  ...     0    0     0    0          0        0    0
+736  0   6   0   0  0  0  0  ...     0    0     0    0          0        0    0
 
 >>> data_count.sparse.density
 0.010792808715706939

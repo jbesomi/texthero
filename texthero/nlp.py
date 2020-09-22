@@ -65,19 +65,17 @@ def named_entities(s: TextSeries, package="spacy") -> pd.Series:
     [('Yesterday', 'DATE', 0, 9), ('NY', 'GPE', 19, 21),
      ('Bill de Blasio', 'PERSON', 27, 41)]
     """
+    entities = []
 
     nlp = en_core_web_sm.load(disable=["tagger", "parser"])
 
     # nlp.pipe is now 'ner'
     for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
-        noun_chunks.append(
-            [
-                (chunk.text, chunk.label_, chunk.start_char, chunk.end_char)
-                for chunk in doc.noun_chunks
-            ]
+        entities.append(
+            [(ent.text, ent.label_, ent.start_char, ent.end_char) for ent in doc.ents]
         )
 
-    return pd.Series(noun_chunks, index=s.index)
+    return pd.Series(entities, index=s.index)
 
 
 @InputSeries(TextSeries)
@@ -118,6 +116,8 @@ def noun_chunks(s: TextSeries) -> pd.Series:
                 for chunk in doc.noun_chunks
             ]
         )
+
+    return pd.Series(noun_chunks, index=s.index)
 
 
 def _count_sentences(s: TextSeries, nlp) -> pd.Series:
@@ -252,11 +252,13 @@ def pos_tag(s: TextSeries) -> pd.Series:
 
     return pd.Series(pos_tags, index=s.index)
 
+
 def _stem(s, stemmer):
     def _stem_algorithm(text):
         return " ".join([stemmer.stem(word) for word in text])
 
     return s.str.split().apply(_stem_algorithm)
+
 
 @InputSeries(TextSeries)
 def stem(s: TextSeries, stem="snowball", language="english") -> TextSeries:

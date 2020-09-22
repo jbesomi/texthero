@@ -399,6 +399,7 @@ def remove_stopwords(
     """
     return replace_stopwords(s, symbol="", stopwords=stopwords)
 
+
 def get_default_pipeline() -> List[Callable[[pd.Series], pd.Series]]:
     """
     Return a list contaning all the methods used in the default cleaning

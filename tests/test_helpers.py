@@ -92,8 +92,8 @@ class TestPreprocessingParallelized(PandasTestCase):
 
     def parallelized_test_helper(self, func, s, non_parallel_s_true, **kwargs):
 
-        s = s.repeat(20)
-        non_parallel_s_true = non_parallel_s_true.repeat(20)
+        s = s
+        non_parallel_s_true = non_parallel_s_true
 
         pd.testing.assert_series_equal(non_parallel_s_true, func(s, **kwargs))
 

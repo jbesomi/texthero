@@ -171,7 +171,7 @@ def term_frequency(
     >>> import pandas as pd
     >>> s = pd.Series(["Text Text of doc one", "Text of of doc two", "Aha hi bnd one"]).pipe(hero.tokenize)
     >>> hero.term_frequency(s)  # doctest: +SKIP
-    term_frequency
+    term_frequency                                      
                 Aha Text   bnd  doc    hi   of   one  two
     0           0.00  0.4  0.00  0.2  0.00  0.2  0.20  0.0
     1           0.00  0.2  0.00  0.2  0.00  0.4  0.00  0.2

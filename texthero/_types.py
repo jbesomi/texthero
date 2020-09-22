@@ -12,7 +12,7 @@ Series and defines functions to check the types.
 The goal is to be able to do something like this:
 
 @InputSeries(TokenSeries)
-def tfidf(s: TokenSeries) -> DocumentTermDF:
+def tfidf(s: TokenSeries) -> DataFrame:
     ...
 
 The decorator (@...) makes python check whether the input is
@@ -42,12 +42,18 @@ These are the implemented types:
 - TextSeries: cells are text (i.e. strings), e.g. "Test"
 - TokenSeries: cells are lists of tokens (i.e. lists of strings), e.g. ["word1", "word2"]
 - VectorSeries: cells are vector representations of text, e.g. [0.25, 0.75]
-- DocumentTermDF: DataFrame is sparse and multiindexed in the columns with every subcolumn
-                  being an individual feature
 
-The classes are lightweight subclasses of pd.Series and serve 2 purposes:
+The implemented types are lightweight subclasses of pd.Series and serve 2 purposes:
 1. Good documentation for users through docstring.
 2. Function to check if a pd.Series has the required properties.
+
+Additionally, sometimes Texthero functions (most that accept a
+VectorSeries as input) also accept a Pandas DataFrame
+as input that is representing a matrix. Every cell value
+is then one entry in the matrix. We only have a subclass
+DataFrame(HeroSeries) to easily support the type check
+with the InputSeries decorator below and
+give a good error message / documentation to users.
 
 """
 
@@ -82,17 +88,18 @@ class HeroTypes(pd.Series, pd.DataFrame):
     3. VectorSeries: Every cell is a vector representing text, i.e.
     a list of floats. For example, `pd.Series([[1.0, 2.0], [3.0]])` is a valid VectorSeries.
 
-    4. DocumentTermDF: DataFrame is sparse and multiindexed in the columns with every subcolumn
-    being an individual feature
-    For example,
-    `pd.DataFrame([[1, 2, 3], [4,5,6]], columns=pd.MultiIndex.from_tuples([("count", "hi"), ("count", "servus"), ("count", "hola")]))`
-    is a valid DocumentTermDF.
+    Additionally, some Texthero functions (most that accept
+    VectorSeries input) accept a Pandas DataFrame as input that is
+    representing a matrix.
+    Every cell value is one entry in the matrix.
+    An example is
+    `pd.DataFrame([[1, 2, 3], [4, 5, 6]], columns=["word1", "word2", "word3"])`.
 
     These types of Series are supposed to make using the library
     easier and more intuitive. For example, if you see a
     function head
     ```
-    def tfidf(s: TokenSeries) -> DocumentTermDF
+    def tfidf(s: TokenSeries) -> DataFrame
     ```
     then you know that the function takes a Pandas Series
     whose cells are lists of strings (tokens) and will
@@ -122,10 +129,14 @@ class TextSeries(HeroTypes):
             " See help(hero.HeroTypes) for more information."
         )
 
-        if not (isinstance(s, pd.Series) and isinstance(s.iloc[0], str)):
+        try:
+            first_non_nan_value = s.loc[s.first_valid_index()]
+            if not isinstance(first_non_nan_value, str):
+                return False, error_string
+        except KeyError:  # Only NaNs in Series -> same warning applies
             return False, error_string
-        else:
-            return True, ""
+
+        return True, ""
 
 
 class TokenSeries(HeroTypes):
@@ -150,10 +161,14 @@ class TokenSeries(HeroTypes):
                 cell, (list, tuple)
             )
 
-        if not (isinstance(s, pd.Series) and is_list_of_strings(s.iloc[0])):
+        try:
+            first_non_nan_value = s.loc[s.first_valid_index()]
+            if not is_list_of_strings(first_non_nan_value):
+                return False, error_string
+        except KeyError:  # Only NaNs in Series -> same warning applies
             return False, error_string
-        else:
-            return True, ""
+
+        return True, ""
 
 
 class VectorSeries(HeroTypes):
@@ -185,39 +200,39 @@ class VectorSeries(HeroTypes):
         def is_list_of_numbers(cell):
             return isinstance(cell, (list, tuple)) and all(is_numeric(x) for x in cell)
 
-        if not (isinstance(s, pd.Series) and is_list_of_numbers(s.iloc[0])):
+        try:
+            first_non_nan_value = s.loc[s.first_valid_index()]
+            if not is_list_of_numbers(first_non_nan_value):
+                return False, error_string
+        except KeyError:  # Only NaNs in Series -> same warning applies
             return False, error_string
-        else:
-            return True, ""
+
+        return True, ""
 
 
-class DocumentTermDF(HeroTypes):
+class DataFrame(HeroTypes):
     """
-    A DocumentTermDF is a sparse DataFrame that is
-    multiindexed in the columns with every subcolumn
-    being an individual feature.
+    A Pandas DataFrame
+    representing a matrix (e.g. a Document-Term-Matrix).
+    Every cell value is one entry in the matrix.
     For example,
-    `pd.DataFrame([[1, 2, 3], [4,5,6]], columns=pd.MultiIndex.from_tuples([("count", "hi"), ("count", "servus"), ("count", "hola")]))`
-    is a valid DocumentTermDF.
+    `pd.DataFrame([[1, 2, 3], [4,5,6]], columns=["word1", "word2", "word3"]))`.
+
     """
 
     @staticmethod
     def check_type(df: pd.DataFrame, input_output="") -> Tuple[bool, str]:
         """
-        Check if a given Pandas Series has the properties of a DocumentTermDF.
+        Check if a given Pandas Series has the properties of a DataFrame.
         """
 
         error_string = (
-            "should be DocumentTermDF: The input should be a DocumentTermDF, so a DataFrame"
-            " with a MultiIndex in the columns."
+            "should be DataFrame: The input should be a Pandas DataFrame"
+            " representing a matrix, where every cell is one entry of the matrix."
             " See help(hero.HeroTypes) for more information."
         )
 
-        if not (
-            isinstance(df, pd.DataFrame)
-            and isinstance(df.columns, pd.MultiIndex)
-            and pd.api.types.is_sparse(df.dtypes[0])
-        ):
+        if not isinstance(df, pd.DataFrame):
             return False, error_string
         else:
             return True, ""
@@ -227,7 +242,6 @@ def InputSeries(allowed_hero_series_types):
     """
     Check if first argument of function has / fulfills
     type allowed_hero_series_type
-
     Examples
     --------
     >>> from texthero._types import *
@@ -239,10 +253,9 @@ def InputSeries(allowed_hero_series_types):
     >>> # throws a type error with a nice explaination
     >>> f(pd.Series([["I", "am", "tokenized"]]))
     >>> # passes
-
     With several possible types:
 
-    >>> @InputSeries([DocumentTermDF, VectorSeries])
+    >>> @InputSeries([DataFrame, VectorSeries])
     ... def g(x):
     ...     pass
     """

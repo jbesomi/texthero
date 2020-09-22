@@ -11,7 +11,6 @@ import unicodedata
 import numpy as np
 import pandas as pd
 import unidecode
-from nltk.stem import PorterStemmer, SnowballStemmer
 
 from texthero import stopwords as _stopwords
 from texthero._types import TokenSeries, TextSeries, InputSeries
@@ -78,10 +77,10 @@ def replace_digits(s: TextSeries, symbols: str = " ", only_blocks=True) -> TextS
     ----------
     s : :class:`texthero._types.TextSeries`
 
-    symbols : str (default single empty space " ")
+    symbols : str, optional, default=" "
         Symbols to replace
 
-    only_blocks : bool
+    only_blocks : bool, optional, default=True
         When set to False, replace all digits.
 
     Examples
@@ -120,7 +119,7 @@ def remove_digits(s: TextSeries, only_blocks=True) -> TextSeries:
     ----------
     s : :class:`texthero._types.TextSeries`
 
-    only_blocks : bool
+    only_blocks : bool, optional, default=True
         Remove only blocks of digits.
 
     Examples
@@ -154,7 +153,7 @@ def replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
     ----------
     s : :class:`texthero._types.TextSeries`
 
-    symbol : str (default single empty space)
+    symbol : str, optional, default=" "
         Symbol to use as replacement for all string punctuation. 
 
     Examples
@@ -269,8 +268,8 @@ def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
     stopwords : Set[str]
         Set of stopwords string to remove.
 
-    symbol: str, Optional
-        Character(s) to replace words with; defaults to a space.
+    symbol: str, optional, default=" "
+        Character(s) to replace words with.
 
     Examples
     --------
@@ -308,9 +307,9 @@ def replace_stopwords(
     symbol: str
         Character(s) to replace words with.
 
-    stopwords : Set[str], Optional
-        Set of stopwords string to remove. If not passed, by default it used
-        NLTK English stopwords. 
+    stopwords : Set[str], optional, default=None
+        Set of stopwords string to remove. If not passed,
+        by default uses NLTK English stopwords. 
 
     Examples
     --------
@@ -341,9 +340,9 @@ def remove_stopwords(
     ----------
     s : :class:`texthero._types.TextSeries`
 
-    stopwords : Set[str], Optional
-        Set of stopwords string to remove. If not passed, by default it used
-        NLTK English stopwords.
+    stopwords : Set[str], optional, default=None
+        Set of stopwords string to remove. If not passed,
+        by default uses NLTK English stopwords.
 
     Examples
     --------
@@ -372,62 +371,6 @@ def remove_stopwords(
 
     """
     return replace_stopwords(s, symbol="", stopwords=stopwords)
-
-
-@InputSeries(TextSeries)
-def stem(s: TextSeries, stem="snowball", language="english") -> TextSeries:
-    r"""
-    Stem series using either `porter` or `snowball` NLTK stemmers.
-
-    The act of stemming means removing the end of a words with an heuristic
-    process.
-    It's useful in context where the meaning of the word is important rather
-    than his derivation. Stemming is very efficient and adapt in case the given
-    dataset is large.
-
-    Make use of two NLTK stemming algorithms known as
-    :class:`nltk.stem.SnowballStemmer` and :class:`nltk.stem.PorterStemmer`.
-    SnowballStemmer should be used when the Pandas Series contains non-English
-    text has it has multilanguage support.
-
-
-    Parameters
-    ----------
-    s : :class:`texthero._types.TextSeries`
-
-    stem : str (snowball by default)
-        Stemming algorithm. It can be either 'snowball' or 'porter'
-
-    language : str (english by default)
-        Supported languages: `danish`, `dutch`, `english`, `finnish`, `french`,
-        `german` , `hungarian`, `italian`, `norwegian`, `portuguese`,
-        `romanian`, `russian`, `spanish` and `swedish`.
-
-    Notes
-    -----
-    By default NLTK stemming algorithms lowercase all text.
-
-    Examples
-    --------
-    >>> import texthero as hero
-    >>> import pandas as pd
-    >>> s = pd.Series("I used to go \t\n running.")
-    >>> hero.stem(s)
-    0    i use to go running.
-    dtype: object
-    """
-
-    if stem == "porter":
-        stemmer = PorterStemmer()
-    elif stem == "snowball":
-        stemmer = SnowballStemmer(language)
-    else:
-        raise ValueError("stem argument must be either 'porter' of 'stemmer'")
-
-    def _stem(text):
-        return " ".join([stemmer.stem(word) for word in text])
-
-    return s.str.split().apply(_stem)
 
 
 def get_default_pipeline() -> List[Callable[[pd.Series], pd.Series]]:
@@ -474,8 +417,12 @@ def clean(s: TextSeries, pipeline=None) -> TextSeries:
     ----------
     s : :class:`texthero._types.TextSeries`
 
-    pipeline :List[Callable[[Pandas Series], Pandas Series]]
-       inserting specific pipeline to clean a text
+    pipeline : List[Callable[Pandas Series, Pandas Series]],
+               optional, default=None
+       Specific pipeline to clean the texts. Has to be a list
+       of functions taking as input and returning as output
+       a Pandas Series. If None, the default pipeline
+       is used.
    
     Examples
     --------
@@ -761,14 +708,14 @@ def phrases(
     ----------
     s : :class:`texthero._types.TokenSeries`
     
-    min_count : Int, optional. Default is 5.
-        ignore tokens with frequency less than this
+    min_count : int, optional, default=5
+        Ignore tokens with frequency less than this.
         
-    threshold : Int, optional. Default is 10.
-        ignore tokens with a score under that threshold
+    threshold : int, optional, default=10
+        Ignore tokens with a score under that threshold.
         
-    symbol : Str, optional. Default is '_'.
-        character used to join collocation words
+    symbol : str, optional, default="_"
+        Character used to join collocation words.
 
     Examples
     --------
@@ -809,7 +756,7 @@ def replace_urls(s: TextSeries, symbol: str) -> TextSeries:
     ----------
     s : :class:`texthero._types.TextSeries`
 
-    symbol: String
+    symbol : str
         The symbol to which the URL should be changed to.
 
     Examples
@@ -868,7 +815,7 @@ def replace_tags(s: TextSeries, symbol: str) -> TextSeries:
     s : :class:`texthero._types.TextSeries`
 
     symbols : str
-        Symbols to replace
+        Symbol to replace tags with.
 
     Examples
     --------
@@ -921,8 +868,8 @@ def replace_hashtags(s: TextSeries, symbol: str) -> TextSeries:
     ----------
     s : :class:`texthero._types.TextSeries`
 
-    symbols : str
-        Symbols to replace
+    symbol : str
+        Symbol to replace hashtags with.
     
     Examples
     --------

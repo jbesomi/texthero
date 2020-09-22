@@ -111,13 +111,13 @@ from texthero import preprocessing
 custom_pipeline = [preprocessing.fillna,
                    preprocessing.lowercase,
                    preprocessing.remove_whitespace]
-df['clean_text'] = hero.clean(df['text'], custom_pipeline)
+df['clean_text_custom_pipeline'] = hero.clean(df['text'], custom_pipeline)
 ```
 
 or alternatively
 
 ```python
-df['clean_text'] = df['clean_text'].pipe(hero.clean, custom_pipeline)
+df['clean_text_custom_pipeline'] = df['text'].pipe(hero.clean, custom_pipeline)
 ```
 
 ##### Tokenize
@@ -167,7 +167,7 @@ many entries). For that, we can use PCA. PCA generates new vectors from the tfid
 that showcase the differences among the documents most strongly in fewer dimensions, often 2 or 3.
 
 ```python
-df['pca'] = hero.pca(df['tfidf'])
+df['pca'] = hero.pca(df_tfidf)
 ```
 
 ##### All in one step

@@ -187,10 +187,7 @@ def term_frequency(
     s_term_frequency = s.pipe(
         count, max_features=max_features, min_df=min_df, max_df=max_df
     ).pipe(normalize, norm="l1")
-    # Rename first level of index from "count" to "term_frequency"
-    s_term_frequency.columns = pd.MultiIndex.from_product(
-        [["term_frequency"], s_term_frequency.columns.levels[1]]
-    )
+    
     return s_term_frequency
 
 

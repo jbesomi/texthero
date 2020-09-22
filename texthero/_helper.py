@@ -45,7 +45,7 @@ def handle_nans(replace_nans_with):
     ... def replace_b_with_c(s):
     ...     return s.str.replace("b", "c")
     >>> s_with_nan = pd.Series(["Test b", np.nan])
-    >>> replace_b_with_c(s_with_nan)
+    >>> replace_b_with_c(s_with_nan) # doctest: +SKIP
     0            Test c
     1    I was missing!
     dtype: object

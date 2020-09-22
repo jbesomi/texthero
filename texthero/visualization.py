@@ -49,21 +49,21 @@ def scatterplot(
         The name of the column of the DataFrame to use for x and y (and z)
         axis.
 
-    color: str, default to None.
+    color: str, optional, default=None
         Name of the column to use for coloring (rows with same value get same
         color).
 
-    hover_name: str, default to None
+    hover_name: str, optional, default=None
         Name of the column to supply title of hover data when hovering over a
         point.
 
-    hover_data: List[str], default to [].
+    hover_data: List[str], optional, default=[]
         List of column names to supply data when hovering over a point.
 
     title: str, default to "".
         Title of the plot.
 
-    return_figure: optional, default to False.
+    return_figure: bool, optional, default=False
         Function returns the figure instead of showing it if set to True.
 
     Examples
@@ -77,11 +77,11 @@ def scatterplot(
     >>> df["pca"] = (
     ...             hero.tfidf(df["texts"])
     ...                 .pipe(hero.pca, n_components=3)
-    ... ) # TODO: when others get Representation Support: remove flatten
+    ... )
     >>> df["topics"] = (
     ...                hero.tfidf(df["texts"])
     ...                    .pipe(hero.kmeans, n_clusters=2)
-    ... ) # TODO: when others get Representation Support: remove flatten
+    ... )
     >>> hero.scatterplot(df, col="pca", color="topics",
     ...                  hover_data=["texts"]) # doctest: +SKIP
     """
@@ -167,44 +167,44 @@ def wordcloud(
     ----------
     s : :class:`texthero._types.TextSeries`
 
-    font_path : str
+    font_path : str, optional, default=None
         Font path to the font that will be used (OTF or TTF). Defaults to
         DroidSansMono path on a Linux machine. If you are on another OS or
         don't have this font, you need to adjust this path.
 
-    width : int
+    width : int, optional, default=400
         Width of the canvas.
 
-    height : int
+    height : int, optional, default=200
         Height of the canvas.
 
-    max_words : number (default=200)
+    max_words : int, optional, default=200
         The maximum number of words.
 
-    mask : nd-array or None (default=None)
+    mask : nd-array or None, optional, default=None
         When set, gives a binary mask on where to draw words. When set, width
         and height will be ignored and the shape of mask will be used instead.
         All white (#FF or #FFFFFF) entries will be considerd "masked out"
         while other entries will be free to draw on.
 
-    contour_width: float (default=0)
+    contour_width: float, optional, default=0
         If mask is not None and contour_width > 0, draw the mask contour.
 
-    contour_color: color value (default="PAPAYAWHIP")
+    contour_color: str, optional, default="PAPAYAWHIP"
         Mask contour color.
 
-    min_font_size : int (default=4)
+    min_font_size : int, optional, default=4
         Smallest font size to use. Will stop when there is no more room in
         this size.
 
-    background_color : color value (default="PAPAYAWHIP")
+    background_color : str, optional, default="PAPAYAWHIP"
         Background color for the word cloud image.
 
-    max_font_size : int or None (default=None)
+    max_font_size : int or None, optional, default=None
         Maximum font size for the largest word. If None, height of the image
         is used.
 
-    relative_scaling : float (default='auto')
+    relative_scaling : float, optional, default="auto"
         Importance of relative word frequencies for font-size.  With
         relative_scaling=0, only word-ranks are considered.  With
         relative_scaling=1, a word that is twice as frequent will have twice
@@ -213,7 +213,7 @@ def wordcloud(
         If 'auto' it will be set to 0.5 unless repeat is true, in which
         case it will be set to 0.
 
-    colormap : string or matplotlib colormap, default="viridis"
+    colormap : string or matplotlib colormap, optional, default="viridis"
         Matplotlib colormap to randomly draw colors from for each word.
 
     """
@@ -275,7 +275,7 @@ def top_words(s: TextSeries, normalize=False) -> pd.Series:
 
     Parameters 
     ----------
-    normalize : optional, default to False.
+    normalize : bool, optional, default=False.
         When set to true, return normalized values.
 
     Examples

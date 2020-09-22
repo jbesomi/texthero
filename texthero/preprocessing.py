@@ -14,6 +14,7 @@ import unidecode
 
 from texthero import stopwords as _stopwords
 from texthero._types import TokenSeries, TextSeries, InputSeries
+from texthero.helper import parallel
 
 from typing import List, Callable, Union
 
@@ -21,6 +22,10 @@ from typing import List, Callable, Union
 import warnings
 
 warnings.filterwarnings(action="ignore", category=UserWarning, module="gensim")
+
+
+def _fillna(s: TextSeries) -> TextSeries:
+    return s.fillna("").astype("str")
 
 
 @InputSeries(TextSeries)
@@ -41,7 +46,11 @@ def fillna(s: TextSeries) -> TextSeries:
     3    You're
     dtype: object
     """
-    return s.fillna("").astype("str")
+    return parallel(s, _fillna)
+
+
+def _lowercase(s: TextSeries) -> TextSeries:
+    return s.str.lower()
 
 
 @InputSeries(TextSeries)
@@ -59,7 +68,15 @@ def lowercase(s: TextSeries) -> TextSeries:
     0    this is new york with upper letters
     dtype: object
     """
-    return s.str.lower()
+    return parallel(s, _lowercase)
+
+
+def _replace_digits(s: TextSeries, symbols: str = " ", only_blocks=True) -> TextSeries:
+    if only_blocks:
+        pattern = r"\b\d+\b"
+        return s.str.replace(pattern, symbols)
+    else:
+        return s.str.replace(r"\d+", symbols)
 
 
 @InputSeries(TextSeries)
@@ -94,12 +111,7 @@ def replace_digits(s: TextSeries, symbols: str = " ", only_blocks=True) -> TextS
     0    X falconX
     dtype: object
     """
-
-    if only_blocks:
-        pattern = r"\b\d+\b"
-        return s.str.replace(pattern, symbols)
-    else:
-        return s.str.replace(r"\d+", symbols)
+    return parallel(s, _replace_digits, symbols=symbols, only_blocks=only_blocks)
 
 
 @InputSeries(TextSeries)
@@ -137,6 +149,10 @@ def remove_digits(s: TextSeries, only_blocks=True) -> TextSeries:
     return replace_digits(s, " ", only_blocks)
 
 
+def _replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
+    return s.str.replace(rf"([{string.punctuation}])+", symbol)
+
+
 @InputSeries(TextSeries)
 def replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
     """
@@ -164,8 +180,7 @@ def replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
     0    Finnaly <PUNCT> 
     dtype: object
     """
-
-    return s.str.replace(rf"([{string.punctuation}])+", symbol)
+    return parallel(s, _replace_punctuation, symbol=symbol)
 
 
 @InputSeries(TextSeries)
@@ -192,7 +207,7 @@ def remove_punctuation(s: TextSeries) -> TextSeries:
     return replace_punctuation(s, " ")
 
 
-def _remove_diacritics(text: str) -> str:
+def _remove_diacritics_algorithm(text: str) -> str:
     """
     Remove diacritics and accents from one string.
 
@@ -201,13 +216,18 @@ def _remove_diacritics(text: str) -> str:
     >>> from texthero.preprocessing import _remove_diacritics
     >>> import pandas as pd
     >>> text = "Montréal, über, 12.89, Mère, Françoise, noël, 889, اِس, اُس"
-    >>> _remove_diacritics(text)
+    >>> _remove_diacritics_algorithm(text)
     'Montreal, uber, 12.89, Mere, Francoise, noel, 889, اس, اس'
     """
+
     nfkd_form = unicodedata.normalize("NFKD", text)
     # unicodedata.combining(char) checks if the character is in
     # composed form (consisting of several unicode chars combined), i.e. a diacritic
     return "".join([char for char in nfkd_form if not unicodedata.combining(char)])
+
+
+def _remove_diacritics(s: TextSeries) -> TextSeries:
+    return s.astype("unicode").apply(_remove_diacritics_algorithm)
 
 
 @InputSeries(TextSeries)
@@ -229,7 +249,11 @@ def remove_diacritics(s: TextSeries) -> TextSeries:
     'Montreal, uber, 12.89, Mere, Francoise, noel, 889, اس, اس'
 
     """
-    return s.astype("unicode").apply(_remove_diacritics)
+    return parallel(s, _remove_diacritics)
+
+
+def _remove_whitespace(s: TextSeries) -> TextSeries:
+    return s.str.replace("\xa0", " ").str.split().str.join(" ")
 
 
 @InputSeries(TextSeries)
@@ -252,11 +276,10 @@ def remove_whitespace(s: TextSeries) -> TextSeries:
     0    Title Subtitle ...
     dtype: object
     """
+    return parallel(s, _remove_whitespace)
 
-    return s.str.replace("\xa0", " ").str.split().str.join(" ")
 
-
-def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
+def _replace_stopwords_algorithm(text: str, words: Set[str], symbol: str = " ") -> str:
     """
     Remove words in a set from a string, replacing them with a symbol.
 
@@ -276,7 +299,7 @@ def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
     >>> s = "the book of the jungle"
     >>> symbol = "$"
     >>> stopwords = ["the", "of"]
-    >>> _replace_stopwords(s, stopwords, symbol)
+    >>> _replace_stopwords_algorithm(s, stopwords, symbol)
     '$ book $ $ jungle'
 
     """
@@ -288,6 +311,12 @@ def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
     """
 
     return "".join(t if t not in words else symbol for t in re.findall(pattern, text))
+
+
+def _replace_stopwords(
+    s: TextSeries, symbol: str, stopwords: Optional[Set[str]] = None
+) -> TextSeries:
+    return s.apply(_replace_stopwords_algorithm, words=stopwords, symbol=symbol)
 
 
 @InputSeries(TextSeries)
@@ -320,10 +349,9 @@ def replace_stopwords(
     dtype: object
 
     """
-
     if stopwords is None:
         stopwords = _stopwords.DEFAULT
-    return s.apply(_replace_stopwords, args=(stopwords, symbol))
+    return parallel(s, _replace_stopwords, symbol=symbol, stopwords=stopwords)
 
 
 @InputSeries(TextSeries)
@@ -485,6 +513,10 @@ def drop_no_content(s: TextSeries) -> TextSeries:
     return s[has_content(s)]
 
 
+def _remove_round_brackets(s: TextSeries) -> TextSeries:
+    return s.str.replace(r"\([^()]*\)", "")
+
+
 @InputSeries(TextSeries)
 def remove_round_brackets(s: TextSeries) -> TextSeries:
     """
@@ -508,7 +540,11 @@ def remove_round_brackets(s: TextSeries) -> TextSeries:
     :meth:`remove_square_brackets`
 
     """
-    return s.str.replace(r"\([^()]*\)", "")
+    return parallel(s, _remove_round_brackets)
+
+
+def _remove_curly_brackets(s: TextSeries) -> TextSeries:
+    return s.str.replace(r"\{[^{}]*\}", "")
 
 
 @InputSeries(TextSeries)
@@ -534,7 +570,11 @@ def remove_curly_brackets(s: TextSeries) -> TextSeries:
     :meth:`remove_square_brackets`
 
     """
-    return s.str.replace(r"\{[^{}]*\}", "")
+    return parallel(s, _remove_curly_brackets)
+
+
+def _remove_square_brackets(s: TextSeries) -> TextSeries:
+    return s.str.replace(r"\[[^\[\]]*\]", "")
 
 
 @InputSeries(TextSeries)
@@ -559,9 +599,12 @@ def remove_square_brackets(s: TextSeries) -> TextSeries:
     :meth:`remove_round_brackets`
     :meth:`remove_curly_brackets`
 
-
     """
-    return s.str.replace(r"\[[^\[\]]*\]", "")
+    return parallel(s, _remove_square_brackets)
+
+
+def _remove_angle_brackets(s: TextSeries) -> TextSeries:
+    return s.str.replace(r"<[^<>]*>", "")
 
 
 @InputSeries(TextSeries)
@@ -587,7 +630,7 @@ def remove_angle_brackets(s: TextSeries) -> TextSeries:
     :meth:`remove_square_brackets`
 
     """
-    return s.str.replace(r"<[^<>]*>", "")
+    return parallel(s, _remove_angle_brackets)
 
 
 @InputSeries(TextSeries)
@@ -623,6 +666,16 @@ def remove_brackets(s: TextSeries) -> TextSeries:
     )
 
 
+def _remove_html_tags(s: TextSeries) -> TextSeries:
+
+    pattern = r"""(?x)                              # Turn on free-spacing
+      <[^>]+>                                       # Remove <html> tags
+      | &([a-z0-9]+|\#[0-9]{1,6}|\#x[0-9a-f]{1,6}); # Remove &nbsp;
+      """
+
+    return s.str.replace(pattern, "")
+
+
 @InputSeries(TextSeries)
 def remove_html_tags(s: TextSeries) -> TextSeries:
     """
@@ -642,13 +695,18 @@ def remove_html_tags(s: TextSeries) -> TextSeries:
     dtype: object
 
     """
+    return parallel(s, _remove_html_tags)
 
-    pattern = r"""(?x)                              # Turn on free-spacing
-      <[^>]+>                                       # Remove <html> tags
-      | &([a-z0-9]+|\#[0-9]{1,6}|\#x[0-9a-f]{1,6}); # Remove &nbsp;
-      """
 
-    return s.str.replace(pattern, "")
+def _tokenize(s: TextSeries) -> TokenSeries:
+    punct = string.punctuation.replace("_", "")
+    # In regex, the metacharacter 'w' is "a-z, A-Z, 0-9, including the _ (underscore)
+    # character." We therefore remove it from the punctuation string as this is already
+    # included in \w.
+
+    pattern = rf"((\w)([{punct}])(?:\B|$)|(?:^|\B)([{punct}])(\w))"
+
+    return s.str.replace(pattern, r"\2 \3 \4 \5").str.split()
 
 
 @InputSeries(TextSeries)
@@ -673,14 +731,7 @@ def tokenize(s: TextSeries) -> TokenSeries:
 
     """
 
-    punct = string.punctuation.replace("_", "")
-    # In regex, the metacharacter 'w' is "a-z, A-Z, 0-9, including the _ (underscore)
-    # character." We therefore remove it from the punctuation string as this is already
-    # included in \w.
-
-    pattern = rf"((\w)([{punct}])(?:\B|$)|(?:^|\B)([{punct}])(\w))"
-
-    return s.str.replace(pattern, r"\2 \3 \4 \5").str.split()
+    return parallel(s, _tokenize)
 
 
 # Warning message for not-tokenized inputs
@@ -745,6 +796,11 @@ def phrases(
     return pd.Series(phrases.fit_transform(s.values), index=s.index)
 
 
+def _replace_urls(s: TextSeries, symbol: str) -> TextSeries:
+    pattern = r"http\S+"
+    return s.str.replace(pattern, symbol)
+
+
 @InputSeries(TextSeries)
 def replace_urls(s: TextSeries, symbol: str) -> TextSeries:
     r"""Replace all urls with the given symbol.
@@ -772,10 +828,7 @@ def replace_urls(s: TextSeries, symbol: str) -> TextSeries:
     :meth:`texthero.preprocessing.remove_urls`
 
     """
-
-    pattern = r"http\S+"
-
-    return s.str.replace(pattern, symbol)
+    return parallel(s, _replace_urls, symbol=symbol)
 
 
 @InputSeries(TextSeries)
@@ -803,6 +856,12 @@ def remove_urls(s: TextSeries) -> TextSeries:
 
 
 @InputSeries(TextSeries)
+def _replace_tags(s: TextSeries, symbol: str) -> TextSeries:
+    pattern = r"@[a-zA-Z0-9]+"
+    return s.str.replace(pattern, symbol)
+
+
+@InputSeries(TextSeries)
 def replace_tags(s: TextSeries, symbol: str) -> TextSeries:
     """Replace all tags from a given Pandas Series with symbol.
 
@@ -826,9 +885,7 @@ def replace_tags(s: TextSeries, symbol: str) -> TextSeries:
     dtype: object
 
     """
-
-    pattern = r"@[a-zA-Z0-9]+"
-    return s.str.replace(pattern, symbol)
+    return parallel(s, _replace_tags, symbol=symbol)
 
 
 @InputSeries(TextSeries)
@@ -856,6 +913,11 @@ def remove_tags(s: TextSeries) -> TextSeries:
     return replace_tags(s, " ")
 
 
+def _replace_hashtags(s: TextSeries, symbol: str) -> TextSeries:
+    pattern = r"#[a-zA-Z0-9_]+"
+    return s.str.replace(pattern, symbol)
+
+
 @InputSeries(TextSeries)
 def replace_hashtags(s: TextSeries, symbol: str) -> TextSeries:
     """Replace all hashtags from a Pandas Series with symbol
@@ -880,8 +942,7 @@ def replace_hashtags(s: TextSeries, symbol: str) -> TextSeries:
     dtype: object
 
     """
-    pattern = r"#[a-zA-Z0-9_]+"
-    return s.str.replace(pattern, symbol)
+    return parallel(s, _replace_hashtags, symbol=symbol)
 
 
 @InputSeries(TextSeries)

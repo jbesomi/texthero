@@ -1,10 +1,14 @@
 """
 Useful helper functions for the texthero library.
 """
-
+import sys
 import pandas as pd
+import multiprocessing as mp
+import numpy as np
 import functools
 import warnings
+
+from texthero import config
 
 
 """
@@ -36,7 +40,7 @@ def handle_nans(replace_nans_with):
 
     Examples
     --------
-    >>> from texthero._helper import handle_nans
+    >>> from texthero.helper import handle_nans
     >>> import pandas as pd
     >>> import numpy as np
     >>> @handle_nans(replace_nans_with="I was missing!")
@@ -71,3 +75,37 @@ def handle_nans(replace_nans_with):
         return wrapper
 
     return decorator
+
+
+"""
+Parallelization.
+"""
+
+
+cores = mp.cpu_count()
+partitions = cores
+
+
+def parallel(s, func, *args, **kwargs):
+
+    if len(s) < config.MIN_LINES_FOR_PARALLELIZATION or not config.PARALLELIZE:
+        # Execute as usual.
+        return func(s, *args, **kwargs)
+
+    else:
+        # Execute in parallel.
+
+        # Split the data up into batches.
+        s_split = np.array_split(s, partitions)
+
+        # Open threadpool.
+        pool = mp.Pool(cores)
+        # Execute in parallel and concat results (order is kept).
+        s_result = pd.concat(
+            pool.map(functools.partial(func, *args, **kwargs), s_split)
+        )
+
+        pool.close()
+        pool.join()
+
+        return s_result

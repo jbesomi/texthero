@@ -7,6 +7,19 @@ import pandas as pd
 import en_core_web_sm
 from nltk.stem import PorterStemmer, SnowballStemmer
 from texthero._types import TextSeries, InputSeries
+from texthero.helper import parallel
+
+
+def _named_entities(s: TextSeries, nlp) -> pd.Series:
+
+    entities = []
+
+    for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
+        entities.append(
+            [(ent.text, ent.label_, ent.start_char, ent.end_char) for ent in doc.ents]
+        )
+
+    return pd.Series(entities, index=s.index)
 
 
 @InputSeries(TextSeries)
@@ -66,6 +79,22 @@ def named_entities(s: TextSeries, package="spacy") -> pd.Series:
 
 
 @InputSeries(TextSeries)
+def _noun_chunks(s: TextSeries, nlp) -> pd.Series:
+
+    noun_chunks = []
+
+    # nlp.pipe is now "tagger", "parser"
+    for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
+        noun_chunks.append(
+            [
+                (chunk.text, chunk.label_, chunk.start_char, chunk.end_char)
+                for chunk in doc.noun_chunks
+            ]
+        )
+
+    return pd.Series(noun_chunks, index=s.index)
+
+
 def noun_chunks(s: TextSeries) -> pd.Series:
     """
     Return noun chunks (noun phrases).
@@ -91,20 +120,20 @@ def noun_chunks(s: TextSeries) -> pd.Series:
     dtype: object
     """
 
-    noun_chunks = []
-
     nlp = en_core_web_sm.load(disable=["ner"])
 
-    # nlp.pipe is now "tagger", "parser"
-    for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
-        noun_chunks.append(
-            [
-                (chunk.text, chunk.label_, chunk.start_char, chunk.end_char)
-                for chunk in doc.noun_chunks
-            ]
-        )
+    return parallel(s, _noun_chunks, nlp=nlp)
 
-    return pd.Series(noun_chunks, index=s.index)
+
+def _count_sentences(s: TextSeries, nlp) -> pd.Series:
+
+    number_of_sentences = []
+
+    for doc in nlp.pipe(s.values, batch_size=32):
+        sentences = len(list(doc.sents))
+        number_of_sentences.append(sentences)
+
+    return pd.Series(number_of_sentences, index=s.index)
 
 
 @InputSeries(TextSeries)
@@ -129,17 +158,27 @@ def count_sentences(s: TextSeries) -> pd.Series:
     1    3
     dtype: int64
     """
-    number_of_sentences = []
 
     nlp = en_core_web_sm.load(disable=["tagger", "parser", "ner"])
 
     nlp.add_pipe(nlp.create_pipe("sentencizer"))  # Pipe is only "sentencizer"
 
-    for doc in nlp.pipe(s.values, batch_size=32):
-        sentences = len(list(doc.sents))
-        number_of_sentences.append(sentences)
+    return parallel(s, _count_sentences, nlp=nlp)
 
-    return pd.Series(number_of_sentences, index=s.index)
+
+def _pos_tag(s: TextSeries, nlp) -> pd.Series:
+
+    pos_tags = []
+
+    for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
+        pos_tags.append(
+            [
+                (token.text, token.pos_, token.tag_, token.idx, token.idx + len(token))
+                for token in doc
+            ]
+        )
+
+    return pd.Series(pos_tags, index=s.index)
 
 
 @InputSeries(TextSeries)
@@ -219,6 +258,13 @@ def pos_tag(s: TextSeries) -> pd.Series:
     return pd.Series(pos_tags, index=s.index)
 
 
+def _stem(s, stemmer):
+    def _stem_algorithm(text):
+        return " ".join([stemmer.stem(word) for word in text])
+
+    return s.str.split().apply(_stem_algorithm)
+
+
 @InputSeries(TextSeries)
 def stem(s: TextSeries, stem="snowball", language="english") -> TextSeries:
     r"""
@@ -269,7 +315,4 @@ def stem(s: TextSeries, stem="snowball", language="english") -> TextSeries:
     else:
         raise ValueError("stem argument must be either 'porter' of 'stemmer'")
 
-    def _stem(text):
-        return " ".join([stemmer.stem(word) for word in text])
-
-    return s.str.split().apply(_stem)
+    return parallel(s, _stem, stemmer=stemmer)

@@ -1,6 +1,6 @@
 ---
-id: tutorial-nlp
-title: Tutorial NLP
+id: getting-started-nlp
+title: Getting started - NLP
 ---
 
 # Texthero's NLP Module

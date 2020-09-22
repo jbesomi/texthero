@@ -22,7 +22,7 @@ remove_punctuation(s: TextSeries) -> TextSeries
  ```
 in the documentation. You then know that this function takes as input a _TextSeries_ and returns as output a _TextSeries_, so it can be used in the preprocessing phase of your work, where each document is one string.
 
-<h3 align="center">The four HeroSeries Types</h3>
+<h3 align="center">The HeroSeries Types</h3>
 
 These are the three types currently supported by the library; almost all of the libraries functions takes as input and return as output one of these types:
 

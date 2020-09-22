@@ -1,3 +1,8 @@
+---
+id: getting-started-visualization
+title: Getting started - visualization
+---
+
 # Visualisation
 
 Now, before you start processing your dataset, you might want to visualize your data first in order to get the gist of the data and to choose, which NLP toolkit and models will be most suitable. The following tutorial will introduce two methods. Those will show you in a quick way the most frequent words in our dataset.

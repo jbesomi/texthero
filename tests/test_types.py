@@ -72,19 +72,62 @@ class TestTypes(PandasTestCase):
         except TypeError:
             self.fail("Failed although input type is correct.")
 
-    def test_inputseries_correct_type_documentrepresentationseries(self):
-        @_types.InputSeries(_types.RepresentationSeries)
+    def test_inputseries_correct_type_DataFrame(self):
+        @_types.InputSeries(_types.DataFrame)
         def f(s):
             pass
 
         try:
-            f(
-                pd.Series(
-                    [1, 2, 3],
-                    index=pd.MultiIndex.from_tuples(
-                        [("doc1", "word1"), ("doc1", "word2"), ("doc2", "word1")]
-                    ),
-                )
-            )
+            f(pd.DataFrame([[1, 2, 3]], columns=["a", "b", "c"], dtype="Sparse",))
         except TypeError:
             self.fail("Failed although input type is correct.")
+
+    def test_inputseries_correct_type_first_value_is_nan_TextSeries(self):
+        @_types.InputSeries(_types.TextSeries)
+        def f(s):
+            pass
+
+        try:
+            f(pd.Series([np.nan, pd.NA, "I'm a TextSeries"]))
+        except TypeError:
+            self.fail("Failed although input type is correct.")
+
+    def test_inputseries_correct_type_first_value_is_nan_TokenSeries(self):
+        @_types.InputSeries(_types.TokenSeries)
+        def f(s):
+            pass
+
+        try:
+            f(pd.Series([np.nan, pd.NA, ["Token", "Series"]]))
+        except TypeError:
+            self.fail("Failed although input type is correct.")
+
+    def test_inputseries_correct_type_first_value_is_nan_VectorSeries(self):
+        @_types.InputSeries(_types.VectorSeries)
+        def f(s):
+            pass
+
+        try:
+            f(pd.Series([np.nan, pd.NA, [0, 1, 2]]))
+        except TypeError:
+            self.fail("Failed although input type is correct.")
+
+    def test_several_possible_types_correct_type(self):
+        @_types.InputSeries([_types.DataFrame, _types.VectorSeries])
+        def f(x):
+            pass
+
+        try:
+            f(pd.DataFrame([[1, 2, 3]], columns=["a", "b", "c"], dtype="Sparse",))
+
+            f(pd.Series([[1.0, 2.0]]))
+
+        except TypeError:
+            self.fail("Failed although input type is correct.")
+
+    def test_several_possible_types_wrong_type(self):
+        @_types.InputSeries([_types.DataFrame, _types.VectorSeries])
+        def f(x):
+            pass
+
+        self.assertRaises(TypeError, f, pd.Series([["token", "ized"]]))

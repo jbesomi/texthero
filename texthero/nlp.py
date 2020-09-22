@@ -4,7 +4,8 @@ The texthero.nlp module supports common NLP tasks such as named_entities, noun_c
 
 import spacy
 import pandas as pd
-
+import en_core_web_sm
+from nltk.stem import PorterStemmer, SnowballStemmer
 from texthero._types import TextSeries, InputSeries
 from texthero.helper import parallel
 
@@ -65,16 +66,9 @@ def named_entities(s: TextSeries, package="spacy") -> pd.Series:
      ('Bill de Blasio', 'PERSON', 27, 41)]
     """
 
-    nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser"])
+    nlp = en_core_web_sm.load(disable=["tagger", "parser"])
+
     # nlp.pipe is now 'ner'
-
-    return parallel(s, _named_entities, nlp=nlp)
-
-
-def _noun_chunks(s: TextSeries, nlp) -> pd.Series:
-
-    noun_chunks = []
-
     for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
         noun_chunks.append(
             [
@@ -112,10 +106,18 @@ def noun_chunks(s: TextSeries) -> pd.Series:
     dtype: object
     """
 
-    nlp = spacy.load("en_core_web_sm", disable=["ner"])
-    # nlp.pipe is now "tagger", "parser"
+    noun_chunks = []
 
-    return parallel(s, _noun_chunks, nlp=nlp)
+    nlp = en_core_web_sm.load(disable=["ner"])
+
+    # nlp.pipe is now "tagger", "parser"
+    for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
+        noun_chunks.append(
+            [
+                (chunk.text, chunk.label_, chunk.start_char, chunk.end_char)
+                for chunk in doc.noun_chunks
+            ]
+        )
 
 
 def _count_sentences(s: TextSeries, nlp) -> pd.Series:
@@ -152,7 +154,8 @@ def count_sentences(s: TextSeries) -> pd.Series:
     dtype: int64
     """
 
-    nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser", "ner"])
+    nlp = en_core_web_sm.load(disable=["tagger", "parser", "ner"])
+
     nlp.add_pipe(nlp.create_pipe("sentencizer"))  # Pipe is only "sentencizer"
 
     return parallel(s, _count_sentences, nlp=nlp)
@@ -234,7 +237,73 @@ def pos_tag(s: TextSeries) -> pd.Series:
      25), ('day', 'NOUN', 'NN', 26, 29)]
     """
 
-    nlp = spacy.load("en_core_web_sm", disable=["parser", "ner"])
-    # nlp.pipe is now "tagger"
+    pos_tags = []
 
-    return parallel(s, _pos_tag, nlp=nlp)
+    nlp = en_core_web_sm.load(disable=["parser", "ner"])
+
+    # nlp.pipe is now "tagger"
+    for doc in nlp.pipe(s.astype("unicode").values, batch_size=32):
+        pos_tags.append(
+            [
+                (token.text, token.pos_, token.tag_, token.idx, token.idx + len(token))
+                for token in doc
+            ]
+        )
+
+    return pd.Series(pos_tags, index=s.index)
+
+
+@InputSeries(TextSeries)
+def stem(s: TextSeries, stem="snowball", language="english") -> TextSeries:
+    r"""
+    Stem series using either `porter` or `snowball` NLTK stemmers.
+
+    The act of stemming means removing the end of a words with an heuristic
+    process.
+    It's useful in context where the meaning of the word is important rather
+    than his derivation. Stemming is very efficient and adapt in case the given
+    dataset is large.
+
+    Make use of two NLTK stemming algorithms known as
+    :class:`nltk.stem.SnowballStemmer` and :class:`nltk.stem.PorterStemmer`.
+    SnowballStemmer should be used when the Pandas Series contains non-English
+    text has it has multilanguage support.
+
+
+    Parameters
+    ----------
+    s : :class:`texthero._types.TextSeries`
+
+    stem : str, optional, default="snowball"
+        Stemming algorithm. It can be either 'snowball' or 'porter'
+
+    language : str, optional, default="english"
+        Supported languages: `danish`, `dutch`, `english`, `finnish`,
+        `french`, `german` , `hungarian`, `italian`, `norwegian`,
+        `portuguese`, `romanian`, `russian`, `spanish` and `swedish`.
+
+    Notes
+    -----
+    By default NLTK stemming algorithms lowercase all text.
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series("I used to go \t\n running.")
+    >>> hero.stem(s)
+    0    i use to go running.
+    dtype: object
+    """
+
+    if stem == "porter":
+        stemmer = PorterStemmer()
+    elif stem == "snowball":
+        stemmer = SnowballStemmer(language)
+    else:
+        raise ValueError("stem argument must be either 'porter' of 'stemmer'")
+
+    def _stem(text):
+        return " ".join([stemmer.stem(word) for word in text])
+
+    return s.str.split().apply(_stem)

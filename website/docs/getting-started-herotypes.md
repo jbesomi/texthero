@@ -1,3 +1,8 @@
+---
+id: getting-started-herotypes
+title: Getting started HeroTypes
+---
+
 <h1 align="center">HeroTypes</h1>
 
 In Texthero, we're always working with Pandas Series and Pandas Dataframes to gain insights from text data! To make things easier and more intuitive, we differentiate between different types of Series/DataFrames, depending on where we are on the road to understanding our dataset.

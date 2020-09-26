@@ -36,15 +36,15 @@ def fillna(s: TextSeries, replace_string = "") -> TextSeries:
     >>> s = pd.Series(["I'm", np.NaN, pd.NA, "You're"])
     >>> hero.fillna(s)
     0       I'm
-    1           
-    2
+    1          
+    2          
     3    You're
     dtype: object
     >>> hero.fillna(s, "Missing")
-    0       I'm
-    1   Missing
-    2   Missing
-    3    You're
+    0        I'm
+    1    Missing
+    2    Missing
+    3     You're
     dtype: object
     """
 

@@ -24,7 +24,7 @@ warnings.filterwarnings(action="ignore", category=UserWarning, module="gensim")
 
 
 @InputSeries(TextSeries)
-def fillna(s: TextSeries, replace_string = "") -> TextSeries:
+def fillna(s: TextSeries, replace_string="") -> TextSeries:
     """
     Replaces not assigned values with empty or given string.
 

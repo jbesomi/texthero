@@ -103,6 +103,7 @@ Tokenization issues are language specific and the process can involve ambiguity 
 Texthero takes care of making the best set of choices based on the most reasonable assumptions...in just one command!
 
 ```python
+import pandas as pd
 from texthero import tokenize
 
 s = pd.Series(["Hulk is the greenest superhero!"])

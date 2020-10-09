@@ -184,3 +184,7 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 docs/source/api
+
+
+# Hide vs code hidden files
+.vs_code

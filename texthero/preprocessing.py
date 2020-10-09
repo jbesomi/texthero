@@ -24,15 +24,15 @@ warnings.filterwarnings(action="ignore", category=UserWarning, module="gensim")
 
 
 @InputSeries(TextSeries)
-def fillna(s: TextSeries) -> TextSeries:
+def fillna(s: TextSeries, replace_string="") -> TextSeries:
     """
-    Replaces not assigned values with empty string.
-
+    Replaces not assigned values with empty or given string.
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
+    >>> import numpy as np
     >>> s = pd.Series(["I'm", np.NaN, pd.NA, "You're"])
     >>> hero.fillna(s)
     0       I'm
@@ -40,8 +40,15 @@ def fillna(s: TextSeries) -> TextSeries:
     2          
     3    You're
     dtype: object
+    >>> hero.fillna(s, "Missing")
+    0        I'm
+    1    Missing
+    2    Missing
+    3     You're
+    dtype: object
     """
-    return s.fillna("").astype("str")
+
+    return s.fillna(replace_string).astype("str")
 
 
 @InputSeries(TextSeries)

@@ -114,6 +114,13 @@ class TestPreprocessing(PandasTestCase):
         pipeline = [preprocessing.lowercase, preprocessing.remove_stopwords]
         self.assertEqual(preprocessing.clean(s, pipeline=pipeline), s_true)
 
+    def test_pipeline_default(self):
+        s = pd.Series(
+            "Amazon! < br />< br /> If I was going to order any soft drink online, it would be Diet Coke with Lime"
+        )
+        s_true = pd.Series("amazon going order soft drink online would diet coke lime")
+        self.assertEqual(preprocessing.clean(s), s_true)
+
     """
     Test stopwords.
     """
@@ -151,8 +158,8 @@ class TestPreprocessing(PandasTestCase):
     """
 
     def test_remove_html_tags(self):
-        s = pd.Series("<html>remove <br>html</br> tags<html> &nbsp;")
-        s_true = pd.Series("remove html tags ")
+        s = pd.Series("<html>remove <br>html</br> tags<html> &nbsp; < br />< br />")
+        s_true = pd.Series("remove html tags  ")
         self.assertEqual(preprocessing.remove_html_tags(s), s_true)
 
     """

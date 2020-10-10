@@ -397,6 +397,7 @@ def get_default_pipeline() -> List[Callable[[pd.Series], pd.Series]]:
         fillna,
         lowercase,
         remove_digits,
+        remove_html_tags,
         remove_punctuation,
         remove_diacritics,
         remove_stopwords,

@@ -116,9 +116,19 @@ class TestPreprocessing(PandasTestCase):
 
     def test_pipeline_default(self):
         s = pd.Series(
-            "Amazon! < br />< br /> If I was going to order any soft drink online, it would be Diet Coke with Lime"
+            [
+                "Amazon! < br />< br /> If I was going to order any soft drink online, it would be Diet Coke with Lime",
+                pd.NA,
+                "-1234. Mère, Françoise, noël",
+            ]
         )
-        s_true = pd.Series("amazon going order soft drink online would diet coke lime")
+        s_true = pd.Series(
+            [
+                "amazon going order soft drink online would diet coke lime",
+                "",
+                "mere francoise noel",
+            ]
+        )
         self.assertEqual(preprocessing.clean(s), s_true)
 
     """

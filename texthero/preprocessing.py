@@ -329,6 +329,7 @@ def replace_stopwords(
 
     if stopwords is None:
         from texthero import stopwords as _stopwords
+
         stopwords = _stopwords.DEFAULT
     return s.apply(_replace_stopwords, args=(stopwords, symbol))
 

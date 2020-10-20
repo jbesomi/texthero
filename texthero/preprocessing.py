@@ -12,7 +12,6 @@ import numpy as np
 import pandas as pd
 import unidecode
 
-from texthero import stopwords as _stopwords
 from texthero._types import TokenSeries, TextSeries, InputSeries
 
 from typing import List, Callable, Union
@@ -329,6 +328,8 @@ def replace_stopwords(
     """
 
     if stopwords is None:
+        from texthero import stopwords as _stopwords
+
         stopwords = _stopwords.DEFAULT
     return s.apply(_replace_stopwords, args=(stopwords, symbol))
 

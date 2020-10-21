@@ -388,10 +388,11 @@ def get_default_pipeline() -> List[Callable[[pd.Series], pd.Series]]:
      1. :meth:`texthero.preprocessing.fillna`
      2. :meth:`texthero.preprocessing.lowercase`
      3. :meth:`texthero.preprocessing.remove_digits`
-     4. :meth:`texthero.preprocessing.remove_punctuation`
-     5. :meth:`texthero.preprocessing.remove_diacritics`
-     6. :meth:`texthero.preprocessing.remove_stopwords`
-     7. :meth:`texthero.preprocessing.remove_whitespace`
+     4. :meth:`texthero.preprocessing.remove_html_tags`
+     5. :meth:`texthero.preprocessing.remove_punctuation`
+     6. :meth:`texthero.preprocessing.remove_diacritics`
+     7. :meth:`texthero.preprocessing.remove_stopwords`
+     8. :meth:`texthero.preprocessing.remove_whitespace`
     """
     return [
         fillna,

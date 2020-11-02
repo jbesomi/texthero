@@ -10,7 +10,6 @@ import unicodedata
 
 import numpy as np
 import pandas as pd
-import unidecode
 
 from texthero._types import TokenSeries, TextSeries, InputSeries
 

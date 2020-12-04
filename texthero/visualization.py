@@ -64,9 +64,9 @@ def scatterplot(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> df = pd.DataFrame(["Football, Sports, Soccer",
-    ...                    "music, violin, orchestra", "football, fun, sports",
-    ...                    "music, fun, guitar"], columns=["texts"])
+    >>> df = pd.DataFrame(["spider, scorpion, bat",
+    ...                    "cape, costume, armor", "mask, eye-liner, earphones",
+    ...                    "cape, whip, ant"], columns=["texts"])
     >>> df["texts"] = hero.clean(df["texts"]).pipe(hero.tokenize)
     >>> df["pca"] = (
     ...             hero.tfidf(df["texts"])
@@ -276,13 +276,19 @@ def top_words(s: TextSeries, normalize=False) -> pd.Series:
     --------
     >>> import pandas as pd
     >>> import texthero as hero
-    >>> s = pd.Series("one two two three three three")
+    >>> s = pd.Series("I believe in second chances, I believe in redemption, but, mostly, I believe in my friends.")
     >>> hero.top_words(s)
-    three    3
-    two      2
-    one      1
+    believe       3
+    I             3
+    in            3
+    chances       1
+    my            1
+    friends       1
+    mostly        1
+    redemption    1
+    but           1
+    second        1
     dtype: int64
-
     """
 
     # Replace all punctuation that are NOT in-between chacarters

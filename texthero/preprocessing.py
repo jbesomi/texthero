@@ -31,18 +31,18 @@ def fillna(s: TextSeries, replace_string="") -> TextSeries:
     >>> import texthero as hero
     >>> import pandas as pd
     >>> import numpy as np
-    >>> s = pd.Series(["I'm", np.NaN, pd.NA, "You're"])
+    >>> s = pd.Series(["I'm", np.NaN, pd.NA, "BATMAN!"])
     >>> hero.fillna(s)
     0       I'm
-    1          
-    2          
-    3    You're
+    1
+    2
+    3    BATMAN!
     dtype: object
     >>> hero.fillna(s, "Missing")
     0        I'm
     1    Missing
     2    Missing
-    3     You're
+    3     BATMAN!
     dtype: object
     """
 
@@ -54,14 +54,13 @@ def lowercase(s: TextSeries) -> TextSeries:
     """
     Lowercase all texts in a series.
 
-    
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("This is NeW YoRk wIth upPer letters")
+    >>> s = pd.Series("BE thE Best you Can Be!")
     >>> hero.lowercase(s)
-    0    this is new york with upper letters
+    0    be the best you can be!
     dtype: object
     """
     return s.str.lower()
@@ -130,12 +129,12 @@ def remove_digits(s: TextSeries, only_blocks=True) -> TextSeries:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("7ex7hero is fun 1111")
+    >>> s = pd.Series("Here comes5The Fantastic 4!")
     >>> hero.preprocessing.remove_digits(s)
-    0    7ex7hero is fun  
+    0    Here comes5The Fantastic  !
     dtype: object
     >>> hero.preprocessing.remove_digits(s, only_blocks=False)
-    0     ex hero is fun  
+    0    Here comes The Fantastic  !
     dtype: object
     """
 
@@ -148,8 +147,8 @@ def replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
     Replace all punctuation with a given symbol.
 
     Replace all punctuation from the given
-    Pandas Series with a custom symbol. 
-    It considers as punctuation characters all :data:`string.punctuation` 
+    Pandas Series with a custom symbol.
+    It considers as punctuation characters all :data:`string.punctuation`
     symbols `!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~).`
 
 
@@ -158,15 +157,15 @@ def replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
     s : :class:`texthero._types.TextSeries`
 
     symbol : str, optional, default=" "
-        Symbol to use as replacement for all string punctuation. 
+        Symbol to use as replacement for all string punctuation.
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Finnaly.")
+    >>> s = pd.Series("I.am.Groot!")
     >>> hero.replace_punctuation(s, " <PUNCT> ")
-    0    Finnaly <PUNCT> 
+    0    I <PUNCT> am <PUNCT> Groot <PUNC>
     dtype: object
     """
 
@@ -189,9 +188,9 @@ def remove_punctuation(s: TextSeries) -> TextSeries:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Finnaly.")
+    >>> s = pd.Series("I.am.Groot!")
     >>> hero.remove_punctuation(s)
-    0    Finnaly 
+    0    I am Groot
     dtype: object
     """
     return replace_punctuation(s, " ")
@@ -205,9 +204,9 @@ def _remove_diacritics(text: str) -> str:
     --------
     >>> from texthero.preprocessing import _remove_diacritics
     >>> import pandas as pd
-    >>> text = "Montréal, über, 12.89, Mère, Françoise, noël, 889, اِس, اُس"
+    >>> text = "bédéphile, über, 12.89, la Guêpe, 889, shônen, اِس, اُس"
     >>> _remove_diacritics(text)
-    'Montreal, uber, 12.89, Mere, Francoise, noel, 889, اس, اس'
+    'bedephile, uber, 12.89, la Guepe, 889, shonen, اس, اس'
     """
     nfkd_form = unicodedata.normalize("NFKD", text)
     # unicodedata.combining(char) checks if the character is in
@@ -229,10 +228,9 @@ def remove_diacritics(s: TextSeries) -> TextSeries:
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(
-    ...     "Montréal, über, 12.89, Mère, Françoise, noël, 889, اِس, اُس")
+    ...     "bédéphile, über, 12.89, la Guêpe, 889, shônen, اِس, اُس")
     >>> hero.remove_diacritics(s)[0]
-    'Montreal, uber, 12.89, Mere, Francoise, noel, 889, اس, اس'
-
+    'bedephile, uber, 12.89, la Guepe, 889, shonen, اس, اس'
     """
     return s.astype("unicode").apply(_remove_diacritics)
 
@@ -252,9 +250,9 @@ def remove_whitespace(s: TextSeries) -> TextSeries:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Title \n Subtitle \t    ...")
+    >>> s = pd.Series("I am the vengeance,\n I am the night,\n I am BATMAN!")
     >>> hero.remove_whitespace(s)
-    0    Title Subtitle ...
+    0    I am the vengeance, I am the night, I am BATMAN!
     dtype: object
     """
 
@@ -278,18 +276,18 @@ def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
     Examples
     --------
     >>> from texthero.preprocessing import _replace_stopwords
-    >>> s = "the book of the jungle"
+    >>> s = "Oh my God, Batman!"
     >>> symbol = "$"
-    >>> stopwords = ["the", "of"]
+    >>> stopwords = ["my"]
     >>> _replace_stopwords(s, stopwords, symbol)
-    '$ book $ $ jungle'
+    'Oh $ God, Batman!'
 
     """
 
     pattern = r"""(?x)                          # Set flag to allow verbose regexps
-      \w+(?:-\w+)*                              # Words with optional internal hyphens 
+      \w+(?:-\w+)*                              # Words with optional internal hyphens
       | \s*                                     # Any space
-      | [][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]    # Any symbol 
+      | [][!"#$%&'*+,-./:;<=>?@\\^():_`{|}~]    # Any symbol
     """
 
     return "".join(t if t not in words else symbol for t in re.findall(pattern, text))
@@ -313,15 +311,15 @@ def replace_stopwords(
 
     stopwords : Set[str], optional, default=None
         Set of stopwords string to remove. If not passed,
-        by default uses NLTK English stopwords. 
+        by default uses NLTK English stopwords.
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("the book of the jungle")
-    >>> hero.replace_stopwords(s, "X")
-    0    X book X X jungle
+    >>> s = pd.Series("Oh my God, Batman!")
+    >>> hero.replace_stopwords(s, "$")
+    0    Oh $ God, Batman!
     dtype: object
 
     """
@@ -357,9 +355,9 @@ def remove_stopwords(
 
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Texthero is not only for the heroes")
+    >>> s = pd.Series("I have the power!")
     >>> hero.remove_stopwords(s)
-    0    Texthero      heroes
+    0    I   power!
     dtype: object
 
     Add custom words into the default list of stopwords:
@@ -368,10 +366,10 @@ def remove_stopwords(
     >>> from texthero import stopwords
     >>> import pandas as pd
     >>> default_stopwords = stopwords.DEFAULT
-    >>> custom_stopwords = default_stopwords.union(set(["heroes"]))
-    >>> s = pd.Series("Texthero is not only for the heroes")
+    >>> custom_stopwords = default_stopwords.union(set(["power"]))
+    >>> s = pd.Series("I have the power!")
     >>> hero.remove_stopwords(s, custom_stopwords)
-    0    Texthero      
+    0    I   !
     dtype: object
 
 
@@ -432,7 +430,7 @@ def clean(s: TextSeries, pipeline=None) -> TextSeries:
        of functions taking as input and returning as output
        a Pandas Series. If None, the default pipeline
        is used.
-   
+
     Examples
     --------
     For the default pipeline:
@@ -462,14 +460,14 @@ def has_content(s: TextSeries) -> TextSeries:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["content", np.nan, "\t\n", " "])
+    >>> s = pd.Series(["Flame", np.nan, "on!", "\t\n", " "])
     >>> hero.has_content(s)
     0     True
     1    False
-    2    False
+    2     True
     3    False
+    4    False
     dtype: bool
-
     """
     return (s.pipe(remove_whitespace) != "") & (~s.isna())
 
@@ -486,11 +484,11 @@ def drop_no_content(s: TextSeries) -> TextSeries:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["content", np.nan, "\t\n", " "])
+    >>> s = pd.Series(["Flame", np.nan, "on!", "\t\n", " "])
     >>> hero.drop_no_content(s)
-    0    content
+    0    Flame
+    2      on!
     dtype: object
-
     """
     return s[has_content(s)]
 
@@ -505,9 +503,9 @@ def remove_round_brackets(s: TextSeries) -> TextSeries:
 
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Texthero (is not a superhero!)")
+    >>> s = pd.Series("HULK (SMASH!)")
     >>> hero.remove_round_brackets(s)
-    0    Texthero 
+    0    HULK
     dtype: object
 
     See also
@@ -531,9 +529,9 @@ def remove_curly_brackets(s: TextSeries) -> TextSeries:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Texthero {is not a superhero!}")
+    >>> s = pd.Series("HULK  {SMASH!}")
     >>> hero.remove_curly_brackets(s)
-    0    Texthero 
+    0    HULK
     dtype: object
 
     See also
@@ -557,9 +555,9 @@ def remove_square_brackets(s: TextSeries) -> TextSeries:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Texthero [is not a superhero!]")
+    >>> s = pd.Series("HULK [SMASH!]")
     >>> hero.remove_square_brackets(s)
-    0    Texthero 
+    0    HULK
     dtype: object
 
     See also
@@ -584,9 +582,9 @@ def remove_angle_brackets(s: TextSeries) -> TextSeries:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Texthero <is not a superhero!>")
+    >>> s = pd.Series("HULK <SMASH!>")
     >>> hero.remove_angle_brackets(s)
-    0    Texthero 
+    0    HULK
     dtype: object
 
     See also
@@ -611,9 +609,9 @@ def remove_brackets(s: TextSeries) -> TextSeries:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Texthero (round) [square] [curly] [angle]")
+    >>> s = pd.Series("HULK (S) [M] (A) [S] (H)")
     >>> hero.remove_brackets(s)
-    0    Texthero    
+    0    HULK
     dtype: object
 
     See also
@@ -646,9 +644,9 @@ def remove_html_tags(s: TextSeries) -> TextSeries:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("<html><h1>Title</h1></html>")
+    >>> s = pd.Series("<html><h1>HULK</h1><h2>SMASH!</h2></html>")
     >>> hero.remove_html_tags(s)
-    0    Title
+    0    HULKSMASH!
     dtype: object
 
     """
@@ -676,11 +674,10 @@ def tokenize(s: TextSeries) -> TokenSeries:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Today you're looking great!"])
+    >>> s = pd.Series(["I am the LAW!"])
     >>> hero.tokenize(s)
-    0    [Today, you're, looking, great, !]
+    0    [I, am, the, LAW, !]
     dtype: object
-
     """
 
     punct = string.punctuation.replace("_", "")
@@ -716,24 +713,26 @@ def phrases(
     Parameters
     ----------
     s : :class:`texthero._types.TokenSeries`
-    
+
     min_count : int, optional, default=5
         Ignore tokens with frequency less than this.
-        
+
     threshold : int, optional, default=10
         Ignore tokens with a score under that threshold.
-        
+
     symbol : str, optional, default="_"
         Character used to join collocation words.
 
     Examples
     --------
     >>> import texthero as hero
-    >>> s = pd.Series([['New', 'York', 'is', 'a', 'beautiful', 'city'],
-    ...               ['Look', ':', 'New', 'York', '!']])
+    >>> s = pd.Series([['I', 'have', 'the', 'power', '!'],
+    ...               ['I', 'am', 'Groot', '!'],
+                      ['I', 'am', 'the', 'LAW', '.']])
     >>> hero.phrases(s, min_count=1, threshold=1)
-    0    [New_York, is, a, beautiful, city]
-    1                [Look, :, New_York, !]
+    0    [I, have, the, power, !]
+    1            [I_am, Groot, !]
+    2         [I_am, the, LAW, .]
     dtype: object
 
     Reference
@@ -741,7 +740,6 @@ def phrases(
     `Mikolov, et. al: "Distributed Representations of Words and Phrases and
     their Compositionality"
         <https://arxiv.org/abs/1310.4546>`_
-
     """
 
     if not isinstance(s.iloc[0], list):
@@ -772,15 +770,14 @@ def replace_urls(s: TextSeries, symbol: str) -> TextSeries:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Go to: https://example.com")
+    >>> s = pd.Series("Find me on https://www.marvel.com/")
     >>> hero.replace_urls(s, "<URL>")
-    0    Go to: <URL>
+    0    Find me on <URL>
     dtype: object
 
     See also
     --------
     :meth:`texthero.preprocessing.remove_urls`
-
     """
 
     pattern = r"http\S+"
@@ -798,15 +795,14 @@ def remove_urls(s: TextSeries) -> TextSeries:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Go to: https://example.com")
+    >>> s = pd.Series("Find me on https://www.marvel.com/")
     >>> hero.remove_urls(s)
-    0    Go to:  
+    0    Find me on
     dtype: object
 
     See also
     --------
     :meth:`texthero.preprocessing.replace_urls`
-
     """
 
     return replace_urls(s, " ")
@@ -817,7 +813,7 @@ def replace_tags(s: TextSeries, symbol: str) -> TextSeries:
     """Replace all tags from a given Pandas Series with symbol.
 
     A tag is a string formed by @ concatenated with a sequence of characters
-    and digits. Example: @texthero123.
+    and digits. Example: @spiderparker59.
 
     Parameters
     ----------
@@ -830,11 +826,10 @@ def replace_tags(s: TextSeries, symbol: str) -> TextSeries:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Hi @texthero123, we will replace you")
+    >>> s = pd.Series("Hi @spiderparker59, we will replace you")
     >>> hero.replace_tags(s, symbol='TAG')
     0    Hi TAG, we will replace you
     dtype: object
-
     """
 
     pattern = r"@[a-zA-Z0-9]+"
@@ -847,13 +842,13 @@ def remove_tags(s: TextSeries) -> TextSeries:
     """Remove all tags from a given Pandas Series.
 
     A tag is a string formed by @ concatenated with a sequence of characters
-    and digits. Example: @texthero123. Tags are replaceb by an empty space ` `.
+    and digits. Example: @spiderparker59. Tags are replaceb by an empty space ` `.
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Hi @tag, we will remove you")
+    >>> s = pd.Series("Hi @spiderparker59, we will remove you")
     >>> hero.remove_tags(s)
     0    Hi  , we will remove you
     dtype: object
@@ -863,6 +858,7 @@ def remove_tags(s: TextSeries) -> TextSeries:
     :meth:`texthero.preprocessing.replace_tags` for replacing a tag with a
         custom symbol.
     """
+
     return replace_tags(s, " ")
 
 
@@ -871,7 +867,7 @@ def replace_hashtags(s: TextSeries, symbol: str) -> TextSeries:
     """Replace all hashtags from a Pandas Series with symbol
 
     A hashtag is a string formed by # concatenated with a sequence of
-    characters, digits and underscores. Example: #texthero_123. 
+    characters, digits and underscores. Example: #spiderparker_59.
 
     Parameters
     ----------
@@ -879,17 +875,17 @@ def replace_hashtags(s: TextSeries, symbol: str) -> TextSeries:
 
     symbol : str
         Symbol to replace hashtags with.
-    
+
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Hi #texthero_123, we will replace you.")
+    >>> s = pd.Series("Hi #spiderparker_59, we will replace you.")
     >>> hero.replace_hashtags(s, symbol='HASHTAG')
     0    Hi HASHTAG, we will replace you.
     dtype: object
-
     """
+
     pattern = r"#[a-zA-Z0-9_]+"
     return s.str.replace(pattern, symbol)
 
@@ -899,13 +895,13 @@ def remove_hashtags(s: TextSeries) -> TextSeries:
     """Remove all hashtags from a given Pandas Series
 
     A hashtag is a string formed by # concatenated with a sequence of
-    characters, digits and underscores. Example: #texthero_123. 
+    characters, digits and underscores. Example: #spiderparker_59.
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Hi #texthero_123, we will remove you.")
+    >>> s = pd.Series("Hi #spiderparker_59, we will remove you.")
     >>> hero.remove_hashtags(s)
     0    Hi  , we will remove you.
     dtype: object
@@ -915,4 +911,5 @@ def remove_hashtags(s: TextSeries) -> TextSeries:
     :meth:`texthero.preprocessing.replace_hashtags` for replacing a hashtag
         with a custom symbol.
     """
+
     return replace_hashtags(s, " ")

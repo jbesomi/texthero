@@ -64,9 +64,9 @@ def scatterplot(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> df = pd.DataFrame(["spider, scorpion, bat",
-    ...                    "cape, costume, armor", "mask, eye-liner, earphones",
-    ...                    "cape, whip, ant"], columns=["texts"])
+    >>> df = pd.DataFrame(["Saber, Weapon, trident",
+    ...               "cape, costume, mask", "saber, power, weapon",
+    ...               "cape, power, trident"], columns=["texts"])
     >>> df["texts"] = hero.clean(df["texts"]).pipe(hero.tokenize)
     >>> df["pca"] = (
     ...             hero.tfidf(df["texts"])

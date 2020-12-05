@@ -277,17 +277,17 @@ def top_words(s: TextSeries, normalize=False) -> pd.Series:
     >>> import pandas as pd
     >>> import texthero as hero
     >>> s = pd.Series("I believe in second chances, I believe in redemption, but, mostly, I believe in my friends.")
-    >>> hero.top_words(s)
-    in            3
-    believe       3
+    >>> hero.top_words(s).sort_index() # sorted by index as the Series object does not have the same order on different machines
     I             3
+    believe       3
     but           1
+    chances       1
     friends       1
+    in            3
     mostly        1
     my            1
     redemption    1
     second        1
-    chances       1
     dtype: int64
     """
 

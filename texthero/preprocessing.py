@@ -36,13 +36,13 @@ def fillna(s: TextSeries, replace_string="") -> TextSeries:
     0       I'm
     1
     2
-    3    BATMAN!
+    3   BATMAN!
     dtype: object
     >>> hero.fillna(s, "Missing")
     0        I'm
     1    Missing
     2    Missing
-    3     BATMAN!
+    3    BATMAN!
     dtype: object
     """
 
@@ -165,7 +165,7 @@ def replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("I.am.Groot!")
     >>> hero.replace_punctuation(s, " <PUNCT> ")
-    0    I <PUNCT> am <PUNCT> Groot <PUNC>
+    0    I <PUNCT> am <PUNCT> Groot <PUNCT>
     dtype: object
     """
 
@@ -441,6 +441,7 @@ def clean(s: TextSeries, pipeline=None) -> TextSeries:
     >>> hero.clean(s)
     0    uper 9dig aou
     dtype: object
+
     """
 
     if not pipeline:
@@ -468,6 +469,7 @@ def has_content(s: TextSeries) -> TextSeries:
     3    False
     4    False
     dtype: bool
+
     """
     return (s.pipe(remove_whitespace) != "") & (~s.isna())
 
@@ -489,6 +491,7 @@ def drop_no_content(s: TextSeries) -> TextSeries:
     0    Flame
     2      on!
     dtype: object
+
     """
     return s[has_content(s)]
 
@@ -507,6 +510,7 @@ def remove_round_brackets(s: TextSeries) -> TextSeries:
     >>> hero.remove_round_brackets(s)
     0    HULK
     dtype: object
+
 
     See also
     --------
@@ -534,6 +538,7 @@ def remove_curly_brackets(s: TextSeries) -> TextSeries:
     0    HULK
     dtype: object
 
+
     See also
     --------
     :meth:`remove_brackets`
@@ -559,6 +564,7 @@ def remove_square_brackets(s: TextSeries) -> TextSeries:
     >>> hero.remove_square_brackets(s)
     0    HULK
     dtype: object
+
 
     See also
     --------
@@ -587,6 +593,7 @@ def remove_angle_brackets(s: TextSeries) -> TextSeries:
     0    HULK
     dtype: object
 
+
     See also
     --------
     :meth:`remove_brackets`
@@ -613,6 +620,7 @@ def remove_brackets(s: TextSeries) -> TextSeries:
     >>> hero.remove_brackets(s)
     0    HULK
     dtype: object
+
 
     See also
     --------

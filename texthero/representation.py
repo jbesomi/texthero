@@ -753,7 +753,7 @@ def dbscan(
     2    0
     3    2
     dtype: category
-    Categories (3, int64): [0, 1]
+    Categories (3, int64): [0, 1, 2]
     >>> # As we can see, the documents are correctly
     >>> # separated into topics / clusters by the algorithm
     >>> # and we didn't even have to say how many topics there are!

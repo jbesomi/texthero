@@ -34,8 +34,8 @@ def fillna(s: TextSeries, replace_string="") -> TextSeries:
     >>> s = pd.Series(["I'm", np.NaN, pd.NA, "BATMAN!"])
     >>> hero.fillna(s)
     0        I'm
-    1
-    2
+    1           
+    2           
     3    BATMAN!
     dtype: object
 

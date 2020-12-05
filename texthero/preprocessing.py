@@ -283,7 +283,7 @@ def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
     >>> symbol = "$"
     >>> stopwords = ["my"]
     >>> _replace_stopwords(s, stopwords, symbol)
-    'Oh $ God Batman'
+    'Oh $ God, Batman!'
 
     """
 
@@ -322,7 +322,7 @@ def replace_stopwords(
     >>> import pandas as pd
     >>> s = pd.Series("Oh my God, Batman!")
     >>> hero.replace_stopwords(s, "$")
-    0    Oh $ God Batman
+    0    'Oh $ God, Batman!'
     dtype: object
 
     """
@@ -360,7 +360,7 @@ def remove_stopwords(
     >>> import pandas as pd
     >>> s = pd.Series("I have the power!")
     >>> hero.remove_stopwords(s)
-    0    I   power
+    0    I   power!
     dtype: object
 
     Add custom words into the default list of stopwords:
@@ -372,7 +372,7 @@ def remove_stopwords(
     >>> custom_stopwords = default_stopwords.union(set(["power"]))
     >>> s = pd.Series("I have the power!")
     >>> hero.remove_stopwords(s, custom_stopwords)
-    0    I   
+    0    I   !
     dtype: object
 
 

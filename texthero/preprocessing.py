@@ -37,6 +37,7 @@ def fillna(s: TextSeries, replace_string="") -> TextSeries:
     1
     2
     3    BATMAN!
+    dtype: object
 
     dtype: object
     dtype: object
@@ -167,7 +168,7 @@ def replace_punctuation(s: TextSeries, symbol: str = " ") -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("I.am.Groot!")
     >>> hero.replace_punctuation(s, " <PUNCT> ")
-    0    I <PUNCT> am <PUNCT> Groot <PUNCT>
+    0    I <PUNCT> am <PUNCT> Groot <PUNCT> 
     dtype: object
     """
 
@@ -192,7 +193,7 @@ def remove_punctuation(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("I.am.Groot!")
     >>> hero.remove_punctuation(s)
-    0    I am Groot
+    0    I am Groot 
     dtype: object
     """
     return replace_punctuation(s, " ")
@@ -359,7 +360,7 @@ def remove_stopwords(
     >>> import pandas as pd
     >>> s = pd.Series("I have the power!")
     >>> hero.remove_stopwords(s)
-    0    I   power!
+    0    I   power
     dtype: object
 
     Add custom words into the default list of stopwords:
@@ -371,7 +372,7 @@ def remove_stopwords(
     >>> custom_stopwords = default_stopwords.union(set(["power"]))
     >>> s = pd.Series("I have the power!")
     >>> hero.remove_stopwords(s, custom_stopwords)
-    0    I   !
+    0    I   
     dtype: object
 
 
@@ -510,7 +511,7 @@ def remove_round_brackets(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("HULK (SMASH!)")
     >>> hero.remove_round_brackets(s)
-    0    HULK
+    0    HULK 
     dtype: object
 
 
@@ -537,7 +538,7 @@ def remove_curly_brackets(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("HULK  {SMASH!}")
     >>> hero.remove_curly_brackets(s)
-    0    HULK
+    0    HULK  
     dtype: object
 
 
@@ -564,7 +565,7 @@ def remove_square_brackets(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("HULK [SMASH!]")
     >>> hero.remove_square_brackets(s)
-    0    HULK
+    0    HULK 
     dtype: object
 
 
@@ -592,7 +593,7 @@ def remove_angle_brackets(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("HULK <SMASH!>")
     >>> hero.remove_angle_brackets(s)
-    0    HULK
+    0    HULK 
     dtype: object
 
 
@@ -620,7 +621,7 @@ def remove_brackets(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("HULK (S) [M] (A) [S] (H)")
     >>> hero.remove_brackets(s)
-    0    HULK
+    0    HULK     
     dtype: object
 
 
@@ -807,7 +808,7 @@ def remove_urls(s: TextSeries) -> TextSeries:
     >>> import pandas as pd
     >>> s = pd.Series("Find me on https://www.marvel.com/")
     >>> hero.remove_urls(s)
-    0    Find me on
+    0    Find me on  
     dtype: object
 
     See also

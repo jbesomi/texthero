@@ -283,7 +283,7 @@ def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
     >>> symbol = "$"
     >>> stopwords = ["my"]
     >>> _replace_stopwords(s, stopwords, symbol)
-    'Oh $ God, Batman!'
+    'Oh $ God Batman'
 
     """
 

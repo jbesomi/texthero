@@ -322,7 +322,7 @@ def replace_stopwords(
     >>> import pandas as pd
     >>> s = pd.Series("Oh my God, Batman!")
     >>> hero.replace_stopwords(s, "$")
-    0    'Oh $ God, Batman!'
+    0    Oh $ God, Batman!
     dtype: object
 
     """

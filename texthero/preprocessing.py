@@ -727,8 +727,8 @@ def phrases(
     --------
     >>> import texthero as hero
     >>> s = pd.Series([['I', 'have', 'the', 'power', '!'],
-    ...               ['I', 'am', 'Groot', '!'],
-                      ['I', 'am', 'the', 'LAW', '.']])
+    ...                ['I', 'am', 'Groot', '!'],
+    ...                ['I', 'am', 'the', 'LAW', '.']])
     >>> hero.phrases(s, min_count=1, threshold=1)
     0    [I, have, the, power, !]
     1            [I_am, Groot, !]

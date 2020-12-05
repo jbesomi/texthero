@@ -278,16 +278,16 @@ def top_words(s: TextSeries, normalize=False) -> pd.Series:
     >>> import texthero as hero
     >>> s = pd.Series("I believe in second chances, I believe in redemption, but, mostly, I believe in my friends.")
     >>> hero.top_words(s)
+    in            3
     believe       3
     I             3
-    in            3
-    chances       1
-    my            1
+    but           1
     friends       1
     mostly        1
+    my            1
     redemption    1
-    but           1
     second        1
+    chances       1
     dtype: int64
     """
 

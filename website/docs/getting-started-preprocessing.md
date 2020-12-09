@@ -1,123 +1,127 @@
 ---
 id: getting-started-preprocessing
+title: Getting started preprocessing
 ---
 
-## Getting started with <span style="color: #ff8c42">pre-processing</span>
+## Getting started with <span style="color: #ff8c42">preprocessing</span>
 
-Pre-processing is a fundamental step in text analysis. Consistent, methodical and reproducible pre-processing operations are a necessary pre-requisite for success of any type of text-based analysis.
-
+By now you should have a general overview of what Texthero is about, in the next sections we will dig a bit deeper into Texthero's core to appreciate its super powers when it comes to text data.
 
 ## Overview
 
-When we (as humans) read text from a book or a newspaper, the _input_ that our brain gets to understand that text is in the form of individual letters, that are then combined into words, sentences, paragraphs, etc.
-The problem with having a machine reading text is simple: the machine doesn't know how to read letters, words or paragraphs. The machine knows instead how to read _numerical vectors_. 
-Text data has good properties that allow its conversion into a numerical representation. There are several sophisticated methods to make this conversion but, in order to perform well, all of them require the input text in a form that is as clean and simple as possible, in other words **pre-processed**.
-Pre-processing text basically means eliminating any unnecessary information (e.g. the machine does not need to know about punctuation, page numbers or spacing between paragraphs) and solving as many ambiguities as possible (so that, for instance, the verb "run" and its forms "ran", "runs", "running" will all refer to the same concept).
+Preprocessing is the stepping stone to any text analytics project, as well as one of Texthero's pillars. 
 
-How useful is this step?
-Have you ever heard the story that Data Scientists typically spend ~80% of their time to obtain a proper dataset and the remaining ~20% to actually analyze it? Well, for text is kind of the same thing. Pre-processing is a **fundamental step** in text analysis and it usually takes some time to be properly and unambiguously implemented.
+The Texthero's `clean` pipeline provides a great starting point to quickly implement standard preprocessing steps. If your project requires specific preprocessing steps, Texthero offers a `tool` to quickly experiment and find the best preprocessing solution. 
 
-With text hero it only takes one command!
-To clean text data in a reliable way all we have to do is:
+##### Preprocessing API
 
+Check-out the complete [preprocessing API](/docs/api-preprocessing) for a detailed overview of Texthero's preprocessing functions. Texthero's approach to preprocessing is modular, allowing you maximum flexibility in customizing the preprocessing steps for your project.
+
+##### Doing it right
+
+There is no magic formula that fits all preprocessing needs. Texthero offers a modular and customizable approach ideal to preprocess data for bag-of-words models. 
+
+> What is Bag-of-Words?
+A bag-of-words model is a popular, simple and flexible way of extracting features from text for use in modeling, such as with machine learning algorithms. Feature extraction consists in converting text into numbers, specifically vectors of numbers, that a machine learning algorithm can read. A bag-of-words representation describe the occurrence of words within a document resorting on two elements:
+1. A vocabulary of known words
+2. A measure of presence of known words
+For example, given the following two text documents:
 ```python
-df['clean_text'] = hero.clean(df['text'])
+doc1 = "Hulk likes to eat avocados. Green Lantern likes avocados too."
+doc2 = "Green Lantern also likes bonfires."
 ```
-
-> NOTE. In this section we use the same [BBC Sport Dataset](http://mlg.ucd.ie/datasets/bbc.html) as in **Getting Started**. To load the `bbc sport` dataset in a Pandas DataFrame run:
+We can use bag-of-words representation to generate two dictionaries as follws:
 ```python
-df = pd.read_csv(
-   "https://github.com/jbesomi/texthero/raw/master/dataset/bbcsport.csv"
-)
+BoW1 = {"Hulk":1, "likes":2, "to":1, "eat":1, "avocados":2, "Green":1, "Lantern":1, "too":1}
+BoW2 = {"Green":1, "Lantern":1, "also":1, "likes":1, "bonfires":1}
 ```
+After transforming the text into a "bag of words", we can calculate various measures to characterize the text. The most common type of characteristics, or features, calculated from the bag-of-words model relates to term frequency, namely, the number of times a term appears in the text.
 
-## Key Functions
+Texthero is a powerful tool to prepare data for bag-of-words modeling. It enables:
+- Preliminary exploration of text data of any format and structure
+- Extraction of relevant and clean content for use in bag-of-words models
+- Flexibility in adapting to user-specific tasks and contexts
 
-### Clean
+### Text preprocessing, From zero to hero
 
-Texthero's clean method allows a rapid implementation of key cleaning steps that are:
+##### Standard pipeline
 
-- Derived from review of relevant academic literature (#include citations)
-- Validated by a group of NLP enthusiasts with applied experience in different contexts
-- Accepted by the NLP community as standard and inescapable
-
-The default steps do the following:
-
-| Step                 | Description                                            |
-|----------------------|--------------------------------------------------------|
-|`fillna()`            |Replace missing values with empty spaces                |
-|`lowercase()`         |Lowercase all text to make the analysis case-insensitive|
-|`remove_digits()`     |Remove numbers                                          |
-|`remove_punctuation()`|Remove punctuation symbols (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~) |
-|`remove_diacritics()` |Remove accents
-|`remove_stopwords()`  |Remove the most common words ("i", "me", "myself", "we", "our", etc.) |
-                   
-|`remove_whitespace()` |Remove spaces between words|
-
-
-
-in just one command!
+Let's see how Texthero can help with cleaning messy text data and get them ready for bag-of-words models.
 
 ```python
-df['clean_text'] = hero.clean(df['text'])
-```
-
-##### Custom Pipelines
-
-Sometimes, project specificities might require different approaches to pre-processing. For instance, you might decide that digits are important to your analyses if you are analyzing movies and one of them is "007-James Bond". Or, you might decide that in your specific setting stopwords contain relevant information (e.g. if your data is about music bands and contains "The Who" or "Take That").
-If this is the case, you can easily customize the pre-processing pipeline by implementing only specific cleaning steps:
-
-```python
-from texthero import preprocessing
-
-custom_pipeline = [preprocessing.fillna,
-                   preprocessing.lowercase,
-                   preprocessing.remove_punctuation
-                   preprocessing.remove_whitespace]
-df['clean_text'] = hero.clean(df['text'], custom_pipeline)
-```
-
-or alternatively
-
-```python
-df['clean_text'] = df['clean_text'].pipe(hero.clean, custom_pipeline)
-```
-
-In the above example we want to pre-process the text despite keeping accents, digits and stop words.
-
-### Tokenize
-
-Given a character sequence, tokenization is the task of chopping it up into pieces, called tokens. Here is an example of tokenization:
-
-Text: "Hulk is the greenest superhero!"
-Tokens: "hulk", "is", "the", "greenest", "superhero", "!"
-
-A token is a sequence of character grouped together as a useful semantic unit for processing. The major question of the tokenization step is how to make the split. In the example above it was quite straightforward: we chopped up the sentence on white spaces. But what would you do if the input text was:
-"Hulk isn't the greenest superhero, Green Lantern is!"
-
-Notice that the "isn't" contraction could lead to any of the following tokens:
-"isnt", "isn't", "is" + "n't", "isn" + "t"
-
-Tokenization issues are language specific and the process can involve ambiguity if tokens such as monetary amounts, numbers, hyphen-separated words or URLs are involved.
-
-Texthero takes care of making the best set of choices based on the most reasonable assumptions...in just one command!
-
-```python
+import texthero as hero
 import pandas as pd
-from texthero import tokenize
-
-s = pd.Series(["Hulk is the greenest superhero!"])
-tokenize(s)
+df = pd.DataFrame(
+    ["I have the power! $$ (wow!)",
+     "Flame on! <br>oh!</br>",
+     "HULK SMASH!"], columns=['text'])
+>>> df.head()
+                           text
+0  "I have the power! $$ (wow!)"  
+1       "Flame on! <br>oh!</br>"  
+2                  "HULK SMASH!"
 ```
 
-## Preprocessing API
+To implement Texthero's standard preprocessing pipeline, it only takes one command:
 
-Check-out the complete [preprocessing API](/docs/api-preprocessing) to discover how to customize the preprocessing steps according to your specific needs.
+```python
+hero.preprocessing.clean(df['text'])
+0         power wow
+1    flame br oh br
+2        hulk smash
+Name: text, dtype: object
+```
+
+Texthero's `clean` pipeline takes as input the dataframe column containing the text to preprocess (df['text']) and returns a clean text series. For maximum compatibility with bag-of-words models, the standard cleaning process prioritizes pure text content over other aspects, such as grammar or puntuation. The text is cleaned from what is considered uninformative content, e.g. punctuation signs ("!", "()", ".", etc.), tags ("<br>", "</br>", etc.) and stopwords ("the", "on", etc.).
+
+##### Custom pipeline
+
+Assume that our project requires to keep all punctuation marks. For instance, because instead of bag-of-words we want to use a more advanced and complex neural network transformer where punctuation matters. 
+We might still have specific preprocessing steps to implement. Such as the removal of all stand-alone content within round brackets.
+Let's see how Texthero can help in this case...
+
+The first step would be to search for the specific function that "removes content in parenthesis" in the [preprocessing API](/docs/api-preprocessing).
+Turns out that "remove_round_brackets" is the function we are looking for as  it "removes content within brackets and the brackets itself".
+We now need to create a custom preprocessing pipeline where the only implemented step is "remove_round_brackets". In order to do this, we resort on Pandas "pipe" function as follows:
+
+```python
+df['clean'] = (
+    df['text']
+    .pipe(hero.preprocessing.remove_round_brackets)
+)
+>>> df['clean'].head(2)
+0      I have the power! $$ 
+1    Flame on! <br>oh!</br>
+Name: clean, dtype: object
+```
+The part of text within brackets "(wow!)" has been succesfully removed!
 
 
+If our project required instead the removal of HTML tags only. We will proceed in a similar way:
+
+```python
+df['clean'] = (
+    df['text']
+    .pipe(hero.preprocessing.remove_html_tags)
+)
+>>> df['clean'].head(2)
+0    I have the power! $$ (wow!)
+1                  Flame on! oh!
+Name: clean, dtype: object
+```
+The HTML tags "<br>" and "</br>" have now been removed!
+
+
+If we were to apply both preprocessing steps above, the resulting custom pipeline will look like this:
+```python
+custom_pipeline = [hero.preprocessing.remove_round_brackets,
+                   hero.preprocessing.remove_html_tags]
+df['clean'] = hero.clean(df['text'], custom_pipeline)
+```
+
+##### Going further
 If you are interested in learning more about text cleaning or NLP in general, check out these resources:
 
 - Daniel Jurafsky and James H. Martin. 2008. Speech and Language Processing: An Introduction to Natural Language Processing, Speech Recognition, and Computational Linguistics. 2nd edition. Prentice-Hall.
 
 - Christopher D. Manning and Hinrich Schütze. 1999. Foundations of Statistical Natural Language Processing. Cambridge, MA: MIT Press.
-

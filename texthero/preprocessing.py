@@ -916,6 +916,16 @@ def describe(s: TextSeries, s_labels: pd.Series = None) -> pd.DataFrame:
     in every cell). Additionally gather information
     about class labels if they are given in s_labels.
 
+    In the output, all lengths are in number of characters.
+
+    Parameters
+    ----------
+    s : :class:`texthero._types.TextSeries`
+        The series with texts to describe.
+    
+    s_labels : pd.Series
+        Series with labels for s.
+
     Examples
     --------
     >>> import texthero as hero

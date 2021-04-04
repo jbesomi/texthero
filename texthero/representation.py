@@ -169,38 +169,26 @@ def term_frequency(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Sentence one hey", "Sentence two"]).pipe(hero.tokenize)
-    >>> hero.term_frequency(s) # doctest: +SKIP              
-            Sentence  hey  one  two
-    0            0.2  0.2  0.2  0.0
-    1            0.2  0.0  0.0  0.2
+    >>> s = pd.Series(["Text Text of doc one", "Text of of doc two", "Aha hi bnd one"]).pipe(hero.tokenize)
+    >>> hero.term_frequency(s)  # doctest: +SKIP
+    term_frequency                                      
+                Aha Text   bnd  doc    hi   of   one  two
+    0           0.00  0.4  0.00  0.2  0.00  0.2  0.20  0.0
+    1           0.00  0.2  0.00  0.2  0.00  0.4  0.00  0.2
+    2           0.25  0.0  0.25  0.0  0.25  0.0  0.25  0.0
 
     See Also
     --------
     TODO add tutorial link
     """
-    # Check if input is tokenized. Else, print warning and tokenize.
-    if not isinstance(s.iloc[0], list):
-        warnings.warn(_not_tokenized_warning_message, DeprecationWarning)
-        s = preprocessing.tokenize(s)
+    # Term frequency is just the word counts for each document
+    # with each document divided by the number of terms in the
+    # document. That's just l1 normalization!
+    s_term_frequency = s.pipe(
+        count, max_features=max_features, min_df=min_df, max_df=max_df
+    ).pipe(normalize, norm="l1")
 
-    tf = CountVectorizer(
-        max_features=max_features,
-        tokenizer=lambda x: x,
-        preprocessor=lambda x: x,
-        min_df=min_df,
-        max_df=max_df,
-    )
-
-    tf_vectors_csr = tf.fit_transform(s)
-    tf_vectors_coo = coo_matrix(tf_vectors_csr)
-
-    total_count_coo = np.sum(tf_vectors_coo)
-    frequency_coo = np.divide(tf_vectors_coo, total_count_coo)
-
-    return pd.DataFrame.sparse.from_spmatrix(
-        frequency_coo, s.index, tf.get_feature_names()
-    )
+    return s_term_frequency
 
 
 def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFrame:

@@ -10,9 +10,7 @@ import unicodedata
 
 import numpy as np
 import pandas as pd
-import unidecode
 
-from texthero import stopwords as _stopwords
 from texthero._types import TokenSeries, TextSeries, InputSeries
 from texthero import visualization
 
@@ -25,15 +23,15 @@ warnings.filterwarnings(action="ignore", category=UserWarning, module="gensim")
 
 
 @InputSeries(TextSeries)
-def fillna(s: TextSeries) -> TextSeries:
+def fillna(s: TextSeries, replace_string="") -> TextSeries:
     """
-    Replaces not assigned values with empty string.
-
+    Replaces not assigned values with empty or given string.
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
+    >>> import numpy as np
     >>> s = pd.Series(["I'm", np.NaN, pd.NA, "You're"])
     >>> hero.fillna(s)
     0       I'm
@@ -41,8 +39,15 @@ def fillna(s: TextSeries) -> TextSeries:
     2          
     3    You're
     dtype: object
+    >>> hero.fillna(s, "Missing")
+    0        I'm
+    1    Missing
+    2    Missing
+    3     You're
+    dtype: object
     """
-    return s.fillna("").astype("str")
+
+    return s.fillna(replace_string).astype("str")
 
 
 @InputSeries(TextSeries)
@@ -323,6 +328,8 @@ def replace_stopwords(
     """
 
     if stopwords is None:
+        from texthero import stopwords as _stopwords
+
         stopwords = _stopwords.DEFAULT
     return s.apply(_replace_stopwords, args=(stopwords, symbol))
 
@@ -382,15 +389,17 @@ def get_default_pipeline() -> List[Callable[[pd.Series], pd.Series]]:
      1. :meth:`texthero.preprocessing.fillna`
      2. :meth:`texthero.preprocessing.lowercase`
      3. :meth:`texthero.preprocessing.remove_digits`
-     4. :meth:`texthero.preprocessing.remove_punctuation`
-     5. :meth:`texthero.preprocessing.remove_diacritics`
-     6. :meth:`texthero.preprocessing.remove_stopwords`
-     7. :meth:`texthero.preprocessing.remove_whitespace`
+     4. :meth:`texthero.preprocessing.remove_html_tags`
+     5. :meth:`texthero.preprocessing.remove_punctuation`
+     6. :meth:`texthero.preprocessing.remove_diacritics`
+     7. :meth:`texthero.preprocessing.remove_stopwords`
+     8. :meth:`texthero.preprocessing.remove_whitespace`
     """
     return [
         fillna,
         lowercase,
         remove_digits,
+        remove_html_tags,
         remove_punctuation,
         remove_diacritics,
         remove_stopwords,
@@ -408,10 +417,11 @@ def clean(s: TextSeries, pipeline=None) -> TextSeries:
      1. :meth:`texthero.preprocessing.fillna`
      2. :meth:`texthero.preprocessing.lowercase`
      3. :meth:`texthero.preprocessing.remove_digits`
-     4. :meth:`texthero.preprocessing.remove_punctuation`
-     5. :meth:`texthero.preprocessing.remove_diacritics`
-     6. :meth:`texthero.preprocessing.remove_stopwords`
-     7. :meth:`texthero.preprocessing.remove_whitespace`
+     4. :meth:`texthero.preprocessing.remove_html_tags`
+     5. :meth:`texthero.preprocessing.remove_punctuation`
+     6. :meth:`texthero.preprocessing.remove_diacritics`
+     7. :meth:`texthero.preprocessing.remove_stopwords`
+     8. :meth:`texthero.preprocessing.remove_whitespace`
 
     Parameters
     ----------

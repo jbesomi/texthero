@@ -229,6 +229,7 @@ class AbstractRepresentationTest(PandasTestCase):
             rtol=0.1,
             atol=0.1,
             check_category_order=False,
+            check_categorical=False
         )
 
     @parameterized.expand(test_cases_dim_reduction_and_clustering)
@@ -255,6 +256,7 @@ class AbstractRepresentationTest(PandasTestCase):
             rtol=0.1,
             atol=0.1,
             check_category_order=False,
+            check_categorical=False
         )
 
     def test_normalize_DataFrame_also_as_output(self):

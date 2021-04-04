@@ -4,9 +4,17 @@ The texthero.nlp module supports common NLP tasks such as named_entities, noun_c
 
 import spacy
 import pandas as pd
-import en_core_web_sm
 from nltk.stem import PorterStemmer, SnowballStemmer
 from texthero._types import TextSeries, InputSeries
+
+try:
+    # If not present, download 'en_core_web_sm'
+    import en_core_web_sm
+except ModuleNotFoundError:
+    from spacy.cli.download import download as spacy_download
+
+    spacy_download("en_core_web_sm")
+    import en_core_web_sm
 
 
 @InputSeries(TextSeries)

@@ -222,6 +222,29 @@ class AbstractRepresentationTest(PandasTestCase):
         else:
             result_s = test_function(vector_s, random_state=42)
 
+        # Binary categories: also test if it equals with
+        # the category labels inverted (e.g. [0, 1, 0] instead
+        # of [1, 0, 1], which makes no difference functionally)
+        if pd.api.types.is_categorical_dtype(result_s):
+            if len(result_s.cat.categories) == 2 and all(
+                result_s.cat.categories == [0, 1]
+            ):
+                try:
+                    result_s_inverted = result_s.apply(lambda category: 1 - category)
+                    pd.testing.assert_series_equal(
+                        s_true,
+                        result_s_inverted,
+                        check_dtype=False,
+                        rtol=0.1,
+                        atol=0.1,
+                        check_category_order=False,
+                        check_categorical=False,
+                    )
+                    return
+                # inverted comparison fails -> continue to normal comparison
+                except AssertionError:
+                    pass
+
         pd.testing.assert_series_equal(
             s_true,
             result_s,
@@ -248,6 +271,29 @@ class AbstractRepresentationTest(PandasTestCase):
         else:
             result_s = test_function(df, random_state=42)
 
+        # Binary categories: also test if it equals with
+        # the category labels inverted (e.g. [0, 1, 0] instead
+        # of [1, 0, 1], which makes no difference functionally)
+        if pd.api.types.is_categorical_dtype(result_s):
+            if len(result_s.cat.categories) == 2 and all(
+                result_s.cat.categories == [0, 1]
+            ):
+                try:
+                    result_s_inverted = result_s.apply(lambda category: 1 - category)
+                    pd.testing.assert_series_equal(
+                        s_true,
+                        result_s_inverted,
+                        check_dtype=False,
+                        rtol=0.1,
+                        atol=0.1,
+                        check_category_order=False,
+                        check_categorical=False,
+                    )
+                    return
+                # inverted comparison fails -> continue to normal comparison
+                except AssertionError:
+                    pass
+
         pd.testing.assert_series_equal(
             s_true,
             result_s,
@@ -255,6 +301,7 @@ class AbstractRepresentationTest(PandasTestCase):
             rtol=0.1,
             atol=0.1,
             check_category_order=False,
+            check_categorical=False,
         )
 
     def test_normalize_DataFrame_also_as_output(self):

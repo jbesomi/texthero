@@ -632,7 +632,7 @@ def kmeans(
     >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(
     ...                                         hero.term_frequency
     ...                                             )
-    >>> hero.kmeans(s, n_clusters=2, random_state=42)
+    >>> hero.kmeans(s, n_clusters=2, random_state=42) # doctest: +SKIP
     0    1
     1    0
     2    1

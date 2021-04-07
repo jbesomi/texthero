@@ -70,7 +70,7 @@ The Hero Series classes.
 # This class is mainly for documentation in the docstring.
 
 
-class HeroTypes(pd.Series, pd.DataFrame):
+class HeroTypes:
     """
     Hero Series Types
     =================

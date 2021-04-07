@@ -226,7 +226,9 @@ class AbstractRepresentationTest(PandasTestCase):
         # the category labels inverted (e.g. [0, 1, 0] instead
         # of [1, 0, 1], which makes no difference functionally)
         if pd.api.types.is_categorical_dtype(result_s):
-            if all(result_s.cat.categories == [0, 1]):
+            if len(result_s.cat.categories) == 2 and all(
+                result_s.cat.categories == [0, 1]
+            ):
                 try:
                     result_s_inverted = result_s.apply(lambda category: 1 - category)
                     pd.testing.assert_series_equal(
@@ -273,7 +275,9 @@ class AbstractRepresentationTest(PandasTestCase):
         # the category labels inverted (e.g. [0, 1, 0] instead
         # of [1, 0, 1], which makes no difference functionally)
         if pd.api.types.is_categorical_dtype(result_s):
-            if all(result_s.cat.categories == [0, 1]):
+            if len(result_s.cat.categories) == 2 and all(
+                result_s.cat.categories == [0, 1]
+            ):
                 try:
                     result_s_inverted = result_s.apply(lambda category: 1 - category)
                     pd.testing.assert_series_equal(

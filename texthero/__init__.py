@@ -16,3 +16,6 @@ from . import nlp
 from .nlp import *
 
 from . import stopwords
+
+from . import visualization_server
+from .visualization_server import *

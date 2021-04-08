@@ -55,10 +55,11 @@ def named_entities(s: TextSeries, package="spacy") -> pd.Series:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Yesterday I was in NY with Bill de Blasio")
+    >>> s = pd.Series("Yesterday, Spider-Man met Daredevil in Queens, New-York.")
     >>> hero.named_entities(s)[0] # doctest: +NORMALIZE_WHITESPACE
-    [('Yesterday', 'DATE', 0, 9), ('NY', 'GPE', 19, 21),
-     ('Bill de Blasio', 'PERSON', 27, 41)]
+    [('Yesterday', 'DATE', 0, 9), ('Spider-Man', 'PERSON', 11, 21),
+     ('Daredevil', 'GPE', 26, 35), ('Queens', 'GPE', 39, 45),
+     ('New-York', 'GPE', 47, 55)]
     """
     entities = []
 
@@ -93,9 +94,9 @@ def noun_chunks(s: TextSeries) -> pd.Series:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("The spotted puppy is sleeping.")
+    >>> s = pd.Series("A little spider just bite me!")
     >>> hero.noun_chunks(s)
-    0    [(The spotted puppy, NP, 0, 17)]
+    0    [(A little spider, NP, 0, 15), (me, NP, 26, 28)]
     dtype: object
     """
 
@@ -130,8 +131,8 @@ def count_sentences(s: TextSeries) -> pd.Series:
     >>> import texthero as hero
     >>> import pandas as pd
     >>> s = pd.Series(
-    ...     ["Yesterday I was in NY with Bill de Blasio. Great story...",
-    ...      "This is the F.B.I.! What? Open up!"])
+    ...     ["Yesterday, Spider-Man met Daredevil in Queens, New-York. Great story...",
+    ...      "This is the S.H.I.E.L.D! What? Open up!"])
     >>> hero.count_sentences(s)
     0    2
     1    3
@@ -166,7 +167,7 @@ def pos_tag(s: TextSeries) -> pd.Series:
     coarse-grained POS has a NOUN value, then the refined POS will give more
     details about the type of the noun, whether it is singular, plural and/or
     proper.
-    
+
     You can use the spacy `explain` function to find out which fine-grained
     POS it is.
 
@@ -204,11 +205,11 @@ def pos_tag(s: TextSeries) -> pd.Series:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("Today is such a beautiful day")
+    >>> s = pd.Series("Today is such a marvelous day")
     >>> print(hero.pos_tag(s)[0]) # doctest: +NORMALIZE_WHITESPACE
-    [('Today', 'NOUN', 'NN', 0, 5), ('is', 'AUX', 'VBZ', 6, 8), ('such', 'DET',
-     'PDT', 9, 13), ('a', 'DET', 'DT', 14, 15), ('beautiful', 'ADJ', 'JJ', 16,
-     25), ('day', 'NOUN', 'NN', 26, 29)]
+    [('Today', 'NOUN', 'NN', 0, 5), ('is', 'AUX', 'VBZ', 6, 8),
+     ('such', 'DET', 'PDT', 9, 13), ('a', 'DET', 'DT', 14, 15),
+     ('marvelous', 'ADJ', 'JJ', 16, 25), ('day', 'NOUN', 'NN', 26, 29)]
     """
 
     pos_tags = []
@@ -264,9 +265,9 @@ def stem(s: TextSeries, stem="snowball", language="english") -> TextSeries:
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series("I used to go \t\n running.")
+    >>> s = pd.Series("I used to go \t\n flying.")
     >>> hero.stem(s)
-    0    i use to go running.
+    0    i use to go flying.
     dtype: object
     """
 

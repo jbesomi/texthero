@@ -1,5 +1,5 @@
 """
-Map words into vectors using different algorithms such as 
+Map words into vectors using different algorithms such as
 TF-IDF, word2vec or GloVe.
 """
 
@@ -60,7 +60,7 @@ def count(
     """
     Represent a text-based Pandas Series using count.
 
-    Rows of the returned DataFrame represent documents whereas 
+    Rows of the returned DataFrame represent documents whereas
     columns are terms. The value in the cell document-term is
     the number of the term in this document. The output is sparse.
     TODO add tutorial link
@@ -78,7 +78,7 @@ def count(
 
     min_df : float in range [0.0, 1.0] or int, optional, default=1
         When building the vocabulary ignore terms that have a document
-        frequency (number of documents they appear in) strictly 
+        frequency (number of documents they appear in) strictly
         lower than the given threshold.
         If float, the parameter represents a proportion of documents,
         integer absolute counts.
@@ -96,12 +96,12 @@ def count(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Sentence one", "Sentence two"]).pipe(hero.tokenize)
+    >>> s = pd.Series(["Batman is not evil", "Joker is evil"]).pipe(hero.tokenize)
     >>> hero.count(s) # doctest: +SKIP
-       Sentence  one  two
-    0         1    1    0
-    1         1    0    1
-   
+        Batman  Joker  evil  is  not
+     0       1      0     1   1    1
+     1       0      1     1   1    0
+
     See Also
     --------
 
@@ -154,7 +154,7 @@ def term_frequency(
 
     min_df : float in range [0.0, 1.0] or int, optional, default=1
         When building the vocabulary ignore terms that have a document
-        frequency (number of documents they appear in) strictly 
+        frequency (number of documents they appear in) strictly
         lower than the given threshold.
         If float, the parameter represents a proportion of documents,
         integer absolute counts.
@@ -169,13 +169,13 @@ def term_frequency(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Text Text of doc one", "Text of of doc two", "Aha hi bnd one"]).pipe(hero.tokenize)
+    >>> s = pd.Series(["Batman is not evil", "Joker is evil", "Bane is evil too"]).pipe(hero.tokenize)
     >>> hero.term_frequency(s)  # doctest: +SKIP
-    term_frequency                                      
-                Aha Text   bnd  doc    hi   of   one  two
-    0           0.00  0.4  0.00  0.2  0.00  0.2  0.20  0.0
-    1           0.00  0.2  0.00  0.2  0.00  0.4  0.00  0.2
-    2           0.25  0.0  0.25  0.0  0.25  0.0  0.25  0.0
+    term_frequency
+            Bane  Batman     Joker      evil        is   not   too
+         0  0.00    0.25  0.000000  0.250000  0.250000  0.25  0.00
+         1  0.00    0.00  0.333333  0.333333  0.333333  0.00  0.00
+         2  0.25    0.00  0.000000  0.250000  0.250000  0.00  0.25
 
     See Also
     --------
@@ -217,8 +217,8 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFram
 
     Different from the `sklearn-implementation of tfidf
     <https://scikit-learn.org/stable/modules/generated/sklearn.feature_
-    extraction.text.TfidfVectorizer.html>`, this function does *not* 
-    normalize the output in any way, so the result is exactly what you 
+    extraction.text.TfidfVectorizer.html>`, this function does *not*
+    normalize the output in any way, so the result is exactly what you
     get applying the formula described above.
 
     The input Series should already be tokenized. If not, it will
@@ -233,15 +233,15 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFram
 
     min_df : float in range [0.0, 1.0] or int, optional, default=1
         When building the vocabulary ignore terms that have a document
-        frequency (number of documents they appear in) strictly 
+        frequency (number of documents they appear in) strictly
         lower than the given threshold.
-        If float, the parameter represents a proportion of documents, 
+        If float, the parameter represents a proportion of documents,
         integer absolute counts.
 
     max_df : float in range [0.0, 1.0] or int, default=1.0
         Ignore terms that have a document frequency (number of documents they
         appear in) frequency strictly higher than the given threshold.
-        This arguments basically permits to remove corpus-specific stop 
+        This arguments basically permits to remove corpus-specific stop
         words. If float, the parameter represents a proportion of documents,
         integer absolute counts.
 
@@ -249,11 +249,11 @@ def tfidf(s: pd.Series, max_features=None, min_df=1, max_df=1.0,) -> pd.DataFram
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Hi Bye", "Test Bye Bye"]).pipe(hero.tokenize)
-    >>> hero.tfidf(s) # doctest: +SKIP                    
-        Bye        Hi      Test
-    0   1.0  1.405465  0.000000
-    1   2.0  0.000000  1.405465
+    >>> s = pd.Series(["I am the LAW", "I am Groot"]).pipe(hero.tokenize)
+    >>> hero.tfidf(s) # doctest: +SKIP
+          Groot    I       LAW   am       the
+    0  0.000000  1.0  1.405465  1.0  1.405465
+    1  1.405465  1.0  0.000000  1.0  0.000000
 
     See Also
     --------
@@ -296,18 +296,18 @@ def pca(
     Perform principal component analysis on the given input.
 
     Principal Component Analysis (PCA) is a statistical method that is
-    used to reveal where the variance in a dataset comes from. For 
-    textual data, one could for example first represent a Series of 
+    used to reveal where the variance in a dataset comes from. For
+    textual data, one could for example first represent a Series of
     documents using :meth:`texthero.representation.tfidf` to get a vector
-    representation of each document. Then, PCA can generate new vectors 
+    representation of each document. Then, PCA can generate new vectors
     from the tfidf representation that showcase the differences among
     the documents most strongly in fewer dimensions.
 
     For example, the tfidf vectors will have length 100 if hero.tfidf was
-    called on a large corpus with max_features=100. Visualizing 100 
+    called on a large corpus with max_features=100. Visualizing 100
     dimensions is hard! Using PCA with n_components=3, every document will
     now get a vector of length 3, and the vectors will be chosen so that
-    the document differences are easily visible. The corpus can now be 
+    the document differences are easily visible. The corpus can now be
     visualized in 3D and we can get a good first view of the data!
 
     In general, *pca* should be called after the text has already been
@@ -340,20 +340,20 @@ def pca(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Football is great",
-    ...                "Hi, I'm Texthero, who are you? Tell me!"])
+    >>> s = pd.Series(["Where is my cape?!",
+    ...                "Hi, I'm Marie-Jane, you're new neighbour!"])
     >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
     >>> # Attention, your results might differ due to
     >>> # the randomness in PCA!
     >>> hero.pca(s) # doctest: +SKIP
     document
-    0     [1.5713577608669735, 1.1102230246251565e-16]
-    1    [-1.5713577608669729, 1.1102230246251568e-16]
+    0    [-1.7213361830752993, 2.482534153247273e-16]
+    1    [1.7213361830752996, 2.4825341532472726e-16]
     dtype: object
 
     See also
     --------
-    `PCA on Wikipedia 
+    `PCA on Wikipedia
     <https://en.wikipedia.org/wiki/Principal_component_analysis>`_
 
     """
@@ -378,12 +378,12 @@ def nmf(
     natural language processing to find clusters of similar
     texts (e.g. some texts in a corpus might be about sports
     and some about music, so they will differ in the usage
-    of technical terms; see the example below). 
+    of technical terms; see the example below).
 
     Given a document-term matrix (so in
     texthero usually a Series after applying
-    :meth:`texthero.representation.tfidf` or some other first 
-    representation function that assigns a scalar (a weight) to each 
+    :meth:`texthero.representation.tfidf` or some other first
+    representation function that assigns a scalar (a weight) to each
     word), NMF will find n_components many topics (clusters) and
     calculate a vector for each document that places it correctly among
     the topics.
@@ -404,27 +404,27 @@ def nmf(
 
     Returns
     -------
-    Pandas Series with the vector calculated by NMF for the document in 
+    Pandas Series with the vector calculated by NMF for the document in
     every cell.
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Football, Sports, Soccer", 
-    ...               "Music, Violin, Orchestra", "Football, Music"])
+    >>> s = pd.Series(["Saber, Weapon, trident",
+    ...               "Cape, Costume, Mask", "Saber, Cape"])
     >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(
     ...                                         hero.term_frequency
     ...                                                 )
     >>> hero.nmf(s) # doctest: +SKIP
-    0                    [0.9080190347553924, 0.0]
-    1                     [0.0, 0.771931061231598]
-    2    [0.3725409073202516, 0.31656880119331093]
+    0                   [0.27766260921934044, 0.0]
+    1                   [0.0, 0.44747079529871103]
+    2    [0.10074274753704408, 0.5022865803893911]
     dtype: object
     >>> # As we can see, the third document, which
     >>> # is a mix of sports and music, is placed
     >>> # between the two axes (the topics) while
-    >>> # the other documents are placed right on 
+    >>> # the other documents are placed right on
     >>> # one topic axis each.
 
     See also
@@ -464,7 +464,7 @@ def tsne(
     t-distributed Stochastic Neighbor Embedding (t-SNE) is
     a machine learning algorithm used to visualize high-dimensional data
     in fewer dimensions. In natural language processing, the
-    high-dimensional data is usually a document-term matrix (so in 
+    high-dimensional data is usually a document-term matrix (so in
     texthero usually a Series after applying
     :meth:`texthero.representation.tfidf` or some other first
     representation function that assigns a scalar (a weight) to each word)
@@ -520,13 +520,13 @@ def tsne(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Football, Sports, Soccer",
-    ...              "Music, Violin, Orchestra",  "Football, Music"])
+    >>> s = pd.Series(["Saber, Weapon, trident",
+    ...               "Cape, Costume, Mask", "Saber, Cape"])
     >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.term_frequency)
     >>> hero.tsne(s, random_state=42) # doctest: +SKIP
-    0      [-18.833383560180664, -276.800537109375]
-    1     [-210.60179138183594, 143.00535583496094]
-    2    [-478.27984619140625, -232.97410583496094]
+    0    [-18.833384, -276.80054]
+    1     [-210.60179, 143.00536]
+    2     [-478.27985, -232.9741]
     dtype: object
 
     See also
@@ -575,17 +575,17 @@ def kmeans(
     Performs K-means clustering algorithm on the given input.
 
     K-means clustering is used in natural language processing
-    to separate texts into k clusters (groups) 
+    to separate texts into k clusters (groups)
     (e.g. some texts in a corpus might be about sports
     and some about music, so they will differ in the usage
     of technical terms; the K-means algorithm uses this
-    to separate them into two clusters). 
+    to separate them into two clusters).
 
     Given a document-term matrix (so in
     texthero usually a Series after applying
-    :meth:`texthero.representation.tfidf` or some other first 
+    :meth:`texthero.representation.tfidf` or some other first
     representation function that assigns a scalar (a weight) to each
-    word), K-means will find k topics (clusters) and assign a topic to 
+    word), K-means will find k topics (clusters) and assign a topic to
     each document.
 
     Kmeans can directly handle sparse input, so when calling kmeans on a
@@ -619,16 +619,16 @@ def kmeans(
 
     Returns
     -------
-    Pandas Series with the cluster the document was assigned to in each 
+    Pandas Series with the cluster the document was assigned to in each
     cell.
 
     Examples
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Football, Sports, Soccer", 
-    ...                 "music, violin, orchestra",
-    ...                "football, fun, sports", "music, fun, guitar"])
+    >>> s = pd.Series(["Saber, Weapon, trident",
+    ...               "cape, costume, mask",
+    ...               "saber, power, weapon", "cape, power, trident"])
     >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(
     ...                                         hero.term_frequency
     ...                                             )
@@ -644,7 +644,7 @@ def kmeans(
 
     See also
     --------
-    `kmeans on Wikipedia 
+    `kmeans on Wikipedia
     <https://en.wikipedia.org/wiki/K-means_clustering>`_
 
     """
@@ -693,8 +693,8 @@ def dbscan(
     Given a document-term matrix (so in
     texthero usually a Series after applying
     :meth:`texthero.representation.tfidf` or some other first
-    representation function that assigns a scalar (a weight) to each 
-    word), DBSCAN will find topics (clusters) and assign a topic to 
+    representation function that assigns a scalar (a weight) to each
+    word), DBSCAN will find topics (clusters) and assign a topic to
     each document.
 
     DBSCAN can directly handle sparse input, so when calling dbscan on a
@@ -708,7 +708,7 @@ def dbscan(
         The maximum distance between two samples for one to be considered
         as in the neighborhood of the other. This is not a maximum bound
         on the distances of points within a cluster. This is the most
-        important DBSCAN parameter to choose appropriately for your data 
+        important DBSCAN parameter to choose appropriately for your data
         set and distance function.
 
     min_samples : int, optional, default=5
@@ -717,7 +717,7 @@ def dbscan(
 
     metric : string or callable, optional, default='euclidean'
         The metric to use when calculating distance between instances in a
-        feature array. Use 
+        feature array. Use
         `sorted(sklearn.neighbors.VALID_METRICS['brute'])`
         to see valid options.
 
@@ -743,17 +743,17 @@ def dbscan(
     --------
     >>> import texthero as hero
     >>> import pandas as pd
-    >>> s = pd.Series(["Football, Sports, Soccer", 
-    ...                "music, violin, orchestra", 
-    ...                "football, fun, sports", "music, enjoy, guitar"])
+    >>> s = pd.Series(["Saber, Weapon, trident",
+    ...               "cape, costume, mask",
+    ...               "saber, power, weapon", "cape, power, trident"])
     >>> s = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
-    >>> hero.dbscan(s, min_samples=1, eps=4)
+    >>> hero.dbscan(s, min_samples=1, eps=3)
     0    0
     1    1
     2    0
-    3    1
+    3    2
     dtype: category
-    Categories (2, int64): [0, 1]
+    Categories (3, int64): [0, 1, 2]
     >>> # As we can see, the documents are correctly
     >>> # separated into topics / clusters by the algorithm
     >>> # and we didn't even have to say how many topics there are!
@@ -825,14 +825,14 @@ def meanshift(
 
         If not given, the bandwidth is estimated.
         Estimating takes time at least quadratic in the number of samples
-        (i.e. documents). For large datasets, it’s wise to set the 
+        (i.e. documents). For large datasets, it’s wise to set the
         bandwidth to a small value.
 
     bin_seeding : bool, optional, default=False
         If true, initial kernel locations are not locations of all
         points, but rather the location of the discretized version of
         points, where points are binned onto a grid whose coarseness
-        corresponds to the bandwidth. Setting this option to True will 
+        corresponds to the bandwidth. Setting this option to True will
         speed up the algorithm because fewer seeds will be initialized.
 
     min_bin_freq : int, optional, default=1
@@ -927,9 +927,9 @@ def normalize(input_matrix: Union[pd.DataFrame, pd.Series], norm="l2") -> pd.Ser
     >>> import texthero as hero
     >>> import pandas as pd
     >>> col = ["a","b","c", "d"]
-    >>> s = pd.DataFrame([[1, 2, 3, 4],[4, 2, 7, 5],[2, 2, 3, 5],[1, 2, 9, 8]], 
+    >>> s = pd.DataFrame([[1, 2, 3, 4],[4, 2, 7, 5],[2, 2, 3, 5],[1, 2, 9, 8]],
     ...                   columns=col).astype("Sparse")
-    >>> hero.normalize(s, norm="max") # doctest: +SKIP      
+    >>> hero.normalize(s, norm="max") # doctest: +SKIP
               a         b     c         d
     0  0.250000  0.500000  0.75  1.000000
     1  0.571429  0.285714  1.00  0.714286

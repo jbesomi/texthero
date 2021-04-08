@@ -8,14 +8,20 @@ import plotly.express as px
 
 from wordcloud import WordCloud
 
-from texthero import preprocessing
+from texthero import preprocessing, representation
 from texthero._types import TextSeries, InputSeries
 import string
 
 from matplotlib.colors import LinearSegmentedColormap as lsg
 import matplotlib.pyplot as plt
 
+from scipy.sparse import csr_matrix, issparse
+from sklearn.preprocessing import normalize as sklearn_normalize
+
+import pyLDAvis
+
 from collections import Counter
+from typing import Tuple
 
 
 def scatterplot(
@@ -267,7 +273,7 @@ def top_words(s: TextSeries, normalize=False) -> pd.Series:
     Tokenization: split by space and remove all punctuations that are not
     between characters.
 
-    Parameters
+    Parameters 
     ----------
     normalize : bool, optional, default=False.
         When set to true, return normalized values.
@@ -304,3 +310,150 @@ def top_words(s: TextSeries, normalize=False) -> pd.Series:
         .explode()  # one word for each line
         .value_counts(normalize=normalize)
     )
+
+
+def visualize_topics(
+    s_document_term: pd.DataFrame,
+    s_document_topic: pd.Series,
+    notebook=True,
+    return_figure=False,
+):
+    """
+    Combine several Texthero functions to get a
+    `pyLDAvis <https://github.com/bmabey/pyLDAvis>`_  visualization
+    straight from document_term_matrix and document_topic_matrix.
+
+    Using this function is equivalent to doing the following:
+    ```python
+
+    >>> import pyLDAvis  # doctest: +SKIP
+    >>> s_document_topic, s_topic_term = hero.topic_matrices(s_document_term, s_document_topic) # doctest: +SKIP
+    >>> s_document_topic_distribution = hero.normalize(s_document_topic, norm="l1") # doctest: +SKIP
+    >>> s_topic_term_distribution = hero.normalize(s_topic_term, norm="l1") # doctest: +SKIP
+    >>> figure = hero.relevant_words_per_topic(s_document_term, s_document_topic_distribution, s_topic_term_distribution, return_figure=True) # doctest: +SKIP
+    >>> # in a Jupyter Notebook
+    >>> pyLDAvis.display(figure) # doctest: +SKIP
+    >>> # otherwise
+    >>> pyLDAvis.show(figure) # doctest: +SKIP
+    ```
+
+    First input has
+    to be output of one of 
+    - :meth:`texthero.representation.tfidf`
+    - :meth:`texthero.representation.count`
+    - :meth:`texthero.representation.term_frequency`.
+
+    Second input can either be the result of
+    clustering, so output of one of
+    - :meth:`texthero.representation.kmeans`
+    - :meth:`texthero.representation.meanshift`
+    - :meth:`texthero.representation.dbscan`
+
+    or the result of :meth:`texthero.representation.lda`.
+
+    The function uses the given clustering
+    or topic modelling from the second input, which relates
+    documents to topics. The first input
+    relates documents to terms. From those
+    two relations (documents->topics, documents->terms),
+    the function calculates a distribution of
+    documents to topics, and a distribution
+    of topics to terms, using :meth:`hero.topic_matrices`_
+    and :meth:`hero.representation.normalize`_.
+
+    These distributions are passed to
+    :meth:`hero.relevant_words_per_topic`_, which
+    uses `pyLDAvis <https://pyldavis.readthedocs.io/en/latest/>`_
+    to visualize the topics and terms.
+
+    Parameters
+    ----------
+    s_document_term : pd.DataFrame
+        Output of one of
+        :meth:`texthero.representation.tfidf`,
+        :meth:`texthero.representation.count`,
+        :meth:`texthero.representation.term_frequency`.
+
+    s_document_topic : pd.Series
+        Output of one of
+        :meth:`texthero.representation.kmeans`,
+        :meth:`texthero.representation.dbscan`,
+        :meth:`texthero.representation.meanshift`,
+        :meth:`texthero.representation.lda`.
+
+    notebook : bool, default True
+        Whether to show the visualization inside
+        a Jupyter Notebook or open a new browser tab.
+        Set this to False when not inside a Jupyter Notebook.
+    return_figure : bool, default False
+        Whether to only return the figure instead
+        of showing it.
+
+    Examples
+    --------
+    Using Clustering:
+
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, band, guitar"])
+    >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
+    >>> s_cluster = s_tfidf.pipe(hero.normalize).pipe(hero.pca, n_components=2).pipe(hero.kmeans, n_clusters=2)
+    >>> # Display in a new browser window:
+    >>> hero.visualize_topics(s_tfidf, s_cluster, notebook=False) # doctest: +SKIP
+    >>> # Display inside the current Jupyter Notebook:
+    >>> hero.visualize_topics(s_tfidf, s_cluster, notebook=True) # doctest: +SKIP
+
+    Using LDA:
+
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> s = pd.Series(["Football, Sports, Soccer", "music, violin, orchestra", "football, fun, sports", "music, band, guitar"])
+    >>> s_tfidf = s.pipe(hero.clean).pipe(hero.tokenize).pipe(hero.tfidf)
+    >>> s_lda = s_tfidf.pipe(hero.lda, n_components=2)
+    >>> # Display in a new browser window:
+    >>> hero.visualize_topics(s_tfidf, s_cluster, notebook=False) # doctest: +SKIP
+    >>> # Display inside the current Jupyter Notebook:
+    >>> hero.visualize_topics(s_tfidf, s_cluster, notebook=True) # doctest: +SKIP
+
+    See Also
+    --------
+    `pyLDAvis <https://pyldavis.readthedocs.io/en/latest/>`_
+    for the methodology on how to find relevant terms.
+
+    :meth:`texthero.representation.topic_matrices`_
+
+    :meth:`texthero.representation.relevant_words_per_topic`_
+
+    TODO add tutorial link
+
+    """
+    # Get topic matrices.
+    s_document_topic, s_topic_term = representation.topic_matrices(
+        s_document_term, s_document_topic
+    )
+
+    # Get topic distributions through normalization.
+    s_document_topic_distribution = representation.normalize(
+        s_document_topic, norm="l1"
+    )
+    s_topic_term_distribution = representation.normalize(s_topic_term, norm="l1")
+
+    # Get the pyLDAvis figure.
+    figure = representation.relevant_words_per_topic(
+        s_document_term,
+        s_document_topic_distribution,
+        s_topic_term_distribution,
+        return_figure=True,
+    )
+
+    if return_figure:
+        return figure
+
+    # Visualize it.
+    if notebook:
+        # Import here as non-notebook users don't have this.
+        import IPython
+
+        return IPython.display.display(pyLDAvis.display(figure))
+    else:
+        pyLDAvis.show(figure)

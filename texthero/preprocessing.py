@@ -11,10 +11,7 @@ import pandas as pd
 import unidecode
 from nltk.stem import PorterStemmer, SnowballStemmer
 
-from texthero import stopwords as _stopwords
-
 from typing import List, Callable
-
 
 # Ignore gensim annoying warnings
 import warnings
@@ -69,9 +66,9 @@ def replace_digits(input: pd.Series, symbols: str = " ", only_blocks=True) -> pd
 
     if only_blocks:
         pattern = r"\b\d+\b"
-        return input.str.replace(pattern, symbols)
+        return input.str.replace(pattern, symbols, regex=True)
     else:
-        return input.str.replace(r"\d+", symbols)
+        return input.str.replace(r"\d+", symbols, regex=True)
 
 
 def remove_digits(input: pd.Series, only_blocks=True) -> pd.Series:
@@ -128,7 +125,7 @@ def replace_punctuation(input: pd.Series, symbol: str = " ") -> pd.Series:
     dtype: object
     """
 
-    return input.str.replace(rf"([{string.punctuation}])+", symbol)
+    return input.str.replace(rf"([{string.punctuation}])+", symbol, regex=True)
 
 
 def remove_punctuation(input: pd.Series) -> pd.Series:
@@ -187,7 +184,7 @@ def remove_whitespace(input: pd.Series) -> pd.Series:
     dtype: object
     """
 
-    return input.str.replace("\xa0", " ").str.split().str.join(" ")
+    return input.str.replace("\xa0", " ", regex=False).str.split().str.join(" ")
 
 
 def _replace_stopwords(text: str, words: Set[str], symbol: str = " ") -> str:
@@ -249,6 +246,8 @@ def replace_stopwords(
     """
 
     if stopwords is None:
+        from texthero import stopwords as _stopwords
+
         stopwords = _stopwords.DEFAULT
     return input.apply(_replace_stopwords, args=(stopwords, symbol))
 
@@ -444,7 +443,7 @@ def remove_round_brackets(s: pd.Series):
     :meth:`remove_square_brackets`
 
     """
-    return s.str.replace(r"\([^()]*\)", "")
+    return s.str.replace(r"\([^()]*\)", "", regex=True)
 
 
 def remove_curly_brackets(s: pd.Series):
@@ -466,7 +465,7 @@ def remove_curly_brackets(s: pd.Series):
     :meth:`remove_square_brackets`
 
     """
-    return s.str.replace(r"\{[^{}]*\}", "")
+    return s.str.replace(r"\{[^{}]*\}", "", regex=True)
 
 
 def remove_square_brackets(s: pd.Series):
@@ -490,7 +489,7 @@ def remove_square_brackets(s: pd.Series):
 
 
     """
-    return s.str.replace(r"\[[^\[\]]*\]", "")
+    return s.str.replace(r"\[[^\[\]]*\]", "", regex=True)
 
 
 def remove_angle_brackets(s: pd.Series):
@@ -513,7 +512,7 @@ def remove_angle_brackets(s: pd.Series):
     :meth:`remove_square_brackets`
 
     """
-    return s.str.replace(r"<[^<>]*>", "")
+    return s.str.replace(r"<[^<>]*>", "", regex=True)
 
 
 def remove_brackets(s: pd.Series):
@@ -567,7 +566,7 @@ def remove_html_tags(s: pd.Series) -> pd.Series:
       | &([a-z0-9]+|\#[0-9]{1,6}|\#x[0-9a-f]{1,6}); # Remove &nbsp;
       """
 
-    return s.str.replace(pattern, "")
+    return s.str.replace(pattern, "", regex=True)
 
 
 def tokenize(s: pd.Series) -> pd.Series:
@@ -595,7 +594,7 @@ def tokenize(s: pd.Series) -> pd.Series:
         rf"((\w)([{string.punctuation}])(?:\B|$)|(?:^|\B)([{string.punctuation}])(\w))"
     )
 
-    return s.str.replace(pattern, r"\2 \3 \4 \5").str.split()
+    return s.str.replace(pattern, r"\2 \3 \4 \5", regex=True).str.split()
 
 
 def tokenize_with_phrases(s: pd.Series, min_count: int = 5, threshold: int = 10):
@@ -661,7 +660,7 @@ def replace_urls(s: pd.Series, symbol: str) -> pd.Series:
 
     pattern = r"http\S+"
 
-    return s.str.replace(pattern, symbol)
+    return s.str.replace(pattern, symbol, regex=True)
 
 
 def remove_urls(s: pd.Series) -> pd.Series:

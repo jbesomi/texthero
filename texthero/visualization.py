@@ -179,7 +179,7 @@ def top_words(s: pd.Series, normalize=False) -> pd.Series:
 
     return (
         s.str.replace(
-            pattern, r"\2 \3"
+            pattern, r"\2 \3", regex=True
         )  # \2 and \3 permits to keep the character around the punctuation.
         .str.split()  # now split by space
         .explode()  # one word for each line

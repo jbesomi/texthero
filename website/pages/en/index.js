@@ -320,7 +320,7 @@ hero.scatterplot(
                         <small>... need more? find named entities</small>
                     </h2>
                     <Code>{`df['named_entities'] = (
-    hero.named_entities(df['text']
+    hero.named_entities(df['text'])
 )
 df[['named_entities', 'topic']].head(2)
                         `}

@@ -2,7 +2,7 @@
 The texthero.preprocess module allow for efficient pre-processing of text-based Pandas Series and DataFrame.
 """
 
-from gensim.sklearn_api.phrases import PhrasesTransformer
+from gensim.models.phrases import Phrases
 import re
 import string
 from typing import Optional, Set
@@ -749,10 +749,12 @@ def phrases(
         s = tokenize(s)
 
     delimiter = symbol.encode("utf-8")
-    phrases = PhrasesTransformer(
-        min_count=min_count, threshold=threshold, delimiter=delimiter
+    phrases_model = Phrases(
+        sentences, min_count=1, threshold=1, connector_words=ENGLISH_CONNECTOR_WORDS
     )
-    return pd.Series(phrases.fit_transform(s.values), index=s.index)
+    output = pd.Series(phrases_model[s.values], index=s.index)
+    print(output)
+    return output 
 
 
 @InputSeries(TextSeries)

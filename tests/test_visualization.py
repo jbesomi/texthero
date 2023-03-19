@@ -2,8 +2,9 @@ import string
 
 import pandas as pd
 import doctest
+import warnings
 
-from texthero import visualization
+from texthero import visualization, preprocessing, representation
 from . import PandasTestCase
 
 
@@ -79,3 +80,60 @@ class TestVisualization(PandasTestCase):
     def test_wordcloud(self):
         s = pd.Series("one two three")
         self.assertEqual(visualization.wordcloud(s), None)
+
+    """
+    Test visualize_topics
+    """
+
+    def test_visualize_topics_clustering_for_second_input(self):
+
+        s = pd.Series(
+            [
+                "Football, Sports, Soccer",
+                "music, violin, orchestra",
+                "football, fun, sports",
+                "music, band, guitar",
+            ]
+        )
+
+        s_tfidf = (
+            s.pipe(preprocessing.clean)
+            .pipe(preprocessing.tokenize)
+            .pipe(representation.tfidf)
+        )
+        s_cluster = (
+            s_tfidf.pipe(representation.normalize)
+            .pipe(representation.pca, n_components=2)
+            .pipe(representation.kmeans, n_clusters=2)
+        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.assertIsNotNone(
+                visualization.visualize_topics(s_tfidf, s_cluster, return_figure=True)
+            )
+
+    def test_visualize_topics_topic_modelling_for_second_input(self):
+
+        s = pd.Series(
+            [
+                "Football, Sports, Soccer",
+                "music, violin, orchestra",
+                "football, fun, sports",
+                "music, band, guitar",
+            ]
+        )
+
+        s_tfidf = (
+            s.pipe(preprocessing.clean)
+            .pipe(preprocessing.tokenize)
+            .pipe(representation.tfidf)
+        )
+        s_lda = s_tfidf.pipe(representation.normalize).pipe(
+            representation.lda, n_components=2
+        )
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.assertIsNotNone(
+                visualization.visualize_topics(s_tfidf, s_lda, return_figure=True)
+            )

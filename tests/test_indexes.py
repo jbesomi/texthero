@@ -12,6 +12,13 @@ s_text = pd.Series(["Test"], index=[5])
 s_tokenized_lists = pd.Series([["Test", "Test2"], ["Test3"]], index=[5, 6])
 s_numeric = pd.Series([5.0], index=[5])
 s_numeric_lists = pd.Series([[5.0, 5.0], [6.0, 6.0]], index=[5, 6])
+df_document_term = pd.DataFrame(
+    [[0.125, 0.0, 0.0, 0.125, 0.250], [0.0, 0.25, 0.125, 0.0, 0.125]],
+    index=[5, 6],
+    columns=pd.MultiIndex.from_product([["test"], ["!", ".", "?", "TEST", "Test"]]),
+    dtype="Sparse",
+)
+
 
 # Define all test cases. Every test case is a list
 # of [name of test case, function to test, tuple of valid input for the function].
@@ -62,9 +69,21 @@ test_cases_representation = [
     ["pca", representation.pca, (s_numeric_lists, 0)],
     ["nmf", representation.nmf, (s_numeric_lists,)],
     ["tsne", representation.tsne, (s_numeric_lists,)],
+    ["truncatedSVD", representation.tsne, (s_numeric_lists, 1)],
+    ["lda", representation.tsne, (s_numeric_lists, 1)],
     ["kmeans", representation.kmeans, (s_numeric_lists, 1)],
     ["dbscan", representation.dbscan, (s_numeric_lists,)],
     ["meanshift", representation.meanshift, (s_numeric_lists,)],
+    [
+        "topics_from_topic_model",
+        representation.topics_from_topic_model,
+        (s_numeric_lists,),
+    ],
+    [
+        "top_words_per_document",
+        representation.relevant_words_per_document,
+        (df_document_term,),
+    ],
 ]
 
 test_cases_visualization = []
@@ -94,12 +113,22 @@ class AbstractIndexTest(PandasTestCase):
     def test_correct_index(self, name, test_function, valid_input):
         s = valid_input[0]
         result_s = test_function(*valid_input)
-        t_same_index = pd.Series(s.values, s.index)
+
+        if isinstance(s, pd.Series):
+            t_same_index = pd.Series(s.values, s.index)
+        else:
+            t_same_index = pd.DataFrame(s.values, s.index)
+
         self.assertTrue(result_s.index.equals(t_same_index.index))
 
     @parameterized.expand(test_cases)
     def test_incorrect_index(self, name, test_function, valid_input):
         s = valid_input[0]
         result_s = test_function(*valid_input)
-        t_different_index = pd.Series(s.values, index=None)
+
+        if isinstance(s, pd.Series):
+            t_different_index = pd.Series(s.values, index=None)
+        else:
+            t_different_index = pd.DataFrame(s.values, index=None)
+
         self.assertFalse(result_s.index.equals(t_different_index.index))

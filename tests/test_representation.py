@@ -315,3 +315,160 @@ class AbstractRepresentationTest(PandasTestCase):
         pd.testing.assert_frame_equal(
             result, correct_output, check_dtype=False, rtol=0.1, atol=0.1,
         )
+
+    """
+    Test Topic Modelling (not all are suitable for parameterization).
+    `topics_from_topic_model, lda, truncatedSVD` already tested above.
+
+    Here, we test
+    `relevant_words_per_document, relevant_words_per_topic, topic_matrices`
+    """
+
+    def test_relevant_words_per_document(self):
+        s = pd.Series(
+            [
+                "Football, Sports, Soccer",
+                "music, violin, orchestra",
+                "football, fun, sports",
+                "music, band, guitar",
+            ]
+        )
+
+        s_tfidf = (
+            s.pipe(preprocessing.clean)
+            .pipe(preprocessing.tokenize)
+            .pipe(representation.tfidf)
+        )
+        s_result = representation.relevant_words_per_document(s_tfidf, n_words=2)
+
+        s_true = pd.Series(
+            [
+                ["soccer", "sports"],
+                ["violin", "orchestra"],
+                ["fun", "sports"],
+                ["guitar", "band"],
+            ],
+        )
+        pd.testing.assert_series_equal(s_result, s_true)
+
+    def test_relevant_words_per_topic(self):
+        s = pd.Series(
+            [
+                "Football, Sports, Soccer",
+                "music, violin, orchestra",
+                "football, fun, sports",
+                "music, band, guitar",
+            ]
+        )
+        s_tfidf = (
+            s.pipe(preprocessing.clean)
+            .pipe(preprocessing.tokenize)
+            .pipe(representation.tfidf)
+        )
+        s_cluster = (
+            s_tfidf.pipe(representation.normalize)
+            .pipe(representation.pca, n_components=2, random_state=42)
+            .pipe(representation.kmeans, n_clusters=2, random_state=42)
+        )
+
+        s_document_topic, s_topic_term = representation.topic_matrices(
+            s_tfidf, s_cluster
+        )
+        s_document_topic_distribution = representation.normalize(
+            s_document_topic, norm="l1"
+        )
+        s_topic_term_distribution = representation.normalize(s_topic_term, norm="l1")
+
+        s_result = representation.relevant_words_per_topic(
+            s_tfidf, s_document_topic_distribution, s_topic_term_distribution, n_words=3
+        )
+        s_true = pd.Series(
+            [["music", "violin", "orchestra"], ["sports", "football", "soccer"]],
+        )
+        pd.testing.assert_series_equal(s_result, s_true, check_names=False)
+
+    def test_topic_matrices_clustering_for_second_input(self):
+
+        s = pd.Series(["Football", "Music", "Football", "Music",])
+
+        s_tfidf = (
+            s.pipe(preprocessing.clean)
+            .pipe(preprocessing.tokenize)
+            .pipe(representation.tfidf)
+        )
+        s_cluster = (
+            s_tfidf.pipe(representation.normalize)
+            .pipe(representation.pca, n_components=2, random_state=42)
+            .pipe(representation.kmeans, n_clusters=2, random_state=42)
+        )
+
+        s_document_topic_result, s_topic_term_result = representation.topic_matrices(
+            s_tfidf, s_cluster
+        )
+
+        s_document_topic_true = pd.DataFrame(
+            [[0, 1], [1, 0], [0, 1], [1, 0]], columns=[0, 1]
+        )
+
+        s_topic_term_true = pd.DataFrame(
+            [[0.0, 3.021651], [3.021651, 0.0]], columns=["football", "music"]
+        )
+
+        pd.testing.assert_frame_equal(
+            s_document_topic_result,
+            s_document_topic_true,
+            check_less_precise=True,
+            check_dtype=False,
+        )
+
+        pd.testing.assert_frame_equal(
+            s_topic_term_result,
+            s_topic_term_true,
+            check_less_precise=True,
+            check_dtype=False,
+        )
+
+    def test_visualize_topics_topic_modelling_for_second_input(self):
+
+        s = pd.Series(["Football", "Music", "Football", "Music",])
+
+        s_tfidf = (
+            s.pipe(preprocessing.clean)
+            .pipe(preprocessing.tokenize)
+            .pipe(representation.tfidf)
+        )
+        s_lda = s_tfidf.pipe(representation.normalize).pipe(
+            representation.lda, n_components=2, random_state=42
+        )
+
+        s_document_topic_result, s_topic_term_result = representation.topic_matrices(
+            s_tfidf, s_lda
+        )
+
+        s_document_topic_true = pd.DataFrame(
+            [
+                [0.744417, 0.255583],
+                [0.255583, 0.744417],
+                [0.744417, 0.255583],
+                [0.255583, 0.744417],
+            ],
+            columns=[0, 1],
+        )
+
+        s_topic_term_true = pd.DataFrame(
+            [[2.249368, 0.772283], [0.772283, 2.249369]], columns=["football", "music"],
+        )
+
+        pd.testing.assert_frame_equal(
+            s_document_topic_result,
+            s_document_topic_true,
+            check_less_precise=True,
+            check_dtype=False,
+        )
+
+        pd.testing.assert_frame_equal(
+            s_topic_term_result,
+            s_topic_term_true,
+            check_less_precise=True,
+            check_dtype=False,
+        )

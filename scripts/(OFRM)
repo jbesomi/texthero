@@ -1,0 +1,40 @@
+DNS Lookup
+Use this DNS lookup tool to easily view the standard DNS records for a domain.
+Coinbase.com
+
+A : 104.18.4.43
+A : 104.18.5.43
+AAAA : 2606:4700::6812:52b
+AAAA : 2606:4700::6812:42b
+MX : 1 aspmx.l.google.com.
+MX : 10 alt3.aspmx.l.google.com.
+MX : 10 alt4.aspmx.l.google.com.
+MX : 5 alt1.aspmx.l.google.com.
+MX : 5 alt2.aspmx.l.google.com.
+NS : sam.ns.cloudflare.com.
+NS : sue.ns.cloudflare.com.
+TXT : "1password-site-verification=2JYSQ7TWXVDP7DWPHTZRLBRESI"
+TXT : "MS=ms23710130"
+TXT : "ahrefs-site-verification_cc6fbe8f6b26b9b07f97892536cda45b7ce7917b040baacf81facc14e820e887"
+TXT : "applause-verification:4e8f0335-526a-4a52-8da4-f4ecedc931ef"
+TXT : "apple-domain-verification=8HpWlON81jar5xva"
+TXT : "atlassian-domain-verification=hDuZ4Ho1Rts/J4kaoxR9K2Qnywy2Uo+GV8bDIwXEsE4uovTo0vcL+8AVpI4+3j2V"
+TXT : "docusign=642eb6c3-8697-4ebd-8a51-a48a05713018"
+TXT : "docusign=8ace657e-b7bc-4ed2-9cb3-8aa55e7d0597"
+TXT : "dropbox-domain-verification=ap29irieph9f"
+TXT : "facebook-domain-verification=qbphvvib286cbvluswam0qypj99ofm"
+TXT : "google-site-verification=5Vrsjlgs1uhwN5AU2Vg1TPuEBasNdhX3CgxtfTdXOQQ"
+TXT : "google-site-verification=F0pv18D2VaKyH77hhpE9OZuDVipTi_YUGqKGzSOUfnQ"
+TXT : "google-site-verification=Mf-1A418PKg0c9t2nAaK4zjWv2A_N8uNGu078EWqCZc"
+TXT : "google-site-verification=gwL0hNTFdVrIO_MRAN6m07GJs7aZFGC-XkJcaq8We2s"
+TXT : "google-site-verification=qyTrwiATuVJMBGXPOYPOr-NSYW90-idNJU7uTh6-v7Y"
+TXT : "google-site-verification=veWhMcRP5-ISDr7tSAI7Mjh9ELqQ7ndOvbHY-xcsl9o"
+TXT : "keybase-site-verification=UlVJ6_FMc2ceBGKC2cjhy8FF1iGw-iuvdc1WzRX7foU"
+TXT : "miro-verification=790dc2010116c659230c25705d7a5358cd78d99b"
+TXT : "mongodb-site-verification=hME8tDWzya9rzZbckAxwpiEiv12KX8Gd"
+TXT : "onetrust-domain-verification=f131f1d66b1b445cb8edc36b8edd78e8"
+TXT : "slack-domain-verification=MlD3gzX7txujPKkmWsULE6w264DyKkTkxbT7nPTd"
+TXT : "smartsheet-site-validation=kyRJbpapnk1ExowiffTo0f3Pc-9XKoSh"
+TXT : "stripe-verification=f66cbde9148f67d1bb992cfe5ae3fc1efa829c816b726b0bb28ff243325344dc"
+TXT : "v=spf1 include:amazonses.com include:_spf.google.com -all"
+SOA : sam.ns.cloudflare.com. dns.cloudflare.com. 2312785569 10000 2400 604800 1800

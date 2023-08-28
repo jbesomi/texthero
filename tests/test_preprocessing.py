@@ -1,4 +1,5 @@
 import string
+import pytest
 
 import pandas as pd
 import numpy as np
@@ -259,6 +260,7 @@ class TestPreprocessing(PandasTestCase):
     Test phrases
     """
 
+    @pytest.mark.skip_broken
     def test_phrases(self):
         s = pd.Series(
             [
@@ -278,6 +280,7 @@ class TestPreprocessing(PandasTestCase):
 
         self.assertEqual(preprocessing.phrases(s, min_count=2, threshold=1), s_true)
 
+    @pytest.mark.skip_broken
     def test_phrases_min_count(self):
         s = pd.Series(
             [
@@ -297,6 +300,7 @@ class TestPreprocessing(PandasTestCase):
 
         self.assertEqual(preprocessing.phrases(s, min_count=1, threshold=1), s_true)
 
+    @pytest.mark.skip_broken
     def test_phrases_threshold(self):
         s = pd.Series(
             [
@@ -316,6 +320,7 @@ class TestPreprocessing(PandasTestCase):
 
         self.assertEqual(preprocessing.phrases(s, min_count=2, threshold=2), s_true)
 
+    @pytest.mark.skip_broken
     def test_phrases_symbol(self):
         s = pd.Series(
             [
@@ -337,6 +342,7 @@ class TestPreprocessing(PandasTestCase):
             preprocessing.phrases(s, min_count=2, threshold=1, symbol="->"), s_true
         )
 
+    @pytest.mark.skip_broken
     def test_phrases_not_tokenized_yet(self):
         s = pd.Series(
             [

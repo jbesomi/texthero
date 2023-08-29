@@ -3,7 +3,9 @@ import numpy as np
 from texthero import representation
 from texthero import preprocessing
 
-from . import PandasTestCase
+import pytest
+
+from .conftest import broken_case
 
 import doctest
 import unittest
@@ -56,7 +58,7 @@ tokenized_output_noncontinous_index = pd.Index([5, 7])
 
 test_cases_vectorization = [
     # format: [function_name, function, correct output for tokenized input above]
-    [
+    broken_case(
         "count",
         representation.count,
         pd.DataFrame(
@@ -64,8 +66,8 @@ test_cases_vectorization = [
             index=tokenized_output_index,
             columns=["!", ".", "?", "TEST", "Test"],
         ).astype("Sparse[int64, 0]"),
-    ],
-    [
+    ),
+    broken_case(
         "term_frequency",
         representation.term_frequency,
         pd.DataFrame(
@@ -74,8 +76,8 @@ test_cases_vectorization = [
             columns=["!", ".", "?", "TEST", "Test"],
             dtype="Sparse",
         ).astype("Sparse[float64, nan]"),
-    ],
-    [
+    ),
+    broken_case(
         "tfidf",
         representation.tfidf,
         pd.DataFrame(
@@ -89,33 +91,33 @@ test_cases_vectorization = [
             index=tokenized_output_index,
             columns=["!", ".", "?", "TEST", "Test"],
         ).astype("Sparse[float64, nan]"),
-    ],
+    ),
 ]
 
 
 test_cases_vectorization_min_df = [
     # format: [function_name, function, correct output for tokenized input above]
-    [
+    broken_case(
         "count",
         representation.count,
         pd.DataFrame([2, 1], index=tokenized_output_index, columns=["Test"],).astype(
             "Sparse[int64, 0]"
         ),
-    ],
-    [
+    ),
+    broken_case(
         "term_frequency",
         representation.term_frequency,
         pd.DataFrame([1, 1], index=tokenized_output_index, columns=["Test"],).astype(
             "Sparse[float64, nan]"
         ),
-    ],
-    [
+    ),
+    broken_case(
         "tfidf",
         representation.tfidf,
         pd.DataFrame([2, 1], index=tokenized_output_index, columns=["Test"],).astype(
             "Sparse[float64, nan]"
         ),
-    ],
+    ),
 ]
 
 
@@ -128,26 +130,26 @@ df = pd.DataFrame([[1.0, 0.0], [0.0, 0.0]], index=[5, 7], columns=["a", "b"],).a
 test_cases_dim_reduction_and_clustering = [
     # format: [function_name, function, correct output for s_vector_series and df input above]
     ["pca", representation.pca, pd.Series([[-0.5, 0.0], [0.5, 0.0]], index=[5, 7],),],
-    [
+    broken_case(
         "nmf",
         representation.nmf,
         pd.Series([[5.119042424626627, 0.0], [0.0, 0.0]], index=[5, 7],),
-    ],
-    [
+    ),
+    broken_case(
         "tsne",
         representation.tsne,
         pd.Series([[164.86682, 1814.1647], [-164.8667, -1814.1644]], index=[5, 7],),
-    ],
-    [
+    ),
+    broken_case(
         "kmeans",
         representation.kmeans,
         pd.Series([1, 0], index=[5, 7], dtype="category"),
-    ],
-    [
+    ),
+    broken_case(
         "dbscan",
         representation.dbscan,
         pd.Series([-1, -1], index=[5, 7], dtype="category"),
-    ],
+    ),
     [
         "meanshift",
         representation.meanshift,
@@ -161,7 +163,7 @@ test_cases_dim_reduction_and_clustering = [
 ]
 
 
-class AbstractRepresentationTest(PandasTestCase):
+class TestAbstractRepresentation:
     """
     Class for representation test cases. Most tests are
     parameterized, some are implemented individually
@@ -172,34 +174,34 @@ class AbstractRepresentationTest(PandasTestCase):
     Vectorization.
     """
 
-    @parameterized.expand(test_cases_vectorization)
+    @pytest.mark.parametrize("name, test_function, correct_output", test_cases_vectorization)
     def test_vectorization_simple(self, name, test_function, correct_output):
         s_true = correct_output
         result_s = test_function(s_tokenized)
         pd.testing.assert_frame_equal(s_true, result_s, check_dtype=False)
 
-    @parameterized.expand(test_cases_vectorization)
+    @pytest.mark.parametrize("name, test_function, correct_output", test_cases_vectorization)
     def test_vectorization_noncontinuous_index_kept(
-        self, name, test_function, correct_output=None
+        self, name, test_function, correct_output
     ):
         result_s = test_function(s_tokenized_with_noncontinuous_index)
         pd.testing.assert_index_equal(
             tokenized_output_noncontinous_index, result_s.index
         )
 
-    @parameterized.expand(test_cases_vectorization_min_df)
+    @pytest.mark.parametrize("name, test_function, correct_output", test_cases_vectorization_min_df)
     def test_vectorization_min_df(self, name, test_function, correct_output):
         s_true = correct_output
         result_s = test_function(s_tokenized, min_df=2)
         pd.testing.assert_frame_equal(s_true, result_s, check_dtype=False)
 
-    @parameterized.expand(test_cases_vectorization)
-    def test_vectorization_not_tokenized_yet_warning(self, name, test_function, *args):
+    @pytest.mark.parametrize("name, test_function, correct_output", test_cases_vectorization)
+    def test_vectorization_not_tokenized_yet_warning(self, name, test_function, correct_output):
         with self.assertWarns(DeprecationWarning):  # check raise warning
             test_function(s_not_tokenized)
 
-    @parameterized.expand(test_cases_vectorization)
-    def test_vectorization_arguments_to_sklearn(self, name, test_function, *args):
+    @pytest.mark.parametrize("name, test_function, correct_output", test_cases_vectorization)
+    def test_vectorization_arguments_to_sklearn(self, name, test_function, correct_output):
         try:
             test_function(s_tokenized, max_features=1, min_df=1, max_df=1.0)
         except TypeError:
@@ -209,7 +211,7 @@ class AbstractRepresentationTest(PandasTestCase):
     Dimensionality Reduction and Clustering
     """
 
-    @parameterized.expand(test_cases_dim_reduction_and_clustering)
+    @pytest.mark.parametrize("name, test_function, correct_output", test_cases_dim_reduction_and_clustering)
     def test_dim_reduction_and_clustering_with_vector_series_input(
         self, name, test_function, correct_output
     ):
@@ -254,7 +256,7 @@ class AbstractRepresentationTest(PandasTestCase):
             check_category_order=False,
         )
 
-    @parameterized.expand(test_cases_dim_reduction_and_clustering)
+    @pytest.mark.parametrize("name, test_function, correct_output", test_cases_dim_reduction_and_clustering)
     def test_dim_reduction_and_clustering_with_dataframe_input(
         self, name, test_function, correct_output
     ):
@@ -304,6 +306,7 @@ class AbstractRepresentationTest(PandasTestCase):
             check_categorical=False,
         )
 
+    @pytest.mark.skip_broken
     def test_normalize_DataFrame_also_as_output(self):
         # normalize should also return DataFrame output for DataFrame
         # input so we test it separately

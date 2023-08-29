@@ -68,16 +68,6 @@ Now, the next main milestone is to provide *multilingual support* and for this b
 For improving the python toolkit and provide an even better experience, your aid and feedback are crucial. If you have any problem or suggestion please open a Github [issue](https://github.com/jbesomi/texthero/issues), we will be glad to support you and help you.
 
 
-<h2 align="center">Beta version</h2>
-
-Texthero's community is growing fast. Texthero though is still in a beta version; soon, a faster and better version will be released and it will bring some major changes.
-
-For instance, to give a more granular control over the pipeline, starting from the next version on, all `preprocessing` functions will require as argument an already tokenized text. This will be a major change.
-
-Once released the stable version (Texthero 2.0), backward compatibility will be respected. Until this point, backward compatibility will be present but it will be weaker.
-
-If you want to be part of this fast-growing movements, do not hesitate to contribute: [CONTRIBUTING](./CONTRIBUTING.md)!
-
 <h2 align="center">Installation</h2>
 
 Install texthero via `pip`:
@@ -244,7 +234,7 @@ Full documentation: [nlp](https://texthero.org/docs/api-nlp)
 
 Supported **representation** algorithms:
 1. Term frequency (`count`)
-1. Term frequency-inverse document frequency (`tfidf`)
+2. Term frequency-inverse document frequency (`tfidf`)
 
 Supported **clustering** algorithms:
 1. K-means (`kmeans`)

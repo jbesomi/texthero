@@ -108,7 +108,7 @@ const siteConfig = {
   // No .html extensions for paths.
   cleanUrl: true,
 
-  gaTrackingId: "G-F9P2X3MWVG",
+  gaTrackingId: "G-0V7XX3QG4C",
 
   // Open Graph and Twitter card images.
   ogImage: "img/T.png",

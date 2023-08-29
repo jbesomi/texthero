@@ -100,6 +100,8 @@ const siteConfig = {
     "/js/code-block-buttons.js",
     "//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js",
     "/js/start_highlight.js",
+    "https://www.googletagmanager.com/gtag/js?id=G-0V7XX3QG4C",
+    "/js/analytics.js",
   ],
   stylesheets: ["/css/code-block-buttons.css", "/css/sphinx_basic.css"],
 
@@ -107,8 +109,6 @@ const siteConfig = {
   onPageNav: "separate",
   // No .html extensions for paths.
   cleanUrl: true,
-
-  gaTrackingId: "G-0V7XX3QG4C",
 
   // Open Graph and Twitter card images.
   ogImage: "img/T.png",

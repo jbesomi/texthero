@@ -404,3 +404,60 @@ class TestPreprocessing(PandasTestCase):
         s_true = pd.Series("Hi  , we will remove you")
 
         self.assertEqual(preprocessing.remove_hashtags(s), s_true)
+
+    """
+    Test describe DataFrame
+    """
+
+    def test_describe(self):
+        df = pd.DataFrame(
+            [
+                ["here here here here go", "sport"],
+                ["There There There", "sport"],
+                ["Test, Test, Test, Test, Test, Test, Test, Test", "sport"],
+                [np.nan, "music"],
+                ["super super", pd.NA],
+                [pd.NA, pd.NA],
+                ["great great great great great", "music"],
+            ],
+            columns=["text", "topics"],
+        )
+        df_description = preprocessing.describe(df["text"], df["topics"])
+        df_true = pd.DataFrame(
+            [
+                7,
+                7,
+                2,
+                ["Test", "great", "here", "There", "super", "go"],
+                ["test", "great", "super", "go"],
+                6.0,
+                2.0,
+                15.0,
+                5.196152422706632,
+                3.0,
+                5.0,
+                5.0,
+                0.6,
+                0.4,
+            ],
+            columns=["Value"],
+            index=pd.MultiIndex.from_tuples(
+                [
+                    ("number of documents", ""),
+                    ("number of unique documents", ""),
+                    ("number of missing documents", ""),
+                    ("most common words", ""),
+                    ("most common words excluding stopwords", ""),
+                    ("average document length", ""),
+                    ("length of shortest document", ""),
+                    ("length of longest document", ""),
+                    ("standard deviation of document lengths", ""),
+                    ("25th percentile document lengths", ""),
+                    ("50th percentile document lengths", ""),
+                    ("75th percentile document lengths", ""),
+                    ("label distribution", "sport"),
+                    ("label distribution", "music"),
+                ]
+            ),
+        )
+        pd.testing.assert_frame_equal(df_description, df_true, check_less_precise=True)

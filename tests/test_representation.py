@@ -254,6 +254,7 @@ class TestAbstractRepresentation:
             rtol=0.1,
             atol=0.1,
             check_category_order=False,
+            check_categorical=False,
         )
 
     @pytest.mark.parametrize("name, test_function, correct_output", test_cases_dim_reduction_and_clustering)

@@ -404,3 +404,45 @@ class TestPreprocessing(PandasTestCase):
         s_true = pd.Series("Hi  , we will remove you")
 
         self.assertEqual(preprocessing.remove_hashtags(s), s_true)
+
+    """
+    Filter Extremes
+    """
+
+    def test_filter_extrems(self):
+        s = pd.Series(
+            [
+                "Here one two one one one go there",
+                "two go one one one two two two is important",
+            ]
+        )
+        s_result = s.pipe(preprocessing.tokenize).pipe(preprocessing.filter_extremes, 3)
+        s_true = pd.Series(
+            [
+                ["one", "two", "one", "one", "one", "go"],
+                ["two", "go", "one", "one", "one", "two", "two", "two"],
+            ]
+        )
+        pd.testing.assert_series_equal(s_result, s_true)
+
+    def test_filter_extrems_min_and_max(self):
+        s = pd.Series(
+            [
+                "Here one two one one one go there",
+                "two go one one one two two two is important",
+                "one two three four this is good",
+                "here one one important statement",
+            ]
+        )
+        s_result = s.pipe(preprocessing.tokenize).pipe(
+            preprocessing.filter_extremes, min_df=2, max_df=3
+        )
+        s_true = pd.Series(
+            [
+                ["two", "go"],
+                ["two", "go", "two", "two", "two", "is", "important"],
+                ["two", "is"],
+                ["important"],
+            ]
+        )
+        pd.testing.assert_series_equal(s_result, s_true)

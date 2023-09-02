@@ -1,6 +1,7 @@
 import string
 
 import pandas as pd
+import plotly
 import doctest
 
 from texthero import visualization
@@ -79,3 +80,19 @@ class TestVisualization(PandasTestCase):
     def test_wordcloud(self):
         s = pd.Series("one two three")
         self.assertEqual(visualization.wordcloud(s), None)
+
+    """
+    Test visualization of describe function
+    """
+
+    def test_visualisation_describe(self):
+        df = pd.DataFrame(
+            [["one two three", "here"], ["one two three", "here"]],
+            columns=["text", "topic"],
+        )
+        self.assertIsInstance(
+            visualization.visualize_describe(
+                df["text"], df["topic"], return_figure=True
+            ),
+            plotly.graph_objs._figure.Figure,
+        )

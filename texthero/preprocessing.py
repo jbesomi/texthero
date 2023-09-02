@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 
 from texthero._types import TokenSeries, TextSeries, InputSeries
+from texthero import visualization
 
 from typing import List, Callable, Union
 
@@ -918,3 +919,100 @@ def remove_hashtags(s: TextSeries) -> TextSeries:
         with a custom symbol.
     """
     return replace_hashtags(s, " ")
+
+
+@InputSeries(TextSeries)
+def describe(s: TextSeries, s_labels: pd.Series = None) -> pd.DataFrame:
+    """
+    Describe a given pandas TextSeries (consisting of strings
+    in every cell). Additionally gather information
+    about class labels if they are given in s_labels.
+
+    Examples
+    --------
+    >>> import texthero as hero
+    >>> import pandas as pd
+    >>> df = pd.read_csv("https://raw.githubusercontent.com/jbesomi/texthero/master/dataset/bbcsport.csv") # doctest: +SKIP
+    >>> df.head(2) # doctest: +SKIP
+                                                    text      topic
+    0  Claxton hunting first major medal\n\nBritish h...  athletics
+    1  O'Sullivan could run in Worlds\n\nSonia O'Sull...  athletics
+    >>> # Describe both the text and the labels
+    >>> hero.describe(df["text"], df["topic"]) # doctest: +SKIP
+                                                                                                  Value
+    number of documents                                                                             737
+    number of unique documents                                                                      727
+    number of missing documents                                                                       0
+    most common words                                          [the, to, a, in, and, of, for, ", I, is]
+    most common words excluding stopwords             [said, first, england, game, one, year, two, w...
+    average document length                                                                     387.803
+    length of shortest document                                                                     119
+    length of longest document                                                                     1855
+    standard deviation of document lengths                                                      210.728
+    25th percentile document lengths                                                                241
+    50th percentile document lengths                                                                340
+    75th percentile document lengths                                                                494
+    label distribution                     football                                            0.359566
+                                           rugby                                               0.199457
+                                           cricket                                              0.16825
+                                           athletics                                           0.137042
+                                           tennis                                              0.135685
+    """
+    # Get values we need for several calculations.
+    description = {}
+    s_tokenized = tokenize(s)
+    has_content_mask = has_content(s)
+    document_lengths = s_tokenized[has_content_mask].map(lambda x: len(x))
+    document_lengths_description = document_lengths.describe()
+
+    # Collect statistics.
+    description["number of documents"] = len(s.index)
+    description["number of unique documents"] = len(s.unique())
+    description["number of missing documents"] = (~has_content_mask).sum()
+    description["most common words"] = visualization.top_words(s).index[:10].tolist()
+    description["most common words excluding stopwords"] = (
+        s.pipe(clean).pipe(visualization.top_words).index[:10].tolist()
+    )
+
+    description["average document length"] = document_lengths_description["mean"]
+    description["length of shortest document"] = document_lengths_description["min"]
+    description["length of longest document"] = document_lengths_description["max"]
+    description[
+        "standard deviation of document lengths"
+    ] = document_lengths_description["std"]
+    description["25th percentile document lengths"] = document_lengths_description[
+        "25%"
+    ]
+    description["50th percentile document lengths"] = document_lengths_description[
+        "50%"
+    ]
+    description["75th percentile document lengths"] = document_lengths_description[
+        "75%"
+    ]
+
+    # Create output Series.
+    s_description = pd.Series(description)
+
+    # Potentially add information about label distribution.
+    if s_labels is not None:
+
+        s_labels_distribution = s_labels.value_counts() / s_labels.value_counts().sum()
+
+        # Put the labels distribution into s_description with multiindex to look nice.
+        s_labels_distribution.index = pd.MultiIndex.from_product(
+            [["label distribution"], s_labels_distribution.index.values]
+        )
+
+        s_description.index = pd.MultiIndex.from_product(
+            [s_description.index.values, [""]]
+        )
+
+        s_description = pd.concat([s_description, s_labels_distribution])
+
+    # DataFrame will look much nicer for users when printing.
+    df_description = pd.DataFrame(
+        s_description.values, index=s_description.index, columns=["Value"]
+    )
+    df_description.index.name = "Statistic"
+
+    return df_description

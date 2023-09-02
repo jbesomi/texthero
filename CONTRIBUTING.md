@@ -75,6 +75,7 @@ Texthero is there for the NLP-community. If you have an idea on how we can impro
 1. Before writing a new function or make any changes, look at similar code for inspiration and to learn about the code format and style. 
 1. The maximal docstring line length should be 75 characters. This should be manually done as `black` formatting does not enforce limits on docstring line length.
 1. Use American English instead of British English (e.g. categorize instead of categorise) when writing comments and documenting docstrings.
+1. Use as most as possible quotes or sentences that you can find from superheroes comics or movies, like "HULK SMASH!", "I am Groot!", "I am the vengeance, I am the night, I am BATMAN!", "With great power comes great responsibility.", etc...
 1. For default argument values, use the defaults from the underlying library if applicable (e.g. the default arguments
 from sklearn if using a sklearn algorithm). If other values are used, add a small comment explaining why. Additionally, look for similar functions and use their default values.
 1. Default values are defined as follows: `x : int, optional, default=2`

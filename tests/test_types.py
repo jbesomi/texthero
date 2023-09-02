@@ -42,6 +42,22 @@ class TestTypes(PandasTestCase):
 
         self.assertRaises(TypeError, f, pd.Series([["token", "ized"]]))
 
+    def test_inputseries_function_executes_correctly_CategorySeries(self):
+        @_types.InputSeries(_types.ClusterSeries)
+        def f(s, t):
+            return t
+
+        s = pd.Series([0, 1], dtype="category")
+        t = "test"
+        self.assertEqual(f(s, t), t)
+
+    def test_inputseries_wrong_type_CategorySeries(self):
+        @_types.InputSeries(_types.ClusterSeries)
+        def f(s):
+            pass
+
+        self.assertRaises(TypeError, f, pd.Series([0, 1]))
+
     def test_inputseries_correct_type_textseries(self):
         @_types.InputSeries(_types.TextSeries)
         def f(s):
